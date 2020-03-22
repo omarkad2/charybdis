@@ -12,22 +12,23 @@ import ma.markware.charybdis.model.annotation.Udt;
 import ma.markware.charybdis.model.annotation.UdtField;
 import org.apache.commons.lang3.StringUtils;
 
-public class UdtClassParser implements ClassAndFieldParser<UdtMetaSource, AbstractFieldMetaSource> {
+public class UdtClassParser extends AbstractClassAndFieldParser<UdtMetaSource, AbstractFieldMetaSource> {
 
   private static UdtClassParser INSTANCE;
 
-  private UdtClassParser() {
+  private UdtClassParser(FieldTypeParser fieldTypeParser) {
+    super(fieldTypeParser);
   }
 
   public static UdtClassParser getInstance() {
     if(INSTANCE == null) {
-      INSTANCE = new UdtClassParser();
+      INSTANCE = new UdtClassParser(new FieldTypeParser());
     }
     return INSTANCE;
   }
 
   @Override
-  public UdtMetaSource parseClass(final Element annotatedClass, final Types typeUtils, final AptParsingContext aptParsingContext) {
+  public UdtMetaSource parseClass(final Element annotatedClass, final Types types, final AptParsingContext aptParsingContext) {
     final Udt udt = annotatedClass.getAnnotation(Udt.class);
     final UdtMetaSource udtMetaSource = new UdtMetaSource();
 
@@ -49,22 +50,21 @@ public class UdtClassParser implements ClassAndFieldParser<UdtMetaSource, Abstra
 
     Stream<? extends Element> fieldsToScan = Stream.concat(annotatedClass.getEnclosedElements().stream()
                                                                            .filter(element-> element.getKind() == ElementKind.FIELD),
-                                                           extractSuperTypesFields(annotatedClass, typeUtils));
+                                                           extractSuperTypesFields(annotatedClass, types));
 
     udtMetaSource.setUdtFields(
-        fieldsToScan.map(fieldElement -> parseField(fieldElement, udtMetaSource.getUdtName(), aptParsingContext))
+        fieldsToScan.map(fieldElement -> parseField(fieldElement, udtMetaSource.getUdtName(), types, aptParsingContext))
                     .filter(Objects::nonNull)
                     .collect(Collectors.toList()));
 
-    aptParsingContext.addUdtMetaSource(udtMetaSource.getUdtName(), udtMetaSource);
     return udtMetaSource;
   }
 
   @Override
-  public AbstractFieldMetaSource parseField(final Element annotatedField, final String udtName, final AptParsingContext aptParsingContext) {
+  public AbstractFieldMetaSource parseField(final Element annotatedField, final String udtName, Types types, final AptParsingContext aptParsingContext) {
     final UdtField udtField = annotatedField.getAnnotation(UdtField.class);
     if (udtField != null) {
-      return parseGenericField(annotatedField, udtField.name());
+      return parseGenericField(annotatedField, udtField.name(), types, aptParsingContext);
     }
     return null;
   }

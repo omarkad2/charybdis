@@ -41,6 +41,15 @@ public class CharybdisProcessorTest extends AbstractProcessorTest {
         process(sources, target));
   }
 
+  @Test
+  public void test() throws IOException, InterruptedException {
+    File source = new File(packagePath, "KeyspaceDefinition.java");
+    File source2 = new File(packagePath, "User.java");
+    List<String> sources = Arrays.asList(source.getPath(), source2.getPath());
+
+    process(sources, target);
+  }
+
   @Override
   protected Collection<String> getAPTOptions() {
       return Collections.singletonList("-AdefaultOverwrite=true");

@@ -14,12 +14,19 @@ import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Types;
 import ma.markware.charybdis.apt.metasource.AbstractFieldMetaSource;
+import ma.markware.charybdis.apt.metasource.FieldTypeMetaSource;
 import ma.markware.charybdis.apt.parser.exception.CharybdisParsingException;
 import org.apache.commons.lang3.StringUtils;
 
-public interface ClassAndFieldParser<CLASS_META_SOURCE, FIELD_META_SOURCE> extends ClassParser<CLASS_META_SOURCE> {
+abstract class AbstractClassAndFieldParser<CLASS_META_SOURCE, FIELD_META_SOURCE> implements ClassParser<CLASS_META_SOURCE> {
 
-  default void validateKeyspaceName(String className, String keyspaceName, AptParsingContext aptParsingContext) {
+  private final FieldTypeParser fieldTypeParser;
+
+  AbstractClassAndFieldParser(FieldTypeParser fieldTypeParser) {
+    this.fieldTypeParser = fieldTypeParser;
+  }
+
+  void validateKeyspaceName(String className, String keyspaceName, AptParsingContext aptParsingContext) {
     if (StringUtils.isBlank(keyspaceName)) {
       throw new CharybdisParsingException(format("Entity %s must be linked to a keyspace", className));
     }
@@ -28,7 +35,7 @@ public interface ClassAndFieldParser<CLASS_META_SOURCE, FIELD_META_SOURCE> exten
     }
   }
 
-  default Stream<? extends Element> extractSuperTypesFields(final Element annotatedElement, Types typeUtils) {
+  Stream<? extends Element> extractSuperTypesFields(final Element annotatedElement, Types typeUtils) {
     Stream<? extends Element> superTypeFields = Stream.empty();
     Element superClass = typeUtils.asElement(((TypeElement) annotatedElement).getSuperclass());
     while (superClass != null) {
@@ -42,24 +49,18 @@ public interface ClassAndFieldParser<CLASS_META_SOURCE, FIELD_META_SOURCE> exten
     return superTypeFields;
   }
 
-  default String getGenericType(String fieldType) {
-    int endIdx = fieldType.indexOf("<");
-    return endIdx > -1 ? fieldType.substring(0, endIdx) : fieldType;
-  }
-
-  default List<String> parseFieldSubTypes(TypeMirror fieldType) {
-    final List<String> fieldSubTypes = new ArrayList<>();
+  private List<FieldTypeMetaSource> parseFieldSubTypes(TypeMirror fieldType, Types types, AptParsingContext aptParsingContext) {
+    final List<FieldTypeMetaSource> fieldSubTypes = new ArrayList<>();
     if (fieldType.getKind() == TypeKind.DECLARED) {
       final DeclaredType declaredType = asDeclared(fieldType);
       for (final TypeMirror parameterizedType : declaredType.getTypeArguments()) {
-        fieldSubTypes.add(parameterizedType.toString());
+        fieldSubTypes.add(fieldTypeParser.parseFieldType(parameterizedType, types, aptParsingContext));
       }
     }
     return fieldSubTypes;
   }
 
-
-  default AbstractFieldMetaSource parseGenericField(Element annotatedField, String annotationName) {
+  AbstractFieldMetaSource parseGenericField(Element annotatedField, String annotationName, Types types, AptParsingContext aptParsingContext) {
     final AbstractFieldMetaSource fieldMetaSource = new AbstractFieldMetaSource();
 
     final String rawFieldName = annotatedField.getSimpleName().toString();
@@ -71,13 +72,13 @@ public interface ClassAndFieldParser<CLASS_META_SOURCE, FIELD_META_SOURCE> exten
     fieldMetaSource.setName(annotationName.toLowerCase());
 
     final TypeMirror fieldType = annotatedField.asType();
-    fieldMetaSource.setFieldType(getGenericType(fieldType.toString()));
+    fieldMetaSource.setFieldType(fieldTypeParser.parseFieldType(fieldType, types, aptParsingContext));
 
-    List<String> fieldSubTypes = parseFieldSubTypes(fieldType);
+    List<FieldTypeMetaSource> fieldSubTypes = parseFieldSubTypes(fieldType, types, aptParsingContext);
     fieldMetaSource.setFieldSubTypes(fieldSubTypes);
 
     return fieldMetaSource;
   }
 
-  FIELD_META_SOURCE parseField(Element annotatedField, String enclosingElementName, AptParsingContext aptParsingContext);
+  abstract FIELD_META_SOURCE parseField(Element annotatedField, String enclosingElementName, Types types, AptParsingContext aptParsingContext);
 }

@@ -1,7 +1,6 @@
 package ma.markware.charybdis.apt;
 
 import com.google.auto.service.AutoService;
-import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Sets;
 import java.util.Map;
 import java.util.Set;
@@ -31,64 +30,24 @@ import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
 @AutoService(javax.annotation.processing.Processor.class)
 public class CharybdisProcessor extends AbstractProcessor {
 
+  private static final Boolean ALLOW_OTHER_PROCESSORS_TO_CLAIM_ANNOTATIONS = Boolean.FALSE;
+
   private Filer filer;
   private Messager messager;
-  private Types typeUtils;
+  private Types types;
   private AptParsingContext aptParsingContext;
   private VelocityEngine velocityEngine;
-  private boolean executed = false;
 
   @Override
   public synchronized void init(final ProcessingEnvironment processingEnv) {
     super.init(processingEnv);
     filer = processingEnv.getFiler();
     messager = processingEnv.getMessager();
-    typeUtils = processingEnv.getTypeUtils();
+    types = processingEnv.getTypeUtils();
     aptParsingContext = new AptParsingContext();
     velocityEngine = new VelocityEngine();
     velocityEngine.setProperty("file.resource.loader.class", ClasspathResourceLoader.class.getName());
     velocityEngine.init();
-  }
-
-  @Override
-  public boolean process(final Set<? extends TypeElement> annotations, final RoundEnvironment roundEnv) {
-    if (!executed) {
-      this.executed = true;
-      Map<String, KeyspaceMetaSource> keyspaceMetaSourceMap = parseKeyspaceClasses(roundEnv, typeUtils, aptParsingContext);
-      Map<String, UdtMetaSource> udtMetaSourceMap = parseUdtClasses(roundEnv, typeUtils, aptParsingContext);
-      Map<String, TableMetaSource> tableMetaSourceMap = parseTableClasses(roundEnv, typeUtils, aptParsingContext);
-    }
-    return true;
-  }
-
-  @VisibleForTesting
-  private Map<String, KeyspaceMetaSource> parseKeyspaceClasses(final RoundEnvironment roundEnv, Types typeUtils, AptParsingContext aptParsingContext) {
-    return roundEnv.getElementsAnnotatedWith(Keyspace.class)
-                   .stream()
-                   .map(annotatedClass ->
-                           KeyspaceClassParser.getInstance().parseClass(annotatedClass, typeUtils, aptParsingContext))
-                   .collect(Collectors.toMap(KeyspaceMetaSource::getKeyspaceName,
-                                      Function.identity()));
-  }
-
-  @VisibleForTesting
-  private Map<String, UdtMetaSource> parseUdtClasses(final RoundEnvironment roundEnv, Types typeUtils, AptParsingContext aptParsingContext) {
-    return roundEnv.getElementsAnnotatedWith(Udt.class)
-                   .stream()
-                   .map(annotatedClass ->
-                            UdtClassParser.getInstance().parseClass(annotatedClass, typeUtils, aptParsingContext))
-                   .collect(Collectors.toMap(UdtMetaSource::getUdtName,
-                                             Function.identity()));
-  }
-
-  @VisibleForTesting
-  private Map<String, TableMetaSource> parseTableClasses(final RoundEnvironment roundEnv, Types typeUtils, AptParsingContext aptParsingContext) {
-    return roundEnv.getElementsAnnotatedWith(Table.class)
-                   .stream()
-                   .map(annotatedClass ->
-                            TableClassParser.getInstance().parseClass(annotatedClass, typeUtils, aptParsingContext))
-                   .collect(Collectors.toMap(TableMetaSource::getTableName,
-                                             Function.identity()));
   }
 
   @Override
@@ -101,5 +60,49 @@ public class CharybdisProcessor extends AbstractProcessor {
   @Override
   public SourceVersion getSupportedSourceVersion() {
     return SourceVersion.latest();
+  }
+
+  @Override
+  public boolean process(final Set<? extends TypeElement> annotations, final RoundEnvironment roundEnv) {
+
+    aptParsingContext.setUdtClasses(getUdtClasses(roundEnv));
+
+    Map<String, KeyspaceMetaSource> keyspaceMetaSourceMap = parseKeyspaceClasses(roundEnv, types, aptParsingContext);
+    Map<String, UdtMetaSource> udtMetaSourceMap = parseUdtClasses(roundEnv, types, aptParsingContext);
+    Map<String, TableMetaSource> tableMetaSourceMap = parseTableClasses(roundEnv, types, aptParsingContext);
+    return ALLOW_OTHER_PROCESSORS_TO_CLAIM_ANNOTATIONS;
+  }
+
+  private Map<String, KeyspaceMetaSource> parseKeyspaceClasses(final RoundEnvironment roundEnv, Types typeUtils, AptParsingContext aptParsingContext) {
+    return roundEnv.getElementsAnnotatedWith(Keyspace.class)
+                   .stream()
+                   .map(annotatedClass ->
+                           KeyspaceClassParser.getInstance().parseClass(annotatedClass, typeUtils, aptParsingContext))
+                   .collect(Collectors.toMap(KeyspaceMetaSource::getKeyspaceName,
+                                      Function.identity()));
+  }
+
+  private Map<String, UdtMetaSource> parseUdtClasses(final RoundEnvironment roundEnv, Types typeUtils, AptParsingContext aptParsingContext) {
+    return roundEnv.getElementsAnnotatedWith(Udt.class)
+                   .stream()
+                   .map(annotatedClass ->
+                            UdtClassParser.getInstance().parseClass(annotatedClass, typeUtils, aptParsingContext))
+                   .collect(Collectors.toMap(UdtMetaSource::getUdtName,
+                                             Function.identity()));
+  }
+
+  private Map<String, TableMetaSource> parseTableClasses(final RoundEnvironment roundEnv, Types typeUtils, AptParsingContext aptParsingContext) {
+    return roundEnv.getElementsAnnotatedWith(Table.class)
+                   .stream()
+                   .map(annotatedClass ->
+                            TableClassParser.getInstance().parseClass(annotatedClass, typeUtils, aptParsingContext))
+                   .collect(Collectors.toMap(TableMetaSource::getTableName,
+                                             Function.identity()));
+  }
+
+  private Set<String> getUdtClasses(final RoundEnvironment roundEnv) {
+    return roundEnv.getElementsAnnotatedWith(Udt.class).stream()
+                   .map(element -> element.asType().toString())
+                   .collect(Collectors.toSet());
   }
 }

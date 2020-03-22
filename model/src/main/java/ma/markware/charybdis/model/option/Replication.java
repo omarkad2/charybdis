@@ -13,27 +13,24 @@ public class Replication {
     return replicationClass;
   }
 
-  public Replication setReplicationClass(final ReplicationStrategyClassEnum replicationClass) {
+  public void setReplicationClass(final ReplicationStrategyClassEnum replicationClass) {
     this.replicationClass = replicationClass;
-    return this;
   }
 
   public int getReplicationFactor() {
     return replicationFactor;
   }
 
-  public Replication setReplicationFactor(final int replicationFactor) {
+  public void setReplicationFactor(final int replicationFactor) {
     this.replicationFactor = replicationFactor;
-    return this;
   }
 
   public Map<String, Integer> getDatacenterReplicaMap() {
     return datacenterReplicaMap;
   }
 
-  public Replication setDatacenterReplicaMap(final Map<String, Integer> datacenterReplicaMap) {
+  public void setDatacenterReplicaMap(final Map<String, Integer> datacenterReplicaMap) {
     this.datacenterReplicaMap = datacenterReplicaMap;
-    return this;
   }
 
   public String toCqlString() {

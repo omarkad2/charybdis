@@ -26,22 +26,23 @@ import ma.markware.charybdis.model.option.SequenceModelEnum;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 
-public class TableClassParser implements ClassAndFieldParser<TableMetaSource, ColumnFieldMetaSource> {
+public class TableClassParser extends AbstractClassAndFieldParser<TableMetaSource, ColumnFieldMetaSource> {
 
   private static TableClassParser INSTANCE;
 
-  private TableClassParser() {
+  private TableClassParser(FieldTypeParser fieldTypeParser) {
+    super(fieldTypeParser);
   }
 
   public static TableClassParser getInstance() {
     if(INSTANCE == null) {
-      INSTANCE = new TableClassParser();
+      INSTANCE = new TableClassParser(new FieldTypeParser());
     }
     return INSTANCE;
   }
 
   @Override
-  public TableMetaSource parseClass(final Element annotatedClass, final Types typeUtils, final AptParsingContext aptParsingContext) {
+  public TableMetaSource parseClass(final Element annotatedClass, final Types types, final AptParsingContext aptParsingContext) {
     final Table table = annotatedClass.getAnnotation(Table.class);
     final TableMetaSource tableMetaSource = new TableMetaSource();
 
@@ -63,8 +64,9 @@ public class TableClassParser implements ClassAndFieldParser<TableMetaSource, Co
 
     Stream<? extends Element> fieldsToScan = Stream.concat(annotatedClass.getEnclosedElements().stream()
                                                                          .filter(element-> element.getKind() == ElementKind.FIELD),
-                                                           extractSuperTypesFields(annotatedClass, typeUtils));
-    final List<ColumnFieldMetaSource> columns = fieldsToScan.map(fieldElement -> parseField(fieldElement, tableMetaSource.getTableName(), aptParsingContext))
+                                                           extractSuperTypesFields(annotatedClass, types));
+    final List<ColumnFieldMetaSource> columns = fieldsToScan.map(fieldElement -> parseField(fieldElement, tableMetaSource.getTableName(), types,
+                                                                                            aptParsingContext))
                                                             .filter(Objects::nonNull)
                                                             .collect(Collectors.toList());
     tableMetaSource.setColumns(columns);
@@ -85,10 +87,10 @@ public class TableClassParser implements ClassAndFieldParser<TableMetaSource, Co
   }
 
   @Override
-  public ColumnFieldMetaSource parseField(final Element annotatedField, final String tableName, final AptParsingContext aptParsingContext) {
+  public ColumnFieldMetaSource parseField(final Element annotatedField, final String tableName, Types types, final AptParsingContext aptParsingContext) {
     final Column column = annotatedField.getAnnotation(Column.class);
     if (column != null) {
-      AbstractFieldMetaSource abstractFieldMetaSource = parseGenericField(annotatedField, column.name());
+      AbstractFieldMetaSource abstractFieldMetaSource = parseGenericField(annotatedField, column.name(), types, aptParsingContext);
       final ColumnFieldMetaSource columnMetaSource = new ColumnFieldMetaSource(abstractFieldMetaSource);
 
       final PartitionKey partitionKey = annotatedField.getAnnotation(PartitionKey.class);
@@ -116,7 +118,8 @@ public class TableClassParser implements ClassAndFieldParser<TableMetaSource, Co
       final GeneratedValue generatedValue = annotatedField.getAnnotation(GeneratedValue.class);
       if (generatedValue != null) {
         try {
-          final SequenceModelEnum sequenceModel = SequenceModelEnum.findSequenceModel(Class.forName(columnMetaSource.getFieldType()));
+          final SequenceModelEnum sequenceModel = SequenceModelEnum.findSequenceModel(Class.forName(columnMetaSource.getFieldType()
+                                                                                                                    .getFullname()));
           if (sequenceModel != null) {
             columnMetaSource.setSequenceModel(sequenceModel);
           } else {
@@ -125,11 +128,11 @@ public class TableClassParser implements ClassAndFieldParser<TableMetaSource, Co
           }
         } catch (final ClassNotFoundException e) {
           throw new CharybdisParsingException(format("Class not found %s values for column '%s' will not be automatically generated",
-                                                     columnMetaSource.getFieldType(), columnMetaSource.getName(), e));
+                                                     columnMetaSource.getFieldType(), columnMetaSource.getName()), e);
         }
       }
 
-      // TODO: ...
+      // TODO: ...Check if date type supported
       columnMetaSource.setCreationDate(annotatedField.getAnnotation(CreationDate.class) != null);
       columnMetaSource.setLastUpdatedDate(annotatedField.getAnnotation(LastUpdatedDate.class) != null);
       return columnMetaSource;
