@@ -55,12 +55,12 @@ class FieldTypeParser {
     return types.erasure(typeMirror).toString();
   }
 
+  private String getGenericType(Type fieldType) {
+    return getGenericType(fieldType.toString());
+  }
+  
   private String getGenericType(String fieldType) {
     int endIdx = fieldType.indexOf("<");
     return endIdx > -1 ? fieldType.substring(0, endIdx) : fieldType;
-  }
-
-  private String getGenericType(Type fieldType) {
-    return getGenericType(fieldType.toString());
   }
 }

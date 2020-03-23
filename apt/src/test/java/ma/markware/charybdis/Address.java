@@ -15,4 +15,27 @@ public class Address {
   @UdtField
   private String city;
 
+  public int getNumber() {
+    return number;
+  }
+
+  public void setNumber(final int number) {
+    this.number = number;
+  }
+
+  public String getStreet() {
+    return street;
+  }
+
+  public void setStreet(final String street) {
+    this.street = street;
+  }
+
+  public String getCity() {
+    return city;
+  }
+
+  public void setCity(final String city) {
+    this.city = city;
+  }
 }

@@ -1,10 +1,10 @@
 package ma.markware.charybdis.apt.parser;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.lang.model.element.Element;
-import javax.lang.model.element.ElementKind;
 import javax.lang.model.util.Types;
 import ma.markware.charybdis.apt.metasource.AbstractFieldMetaSource;
 import ma.markware.charybdis.apt.metasource.UdtMetaSource;
@@ -29,6 +29,8 @@ public class UdtClassParser extends AbstractClassAndFieldParser<UdtMetaSource, A
 
   @Override
   public UdtMetaSource parseClass(final Element annotatedClass, final Types types, final AptParsingContext aptParsingContext) {
+    validateMandatoryConstructors(annotatedClass);
+
     final Udt udt = annotatedClass.getAnnotation(Udt.class);
     final UdtMetaSource udtMetaSource = new UdtMetaSource();
 
@@ -48,14 +50,14 @@ public class UdtClassParser extends AbstractClassAndFieldParser<UdtMetaSource, A
     }
     udtMetaSource.setUdtName(udtName.toLowerCase());
 
-    Stream<? extends Element> fieldsToScan = Stream.concat(annotatedClass.getEnclosedElements().stream()
-                                                                           .filter(element-> element.getKind() == ElementKind.FIELD),
-                                                           extractSuperTypesFields(annotatedClass, types));
+    Stream<? extends Element> fields = extractFields(annotatedClass, types);
 
-    udtMetaSource.setUdtFields(
-        fieldsToScan.map(fieldElement -> parseField(fieldElement, udtMetaSource.getUdtName(), types, aptParsingContext))
-                    .filter(Objects::nonNull)
-                    .collect(Collectors.toList()));
+    List<AbstractFieldMetaSource> udtFields = fields.map(fieldElement -> parseField(fieldElement, udtMetaSource.getUdtName(), types, aptParsingContext))
+                                                  .filter(Objects::nonNull)
+                                                  .collect(Collectors.toList());
+    validateMandatoryMethods(annotatedClass, udtFields, types);
+    udtMetaSource.setUdtFields(udtFields);
+
 
     return udtMetaSource;
   }

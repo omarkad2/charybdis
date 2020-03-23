@@ -8,7 +8,6 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.lang.model.element.Element;
-import javax.lang.model.element.ElementKind;
 import javax.lang.model.util.Types;
 import ma.markware.charybdis.apt.metasource.AbstractFieldMetaSource;
 import ma.markware.charybdis.apt.metasource.ColumnFieldMetaSource;
@@ -43,6 +42,8 @@ public class TableClassParser extends AbstractClassAndFieldParser<TableMetaSourc
 
   @Override
   public TableMetaSource parseClass(final Element annotatedClass, final Types types, final AptParsingContext aptParsingContext) {
+    validateMandatoryConstructors(annotatedClass);
+
     final Table table = annotatedClass.getAnnotation(Table.class);
     final TableMetaSource tableMetaSource = new TableMetaSource();
 
@@ -62,14 +63,15 @@ public class TableClassParser extends AbstractClassAndFieldParser<TableMetaSourc
     }
     tableMetaSource.setTableName(tableName.toLowerCase());
 
-    Stream<? extends Element> fieldsToScan = Stream.concat(annotatedClass.getEnclosedElements().stream()
-                                                                         .filter(element-> element.getKind() == ElementKind.FIELD),
-                                                           extractSuperTypesFields(annotatedClass, types));
-    final List<ColumnFieldMetaSource> columns = fieldsToScan.map(fieldElement -> parseField(fieldElement, tableMetaSource.getTableName(), types,
+    Stream<? extends Element> fields = extractFields(annotatedClass, types);
+
+    final List<ColumnFieldMetaSource> columns = fields.map(fieldElement -> parseField(fieldElement, tableMetaSource.getTableName(), types,
                                                                                             aptParsingContext))
                                                             .filter(Objects::nonNull)
                                                             .collect(Collectors.toList());
+    validateMandatoryMethods(annotatedClass, columns, types);
     tableMetaSource.setColumns(columns);
+
     tableMetaSource.setPartitionKeyColumns(columns.stream()
                                                      .filter(ColumnFieldMetaSource::isPartitionKey)
                                                      .sorted(Comparator.comparingInt(ColumnFieldMetaSource::getPartitionKeyIndex))
@@ -82,6 +84,10 @@ public class TableClassParser extends AbstractClassAndFieldParser<TableMetaSourc
     if (CollectionUtils.isEmpty(tableMetaSource.getPartitionKeyColumns())) {
       throw new CharybdisParsingException(format("There should be at least one partition key defined for the table '%s'", tableName));
     }
+
+    validateMandatoryMethods(annotatedClass, columns, types);
+
+    validateMandatoryConstructors(annotatedClass);
 
     return tableMetaSource;
   }

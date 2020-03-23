@@ -1,11 +1,13 @@
 package ma.markware.charybdis.apt.metasource;
 
 import java.util.List;
+import javax.lang.model.type.TypeMirror;
 
 public class AbstractFieldMetaSource {
 
   private String fieldName;
   private String name;
+  private TypeMirror typeMirror;
   private FieldTypeMetaSource fieldType;
   private List<FieldTypeMetaSource> fieldSubTypes;
   private UdtMetaSource udtMetaSource;
@@ -17,6 +19,7 @@ public class AbstractFieldMetaSource {
   public AbstractFieldMetaSource(AbstractFieldMetaSource abstractFieldMetaSource) {
     this.fieldName = abstractFieldMetaSource.fieldName;
     this.name = abstractFieldMetaSource.name;
+    this.typeMirror = abstractFieldMetaSource.typeMirror;
     this.fieldType = abstractFieldMetaSource.fieldType;
     this.fieldSubTypes = abstractFieldMetaSource.fieldSubTypes;
     this.udtMetaSource = abstractFieldMetaSource.udtMetaSource;
@@ -38,6 +41,14 @@ public class AbstractFieldMetaSource {
 
   public void setName(final String name) {
     this.name = name;
+  }
+
+  public TypeMirror getTypeMirror() {
+    return typeMirror;
+  }
+
+  public void setTypeMirror(final TypeMirror typeMirror) {
+    this.typeMirror = typeMirror;
   }
 
   public FieldTypeMetaSource getFieldType() {
