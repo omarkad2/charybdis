@@ -18,9 +18,9 @@ import ma.markware.charybdis.apt.apt.CharybdisProcessor;
 
 public abstract class AbstractProcessorTest {
 
-  private final JavaCompiler compiler = new SimpleCompiler();
+  private final JavaCompiler compiler = new CustomCompiler();
 
-  List<File> fcg = new ArrayList<>();
+  private List<File> fcg = new ArrayList<>();
 
   CompilationResult process(List<String> classes, String target) {
     File out = new File("target/" + target);
@@ -64,7 +64,7 @@ public abstract class AbstractProcessorTest {
   }
 
 
-  static void delete(File file) {
+  private static void delete(File file) {
     if (file.isDirectory()) {
       for (File f : Objects.requireNonNull(file.listFiles())) {
         delete(f);

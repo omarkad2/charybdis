@@ -27,17 +27,17 @@ import javax.tools.ToolProvider;
 /**
  * Copied from querydsl repo: https://github.com/querydsl/querydsl
  */
-public class SimpleCompiler implements JavaCompiler {
+public class CustomCompiler implements JavaCompiler {
 
   private static final Joiner pathJoiner = Joiner.on(File.pathSeparator);
 
   private static boolean isSureFireBooter(URLClassLoader cl) {
     for (URL url : cl.getURLs()) {
-      if (url.getPath().contains("surefirebooter")) {
+      if (url.getPath()
+             .contains("surefirebooter")) {
         return true;
       }
     }
-
     return false;
   }
 
@@ -49,7 +49,8 @@ public class SimpleCompiler implements JavaCompiler {
         // manifest only jars in the classpath correctly
         URL url = cl.findResource("META-INF/MANIFEST.MF");
         Manifest manifest = new Manifest(url.openStream());
-        String classpath = manifest.getMainAttributes().getValue("Class-Path");
+        String classpath = manifest.getMainAttributes()
+                                   .getValue("Class-Path");
         for (String entry : classpath.split(" ")) {
           URL entryUrl = new URL(entry);
           String decodedPath = URLDecoder.decode(entryUrl.getPath(), "UTF-8");
@@ -58,7 +59,7 @@ public class SimpleCompiler implements JavaCompiler {
       } else {
         ClassLoader c = cl;
         while (c instanceof URLClassLoader) {
-          for (URL url : ((URLClassLoader)c).getURLs()) {
+          for (URL url : ((URLClassLoader) c).getURLs()) {
             String decodedPath = URLDecoder.decode(url.getPath(), "UTF-8");
             paths.add(new File(decodedPath).getAbsolutePath());
           }
@@ -71,28 +72,20 @@ public class SimpleCompiler implements JavaCompiler {
     }
   }
 
-  private final ClassLoader classLoader;
+  private final CustomClassLoader classLoader;
 
   private String classPath;
 
   private final JavaCompiler compiler;
 
-  SimpleCompiler() {
-    this(ToolProvider.getSystemJavaCompiler(), Thread.currentThread().getContextClassLoader());
-  }
-
-  private SimpleCompiler(JavaCompiler compiler, ClassLoader classLoader) {
-    this.compiler = compiler;
-    this.classLoader = classLoader;
+  CustomCompiler() {
+    this.compiler = ToolProvider.getSystemJavaCompiler();
+    this.classLoader = CustomClassLoader.getInstance();
   }
 
   private String getClasspath() {
     if (classPath == null) {
-      if (classLoader instanceof URLClassLoader) {
-        classPath = getClassPath((URLClassLoader) classLoader);
-      } else {
-        throw new IllegalArgumentException("Unsupported ClassLoader " + classLoader);
-      }
+      classPath = getClassPath(classLoader);
     }
     return classPath;
   }
@@ -103,19 +96,15 @@ public class SimpleCompiler implements JavaCompiler {
   }
 
   @Override
-  public StandardJavaFileManager getStandardFileManager(
-      DiagnosticListener<? super JavaFileObject> diagnosticListener, Locale locale,
+  public StandardJavaFileManager getStandardFileManager(DiagnosticListener<? super JavaFileObject> diagnosticListener, Locale locale,
       Charset charset) {
     return compiler.getStandardFileManager(diagnosticListener, locale, charset);
   }
 
   @Override
-  public CompilationTask getTask(Writer out, JavaFileManager fileManager,
-      DiagnosticListener<? super JavaFileObject> diagnosticListener,
-      Iterable<String> options, Iterable<String> classes,
-      Iterable<? extends JavaFileObject> compilationUnits) {
-    return compiler.getTask(out, fileManager, diagnosticListener, options, classes,
-                            compilationUnits);
+  public CompilationTask getTask(Writer out, JavaFileManager fileManager, DiagnosticListener<? super JavaFileObject> diagnosticListener,
+      Iterable<String> options, Iterable<String> classes, Iterable<? extends JavaFileObject> compilationUnits) {
+    return compiler.getTask(out, fileManager, diagnosticListener, options, classes, compilationUnits);
   }
 
   @Override
@@ -138,5 +127,4 @@ public class SimpleCompiler implements JavaCompiler {
     args.addAll(Arrays.asList(arguments));
     return compiler.run(in, out, err, args.toArray(new String[args.size()]));
   }
-
 }
