@@ -31,7 +31,7 @@ public class SimpleCompiler implements JavaCompiler {
 
   private static final Joiner pathJoiner = Joiner.on(File.pathSeparator);
 
-  protected static boolean isSureFireBooter(URLClassLoader cl) {
+  private static boolean isSureFireBooter(URLClassLoader cl) {
     for (URL url : cl.getURLs()) {
       if (url.getPath().contains("surefirebooter")) {
         return true;
@@ -41,7 +41,7 @@ public class SimpleCompiler implements JavaCompiler {
     return false;
   }
 
-  public static String getClassPath(URLClassLoader cl) {
+  private static String getClassPath(URLClassLoader cl) {
     try {
       List<String> paths = new ArrayList<>();
       if (isSureFireBooter(cl)) {
@@ -77,11 +77,11 @@ public class SimpleCompiler implements JavaCompiler {
 
   private final JavaCompiler compiler;
 
-  public SimpleCompiler() {
+  SimpleCompiler() {
     this(ToolProvider.getSystemJavaCompiler(), Thread.currentThread().getContextClassLoader());
   }
 
-  public SimpleCompiler(JavaCompiler compiler, ClassLoader classLoader) {
+  private SimpleCompiler(JavaCompiler compiler, ClassLoader classLoader) {
     this.compiler = compiler;
     this.classLoader = classLoader;
   }
