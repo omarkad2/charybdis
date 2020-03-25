@@ -47,6 +47,10 @@ public class User extends AbstractUser {
   @Column
   private HashMap<String, String> hashMap;
 
+  private User() {
+
+  }
+
   public UUID getId() {
     return id;
   }

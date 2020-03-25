@@ -9,6 +9,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import ma.markware.charybdis.apt.JavaFileBuilder.ColumnAttribute;
+import ma.markware.charybdis.apt.JavaFileBuilder.DefaultAttribute;
 import ma.markware.charybdis.apt.JavaFileBuilder.UdtAttribute;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -135,6 +136,21 @@ public class ValidationProcessorTest extends AbstractProcessorTest {
     CompilationResult processResult = process(sources, target);
     assertThat(processResult.getCode()).isNotEqualTo(0);
     assertThat(processResult.getErr()).contains("Setter is mandatory for field 'street' in class '" + className + "'");
+  }
+
+  @Test
+  void compilation_succeeds_should_ignore_default_attributes() throws IOException {
+    File source = new File(packagePath, "KeyspaceDefinition.java");
+    File source2 =createTempFile("Address", ".java");
+    String className = extractClassName(source2);
+    writeUsingOutputStream(source2, javaFileBuilder.setPackageName("ma.markware.charybdis.domain")
+                                                   .setAnnotation("Udt(keyspace=\"test-keyspace\", name=\"address\")")
+                                                   .setClassName(className)
+                                                   .setAttribute(new UdtAttribute("String", "street", true, true))
+                                                   .setAttribute(new DefaultAttribute("int", "number", false, false)));
+    List<String> sources = Arrays.asList(source.getPath(), source2.getPath());
+    CompilationResult processResult = process(sources, target);
+    assertThat(processResult.getCode()).isEqualTo(0);
   }
 
   @Override

@@ -87,7 +87,7 @@ public class JavaFileBuilder {
 
     @Override
     public String formatAttribute() {
-      return format("\nprivate %s %s;\n", ANNOTATION_PACKAGE, type, name);
+      return format("\nprivate %s %s;\n", type, name);
     }
   }
 
