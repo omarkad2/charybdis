@@ -14,7 +14,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import javax.tools.JavaCompiler;
-import ma.markware.charybdis.apt.apt.CharybdisProcessor;
 
 public abstract class AbstractProcessorTest {
 

@@ -1,9 +1,9 @@
 package ma.markware.charybdis.domain;
 
-import ma.markware.charybdis.apt.model.annotation.Udt;
-import ma.markware.charybdis.apt.model.annotation.UdtField;
+import ma.markware.charybdis.model.annotation.Udt;
+import ma.markware.charybdis.model.annotation.UdtField;
 
-@Udt(keyspace = "test-keyspace", name = "address")
+@Udt(keyspace = "test_keyspace", name = "address")
 public class Address {
 
   @UdtField

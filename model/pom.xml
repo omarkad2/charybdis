@@ -11,5 +11,14 @@
 
   <artifactId>charybdis-model</artifactId>
 
-
+  <dependencies>
+    <dependency>
+      <groupId>com.datastax.oss</groupId>
+      <artifactId>java-driver-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.datastax.oss</groupId>
+      <artifactId>java-driver-query-builder</artifactId>
+    </dependency>
+  </dependencies>
 </project>

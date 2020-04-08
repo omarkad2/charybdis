@@ -1,8 +1,8 @@
 package ma.markware.charybdis.domain;
 
-import ma.markware.charybdis.apt.model.annotation.Keyspace;
+import ma.markware.charybdis.model.annotation.Keyspace;
 
-@Keyspace(name = "test-keyspace")
+@Keyspace(name = "test_keyspace")
 public class KeyspaceDefinition {
 
 }

@@ -31,14 +31,14 @@ public class ValidationProcessorTest extends AbstractProcessorTest {
     File source = new File(packagePath, "KeyspaceDefinition.java");
     File source2 =createTempFile("KeyspaceDuplicate", ".java");
     writeUsingOutputStream(source2, javaFileBuilder.setPackageName("ma.markware.charybdis.domain")
-                                                   .setAnnotation("Keyspace(name = \"test-keyspace\")")
+                                                   .setAnnotation("Keyspace(name = \"test_keyspace\")")
                                                    .setClassName(extractClassName(source2)));
     List<String> sources = Arrays.asList(source.getPath(), source2.getPath());
 
     // Compilation fails
     CompilationResult processResult = process(sources, target);
     assertThat(processResult.getCode()).isNotEqualTo(0);
-    assertThat(processResult.getErr()).contains("keyspace 'test-keyspace' already exist");
+    assertThat(processResult.getErr()).contains("keyspace 'test_keyspace' already exist");
   }
 
   @Test
@@ -49,7 +49,7 @@ public class ValidationProcessorTest extends AbstractProcessorTest {
     // Compilation fails
     CompilationResult processResult = process(sources, target);
     assertThat(processResult.getCode()).isNotEqualTo(0);
-    assertThat(processResult.getErr()).contains("Keyspace test-keyspace doesn't exist");
+    assertThat(processResult.getErr()).contains("Keyspace test_keyspace doesn't exist");
   }
 
   @Test
@@ -58,7 +58,7 @@ public class ValidationProcessorTest extends AbstractProcessorTest {
     File source2 =createTempFile("User", ".java");
     String className = extractClassName(source2);
     writeUsingOutputStream(source2, javaFileBuilder.setPackageName("ma.markware.charybdis.domain")
-                                                   .setAnnotation("Table(keyspace=\"test-keyspace\", name=\"user\")")
+                                                   .setAnnotation("Table(keyspace=\"test_keyspace\", name=\"user\")")
                                                    .setClassName(className)
                                                    .setAttribute(new ColumnAttribute("String", "name", false, true, true)));
 
@@ -76,7 +76,7 @@ public class ValidationProcessorTest extends AbstractProcessorTest {
     File source2 =createTempFile("User", ".java");
     String className = extractClassName(source2);
     writeUsingOutputStream(source2, javaFileBuilder.setPackageName("ma.markware.charybdis.domain")
-                                                   .setAnnotation("Table(keyspace=\"test-keyspace\", name=\"user\")")
+                                                   .setAnnotation("Table(keyspace=\"test_keyspace\", name=\"user\")")
                                                    .setClassName(className)
                                                    .setAttribute(new ColumnAttribute("String", "name", true, false, true)));
     List<String> sources = Arrays.asList(source.getPath(), source2.getPath());
@@ -93,7 +93,7 @@ public class ValidationProcessorTest extends AbstractProcessorTest {
     File source2 =createTempFile("User", ".java");
     String className = extractClassName(source2);
     writeUsingOutputStream(source2, javaFileBuilder.setPackageName("ma.markware.charybdis.domain")
-                                                   .setAnnotation("Table(keyspace=\"test-keyspace\", name=\"user\")")
+                                                   .setAnnotation("Table(keyspace=\"test_keyspace\", name=\"user\")")
                                                    .setClassName(className)
                                                    .setAttribute(new ColumnAttribute("String", "name", true, true, false)));
     List<String> sources = Arrays.asList(source.getPath(), source2.getPath());
@@ -110,7 +110,7 @@ public class ValidationProcessorTest extends AbstractProcessorTest {
     File source2 =createTempFile("Address", ".java");
     String className = extractClassName(source2);
     writeUsingOutputStream(source2, javaFileBuilder.setPackageName("ma.markware.charybdis.domain")
-                                                   .setAnnotation("Udt(keyspace=\"test-keyspace\", name=\"address\")")
+                                                   .setAnnotation("Udt(keyspace=\"test_keyspace\", name=\"address\")")
                                                    .setClassName(className)
                                                    .setAttribute(new UdtAttribute("String", "street", false, true)));
     List<String> sources = Arrays.asList(source.getPath(), source2.getPath());
@@ -127,7 +127,7 @@ public class ValidationProcessorTest extends AbstractProcessorTest {
     File source2 =createTempFile("Address", ".java");
     String className = extractClassName(source2);
     writeUsingOutputStream(source2, javaFileBuilder.setPackageName("ma.markware.charybdis.domain")
-                                                   .setAnnotation("Udt(keyspace=\"test-keyspace\", name=\"address\")")
+                                                   .setAnnotation("Udt(keyspace=\"test_keyspace\", name=\"address\")")
                                                    .setClassName(className)
                                                    .setAttribute(new UdtAttribute("String", "street", true, false)));
     List<String> sources = Arrays.asList(source.getPath(), source2.getPath());
@@ -144,7 +144,7 @@ public class ValidationProcessorTest extends AbstractProcessorTest {
     File source2 =createTempFile("Address", ".java");
     String className = extractClassName(source2);
     writeUsingOutputStream(source2, javaFileBuilder.setPackageName("ma.markware.charybdis.domain")
-                                                   .setAnnotation("Udt(keyspace=\"test-keyspace\", name=\"address\")")
+                                                   .setAnnotation("Udt(keyspace=\"test_keyspace\", name=\"address\")")
                                                    .setClassName(className)
                                                    .setAttribute(new UdtAttribute("String", "street", true, true))
                                                    .setAttribute(new DefaultAttribute("int", "number", false, false)));

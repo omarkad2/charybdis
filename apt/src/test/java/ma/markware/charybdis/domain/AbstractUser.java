@@ -1,9 +1,9 @@
 package ma.markware.charybdis.domain;
 
 import java.time.Instant;
-import ma.markware.charybdis.apt.model.annotation.Column;
-import ma.markware.charybdis.apt.model.annotation.CreationDate;
-import ma.markware.charybdis.apt.model.annotation.LastUpdatedDate;
+import ma.markware.charybdis.model.annotation.Column;
+import ma.markware.charybdis.model.annotation.CreationDate;
+import ma.markware.charybdis.model.annotation.LastUpdatedDate;
 
 public class AbstractUser {
 

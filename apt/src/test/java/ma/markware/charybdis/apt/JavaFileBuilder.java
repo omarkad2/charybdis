@@ -9,7 +9,7 @@ import org.apache.commons.lang.WordUtils;
 
 public class JavaFileBuilder {
 
-  private static final String ANNOTATION_PACKAGE = "ma.markware.charybdis.apt.model.annotation";
+  private static final String ANNOTATION_PACKAGE = "ma.markware.charybdis.model.annotation";
 
   private String packageName;
   private String annotation;

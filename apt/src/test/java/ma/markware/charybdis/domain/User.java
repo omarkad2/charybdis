@@ -1,16 +1,15 @@
 package ma.markware.charybdis.domain;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import ma.markware.charybdis.apt.model.annotation.Column;
-import ma.markware.charybdis.apt.model.annotation.PartitionKey;
-import ma.markware.charybdis.apt.model.annotation.Table;
+import ma.markware.charybdis.model.annotation.Column;
+import ma.markware.charybdis.model.annotation.PartitionKey;
+import ma.markware.charybdis.model.annotation.Table;
 
-@Table(keyspace = "test-keyspace", name = "user")
+@Table(keyspace = "test_keyspace", name = "user")
 public class User extends AbstractUser {
 
   @Column
@@ -33,7 +32,7 @@ public class User extends AbstractUser {
   private Address address;
 
   @Column
-  private ArrayList<UUID> followers;
+  private List<UUID> followers;
 
   @Column
   private RoleEnum role;
@@ -45,9 +44,9 @@ public class User extends AbstractUser {
   private Map<String, String> map;
 
   @Column
-  private HashMap<String, String> hashMap;
+  private Map<String, String> hashMap;
 
-  private User() {
+  public User() {
 
   }
 
@@ -79,7 +78,7 @@ public class User extends AbstractUser {
     return lastname;
   }
 
-  public ArrayList<UUID> getFollowers() {
+  public List<UUID> getFollowers() {
     return followers;
   }
 
@@ -95,7 +94,7 @@ public class User extends AbstractUser {
     return map;
   }
 
-  public HashMap<String, String> getHashMap() {
+  public Map<String, String> getHashMap() {
     return hashMap;
   }
 
@@ -119,7 +118,7 @@ public class User extends AbstractUser {
     this.address = address;
   }
 
-  public void setFollowers(final ArrayList<UUID> followers) {
+  public void setFollowers(final List<UUID> followers) {
     this.followers = followers;
   }
 
@@ -135,7 +134,7 @@ public class User extends AbstractUser {
     this.map = map;
   }
 
-  public void setHashMap(final HashMap<String, String> hashMap) {
+  public void setHashMap(final Map<String, String> hashMap) {
     this.hashMap = hashMap;
   }
 }
