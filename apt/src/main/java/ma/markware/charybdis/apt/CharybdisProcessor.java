@@ -33,7 +33,7 @@ public class CharybdisProcessor extends AbstractProcessor {
     messager = processingEnv.getMessager();
     types = processingEnv.getTypeUtils();
     aptContext = new AptContext();
-    aptConfiguration = new AptConfiguration();
+    aptConfiguration = new AptDefaultConfiguration();
   }
 
   @Override
@@ -64,24 +64,24 @@ public class CharybdisProcessor extends AbstractProcessor {
   private void parse(final RoundEnvironment roundEnv) {
 
     roundEnv.getElementsAnnotatedWith(Keyspace.class).forEach(annotatedClass ->
-      aptContext.keyspaceMetaTypes.add(aptConfiguration.keyspaceParser.parse(annotatedClass, types, aptContext))
+      aptContext.keyspaceMetaTypes.add(aptConfiguration.getKeyspaceParser().parse(annotatedClass, types, aptContext))
     );
 
     roundEnv.getElementsAnnotatedWith(Udt.class).forEach(annotatedClass ->
-      aptContext.udtMetaTypes.add(aptConfiguration.udtParser.parse(annotatedClass, types, aptContext))
+      aptContext.udtMetaTypes.add(aptConfiguration.getUdtParser().parse(annotatedClass, types, aptContext))
     );
 
     roundEnv.getElementsAnnotatedWith(Table.class).forEach(annotatedClass ->
-      aptContext.tableMetaTypes.add(aptConfiguration.tableParser.parse(annotatedClass, types, aptContext))
+      aptContext.tableMetaTypes.add(aptConfiguration.getTableParser().parse(annotatedClass, types, aptContext))
     );
   }
 
   private void serialize() {
 
-    aptContext.keyspaceMetaTypes.forEach(keyspaceMetaType -> aptConfiguration.keyspaceSerializer.serialize(keyspaceMetaType, aptContext, filer));
+    aptContext.keyspaceMetaTypes.forEach(keyspaceMetaType -> aptConfiguration.getKeyspaceSerializer().serialize(keyspaceMetaType, aptContext, filer));
 
-    aptContext.udtMetaTypes.forEach(udtMetaType -> aptConfiguration.udtSerializer.serialize(udtMetaType, aptContext, filer));
+    aptContext.udtMetaTypes.forEach(udtMetaType -> aptConfiguration.getUdtSerializer().serialize(udtMetaType, aptContext, filer));
 
-    aptContext.tableMetaTypes.forEach(tableMetaType -> aptConfiguration.tableSerializer.serialize(tableMetaType, aptContext, filer));
+    aptContext.tableMetaTypes.forEach(tableMetaType -> aptConfiguration.getTableSerializer().serialize(tableMetaType, aptContext, filer));
   }
 }

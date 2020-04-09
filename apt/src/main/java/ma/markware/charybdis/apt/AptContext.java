@@ -28,8 +28,8 @@ public class AptContext {
     udtMetaTypes = new ArrayList<>();
     tableMetaTypes = new ArrayList<>();
     for (final Element element : roundEnv.getElementsAnnotatedWith(Udt.class)) {
-      String udtName = configuration.udtParser.resolveName(element);
-      String udtClassName = configuration.udtSerializer.getClassName(element.getSimpleName()
+      String udtName = configuration.getUdtParser().resolveName(element);
+      String udtClassName = configuration.getUdtSerializer().getClassName(element.getSimpleName()
                                                                                  .toString());
       udtContexts.put(element.asType().toString(), new UdtContext(udtClassName, udtName));
     }

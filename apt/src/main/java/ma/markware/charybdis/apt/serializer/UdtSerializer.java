@@ -27,6 +27,8 @@ import ma.markware.charybdis.model.metadata.UdtMetadata;
 
 public class UdtSerializer implements Serializer<UdtMetaType> {
 
+  private static final String SKIP_LINE = "\n";
+
   @Override
   public void serialize(final UdtMetaType udtMetaType, final AptContext aptContext, final Filer filer) {
 
@@ -40,16 +42,16 @@ public class UdtSerializer implements Serializer<UdtMetaType> {
                                                 .addSuperinterface(ParameterizedTypeName.get(ClassName.get(UdtMetadata.class),
                                                                                     TypeName.get(udtMetaType.getTypeMirror())))
                                                 .addFields(Arrays.asList(
-                                           buildStaticInstance(packageName, generatedClassName, udtName),
-                                           buildEntityNameField(SerializationConstants.KEYSPACE_NAME_ATTRIBUTE, keyspaceName),
-                                           buildEntityNameField(SerializationConstants.UDT_NAME_ATTRIBUTE, udtName),
-                                           buildUdtField(udtMetaType.getUdtFields(), aptContext)))
+                                                   buildStaticInstance(packageName, generatedClassName, udtName),
+                                                   buildEntityNameField(SerializationConstants.KEYSPACE_NAME_ATTRIBUTE, keyspaceName),
+                                                   buildEntityNameField(SerializationConstants.UDT_NAME_ATTRIBUTE, udtName),
+                                                   buildUdtField(udtMetaType.getUdtFields(), aptContext)))
                                                 .addMethods(Arrays.asList(
-                                           buildPrivateConstructor(),
-                                           buildGetEntityNameMethod(SerializationConstants.GET_KEYSPACE_NAME_METHOD, SerializationConstants.KEYSPACE_NAME_ATTRIBUTE),
-                                           buildGetEntityNameMethod(SerializationConstants.GET_UDT_NAME_METHOD, SerializationConstants.UDT_NAME_ATTRIBUTE),
-                                           buildSerializeMethod(udtMetaType, aptContext),
-                                           buildDeserializeMethod(udtMetaType, aptContext)))
+                                                   buildPrivateConstructor(),
+                                                   buildGetEntityNameMethod(SerializationConstants.GET_KEYSPACE_NAME_METHOD, SerializationConstants.KEYSPACE_NAME_ATTRIBUTE),
+                                                   buildGetEntityNameMethod(SerializationConstants.GET_UDT_NAME_METHOD, SerializationConstants.UDT_NAME_ATTRIBUTE),
+                                                   buildSerializeMethod(udtMetaType, aptContext),
+                                                   buildDeserializeMethod(udtMetaType, aptContext)))
                                                 .build();
 
     writeSerialization(packageName, className, udtMetadataSerialization, filer);
@@ -57,24 +59,25 @@ public class UdtSerializer implements Serializer<UdtMetaType> {
 
 
   private FieldSpec buildUdtField(List<UdtFieldMetaType> udtFields, final AptContext aptContext) {
-    CodeBlock.Builder initializerBuild = CodeBlock.builder().add("new $T($N, $N)", UserDefinedTypeBuilder.class,
+    CodeBlock.Builder initializerBuilder = CodeBlock.builder().add("new $T($N, $N)", UserDefinedTypeBuilder.class,
                                                                  SerializationConstants.KEYSPACE_NAME_ATTRIBUTE,
                                                                  SerializationConstants.UDT_NAME_ATTRIBUTE);
     for (UdtFieldMetaType udtField : udtFields) {
       String udtFieldName = udtField.getUdtFieldName();
       TypeDetail udtFieldType = udtField.getFieldType();
       List<TypeDetail> udtFieldSubTypes = udtField.getFieldSubTypes();
+      initializerBuilder.add(SKIP_LINE);
       switch (udtFieldType.getTypeDetailEnum()) {
         case LIST:
         case SET:
           TypeDetail udtFieldSubType = udtFieldSubTypes.get(0);
-          initializerBuild.add(".withField($S, $T.getDataType($L.class, $L.class))", udtFieldName, DataTypeMapper.class,
+          initializerBuilder.add(".withField($S, $T.getDataType($L.class, $L.class))", udtFieldName, DataTypeMapper.class,
                                udtFieldType.getTypeFullname(), udtFieldSubType.getTypeFullname());
           break;
         case MAP:
           TypeDetail udtFieldSubKeyType = udtFieldSubTypes.get(0);
           TypeDetail udtFieldSubValueType = udtFieldSubTypes.get(1);
-          initializerBuild.add(".withField($S, $T.getDataType($L.class, $L.class))", udtFieldName, DataTypeMapper.class,
+          initializerBuilder.add(".withField($S, $T.getDataType($L.class, $L.class))", udtFieldName, DataTypeMapper.class,
                                udtFieldType.getTypeFullname(), udtFieldSubKeyType.getTypeFullname(), udtFieldSubValueType.getTypeFullname());
           break;
         case UDT:
@@ -82,17 +85,17 @@ public class UdtSerializer implements Serializer<UdtMetaType> {
           if (udtContext == null) {
             throw new CharybdisSerializationException(format("Udt field '%s' has a user defined type, yet the type metadata is not found", udtFieldName));
           }
-          initializerBuild.addStatement(".withField($S, $L.$L.udt)", udtFieldName, udtContext.getUdtMetadataClassName(), udtContext.getUdtName());
+          initializerBuilder.add(".withField($S, $L.$L.udt)", udtFieldName, udtContext.getUdtMetadataClassName(), udtContext.getUdtName());
           break;
         default:
-          initializerBuild.add(".withField($S, $T.getDataType($L.class))", udtFieldName, DataTypeMapper.class, udtFieldType.getTypeFullname());
+          initializerBuilder.add(".withField($S, $T.getDataType($L.class))", udtFieldName, DataTypeMapper.class, udtFieldType.getTypeFullname());
           break;
       }
     }
-    initializerBuild.add(".build()");
+    initializerBuilder.add(".build()");
     return FieldSpec.builder(UserDefinedType.class, SerializationConstants.UDT_ATTRIBUTE)
                     .addModifiers(Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)
-                    .initializer(initializerBuild.build())
+                    .initializer(initializerBuilder.build())
                     .build();
   }
 
@@ -104,6 +107,7 @@ public class UdtSerializer implements Serializer<UdtMetaType> {
       String udtGetterName = udtField.getGetterName();
       TypeDetail udtFieldType = udtField.getFieldType();
       List<TypeDetail> fieldSubTypes = udtField.getFieldSubTypes();
+      methodBuilder.add(SKIP_LINE);
       switch (udtFieldType.getTypeDetailEnum()) {
         case LIST:
           TypeDetail listSubType = fieldSubTypes.get(0);
@@ -124,7 +128,7 @@ public class UdtSerializer implements Serializer<UdtMetaType> {
           if (udtContext == null) {
             throw new CharybdisSerializationException("Udt field '%s' has a user defined type, yet the type metadata is not found");
           }
-          methodBuilder.addStatement(".setUdtValue($S, $L.$L.$L($N.$L()))", udtFieldName, udtContext.getUdtMetadataClassName(), udtContext.getUdtName(),
+          methodBuilder.add(".setUdtValue($S, $L.$L.$L($N.$L()))", udtFieldName, udtContext.getUdtMetadataClassName(), udtContext.getUdtName(),
                                      SerializationConstants.SERIALIZE_METHOD, parameterName, udtGetterName);
           break;
         default:
