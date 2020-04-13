@@ -22,17 +22,23 @@ public class AptContext {
   List<TableMetaType> tableMetaTypes;
 
   void init(final RoundEnvironment roundEnv, final AptConfiguration configuration) {
-    keyspaceNames = new HashSet<>();
-    udtContexts = new HashMap<>();
-    keyspaceMetaTypes = new ArrayList<>();
-    udtMetaTypes = new ArrayList<>();
-    tableMetaTypes = new ArrayList<>();
+    initMetaTypes();
+
     for (final Element element : roundEnv.getElementsAnnotatedWith(Udt.class)) {
       String udtName = configuration.getUdtParser().resolveName(element);
       String udtClassName = configuration.getUdtSerializer().getClassName(element.getSimpleName()
                                                                                  .toString());
       udtContexts.put(element.asType().toString(), new UdtContext(udtClassName, udtName));
     }
+  }
+
+  void initMetaTypes() {
+    keyspaceNames = new HashSet<>();
+    udtContexts = new HashMap<>();
+
+    keyspaceMetaTypes = new ArrayList<>();
+    udtMetaTypes = new ArrayList<>();
+    tableMetaTypes = new ArrayList<>();
   }
 
   public void addKeyspaceName(final String keyspaceName) {

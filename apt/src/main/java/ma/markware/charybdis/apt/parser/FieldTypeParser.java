@@ -34,7 +34,7 @@ public class FieldTypeParser {
     TypeDetail typeDetail = new TypeDetail();
 
     String fullname = getErasedType(typeMirror, types);
-    typeDetail.setTypeFullname(fullname);
+    typeDetail.setTypeCanonicalName(fullname);
     typeDetail.setTypeDetailEnum(TypeDetailEnum.NORMAL);
 
     if (aptContext.isUdt(fullname)) {

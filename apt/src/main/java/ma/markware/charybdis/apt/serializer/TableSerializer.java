@@ -205,7 +205,7 @@ public class TableSerializer implements Serializer<TableMetaType> {
       String columnGetterName = columnField.getGetterName();
       switch (columnFieldType.getTypeDetailEnum()) {
         case UDT:
-          UdtContext udtContext = aptContext.getUdtContext(columnFieldType.getTypeFullname());
+          UdtContext udtContext = aptContext.getUdtContext(columnFieldType.getTypeCanonicalName());
           if (udtContext == null) {
             throw new CharybdisSerializationException(format("Column '%s' has a user defined type, yet the type metadata is not found", columnName));
           }
@@ -243,21 +243,21 @@ public class TableSerializer implements Serializer<TableMetaType> {
         case LIST:
           TypeDetail listSubType = columnFieldSubTypes.get(0);
           codeBlockBuilder.addStatement("entity.$L($N.getList($S, $L.class))", columnSetterName, parameterName, columnName,
-                                        listSubType.getTypeFullname());
+                                        listSubType.getTypeCanonicalName());
           break;
         case SET:
           TypeDetail setSubType = columnFieldSubTypes.get(0);
           codeBlockBuilder.addStatement("entity.$L($N.getSet($S, $L.class))", columnSetterName, parameterName, columnName,
-                                        setSubType.getTypeFullname());
+                                        setSubType.getTypeCanonicalName());
           break;
         case MAP:
           TypeDetail fieldSubTypeKey = columnField.getFieldSubTypes().get(0);
           TypeDetail fieldSubTypeValue = columnField.getFieldSubTypes().get(1);
           codeBlockBuilder.addStatement("entity.$L($N.getMap($S, $L.class, $L.class))", columnSetterName, parameterName, columnName,
-                                        fieldSubTypeKey.getTypeFullname(), fieldSubTypeValue.getTypeFullname());
+                                        fieldSubTypeKey.getTypeCanonicalName(), fieldSubTypeValue.getTypeCanonicalName());
           break;
         case UDT:
-          UdtContext udtContext = aptContext.getUdtContext(columnFieldType.getTypeFullname());
+          UdtContext udtContext = aptContext.getUdtContext(columnFieldType.getTypeCanonicalName());
           if (udtContext == null) {
             throw new CharybdisSerializationException(format("Column '%s' has a user defined type, yet the type metadata is not found", columnName));
           }
@@ -267,11 +267,11 @@ public class TableSerializer implements Serializer<TableMetaType> {
           break;
         case ENUM:
           codeBlockBuilder.addStatement("entity.$L($N.getString($S) != null ? $L.valueOf($N.getString($S)) : null)", columnSetterName,
-                                        parameterName, columnName, columnFieldType.getTypeFullname(), parameterName, columnName);
+                                        parameterName, columnName, columnFieldType.getTypeCanonicalName(), parameterName, columnName);
           break;
         default:
           codeBlockBuilder.addStatement("entity.$L($N.get($S, $L.class))", columnSetterName, parameterName, columnName,
-                                        columnFieldType.getTypeFullname());
+                                        columnFieldType.getTypeCanonicalName());
           break;
       }
     }

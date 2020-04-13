@@ -72,23 +72,23 @@ public class UdtSerializer implements Serializer<UdtMetaType> {
         case SET:
           TypeDetail udtFieldSubType = udtFieldSubTypes.get(0);
           initializerBuilder.add(".withField($S, $T.getDataType($L.class, $L.class))", udtFieldName, DataTypeMapper.class,
-                               udtFieldType.getTypeFullname(), udtFieldSubType.getTypeFullname());
+                                 udtFieldType.getTypeCanonicalName(), udtFieldSubType.getTypeCanonicalName());
           break;
         case MAP:
           TypeDetail udtFieldSubKeyType = udtFieldSubTypes.get(0);
           TypeDetail udtFieldSubValueType = udtFieldSubTypes.get(1);
           initializerBuilder.add(".withField($S, $T.getDataType($L.class, $L.class))", udtFieldName, DataTypeMapper.class,
-                               udtFieldType.getTypeFullname(), udtFieldSubKeyType.getTypeFullname(), udtFieldSubValueType.getTypeFullname());
+                                 udtFieldType.getTypeCanonicalName(), udtFieldSubKeyType.getTypeCanonicalName(), udtFieldSubValueType.getTypeCanonicalName());
           break;
         case UDT:
-          UdtContext udtContext = aptContext.getUdtContext(udtFieldType.getTypeFullname());
+          UdtContext udtContext = aptContext.getUdtContext(udtFieldType.getTypeCanonicalName());
           if (udtContext == null) {
             throw new CharybdisSerializationException(format("Udt field '%s' has a user defined type, yet the type metadata is not found", udtFieldName));
           }
           initializerBuilder.add(".withField($S, $L.$L.udt)", udtFieldName, udtContext.getUdtMetadataClassName(), udtContext.getUdtName());
           break;
         default:
-          initializerBuilder.add(".withField($S, $T.getDataType($L.class))", udtFieldName, DataTypeMapper.class, udtFieldType.getTypeFullname());
+          initializerBuilder.add(".withField($S, $T.getDataType($L.class))", udtFieldName, DataTypeMapper.class, udtFieldType.getTypeCanonicalName());
           break;
       }
     }
@@ -111,20 +111,20 @@ public class UdtSerializer implements Serializer<UdtMetaType> {
       switch (udtFieldType.getTypeDetailEnum()) {
         case LIST:
           TypeDetail listSubType = fieldSubTypes.get(0);
-          methodBuilder.add(".setList($S, $N.$L(), $L.class)", udtFieldName, parameterName, udtGetterName, listSubType.getTypeFullname());
+          methodBuilder.add(".setList($S, $N.$L(), $L.class)", udtFieldName, parameterName, udtGetterName, listSubType.getTypeCanonicalName());
           break;
         case SET:
           TypeDetail setSubType = fieldSubTypes.get(0);
-          methodBuilder.add(".setSet($S, $N.$L(), $L.class)", udtFieldName, parameterName, udtGetterName, setSubType.getTypeFullname());
+          methodBuilder.add(".setSet($S, $N.$L(), $L.class)", udtFieldName, parameterName, udtGetterName, setSubType.getTypeCanonicalName());
           break;
         case MAP:
           TypeDetail udtFieldSubKeyType = udtField.getFieldSubTypes().get(0);
           TypeDetail udtFieldSubValueType = udtField.getFieldSubTypes().get(1);
-          methodBuilder.add(".setMap($S, $N.$L(), $L.class, $L.class)", udtFieldName, parameterName, udtGetterName, udtFieldSubKeyType.getTypeFullname(),
-                            udtFieldSubValueType.getTypeFullname());
+          methodBuilder.add(".setMap($S, $N.$L(), $L.class, $L.class)", udtFieldName, parameterName, udtGetterName, udtFieldSubKeyType.getTypeCanonicalName(),
+                            udtFieldSubValueType.getTypeCanonicalName());
           break;
         case UDT:
-          UdtContext udtContext = aptContext.getUdtContext(udtFieldType.getTypeFullname());
+          UdtContext udtContext = aptContext.getUdtContext(udtFieldType.getTypeCanonicalName());
           if (udtContext == null) {
             throw new CharybdisSerializationException("Udt field '%s' has a user defined type, yet the type metadata is not found");
           }
@@ -132,7 +132,7 @@ public class UdtSerializer implements Serializer<UdtMetaType> {
                                      SerializationConstants.SERIALIZE_METHOD, parameterName, udtGetterName);
           break;
         default:
-          methodBuilder.add(".set($S, $N.$L(), $L.class)", udtFieldName, parameterName, udtGetterName, udtFieldType.getTypeFullname());
+          methodBuilder.add(".set($S, $N.$L(), $L.class)", udtFieldName, parameterName, udtGetterName, udtFieldType.getTypeCanonicalName());
           break;
       }
     }
@@ -157,21 +157,21 @@ public class UdtSerializer implements Serializer<UdtMetaType> {
         case LIST:
           TypeDetail listSubType = udtFieldSubTypes.get(0);
           methodBuilder.addStatement("entity.$L($N.getList($S, $L.class))", udtSetterName, parameterName, udtFieldName,
-                                     listSubType.getTypeFullname());
+                                     listSubType.getTypeCanonicalName());
           break;
         case SET:
           TypeDetail setSubType = udtFieldSubTypes.get(0);
           methodBuilder.addStatement("entity.$L($N.getSet($S, $L.class))", udtSetterName, parameterName, udtFieldName,
-                                     setSubType.getTypeFullname());
+                                     setSubType.getTypeCanonicalName());
           break;
         case MAP:
           TypeDetail fieldSubTypeKey = udtField.getFieldSubTypes().get(0);
           TypeDetail fieldSubTypeValue = udtField.getFieldSubTypes().get(1);
           methodBuilder.addStatement("entity.$L($N.getMap($S, $L.class, $L.class))", udtSetterName, parameterName, udtFieldName,
-                                     fieldSubTypeKey.getTypeFullname(), fieldSubTypeValue.getTypeFullname());
+                                     fieldSubTypeKey.getTypeCanonicalName(), fieldSubTypeValue.getTypeCanonicalName());
           break;
         case UDT:
-          UdtContext udtContext = aptContext.getUdtContext(udtFieldType.getTypeFullname());
+          UdtContext udtContext = aptContext.getUdtContext(udtFieldType.getTypeCanonicalName());
           if (udtContext == null) {
             throw new CharybdisSerializationException("Udt field '%s' has a user defined type, yet the type metadata is not found");
           }
@@ -180,10 +180,10 @@ public class UdtSerializer implements Serializer<UdtMetaType> {
           break;
         case ENUM:
           methodBuilder.addStatement("entity.$L($N.getString($S) != null ? $L.valueOf($N.getString($S)) : null)", udtSetterName,
-                                     parameterName, udtFieldName, udtFieldType.getTypeFullname(), parameterName, udtFieldName);
+                                     parameterName, udtFieldName, udtFieldType.getTypeCanonicalName(), parameterName, udtFieldName);
           break;
         default:
-          methodBuilder.addStatement("entity.$L($N.get($S, $L.class))", udtSetterName, parameterName, udtFieldName, udtFieldType.getTypeFullname());
+          methodBuilder.addStatement("entity.$L($N.get($S, $L.class))", udtSetterName, parameterName, udtFieldName, udtFieldType.getTypeCanonicalName());
           break;
       }
     }

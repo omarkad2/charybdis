@@ -7,7 +7,7 @@ import java.lang.annotation.Target;
 import ma.markware.charybdis.model.option.ReplicationStrategyClassEnum;
 
 @Target(ElementType.TYPE)
-@Retention(RetentionPolicy.SOURCE)
+@Retention(RetentionPolicy.CLASS)
 public @interface Keyspace {
 
 

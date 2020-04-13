@@ -14,7 +14,7 @@ import ma.markware.charybdis.apt.JavaFileBuilder.UdtAttribute;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class ValidationProcessorTest extends AbstractProcessorTest {
+public class ProcessorValidationTest extends AbstractProcessorTest {
 
   private static final String packagePath = "src/test/java/ma/markware/charybdis/domain";
   private static final String target = "generated-sources";

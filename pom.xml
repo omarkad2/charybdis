@@ -39,8 +39,9 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <maven.compiler.target>1.8</maven.compiler.target>
-    <maven.compiler.source>1.8</maven.compiler.source>
+    <java.version>1.8</java.version>
+    <maven.compiler.target>${java.version}</maven.compiler.target>
+    <maven.compiler.source>${java.version}</maven.compiler.source>
     <slf4j.version>1.7.26</slf4j.version>
     <logback.version>1.2.3</logback.version>
     <cassandra-driver.version>4.2.0</cassandra-driver.version>
@@ -51,11 +52,12 @@
     <lz4-java.version>1.6.0</lz4-java.version>
     <snappy-java.version>1.1.7.3</snappy-java.version>
     <velocity.version>1.7</velocity.version>
-    <assertj-core.version>1.7.0</assertj-core.version>
+    <assertj-core.version>3.15.0</assertj-core.version>
     <junit-jupiter-api.version>5.6.0</junit-jupiter-api.version>
     <apache-commons.lang3.version>3.9</apache-commons.lang3.version>
     <surefire.version>2.19.1</surefire.version>
     <junit-platform-surefire-provider.version>1.0.3</junit-platform-surefire-provider.version>
+    <mockito.version>3.3.3</mockito.version>
   </properties>
 
   <modules>
@@ -82,7 +84,7 @@
         <version>${project.version}</version>
       </dependency>
 
-      <!--Datastax-->
+      <!--Datastax Driver-->
       <dependency>
         <groupId>com.datastax.oss</groupId>
         <artifactId>java-driver-core</artifactId>
@@ -99,11 +101,12 @@
         <groupId>com.google.auto.service</groupId>
         <artifactId>auto-service</artifactId>
         <version>${auto-service.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.google.testing.compile</groupId>
-        <artifactId>compile-testing</artifactId>
-        <version>${compile-testing.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>com.google.testing.compile</groupId>
+            <artifactId>compile-testing</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <dependency>
         <groupId>com.squareup</groupId>
@@ -128,6 +131,23 @@
         <artifactId>assertj-core</artifactId>
         <version>${assertj-core.version}</version>
         <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.mockito</groupId>
+        <artifactId>mockito-core</artifactId>
+        <version>${mockito.version}</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>com.google.testing.compile</groupId>
+        <artifactId>compile-testing</artifactId>
+        <version>${compile-testing.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
     </dependencies>
   </dependencyManagement>

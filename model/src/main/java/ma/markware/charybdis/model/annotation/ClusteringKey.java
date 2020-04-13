@@ -7,7 +7,7 @@ import java.lang.annotation.Target;
 import ma.markware.charybdis.model.option.ClusteringOrderEnum;
 
 @Target(ElementType.FIELD)
-@Retention(RetentionPolicy.SOURCE)
+@Retention(RetentionPolicy.CLASS)
 public @interface ClusteringKey {
 
   int index() default 0;

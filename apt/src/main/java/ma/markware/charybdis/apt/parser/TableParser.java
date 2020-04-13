@@ -124,7 +124,7 @@ public class TableParser extends AbstractEntityParser<TableMetaType, ColumnField
       if (generatedValue != null) {
         try {
           final SequenceModelEnum sequenceModel = SequenceModelEnum.findSequenceModel(Class.forName(columnMetaType.getFieldType()
-                                                                                                                    .getTypeFullname()));
+                                                                                                                    .getTypeCanonicalName()));
           if (sequenceModel != null) {
             columnMetaType.setSequenceModel(sequenceModel);
           } else {
