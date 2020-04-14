@@ -49,12 +49,12 @@ public class KeyspaceParser implements Parser<KeyspaceMetaType> {
     final Replication replication = new Replication();
     final ReplicationStrategyClassEnum replicationStrategy = keyspace.replicaPlacementStrategy();
     final int replicationFactor = keyspace.replicationFactor();
-    if (replicationStrategy == ReplicationStrategyClassEnum.SIMPLESTRATEGY) {
+    if (replicationStrategy == ReplicationStrategyClassEnum.SIMPLE_STRATEGY) {
       if (replicationFactor > 0) {
         replication.setReplicationClass(replicationStrategy);
         replication.setReplicationFactor(replicationFactor);
       }
-    } else if (replicationStrategy == ReplicationStrategyClassEnum.NETWORKTOPOLOGYSTRATEGY) {
+    } else if (replicationStrategy == ReplicationStrategyClassEnum.NETWORK_TOPOLOGY_STRATEGY) {
       throw new CharybdisParsingException("Replication 'NetworkTopologyStrategy' not yet supported on a particular keyspace");
     }
     return replication;

@@ -7,4 +7,8 @@ public class UdtFieldMetadata {
   public UdtFieldMetadata(final String name) {
     this.name = name;
   }
+
+  public String getName() {
+    return name;
+  }
 }

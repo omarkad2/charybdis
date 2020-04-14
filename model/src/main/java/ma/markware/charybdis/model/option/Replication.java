@@ -1,12 +1,11 @@
 package ma.markware.charybdis.model.option;
 
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Objects;
 
 public class Replication {
 
-  public static Replication DEFAULT_REPLICATION = new Replication(ReplicationStrategyClassEnum.SIMPLESTRATEGY, 1);
+  public static Replication DEFAULT_REPLICATION = new Replication(ReplicationStrategyClassEnum.SIMPLE_STRATEGY, 1);
 
   private ReplicationStrategyClassEnum replicationClass;
   private int replicationFactor;
@@ -36,24 +35,8 @@ public class Replication {
     this.replicationFactor = replicationFactor;
   }
 
-  public Map<String, Integer> getDatacenterReplicaMap() {
-    return datacenterReplicaMap;
-  }
-
   public void setDatacenterReplicaMap(final Map<String, Integer> datacenterReplicaMap) {
     this.datacenterReplicaMap = datacenterReplicaMap;
-  }
-
-  public String toCqlString() {
-    final StringBuilder strBuilder = new StringBuilder().append("'class' : '").append(replicationClass.getValue()).append("'");
-    if (ReplicationStrategyClassEnum.SIMPLESTRATEGY == replicationClass) {
-      strBuilder.append(", 'replication_factor' : ").append(replicationFactor);
-    } else {
-      for (final Entry entry : datacenterReplicaMap.entrySet()) {
-        strBuilder.append(", '").append(entry.getKey()).append("' : ").append(entry.getValue());
-      }
-    }
-    return strBuilder.toString();
   }
 
   @Override
@@ -65,12 +48,21 @@ public class Replication {
       return false;
     }
     final Replication that = (Replication) o;
-    return replicationFactor == that.replicationFactor && replicationClass == that.replicationClass;
+    if (replicationClass != that.replicationClass) {
+      return false;
+    }
+    if (replicationClass == ReplicationStrategyClassEnum.SIMPLE_STRATEGY) {
+      return replicationFactor == that.replicationFactor;
+    }
+    return Objects.equals(datacenterReplicaMap, that.datacenterReplicaMap);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(replicationClass, replicationFactor);
+    if (replicationClass == ReplicationStrategyClassEnum.SIMPLE_STRATEGY) {
+      return Objects.hash(replicationClass, replicationFactor);
+    }
+    return Objects.hash(replicationClass, datacenterReplicaMap);
   }
 
   @Override

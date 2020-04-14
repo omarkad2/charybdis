@@ -26,4 +26,36 @@ public class ColumnMetadata {
     this.isIndexed = isIndexed;
     this.indexName = indexName;
   }
+
+  public String getName() {
+    return name;
+  }
+
+  public boolean isPartitionKey() {
+    return isPartitionKey;
+  }
+
+  public Integer getPartitionKeyIndex() {
+    return partitionKeyIndex;
+  }
+
+  public boolean isClusteringKey() {
+    return isClusteringKey;
+  }
+
+  public Integer getClusteringKeyIndex() {
+    return clusteringKeyIndex;
+  }
+
+  public ClusteringOrderEnum getClusteringOrder() {
+    return clusteringOrder;
+  }
+
+  public String getIndexName() {
+    return indexName;
+  }
+
+  public boolean isIndexed() {
+    return isIndexed;
+  }
 }

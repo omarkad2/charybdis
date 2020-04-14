@@ -25,9 +25,9 @@ public class DataTypeMapper {
     dataTypeMap.put(int.class, DataTypes.INT);
     dataTypeMap.put(Long.class, DataTypes.BIGINT);
     dataTypeMap.put(long.class, DataTypes.BIGINT);
-    dataTypeMap.put(Double.class, DataTypes.INT);
+    dataTypeMap.put(Double.class, DataTypes.DOUBLE);
     dataTypeMap.put(double.class, DataTypes.DOUBLE);
-    dataTypeMap.put(Float.class, DataTypes.INT);
+    dataTypeMap.put(Float.class, DataTypes.FLOAT);
     dataTypeMap.put(float.class, DataTypes.FLOAT);
     dataTypeMap.put(BigDecimal.class, DataTypes.DECIMAL);
     dataTypeMap.put(Enum.class, DataTypes.TEXT);

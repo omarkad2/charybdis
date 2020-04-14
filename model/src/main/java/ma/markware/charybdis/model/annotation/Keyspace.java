@@ -13,7 +13,7 @@ public @interface Keyspace {
 
   String name() default "";
 
-  ReplicationStrategyClassEnum replicaPlacementStrategy() default ReplicationStrategyClassEnum.SIMPLESTRATEGY;
+  ReplicationStrategyClassEnum replicaPlacementStrategy() default ReplicationStrategyClassEnum.SIMPLE_STRATEGY;
 
   int replicationFactor() default 1;
 }

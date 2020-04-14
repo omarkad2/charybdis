@@ -2,9 +2,9 @@ package ma.markware.charybdis.model.option;
 
 public enum ReplicationStrategyClassEnum {
 
-  SIMPLESTRATEGY("SimpleStrategy"),
+  SIMPLE_STRATEGY("SimpleStrategy"),
 
-  NETWORKTOPOLOGYSTRATEGY("NetworkTopologyStrategy");
+  NETWORK_TOPOLOGY_STRATEGY("NetworkTopologyStrategy");
 
   private String value;
 

@@ -39,14 +39,17 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith({CompilationExtension.class, MockitoExtension.class})
 class ProcessorParserTest {
+
   @Mock
   private RoundEnvironment roundEnvironment;
+  
   private AptContext aptContext = new AptContext();
   private AptDefaultConfiguration configuration = new AptDefaultConfiguration();
   private Types types;
   private TypeElement keyspaceTypeElement;
   private TypeElement addressUdtElement;
   private TypeElement userTableElement;
+
   @BeforeEach
   void setup(Elements elements, Types types) {
     this.types = types;
@@ -56,12 +59,14 @@ class ProcessorParserTest {
     when(roundEnvironment.getElementsAnnotatedWith(Udt.class)).thenReturn((Set) Collections.singleton(addressUdtElement));
     aptContext.init(roundEnvironment, configuration);
   }
+
   @Test
   void parseKeyspaceTest() {
     KeyspaceMetaType keyspaceMetaType = configuration.getKeyspaceParser().parse(keyspaceTypeElement, types, aptContext);
     assertThat(keyspaceMetaType.getKeyspaceName()).isEqualTo("test_keyspace");
     assertThat(keyspaceMetaType.getReplication()).isEqualTo(Replication.DEFAULT_REPLICATION);
   }
+
   @Test
   void parseUdtTest() {
     configuration.getKeyspaceParser().parse(keyspaceTypeElement, types, aptContext);
@@ -80,6 +85,7 @@ class ProcessorParserTest {
                   "getCity", "setCity")
         );
   }
+
   @Test
   void parseTableTest() {
     configuration.getKeyspaceParser().parse(keyspaceTypeElement, types, aptContext);
@@ -137,6 +143,7 @@ class ProcessorParserTest {
                   "getLastUpdatedDate", "setLastUpdatedDate")
         );
   }
+
   private TypeDetail buildTypeDetail(String typeCanonicalName, TypeDetail.TypeDetailEnum typeDetailEnum) {
     TypeDetail typeDetail = new TypeDetail();
     typeDetail.setTypeCanonicalName(typeCanonicalName);

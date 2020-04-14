@@ -6,7 +6,7 @@ import java.util.function.Supplier;
 
 public enum SequenceModelEnum {
 
-  UUID(java.util.UUID.class, () -> java.util.UUID.randomUUID());
+  UUID(java.util.UUID.class, java.util.UUID::randomUUID);
 
   private Class<?> supportedClass;
 
