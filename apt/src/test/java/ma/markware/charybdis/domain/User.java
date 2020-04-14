@@ -5,16 +5,29 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import ma.markware.charybdis.model.annotation.ClusteringKey;
 import ma.markware.charybdis.model.annotation.Column;
+import ma.markware.charybdis.model.annotation.GeneratedValue;
+import ma.markware.charybdis.model.annotation.Index;
 import ma.markware.charybdis.model.annotation.PartitionKey;
 import ma.markware.charybdis.model.annotation.Table;
+import ma.markware.charybdis.model.option.ClusteringOrderEnum;
 
 @Table(keyspace = "test_keyspace", name = "user")
 public class User extends AbstractUser {
 
   @Column
   @PartitionKey
+  @GeneratedValue
   private UUID id;
+
+  @Column
+  @ClusteringKey
+  private String fullname;
+
+  @Column(name = "joining_date")
+  @ClusteringKey(index = 1, order = ClusteringOrderEnum.DESC)
+  private Instant joiningDate;
 
   @Column
   private String email;
@@ -23,118 +36,101 @@ public class User extends AbstractUser {
   private String password;
 
   @Column
-  private String firstname;
-
-  @Column
-  private String lastname;
-
-  @Column
   private Address address;
 
   @Column
   private List<UUID> followers;
 
   @Column
+  @Index(name = "access_role")
   private RoleEnum role;
 
-  @Column
+  @Column(name = "access_logs")
   private Set<Instant> accessLogs;
 
   @Column
-  private Map<String, String> map;
-
-  @Column
-  private Map<String, String> hashMap;
+  private Map<String, String> metadata;
 
   public User() {
-
   }
 
   public UUID getId() {
     return id;
   }
 
-  public void setId(final UUID id) {
+  public void setId(UUID id) {
     this.id = id;
+  }
+
+  public String getFullname() {
+    return fullname;
+  }
+
+  public void setFullname(String fullname) {
+    this.fullname = fullname;
+  }
+
+  public Instant getJoiningDate() {
+    return joiningDate;
+  }
+
+  public void setJoiningDate(Instant joiningDate) {
+    this.joiningDate = joiningDate;
   }
 
   public String getEmail() {
     return email;
   }
 
-  public Address getAddress() {
-    return address;
+  public void setEmail(String email) {
+    this.email = email;
   }
 
   public String getPassword() {
     return password;
   }
 
-  public String getFirstname() {
-    return firstname;
+  public void setPassword(String password) {
+    this.password = password;
   }
 
-  public String getLastname() {
-    return lastname;
+  public Address getAddress() {
+    return address;
+  }
+
+  public void setAddress(Address address) {
+    this.address = address;
   }
 
   public List<UUID> getFollowers() {
     return followers;
   }
 
+  public void setFollowers(List<UUID> followers) {
+    this.followers = followers;
+  }
+
   public RoleEnum getRole() {
     return role;
+  }
+
+  public void setRole(RoleEnum role) {
+    this.role = role;
   }
 
   public Set<Instant> getAccessLogs() {
     return accessLogs;
   }
 
-  public Map<String, String> getMap() {
-    return map;
-  }
-
-  public Map<String, String> getHashMap() {
-    return hashMap;
-  }
-
-  public void setEmail(final String email) {
-    this.email = email;
-  }
-
-  public void setPassword(final String password) {
-    this.password = password;
-  }
-
-  public void setFirstname(final String firstname) {
-    this.firstname = firstname;
-  }
-
-  public void setLastname(final String lastname) {
-    this.lastname = lastname;
-  }
-
-  public void setAddress(final Address address) {
-    this.address = address;
-  }
-
-  public void setFollowers(final List<UUID> followers) {
-    this.followers = followers;
-  }
-
-  public void setRole(final RoleEnum role) {
-    this.role = role;
-  }
-
-  public void setAccessLogs(final Set<Instant> accessLogs) {
+  public void setAccessLogs(Set<Instant> accessLogs) {
     this.accessLogs = accessLogs;
   }
 
-  public void setMap(final Map<String, String> map) {
-    this.map = map;
+  public Map<String, String> getMetadata() {
+    return metadata;
   }
 
-  public void setHashMap(final Map<String, String> hashMap) {
-    this.hashMap = hashMap;
+  public void setMetadata(Map<String, String> metadata) {
+    this.metadata = metadata;
   }
 }

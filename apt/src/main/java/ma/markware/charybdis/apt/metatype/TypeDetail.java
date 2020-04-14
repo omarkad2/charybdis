@@ -19,9 +19,8 @@ public class TypeDetail {
     return typeDetailEnum;
   }
 
-  public TypeDetail setTypeDetailEnum(final TypeDetailEnum typeDetailEnum) {
+  public void setTypeDetailEnum(final TypeDetailEnum typeDetailEnum) {
     this.typeDetailEnum = typeDetailEnum;
-    return this;
   }
 
   @Override

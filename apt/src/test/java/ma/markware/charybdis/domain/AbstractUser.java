@@ -7,11 +7,11 @@ import ma.markware.charybdis.model.annotation.LastUpdatedDate;
 
 public class AbstractUser {
 
-  @Column
+  @Column(name = "creation_date")
   @CreationDate
   private Instant creationDate;
 
-  @Column
+  @Column(name = "last_updated_date")
   @LastUpdatedDate
   private Instant lastUpdatedDate;
 

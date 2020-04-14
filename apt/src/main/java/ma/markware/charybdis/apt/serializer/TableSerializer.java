@@ -26,6 +26,7 @@ import ma.markware.charybdis.apt.metatype.TableMetaType;
 import ma.markware.charybdis.apt.metatype.TypeDetail;
 import ma.markware.charybdis.model.metadata.ColumnMetadata;
 import ma.markware.charybdis.model.metadata.TableMetadata;
+import ma.markware.charybdis.model.option.ClusteringOrderEnum;
 import ma.markware.charybdis.model.option.SequenceModelEnum;
 import org.apache.commons.lang3.ArrayUtils;
 
@@ -78,15 +79,21 @@ public class TableSerializer implements Serializer<TableMetaType> {
     FieldSpec[] columnFieldSpecs = new FieldSpec[columnFieldMetaTypes.size()];
     int i = 0;
     for (ColumnFieldMetaType columnFieldMetaType : columnFieldMetaTypes) {
+      CodeBlock.Builder initializerBuilder = CodeBlock.builder();
+      if (columnFieldMetaType.isClusteringKey()) {
+        initializerBuilder.add("new $T($S, $L, $L, $L, $L, $T.$L, $L, $S)", ColumnMetadata.class, columnFieldMetaType.getColumnName(),
+                               columnFieldMetaType.isPartitionKey(), columnFieldMetaType.getPartitionKeyIndex(),
+                               columnFieldMetaType.isClusteringKey(), columnFieldMetaType.getClusteringKeyIndex(), ClusteringOrderEnum.class,
+                               columnFieldMetaType.getClusteringOrder(), columnFieldMetaType.isIndexed(), columnFieldMetaType.getIndexName());
+      } else {
+        initializerBuilder.add("new $T($S, $L, $L, $L, null, null, $L, $S)", ColumnMetadata.class, columnFieldMetaType.getColumnName(),
+                               columnFieldMetaType.isPartitionKey(), columnFieldMetaType.getPartitionKeyIndex(),
+                               columnFieldMetaType.isClusteringKey(),
+                               columnFieldMetaType.isIndexed(), columnFieldMetaType.getIndexName());
+      }
       columnFieldSpecs[i] = (FieldSpec.builder(ColumnMetadata.class, columnFieldMetaType.getFieldName())
                                     .addModifiers(Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)
-                                    .initializer(CodeBlock.builder()
-                                                          .add("new $T($S, $L, $L, $L, $L, $L, $L, $S)", ColumnMetadata.class,
-                                                               columnFieldMetaType.getColumnName(), columnFieldMetaType.isPartitionKey(),
-                                                               columnFieldMetaType.getPartitionKeyIndex(), columnFieldMetaType.isClusteringKey(),
-                                                               columnFieldMetaType.getClusteringKeyIndex(), columnFieldMetaType.getClusteringOrder(),
-                                                               columnFieldMetaType.isIndexed(), columnFieldMetaType.getIndexName())
-                                                          .build())
+                                    .initializer(initializerBuilder.build())
                                     .build());
       i++;
     }
@@ -157,9 +164,10 @@ public class TableSerializer implements Serializer<TableMetaType> {
     tableMetaType.getColumns().stream()
                  .filter(columnFieldMetaType -> !Objects.isNull(columnFieldMetaType.getSequenceModel()))
                  .forEach(
-        columnFieldMetaType -> methodBuilder.addStatement("$N.$L($T.$L.getGenerationMethod().get())", parameterName,
-                                                    columnFieldMetaType.getSetterName(), SequenceModelEnum.class,
-                                                    columnFieldMetaType.getSequenceModel()));
+        columnFieldMetaType -> methodBuilder.addStatement("$N.$L(($L) $T.$L.getGenerationMethod().get())",
+                                                          parameterName, columnFieldMetaType.getSetterName(),
+                                                          columnFieldMetaType.getFieldType().getTypeCanonicalName(), SequenceModelEnum.class,
+                                                          columnFieldMetaType.getSequenceModel()));
     return methodBuilder.endControlFlow().build();
   }
 

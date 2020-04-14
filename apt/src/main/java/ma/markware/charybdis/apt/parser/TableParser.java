@@ -115,7 +115,7 @@ public class TableParser extends AbstractEntityParser<TableMetaType, ColumnField
       }
 
       final Index index = annotatedField.getAnnotation(Index.class);
-      if (index != null && partitionKey != null) {
+      if (index != null && partitionKey == null) {
         columnMetaType.setIndexed(true);
         columnMetaType.setIndexName(format("%s_%s_idx", tableName.toLowerCase(), columnMetaType.getColumnName().toLowerCase()));
       }

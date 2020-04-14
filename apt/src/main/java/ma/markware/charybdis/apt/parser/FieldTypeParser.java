@@ -33,28 +33,28 @@ public class FieldTypeParser {
   TypeDetail parseFieldType(TypeMirror typeMirror, Types types, AptContext aptContext) {
     TypeDetail typeDetail = new TypeDetail();
 
-    String fullname = getErasedType(typeMirror, types);
-    typeDetail.setTypeCanonicalName(fullname);
+    String canonicalName = getErasedType(typeMirror, types);
+    typeDetail.setTypeCanonicalName(canonicalName);
     typeDetail.setTypeDetailEnum(TypeDetailEnum.NORMAL);
 
-    if (aptContext.isUdt(fullname)) {
+    if (aptContext.isUdt(canonicalName)) {
       typeDetail.setTypeDetailEnum(TypeDetailEnum.UDT);
     } else {
       if (typeMirror instanceof DeclaredType) {
         DeclaredType type = (DeclaredType) typeMirror;
         Element element = type.asElement();
         List<Type> interfaces = ((ClassSymbol) element).getInterfaces();
-        if (isTypeMatch(fullname, interfaces, JAVA_UTIL_LIST)) {
-          validateSupportedTypes(fullname, LIST_SUPPORTED_TYPES);
-          validateParameterTypes(fullname, type.getTypeArguments(), 1);
+        if (isTypeMatch(canonicalName, interfaces, JAVA_UTIL_LIST)) {
+          validateSupportedTypes(canonicalName, LIST_SUPPORTED_TYPES);
+          validateParameterTypes(canonicalName, type.getTypeArguments(), 1);
           typeDetail.setTypeDetailEnum(TypeDetailEnum.LIST);
-        } else if (isTypeMatch(fullname, interfaces, JAVA_UTIL_SET)) {
-          validateSupportedTypes(fullname, SET_SUPPORTED_TYPES);
-          validateParameterTypes(fullname, type.getTypeArguments(), 1);
+        } else if (isTypeMatch(canonicalName, interfaces, JAVA_UTIL_SET)) {
+          validateSupportedTypes(canonicalName, SET_SUPPORTED_TYPES);
+          validateParameterTypes(canonicalName, type.getTypeArguments(), 1);
           typeDetail.setTypeDetailEnum(TypeDetailEnum.SET);
-        } else if (isTypeMatch(fullname, interfaces, JAVA_UTIL_MAP)) {
-          validateSupportedTypes(fullname, MAP_SUPPORTED_TYPES);
-          validateParameterTypes(fullname, type.getTypeArguments(), 2);
+        } else if (isTypeMatch(canonicalName, interfaces, JAVA_UTIL_MAP)) {
+          validateSupportedTypes(canonicalName, MAP_SUPPORTED_TYPES);
+          validateParameterTypes(canonicalName, type.getTypeArguments(), 2);
           typeDetail.setTypeDetailEnum(TypeDetailEnum.MAP);
         } else {
           TypeElement typeElement = (TypeElement) element;
@@ -69,21 +69,21 @@ public class FieldTypeParser {
     return typeDetail;
   }
 
-  private void validateSupportedTypes(final String fullname, Set<String> supportedTypes) {
-    if (!supportedTypes.contains(fullname)) {
-      throw new CharybdisParsingException(format("Type '%s' is not supported, try using ['%s'] instead", fullname,
+  private void validateSupportedTypes(final String canonicalName, Set<String> supportedTypes) {
+    if (!supportedTypes.contains(canonicalName)) {
+      throw new CharybdisParsingException(format("Type '%s' is not supported, try using ['%s'] instead", canonicalName,
                                                  StringUtils.join(supportedTypes, ",")));
     }
   }
 
-  private void validateParameterTypes(final String typeFullname, final List<? extends TypeMirror> parameterTypes, final int expectedParameterTypes) {
+  private void validateParameterTypes(final String typeCanonicalName, final List<? extends TypeMirror> parameterTypes, final int expectedParameterTypes) {
     if (parameterTypes.size() != expectedParameterTypes) {
-      throw new CharybdisParsingException(format("type '%s' should have '%d' parameter type(s)", typeFullname, expectedParameterTypes));
+      throw new CharybdisParsingException(format("type '%s' should have '%d' parameter type(s)", typeCanonicalName, expectedParameterTypes));
     }
   }
 
-  private boolean isTypeMatch(String fullname, List<Type> interfaces, String typeName) {
-    return typeName.equals(fullname) || interfaces.stream().anyMatch(inter -> Objects.equals(getGenericType(inter), typeName));
+  private boolean isTypeMatch(String canonicalName, List<Type> interfaces, String typeName) {
+    return typeName.equals(canonicalName) || interfaces.stream().anyMatch(inter -> Objects.equals(getGenericType(inter), typeName));
   }
 
   private String getErasedType(TypeMirror typeMirror, Types types) {
