@@ -1,4 +1,4 @@
-package ma.markware.charybdis.domain;
+package ma.markware.charybdis.apt.domain;
 
 import ma.markware.charybdis.model.annotation.Udt;
 import ma.markware.charybdis.model.annotation.UdtField;
@@ -14,6 +14,9 @@ public class Address {
 
   @UdtField
   private String city;
+
+  @UdtField
+  private Country country;
 
   public int getNumber() {
     return number;
@@ -37,5 +40,13 @@ public class Address {
 
   public void setCity(final String city) {
     this.city = city;
+  }
+
+  public Country getCountry() {
+    return country;
+  }
+
+  public void setCountry(final Country country) {
+    this.country = country;
   }
 }

@@ -1,0 +1,44 @@
+package ma.markware.charybdis.apt.domain;
+
+import com.datastax.oss.driver.api.core.data.UdtValue;
+import com.datastax.oss.driver.api.core.type.UserDefinedType;
+import com.datastax.oss.driver.internal.core.type.UserDefinedTypeBuilder;
+import java.lang.String;
+import ma.markware.charybdis.model.datatype.DataTypeMapper;
+import ma.markware.charybdis.model.metadata.UdtMetadata;
+
+public class Country_Udt implements UdtMetadata<Country> {
+  public static final Country_Udt country = new Country_Udt();
+
+  public static final String KEYSPACE_NAME = "test_keyspace";
+
+  public static final String UDT_NAME = "country";
+
+  public static final UserDefinedType udt = new UserDefinedTypeBuilder(KEYSPACE_NAME, UDT_NAME)
+  .withField("name", DataTypeMapper.getDataType(java.lang.String.class))
+  .withField("countrycode", DataTypeMapper.getDataType(java.lang.String.class)).build();
+
+  private Country_Udt() {
+  }
+
+  public String getKeyspaceName() {
+    return KEYSPACE_NAME;
+  }
+
+  public String getUdtName() {
+    return UDT_NAME;
+  }
+
+  public UdtValue serialize(Country entity) {
+    return udt.newValue()
+        .set("name", entity.getName(), java.lang.String.class)
+        .set("countrycode", entity.getCountryCode(), java.lang.String.class);
+  }
+
+  public Country deserialize(UdtValue udtValue) {
+    Country entity = new Country();
+    entity.setName(udtValue.get("name", java.lang.String.class));
+    entity.setCountryCode(udtValue.get("countrycode", java.lang.String.class));
+    return entity;
+  }
+}

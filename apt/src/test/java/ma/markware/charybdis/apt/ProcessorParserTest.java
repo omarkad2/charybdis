@@ -8,6 +8,7 @@ import static org.mockito.Mockito.when;
 
 import java.time.Instant;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -16,17 +17,19 @@ import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
+import ma.markware.charybdis.apt.domain.Address;
+import ma.markware.charybdis.apt.domain.Country;
+import ma.markware.charybdis.apt.domain.KeyspaceDefinition;
+import ma.markware.charybdis.apt.domain.RoleEnum;
+import ma.markware.charybdis.apt.domain.User;
 import ma.markware.charybdis.apt.metatype.AbstractFieldMetaType;
 import ma.markware.charybdis.apt.metatype.ColumnFieldMetaType;
 import ma.markware.charybdis.apt.metatype.KeyspaceMetaType;
 import ma.markware.charybdis.apt.metatype.TableMetaType;
 import ma.markware.charybdis.apt.metatype.TypeDetail;
+import ma.markware.charybdis.apt.metatype.TypeDetail.TypeDetailEnum;
 import ma.markware.charybdis.apt.metatype.UdtFieldMetaType;
 import ma.markware.charybdis.apt.metatype.UdtMetaType;
-import ma.markware.charybdis.domain.Address;
-import ma.markware.charybdis.domain.KeyspaceDefinition;
-import ma.markware.charybdis.domain.RoleEnum;
-import ma.markware.charybdis.domain.User;
 import ma.markware.charybdis.model.annotation.Udt;
 import ma.markware.charybdis.model.option.ClusteringOrderEnum;
 import ma.markware.charybdis.model.option.Replication;
@@ -47,7 +50,7 @@ class ProcessorParserTest {
   private AptDefaultConfiguration configuration = new AptDefaultConfiguration();
   private Types types;
   private TypeElement keyspaceTypeElement;
-  private TypeElement addressUdtElement;
+  private TypeElement addressUdtElement, countryUdtElement;
   private TypeElement userTableElement;
 
   @BeforeEach
@@ -55,8 +58,9 @@ class ProcessorParserTest {
     this.types = types;
     keyspaceTypeElement = elements.getTypeElement(KeyspaceDefinition.class.getCanonicalName());
     addressUdtElement = elements.getTypeElement(Address.class.getCanonicalName());
+    countryUdtElement = elements.getTypeElement(Country.class.getCanonicalName());
     userTableElement = elements.getTypeElement(User.class.getCanonicalName());
-    when(roundEnvironment.getElementsAnnotatedWith(Udt.class)).thenReturn((Set) Collections.singleton(addressUdtElement));
+    when(roundEnvironment.getElementsAnnotatedWith(Udt.class)).thenReturn((Set) new HashSet<>(asList(addressUdtElement, countryUdtElement)));
     aptContext.init(roundEnvironment, configuration);
   }
 
@@ -82,7 +86,9 @@ class ProcessorParserTest {
             tuple("street", "street", buildTypeDetail(String.class.getCanonicalName(), TypeDetail.TypeDetailEnum.NORMAL), EMPTY_LIST,
                   "getStreet", "setStreet"),
             tuple("city", "city", buildTypeDetail(String.class.getCanonicalName(), TypeDetail.TypeDetailEnum.NORMAL), EMPTY_LIST,
-                  "getCity", "setCity")
+                  "getCity", "setCity"),
+            tuple("country", "country", buildTypeDetail(Country.class.getCanonicalName(), TypeDetailEnum.UDT), EMPTY_LIST,
+                  "getCountry", "setCountry")
         );
   }
 

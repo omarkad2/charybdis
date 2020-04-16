@@ -1,4 +1,4 @@
-package ma.markware.charybdis.domain;
+package ma.markware.charybdis.apt.domain;
 
 public enum RoleEnum {
 

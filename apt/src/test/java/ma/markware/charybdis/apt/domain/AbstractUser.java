@@ -1,4 +1,4 @@
-package ma.markware.charybdis.domain;
+package ma.markware.charybdis.apt.domain;
 
 import java.time.Instant;
 import ma.markware.charybdis.model.annotation.Column;

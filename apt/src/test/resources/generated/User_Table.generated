@@ -1,0 +1,153 @@
+package ma.markware.charybdis.apt.domain;
+
+import com.datastax.oss.driver.api.core.cql.Row;
+import java.lang.Object;
+import java.lang.String;
+import java.time.Instant;
+import java.util.HashMap;
+import java.util.Map;
+import ma.markware.charybdis.model.metadata.ColumnMetadata;
+import ma.markware.charybdis.model.metadata.TableMetadata;
+import ma.markware.charybdis.model.option.ClusteringOrderEnum;
+import ma.markware.charybdis.model.option.SequenceModelEnum;
+
+public class User_Table implements TableMetadata<User> {
+  public static final ColumnMetadata id = new ColumnMetadata("id", true, 0, false, null, null, false, null);
+
+  public static final ColumnMetadata fullname = new ColumnMetadata("fullname", false, null, true, 0, ClusteringOrderEnum.ASC, false, null);
+
+  public static final ColumnMetadata joiningDate = new ColumnMetadata("joining_date", false, null, true, 1, ClusteringOrderEnum.DESC, false, null);
+
+  public static final ColumnMetadata email = new ColumnMetadata("email", false, null, false, null, null, false, null);
+
+  public static final ColumnMetadata password = new ColumnMetadata("password", false, null, false, null, null, false, null);
+
+  public static final ColumnMetadata address = new ColumnMetadata("address", false, null, false, null, null, false, null);
+
+  public static final ColumnMetadata followers = new ColumnMetadata("followers", false, null, false, null, null, false, null);
+
+  public static final ColumnMetadata role = new ColumnMetadata("role", false, null, false, null, null, true, "user_role_idx");
+
+  public static final ColumnMetadata accessLogs = new ColumnMetadata("access_logs", false, null, false, null, null, false, null);
+
+  public static final ColumnMetadata metadata = new ColumnMetadata("metadata", false, null, false, null, null, false, null);
+
+  public static final ColumnMetadata creationDate = new ColumnMetadata("creation_date", false, null, false, null, null, false, null);
+
+  public static final ColumnMetadata lastUpdatedDate = new ColumnMetadata("last_updated_date", false, null, false, null, null, false, null);
+
+  public static final User_Table user = new User_Table();
+
+  public static final String KEYSPACE_NAME = "test_keyspace";
+
+  public static final String TABLE_NAME = "user";
+
+  private User_Table() {
+  }
+
+  public String getKeyspaceName() {
+    return KEYSPACE_NAME;
+  }
+
+  public String getTableName() {
+    return TABLE_NAME;
+  }
+
+  public Map<String, ColumnMetadata> getColumns() {
+    Map<String, ColumnMetadata> results = new HashMap<>();
+    results.put("id", id);
+    results.put("fullname", fullname);
+    results.put("joining_date", joiningDate);
+    results.put("email", email);
+    results.put("password", password);
+    results.put("address", address);
+    results.put("followers", followers);
+    results.put("role", role);
+    results.put("access_logs", accessLogs);
+    results.put("metadata", metadata);
+    results.put("creation_date", creationDate);
+    results.put("last_updated_date", lastUpdatedDate);
+    return results;
+  }
+
+  public Map<String, ColumnMetadata> getPartitionKeyColumns() {
+    Map<String, ColumnMetadata> results = new HashMap<>();
+    results.put("id", id);
+    return results;
+  }
+
+  public Map<String, ColumnMetadata> getClusteringKeyColumns() {
+    Map<String, ColumnMetadata> results = new HashMap<>();
+    results.put("fullname", fullname);
+    results.put("joining_date", joiningDate);
+    return results;
+  }
+
+  public ColumnMetadata getColumnMetadata(String columnName) {
+    return getColumns().get(columnName);
+  }
+
+  public boolean isPrimaryKey(String columnName) {
+    return getPartitionKeyColumns().containsKey(columnName) || getClusteringKeyColumns().containsKey(columnName);
+  }
+
+  public int getPrimaryKeySize() {
+    return getPartitionKeyColumns().size() + getClusteringKeyColumns().size();
+  }
+
+  public int getColumnsSize() {
+    return getColumns().size();
+  }
+
+  public void setGeneratedValues(User entity) {
+    if (entity != null) {
+      entity.setId((java.util.UUID) SequenceModelEnum.UUID.getGenerationMethod().get());
+    }
+  }
+
+  public void setCreationDate(User entity, Instant creationDate) {
+    if (entity != null) {
+      entity.setCreationDate(creationDate);
+    }
+  }
+
+  public void setLastUpdatedDate(User entity, Instant lastUpdatedDate) {
+    if (entity != null) {
+      entity.setLastUpdatedDate(lastUpdatedDate);
+    }
+  }
+
+  public Map<String, Object> serialize(User entity) {
+    Map<String, Object> columnValueMap = new HashMap<>();
+    columnValueMap.put("id", entity.getId());
+    columnValueMap.put("fullname", entity.getFullname());
+    columnValueMap.put("joining_date", entity.getJoiningDate());
+    columnValueMap.put("email", entity.getEmail());
+    columnValueMap.put("password", entity.getPassword());
+    columnValueMap.put("address", Address_Udt.address.serialize(entity.getAddress()));
+    columnValueMap.put("followers", entity.getFollowers());
+    columnValueMap.put("role", entity.getRole() != null ? entity.getRole().name() : null);
+    columnValueMap.put("access_logs", entity.getAccessLogs());
+    columnValueMap.put("metadata", entity.getMetadata());
+    columnValueMap.put("creation_date", entity.getCreationDate());
+    columnValueMap.put("last_updated_date", entity.getLastUpdatedDate());
+    return columnValueMap;
+  }
+
+  public User deserialize(Row row) {
+    User entity = new User();
+    entity.setId(row.get("id", java.util.UUID.class));
+    entity.setFullname(row.get("fullname", java.lang.String.class));
+    entity.setJoiningDate(row.get("joining_date", java.time.Instant.class));
+    entity.setEmail(row.get("email", java.lang.String.class));
+    entity.setPassword(row.get("password", java.lang.String.class));
+    entity.setAddress(Address_Udt.address.deserialize(row.getUdtValue("address")));
+    entity.setFollowers(row.getList("followers", java.util.UUID.class));
+    entity.setRole(row.getString("role") != null ? ma.markware.charybdis.apt.domain.RoleEnum.valueOf(row.getString("role")) : null);
+    entity.setAccessLogs(row.getSet("access_logs", java.time.Instant.class));
+    entity.setMetadata(row.getMap("metadata", java.lang.String.class, java.lang.String.class));
+    entity.setCreationDate(row.get("creation_date", java.time.Instant.class));
+    entity.setLastUpdatedDate(row.get("last_updated_date", java.time.Instant.class));
+    return entity;
+  }
+}

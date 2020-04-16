@@ -1,0 +1,50 @@
+package ma.markware.charybdis.apt.domain;
+
+import com.datastax.oss.driver.api.core.data.UdtValue;
+import com.datastax.oss.driver.api.core.type.UserDefinedType;
+import com.datastax.oss.driver.internal.core.type.UserDefinedTypeBuilder;
+import java.lang.String;
+import ma.markware.charybdis.model.datatype.DataTypeMapper;
+import ma.markware.charybdis.model.metadata.UdtMetadata;
+
+public class Address_Udt implements UdtMetadata<Address> {
+  public static final Address_Udt address = new Address_Udt();
+
+  public static final String KEYSPACE_NAME = "test_keyspace";
+
+  public static final String UDT_NAME = "address";
+
+  public static final UserDefinedType udt = new UserDefinedTypeBuilder(KEYSPACE_NAME, UDT_NAME)
+  .withField("number", DataTypeMapper.getDataType(int.class))
+  .withField("street", DataTypeMapper.getDataType(java.lang.String.class))
+  .withField("city", DataTypeMapper.getDataType(java.lang.String.class))
+  .withField("country", Country_Udt.country.udt).build();
+
+  private Address_Udt() {
+  }
+
+  public String getKeyspaceName() {
+    return KEYSPACE_NAME;
+  }
+
+  public String getUdtName() {
+    return UDT_NAME;
+  }
+
+  public UdtValue serialize(Address entity) {
+    return udt.newValue()
+        .set("number", entity.getNumber(), int.class)
+        .set("street", entity.getStreet(), java.lang.String.class)
+        .set("city", entity.getCity(), java.lang.String.class)
+        .setUdtValue("country", Country_Udt.country.serialize(entity.getCountry()));
+  }
+
+  public Address deserialize(UdtValue udtValue) {
+    Address entity = new Address();
+    entity.setNumber(udtValue.get("number", int.class));
+    entity.setStreet(udtValue.get("street", java.lang.String.class));
+    entity.setCity(udtValue.get("city", java.lang.String.class));
+    entity.setCountry(Country_Udt.country.deserialize(udtValue.getUdtValue("country")));
+    return entity;
+  }
+}
