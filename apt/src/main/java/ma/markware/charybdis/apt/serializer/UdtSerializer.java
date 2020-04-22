@@ -45,7 +45,7 @@ public class UdtSerializer implements Serializer<UdtMetaType> {
                                                    buildStaticInstance(packageName, generatedClassName, udtName),
                                                    buildEntityNameField(SerializationConstants.KEYSPACE_NAME_ATTRIBUTE, keyspaceName),
                                                    buildEntityNameField(SerializationConstants.UDT_NAME_ATTRIBUTE, udtName),
-                                                   buildUdtField(udtMetaType.getUdtFields(), aptContext)))
+                                                   buildUdtField(udtMetaType, aptContext)))
                                                 .addMethods(Arrays.asList(
                                                    buildPrivateConstructor(),
                                                    buildGetEntityNameMethod(SerializationConstants.GET_KEYSPACE_NAME_METHOD, SerializationConstants.KEYSPACE_NAME_ATTRIBUTE),
@@ -58,11 +58,14 @@ public class UdtSerializer implements Serializer<UdtMetaType> {
   }
 
 
-  private FieldSpec buildUdtField(List<UdtFieldMetaType> udtFields, final AptContext aptContext) {
-    CodeBlock.Builder initializerBuilder = CodeBlock.builder().add("new $T($N, $N)", UserDefinedTypeBuilder.class,
-                                                                 SerializationConstants.KEYSPACE_NAME_ATTRIBUTE,
-                                                                 SerializationConstants.UDT_NAME_ATTRIBUTE);
-    for (UdtFieldMetaType udtField : udtFields) {
+  private FieldSpec buildUdtField(UdtMetaType udtMetaType, final AptContext aptContext) {
+    CodeBlock.Builder initializerBuilder = CodeBlock.builder()
+                                                    .add("new $T($N, $N)", UserDefinedTypeBuilder.class,
+                                                         SerializationConstants.KEYSPACE_NAME_ATTRIBUTE,
+                                                         SerializationConstants.UDT_NAME_ATTRIBUTE)
+                                                    .add(".frozen()");
+
+    for (UdtFieldMetaType udtField : udtMetaType.getUdtFields()) {
       String udtFieldName = udtField.getUdtFieldName();
       TypeDetail udtFieldType = udtField.getFieldType();
       List<TypeDetail> udtFieldSubTypes = udtField.getFieldSubTypes();

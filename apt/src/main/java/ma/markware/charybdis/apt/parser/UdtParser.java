@@ -68,6 +68,8 @@ public class UdtParser extends AbstractEntityParser<UdtMetaType, UdtFieldMetaTyp
       }
       udtFieldMetaType.setUdtFieldName(udtFieldName.toLowerCase());
 
+      udtFieldMetaType.setFrozen(udtField.frozen());
+
       return udtFieldMetaType;
     }
     return null;

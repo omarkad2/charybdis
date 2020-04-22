@@ -44,7 +44,7 @@
     <maven.compiler.source>${java.version}</maven.compiler.source>
     <slf4j.version>1.7.26</slf4j.version>
     <logback.version>1.2.3</logback.version>
-    <cassandra-driver.version>4.2.0</cassandra-driver.version>
+    <cassandra-driver.version>4.5.1</cassandra-driver.version>
     <snakeyaml.version>1.24</snakeyaml.version>
     <auto-service.version>1.0-rc6</auto-service.version>
     <javapoet.version>1.12.1</javapoet.version>

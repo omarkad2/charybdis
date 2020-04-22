@@ -11,5 +11,5 @@ public @interface Column {
 
   String name() default "";
 
-  boolean isEnum() default false;
+  boolean frozen() default false;
 }

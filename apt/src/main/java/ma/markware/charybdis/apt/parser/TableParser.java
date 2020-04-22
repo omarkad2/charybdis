@@ -98,6 +98,8 @@ public class TableParser extends AbstractEntityParser<TableMetaType, ColumnField
       }
       columnMetaType.setColumnName(columnName.toLowerCase());
 
+      columnMetaType.setFrozen(column.frozen());
+
       final PartitionKey partitionKey = annotatedField.getAnnotation(PartitionKey.class);
       if (partitionKey != null) {
         columnMetaType.setPartitionKeyIndex(partitionKey.index());

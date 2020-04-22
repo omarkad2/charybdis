@@ -10,4 +10,6 @@ import java.lang.annotation.Target;
 public @interface UdtField {
 
   String name() default "";
+
+  boolean frozen() default false;
 }

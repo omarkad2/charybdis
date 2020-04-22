@@ -9,6 +9,7 @@ public class AbstractFieldMetaType {
   private TypeMirror typeMirror;
   private TypeDetail fieldType;
   private List<TypeDetail> fieldSubTypes;
+  private boolean frozen;
   private String getterName;
   private String setterName;
 
@@ -19,6 +20,7 @@ public class AbstractFieldMetaType {
     this.typeMirror = abstractFieldMetaType.typeMirror;
     this.fieldType = abstractFieldMetaType.fieldType;
     this.fieldSubTypes = abstractFieldMetaType.fieldSubTypes;
+    this.frozen = abstractFieldMetaType.frozen;
     this.getterName = abstractFieldMetaType.getterName;
     this.setterName = abstractFieldMetaType.setterName;
   }
@@ -53,6 +55,14 @@ public class AbstractFieldMetaType {
 
   public void setFieldSubTypes(final List<TypeDetail> fieldSubTypes) {
     this.fieldSubTypes = fieldSubTypes;
+  }
+
+  public boolean isFrozen() {
+    return frozen;
+  }
+
+  public void setFrozen(final boolean frozen) {
+    this.frozen = frozen;
   }
 
   public String getGetterName() {
