@@ -1,16 +1,17 @@
 package ma.markware.charybdis.dsl.select;
 
 import java.util.Collection;
-import java.util.Map;
 import java.util.Optional;
+import ma.markware.charybdis.dsl.Record;
+import ma.markware.charybdis.query.PageRequest;
 
 public interface SelectFetchExpression {
 
-  Object fetchOne();
+  Record fetchOne();
 
-  Optional<Object> fetchOptional();
+  Optional<Record> fetchOptional();
 
-  Map<Object, Object> fetchMap();
+  Collection<Record> fetch();
 
-  Collection<Object> fetch();
+  Collection<Record> fetchPaged(PageRequest pageRequest);
 }

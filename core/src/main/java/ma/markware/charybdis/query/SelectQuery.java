@@ -1,6 +1,8 @@
 package ma.markware.charybdis.query;
 
+import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.cql.ResultSet;
+import com.datastax.oss.driver.api.core.cql.SimpleStatement;
 import com.datastax.oss.driver.api.core.metadata.schema.ClusteringOrder;
 import com.datastax.oss.driver.api.querybuilder.BindMarker;
 import com.datastax.oss.driver.api.querybuilder.QueryBuilder;
@@ -53,7 +55,7 @@ public class SelectQuery extends AbstractQuery {
 
   public void addSelectors(ColumnMetadata... columns) {
     for(ColumnMetadata column : columns) {
-      this.selectors.add(Selector.column(column.getName()));
+      this.selectors.add(Selector.column(column.getColumnName()));
     }
   }
 
@@ -98,7 +100,7 @@ public class SelectQuery extends AbstractQuery {
         }
         break;
       default:
-        //TODO throw error unsupported criteria expresssion
+        //TODO throw error unsupported criteria expression
         break;
     }
   }
@@ -119,7 +121,18 @@ public class SelectQuery extends AbstractQuery {
     this.allowFiltering = true;
   }
 
-  public Select build() {
+  @Override
+  public ResultSet execute(final CqlSession session) {
+    SimpleStatement simpleStatement = buildStatement();
+    return executeStatement(session, simpleStatement, bindValues.toArray());
+  }
+
+  public ResultSet execute(final CqlSession session, final PageRequest pageRequest) {
+    SimpleStatement simpleStatement = buildStatement();
+    return executeStatement(session, simpleStatement, pageRequest.getFetchSize(), pageRequest.getPagingState(), bindValues.toArray(), null);
+  }
+
+  private SimpleStatement buildStatement() {
     Select select = null;
     SelectFrom selectFrom = QueryBuilder.selectFrom(keyspace, table);
 
@@ -139,11 +152,6 @@ public class SelectQuery extends AbstractQuery {
       select = select.allowFiltering();
     }
 
-    return select;
-  }
-
-  @Override
-  public ResultSet execute() {
-    return null;
+    return select.build();
   }
 }

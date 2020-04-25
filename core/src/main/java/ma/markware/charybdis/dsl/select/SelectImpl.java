@@ -1,13 +1,15 @@
 package ma.markware.charybdis.dsl.select;
 
 import com.datastax.oss.driver.api.core.CqlSession;
+import com.datastax.oss.driver.api.core.cql.ResultSet;
 import java.util.Collection;
-import java.util.Map;
 import java.util.Optional;
 import ma.markware.charybdis.dsl.CriteriaExpression;
 import ma.markware.charybdis.dsl.OrderExpression;
+import ma.markware.charybdis.dsl.Record;
 import ma.markware.charybdis.model.metadata.ColumnMetadata;
 import ma.markware.charybdis.model.metadata.TableMetadata;
+import ma.markware.charybdis.query.PageRequest;
 import ma.markware.charybdis.query.SelectQuery;
 
 public class SelectImpl implements SelectInitExpression, SelectFromExpression, SelectConditionExpression, SelectLimitExpression, SelectOrderExpression,
@@ -68,22 +70,28 @@ public class SelectImpl implements SelectInitExpression, SelectFromExpression, S
   }
 
   @Override
-  public Object fetchOne() {
+  public Record fetchOne() {
+    selectQuery.addLimit(1);
+    ResultSet resultSet = selectQuery.execute(session);
+    if (resultSet == null) {
+      // TODO: throw exception may be
+      return null;
+    }
     return null;
   }
 
   @Override
-  public Optional<Object> fetchOptional() {
+  public Optional<Record> fetchOptional() {
     return Optional.empty();
   }
 
   @Override
-  public Map<Object, Object> fetchMap() {
+  public Collection<Record> fetch() {
     return null;
   }
 
   @Override
-  public Collection<Object> fetch() {
+  public Collection<Record> fetchPaged(final PageRequest pageRequest) {
     return null;
   }
 }

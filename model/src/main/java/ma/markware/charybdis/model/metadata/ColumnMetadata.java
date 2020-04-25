@@ -1,61 +1,25 @@
 package ma.markware.charybdis.model.metadata;
 
+import com.datastax.oss.driver.api.core.cql.Row;
 import ma.markware.charybdis.model.option.ClusteringOrderEnum;
 
-public class ColumnMetadata {
+public interface ColumnMetadata<T> {
 
-  private String name;
-  private boolean isPartitionKey;
-  private Integer partitionKeyIndex;
-  private boolean isClusteringKey;
-  private Integer clusteringKeyIndex;
-  private ClusteringOrderEnum clusteringOrder;
-  private String indexName;
-  private boolean isIndexed;
+  String getColumnName();
 
-  public ColumnMetadata(final String name, final boolean isPartitionKey, final Integer partitionKeyIndex,
-      final boolean isClusteringKey, final Integer clusteringKeyIndex, final ClusteringOrderEnum clusteringOrder,
-      final boolean isIndexed, final String indexName) {
-    this.name = name;
-    this.isPartitionKey = isPartitionKey;
-    this.partitionKeyIndex = partitionKeyIndex;
-    this.isClusteringKey = isClusteringKey;
-    this.clusteringKeyIndex = clusteringKeyIndex;
-    this.clusteringOrder =
-        clusteringOrder != null ? ClusteringOrderEnum.valueOf(clusteringOrder.name()) : null;
-    this.isIndexed = isIndexed;
-    this.indexName = indexName;
-  }
+  boolean isPartitionKey();
 
-  public String getName() {
-    return name;
-  }
+  Integer getPartitionKeyIndex();
 
-  public boolean isPartitionKey() {
-    return isPartitionKey;
-  }
+  boolean isClusteringKey();
 
-  public Integer getPartitionKeyIndex() {
-    return partitionKeyIndex;
-  }
+  Integer getClusteringKeyIndex();
 
-  public boolean isClusteringKey() {
-    return isClusteringKey;
-  }
+  ClusteringOrderEnum getClusteringOrder();
 
-  public Integer getClusteringKeyIndex() {
-    return clusteringKeyIndex;
-  }
+  boolean isIndexed();
 
-  public ClusteringOrderEnum getClusteringOrder() {
-    return clusteringOrder;
-  }
+  String getIndexName();
 
-  public String getIndexName() {
-    return indexName;
-  }
-
-  public boolean isIndexed() {
-    return isIndexed;
-  }
+  T getColumnValue(Row row);
 }
