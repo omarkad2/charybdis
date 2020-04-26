@@ -489,7 +489,7 @@ public class User_Table implements TableMetadata<User> {
     return TABLE_NAME;
   }
 
-  public Map<String, ColumnMetadata> getColumns() {
+  public Map<String, ColumnMetadata> getColumnsMetadata() {
     Map<String, ColumnMetadata> results = new HashMap<>();
     results.put("id", id);
     results.put("fullname", fullname);
@@ -520,7 +520,7 @@ public class User_Table implements TableMetadata<User> {
   }
 
   public ColumnMetadata getColumnMetadata(String columnName) {
-    return getColumns().get(columnName);
+    return getColumnsMetadata().get(columnName);
   }
 
   public boolean isPrimaryKey(String columnName) {
@@ -532,7 +532,7 @@ public class User_Table implements TableMetadata<User> {
   }
 
   public int getColumnsSize() {
-    return getColumns().size();
+    return getColumnsMetadata().size();
   }
 
   public void setGeneratedValues(User entity) {

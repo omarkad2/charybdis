@@ -34,6 +34,7 @@ public class SelectQuery extends AbstractQuery {
   private Map<String, ClusteringOrder> orderings;
   private Integer limit;
   private boolean allowFiltering;
+  private PageRequest pageRequest;
 
   public SelectQuery() {
     this.selectors = new ArrayList<>();
@@ -121,15 +122,17 @@ public class SelectQuery extends AbstractQuery {
     this.allowFiltering = true;
   }
 
+  public void addPageRequest(PageRequest pageRequest) {
+    this.pageRequest = pageRequest;
+  }
+
   @Override
   public ResultSet execute(final CqlSession session) {
     SimpleStatement simpleStatement = buildStatement();
+    if (pageRequest != null) {
+      return executeStatement(session, simpleStatement, pageRequest.getFetchSize(), pageRequest.getPagingState(), bindValues.toArray());
+    }
     return executeStatement(session, simpleStatement, bindValues.toArray());
-  }
-
-  public ResultSet execute(final CqlSession session, final PageRequest pageRequest) {
-    SimpleStatement simpleStatement = buildStatement();
-    return executeStatement(session, simpleStatement, pageRequest.getFetchSize(), pageRequest.getPagingState(), bindValues.toArray(), null);
   }
 
   private SimpleStatement buildStatement() {

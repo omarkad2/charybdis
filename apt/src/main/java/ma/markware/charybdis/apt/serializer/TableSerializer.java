@@ -54,7 +54,7 @@ public class TableSerializer implements Serializer<TableMetaType> {
                                                       buildPrivateConstructor(),
                                                       buildGetEntityNameMethod(SerializationConstants.GET_KEYSPACE_NAME_METHOD, SerializationConstants.KEYSPACE_NAME_ATTRIBUTE),
                                                       buildGetEntityNameMethod(SerializationConstants.GET_TABLE_NAME_METHOD, SerializationConstants.TABLE_NAME_ATTRIBUTE),
-                                                      buildColumnsGetterMethod(SerializationConstants.GET_ALL_COLUMNS_METHOD, tableMetaType.getColumns()),
+                                                      buildColumnsGetterMethod(SerializationConstants.GET_COLUMNS_METADATA_METHOD, tableMetaType.getColumns()),
                                                       buildColumnsGetterMethod(SerializationConstants.GET_PARTITION_KEY_COLUMNS_METHOD, tableMetaType.getPartitionKeyColumns()),
                                                       buildColumnsGetterMethod(SerializationConstants.GET_CLUSTERING_KEY_COLUMNS_METHOD, tableMetaType.getClusteringKeyColumns()),
                                                       buildGetColumnMetadata(),
@@ -83,8 +83,8 @@ public class TableSerializer implements Serializer<TableMetaType> {
       ParameterizedTypeName fieldType = ParameterizedTypeName.get(ClassName.get(ColumnMetadata.class), TypeName.get(columnFieldMetaType.getTypeMirror()));
       CodeBlock.Builder initializerBuilder = CodeBlock.builder()
                                                       .add("$L", TypeSpec.anonymousClassBuilder("")
-                                                                            .addSuperinterface(fieldType)
-                                                                            .addMethods(Arrays.asList(
+                                                                         .addSuperinterface(fieldType)
+                                                                         .addMethods(Arrays.asList(
                                                                                 buildColumnMetadataGetColumnNameMethod(columnFieldMetaType),
                                                                                 buildColumnMetadataIsPartitionKeyMethod(columnFieldMetaType),
                                                                                 buildColumnMetadataGetPartitionKeyIndexMethod(columnFieldMetaType),
@@ -94,8 +94,8 @@ public class TableSerializer implements Serializer<TableMetaType> {
                                                                                 buildColumnMetadataIsIndexedMethod(columnFieldMetaType),
                                                                                 buildColumnMetadataGetIndexNameMethod(columnFieldMetaType),
                                                                                 buildColumnMetadataGetColumnValueMethod(columnFieldMetaType, aptContext)
-                                                                            ))
-                                                                            .build());
+                                                                         ))
+                                                                         .build());
 
       columnFieldSpecs[i] = (FieldSpec.builder(fieldType, columnFieldMetaType.getFieldName())
                                     .addModifiers(Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)
@@ -243,7 +243,7 @@ public class TableSerializer implements Serializer<TableMetaType> {
                      .addModifiers(Modifier.PUBLIC)
                      .addParameter(String.class, parameterName)
                      .returns(ColumnMetadata.class)
-                     .addStatement("return $L().get($N)", SerializationConstants.GET_ALL_COLUMNS_METHOD, parameterName)
+                     .addStatement("return $L().get($N)", SerializationConstants.GET_COLUMNS_METADATA_METHOD, parameterName)
                      .build();
   }
 
@@ -272,7 +272,7 @@ public class TableSerializer implements Serializer<TableMetaType> {
     return MethodSpec.methodBuilder(SerializationConstants.GET_COLUMNS_SIZE_METHOD)
                      .addModifiers(Modifier.PUBLIC)
                      .returns(int.class)
-                     .addStatement("return $L().size()", SerializationConstants.GET_ALL_COLUMNS_METHOD)
+                     .addStatement("return $L().size()", SerializationConstants.GET_COLUMNS_METADATA_METHOD)
                      .build();
   }
 

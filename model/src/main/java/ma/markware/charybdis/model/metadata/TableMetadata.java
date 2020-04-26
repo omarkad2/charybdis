@@ -12,6 +12,8 @@ public interface TableMetadata<ENTITY> {
 
   ColumnMetadata getColumnMetadata(String columnName);
 
+  Map<String, ColumnMetadata> getColumnsMetadata();
+
   int getPrimaryKeySize();
 
   int getColumnsSize();

@@ -2,11 +2,13 @@ package ma.markware.charybdis.dsl.select;
 
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.cql.ResultSet;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Optional;
 import ma.markware.charybdis.dsl.CriteriaExpression;
 import ma.markware.charybdis.dsl.OrderExpression;
 import ma.markware.charybdis.dsl.Record;
+import ma.markware.charybdis.dsl.utils.RecordUtils;
 import ma.markware.charybdis.model.metadata.ColumnMetadata;
 import ma.markware.charybdis.model.metadata.TableMetadata;
 import ma.markware.charybdis.query.PageRequest;
@@ -17,18 +19,21 @@ public class SelectImpl implements SelectInitExpression, SelectFromExpression, S
 
   private final CqlSession session;
   private final SelectQuery selectQuery;
+  private Collection<ColumnMetadata> selectedColumnsMetadata;
 
   public SelectImpl(final CqlSession session) {
     this.session = session;
     this.selectQuery = new SelectQuery();
   }
 
-  public SelectInitExpression select(final ColumnMetadata... columns) {
+  public SelectInitExpression select(final ColumnMetadata<?>... columns) {
+    this.selectedColumnsMetadata = Arrays.asList(columns);
     selectQuery.addSelectors(columns);
     return this;
   }
 
   public SelectFromExpression selectFrom(final TableMetadata tableMetadata) {
+    this.selectedColumnsMetadata = tableMetadata.getColumnsMetadata().values();
     selectQuery.addSelectFrom(tableMetadata);
     return this;
   }
@@ -77,21 +82,27 @@ public class SelectImpl implements SelectInitExpression, SelectFromExpression, S
       // TODO: throw exception may be
       return null;
     }
-    return null;
+    return RecordUtils.rowToRecord(resultSet.one(), selectedColumnsMetadata);
   }
 
   @Override
   public Optional<Record> fetchOptional() {
-    return Optional.empty();
+    return Optional.ofNullable(fetchOne());
   }
 
   @Override
   public Collection<Record> fetch() {
-    return null;
+    ResultSet resultSet = selectQuery.execute(session);
+    if (resultSet == null) {
+      return null;
+    }
+    return RecordUtils.resultSetToRecords(resultSet, selectedColumnsMetadata);
   }
 
   @Override
-  public Collection<Record> fetchPaged(final PageRequest pageRequest) {
-    return null;
+  public Collection<Record> fetchPage(final PageRequest pageRequest) {
+    selectQuery.addPageRequest(pageRequest);
+    return fetch();
   }
+
 }

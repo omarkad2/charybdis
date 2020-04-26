@@ -23,7 +23,7 @@ final class SerializationConstants {
   static final String IS_INDEXED_METHOD = "isIndexed";
   static final String GET_INDEX_NAME_METHOD = "getIndexName";
   static final String GET_COLUMN_VALUE_METHOD = "getColumnValue";
-  static final String GET_ALL_COLUMNS_METHOD = "getColumns";
+  static final String GET_COLUMNS_METADATA_METHOD = "getColumnsMetadata";
   static final String GET_PARTITION_KEY_COLUMNS_METHOD = "getPartitionKeyColumns";
   static final String GET_CLUSTERING_KEY_COLUMNS_METHOD = "getClusteringKeyColumns";
   static final String GET_COLUMN_METADATA_METHOD = "getColumnMetadata";

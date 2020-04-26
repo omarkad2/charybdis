@@ -13,5 +13,5 @@ public interface SelectFetchExpression {
 
   Collection<Record> fetch();
 
-  Collection<Record> fetchPaged(PageRequest pageRequest);
+  Collection<Record> fetchPage(PageRequest pageRequest);
 }

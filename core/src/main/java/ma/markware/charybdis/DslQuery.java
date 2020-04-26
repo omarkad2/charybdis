@@ -1,7 +1,9 @@
 package ma.markware.charybdis;
 
+import com.datastax.oss.driver.api.core.config.DriverExecutionProfile;
 import ma.markware.charybdis.dsl.delete.DeleteInitExpression;
 import ma.markware.charybdis.dsl.insert.InsertInitExpression;
+import ma.markware.charybdis.dsl.insert.InsertInitWithColumnsExpression;
 import ma.markware.charybdis.dsl.select.SelectFromExpression;
 import ma.markware.charybdis.dsl.select.SelectInitExpression;
 import ma.markware.charybdis.dsl.update.UpdateInitExpression;
@@ -14,9 +16,15 @@ public interface DslQuery {
 
   SelectFromExpression selectFrom(TableMetadata table);
 
-  InsertInitExpression insert();
+  InsertInitExpression insertInto(TableMetadata table);
 
-  UpdateInitExpression update();
+  InsertInitWithColumnsExpression insertInto(TableMetadata table, ColumnMetadata... columns);
+
+  UpdateInitExpression update(TableMetadata table);
 
   DeleteInitExpression delete();
+
+  DslQuery using(DriverExecutionProfile executionProfile);
+
+  DslQuery using(String executionProfile);
 }
