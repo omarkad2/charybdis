@@ -1,5 +1,8 @@
 package ma.markware.charybdis.dsl.delete;
 
-public class DeleteInitExpression {
+import ma.markware.charybdis.model.metadata.TableMetadata;
 
+public interface DeleteInitExpression {
+
+  DeleteUsingTimestampExpression from(TableMetadata table);
 }

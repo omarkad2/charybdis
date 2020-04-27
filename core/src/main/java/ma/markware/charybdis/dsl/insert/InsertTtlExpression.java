@@ -2,5 +2,5 @@ package ma.markware.charybdis.dsl.insert;
 
 public interface InsertTtlExpression extends InsertExecuteExpression {
 
-  InsertExecuteExpression ttl(int seconds);
+  InsertExecuteExpression usingTtl(int seconds);
 }

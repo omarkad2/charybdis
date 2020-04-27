@@ -14,7 +14,7 @@ import ma.markware.charybdis.model.metadata.TableMetadata;
 import ma.markware.charybdis.query.PageRequest;
 import ma.markware.charybdis.query.SelectQuery;
 
-public class SelectImpl implements SelectInitExpression, SelectFromExpression, SelectConditionExpression, SelectLimitExpression, SelectOrderExpression,
+public class SelectImpl implements SelectInitExpression, SelectWhereExpression, SelectExtraWhereExpression, SelectLimitExpression, SelectOrderExpression,
     SelectFilteringExpression, SelectFetchExpression {
 
   private final CqlSession session;
@@ -32,26 +32,26 @@ public class SelectImpl implements SelectInitExpression, SelectFromExpression, S
     return this;
   }
 
-  public SelectFromExpression selectFrom(final TableMetadata tableMetadata) {
+  public SelectWhereExpression selectFrom(final TableMetadata tableMetadata) {
     this.selectedColumnsMetadata = tableMetadata.getColumnsMetadata().values();
     selectQuery.addSelectFrom(tableMetadata);
     return this;
   }
 
   @Override
-  public SelectFromExpression from(final TableMetadata tableMetadata) {
+  public SelectWhereExpression from(final TableMetadata tableMetadata) {
     selectQuery.addFrom(tableMetadata);
     return this;
   }
 
   @Override
-  public SelectConditionExpression where(final CriteriaExpression criteriaExpression) {
+  public SelectExtraWhereExpression where(final CriteriaExpression criteriaExpression) {
     selectQuery.addWhere(criteriaExpression);
     return this;
   }
 
   @Override
-  public SelectConditionExpression and(final CriteriaExpression criteriaExpression) {
+  public SelectExtraWhereExpression and(final CriteriaExpression criteriaExpression) {
     selectQuery.addAndCondition(criteriaExpression);
     return this;
   }

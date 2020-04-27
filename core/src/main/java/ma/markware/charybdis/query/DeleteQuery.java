@@ -3,64 +3,64 @@ package ma.markware.charybdis.query;
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.cql.ResultSet;
 import com.datastax.oss.driver.api.core.cql.SimpleStatement;
-import com.datastax.oss.driver.api.core.metadata.schema.ClusteringOrder;
 import com.datastax.oss.driver.api.querybuilder.BindMarker;
 import com.datastax.oss.driver.api.querybuilder.QueryBuilder;
+import com.datastax.oss.driver.api.querybuilder.condition.Condition;
+import com.datastax.oss.driver.api.querybuilder.delete.Delete;
+import com.datastax.oss.driver.api.querybuilder.delete.DeleteSelection;
 import com.datastax.oss.driver.api.querybuilder.relation.Relation;
-import com.datastax.oss.driver.api.querybuilder.select.Select;
-import com.datastax.oss.driver.api.querybuilder.select.SelectFrom;
 import com.datastax.oss.driver.api.querybuilder.select.Selector;
-import com.datastax.oss.driver.internal.querybuilder.select.AllSelector;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import ma.markware.charybdis.dsl.CriteriaExpression;
-import ma.markware.charybdis.dsl.OrderExpression;
 import ma.markware.charybdis.model.metadata.ColumnMetadata;
 import ma.markware.charybdis.model.metadata.TableMetadata;
 
-public class SelectQuery extends AbstractQuery {
-
-  private static final List<Selector> SELECT_ALL = Collections.singletonList(AllSelector.INSTANCE);
+public class DeleteQuery extends AbstractQuery {
 
   private String keyspace;
   private String table;
   private List<Selector> selectors;
   private List<Relation> relations;
+  private List<Condition> conditions;
   private List<Object> bindValues;
-  private Map<String, ClusteringOrder> orderings;
-  private Integer limit;
-  private boolean allowFiltering;
-  private PageRequest pageRequest;
+  private Long timestamp;
+  private boolean ifExists;
 
-  public SelectQuery() {
+  public DeleteQuery() {
     this.selectors = new ArrayList<>();
     this.relations = new ArrayList<>();
+    this.conditions = new ArrayList<>();
     this.bindValues = new ArrayList<>();
-    this.orderings = new HashMap<>();
-    this.allowFiltering = false;
   }
 
-  public void addFrom(TableMetadata tableMetadata) {
+  public void addTable(TableMetadata tableMetadata) {
     this.keyspace = tableMetadata.getKeyspaceName();
     this.table = tableMetadata.getTableName();
   }
 
-  public void addSelectFrom(TableMetadata tableMetadata) {
-    addFrom(tableMetadata);
-    this.selectors = SELECT_ALL;
-  }
-
-  public void addSelectors(ColumnMetadata... columns) {
-    for(ColumnMetadata column : columns) {
+  public void addSelectors(ColumnMetadata... columnsMetadata) {
+    for(ColumnMetadata column : columnsMetadata) {
       this.selectors.add(Selector.column(column.getColumnName()));
     }
   }
 
-  public void addAndCondition(CriteriaExpression criteriaExpression) {
+  public void addTimestamp(Instant timestamp) {
+    this.timestamp = timestamp.toEpochMilli();
+  }
+
+  public void addTimestamp(long timestamp) {
+    this.timestamp = timestamp;
+  }
+
+  public void enableIfExists() {
+    this.ifExists = true;
+  }
+
+  public void addWhere(CriteriaExpression criteriaExpression) {
     String columnName = criteriaExpression.getColumnName();
     Object[] values = criteriaExpression.getValues();
     switch(criteriaExpression.getCriteriaOperator()) {
@@ -106,51 +106,69 @@ public class SelectQuery extends AbstractQuery {
     }
   }
 
-  public void addWhere(CriteriaExpression criteriaExpression) {
-    addAndCondition(criteriaExpression);
-  }
-
-  public void addOrderBy(OrderExpression orderExpression) {
-    orderings.put(orderExpression.getColumnName(), orderExpression.getClusteringOrder());
-  }
-
-  public void addLimit(int limit) {
-    this.limit = limit;
-  }
-
-  public void enableFiltering() {
-    this.allowFiltering = true;
-  }
-
-  public void addPageRequest(PageRequest pageRequest) {
-    this.pageRequest = pageRequest;
+  public void addIf(CriteriaExpression criteriaExpression) {
+    String columnName = criteriaExpression.getColumnName();
+    Object[] values = criteriaExpression.getValues();
+    switch(criteriaExpression.getCriteriaOperator()) {
+      case EQ:
+        conditions.add(Condition.column(columnName).isEqualTo(QueryBuilder.bindMarker()));
+        bindValues.add(values[0]);
+        break;
+      case GT:
+        conditions.add(Condition.column(columnName).isGreaterThan(QueryBuilder.bindMarker()));
+        bindValues.add(values[0]);
+        break;
+      case GTE:
+        conditions.add(Condition.column(columnName).isGreaterThanOrEqualTo(QueryBuilder.bindMarker()));
+        bindValues.add(values[0]);
+        break;
+      case LT:
+        conditions.add(Condition.column(columnName).isLessThan(QueryBuilder.bindMarker()));
+        bindValues.add(values[0]);
+        break;
+      case LTE:
+        conditions.add(Condition.column(columnName).isLessThanOrEqualTo(QueryBuilder.bindMarker()));
+        bindValues.add(values[0]);
+        break;
+      case IN:
+        if (values.length > 0) {
+          final BindMarker[] bindMarkers = new BindMarker[values.length];
+          Arrays.fill(bindMarkers, QueryBuilder.bindMarker());
+          conditions.add(Condition.column(columnName)
+                                .in(bindMarkers));
+          Collections.addAll(bindValues, values);
+        } else {
+          conditions.add(Condition.column(columnName)
+                                .in(QueryBuilder.raw("")));
+        }
+        break;
+      default:
+        //TODO throw error unsupported criteria expression
+        break;
+    }
   }
 
   @Override
   public ResultSet execute(final CqlSession session) {
-    Select select = null;
-    SelectFrom selectFrom = QueryBuilder.selectFrom(keyspace, table);
+    DeleteSelection deleteSelection = QueryBuilder.deleteFrom(keyspace, table);
 
-    if (SELECT_ALL.equals(selectors)) {
-      select = selectFrom.all();
-    } else {
-      select = selectFrom.selectors(selectors);
+    if (!selectors.isEmpty()) {
+      deleteSelection = deleteSelection.selectors(this.selectors);
     }
 
-    select = select.where(relations).orderBy(orderings);
-
-    if (limit != null) {
-      select = select.limit(limit);
+    if (timestamp != null) {
+      deleteSelection = deleteSelection.usingTimestamp(timestamp);
     }
 
-    if (allowFiltering) {
-      select = select.allowFiltering();
+    Delete delete = deleteSelection.where(relations);
+
+    if (ifExists) {
+      delete = delete.ifExists();
     }
 
-    SimpleStatement simpleStatement = select.build();
-    if (pageRequest != null) {
-      return executeStatement(session, simpleStatement, pageRequest.getFetchSize(), pageRequest.getPagingState(), bindValues.toArray());
-    }
+    delete = delete.if_(conditions);
+
+    SimpleStatement simpleStatement = delete.build();
     return executeStatement(session, simpleStatement, bindValues.toArray());
   }
 }

@@ -4,5 +4,5 @@ import ma.markware.charybdis.model.metadata.TableMetadata;
 
 public interface SelectInitExpression {
 
-  SelectFromExpression from(TableMetadata tableMetadata);
+  SelectWhereExpression from(TableMetadata tableMetadata);
 }

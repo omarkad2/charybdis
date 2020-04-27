@@ -23,11 +23,11 @@ public class InsertQuery extends AbstractQuery {
   private String table;
   private ColumnNameValueMapping columnNameValueMapping;
   private Integer ttl;
-  private boolean checkIfNotExists;
+  private boolean ifNotExists;
 
   public InsertQuery() {
     this.columnNameValueMapping = new ColumnNameValueMapping();
-    this.checkIfNotExists = false;
+    this.ifNotExists = false;
   }
 
   public void addTable(TableMetadata tableMetadata) {
@@ -56,8 +56,8 @@ public class InsertQuery extends AbstractQuery {
     this.ttl = ttl;
   }
 
-  public void enableCheckIfNotExists() {
-    this.checkIfNotExists = true;
+  public void enableIfNotExists() {
+    this.ifNotExists = true;
   }
 
   @Override
@@ -77,7 +77,7 @@ public class InsertQuery extends AbstractQuery {
     if (ttl != null) {
       insert = insert.usingTtl(ttl);
     }
-    if (checkIfNotExists) {
+    if (ifNotExists) {
       insert = insert.ifNotExists();
     }
 

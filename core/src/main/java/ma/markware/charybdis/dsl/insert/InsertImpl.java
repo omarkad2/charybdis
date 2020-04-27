@@ -41,12 +41,12 @@ public class InsertImpl implements InsertInitExpression, InsertInitWithColumnsEx
 
   @Override
   public InsertTtlExpression ifNotExists() {
-    insertQuery.enableCheckIfNotExists();
+    insertQuery.enableIfNotExists();
     return this;
   }
 
   @Override
-  public InsertExecuteExpression ttl(final int ttl) {
+  public InsertExecuteExpression usingTtl(final int ttl) {
     insertQuery.addTtl(ttl);
     return this;
   }
