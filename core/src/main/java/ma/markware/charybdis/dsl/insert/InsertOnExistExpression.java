@@ -1,6 +1,6 @@
 package ma.markware.charybdis.dsl.insert;
 
-public interface InsertOnExistExpression extends InsertTtlExpression {
+public interface InsertOnExistExpression extends InsertTtlExpression, InsertTimestampExpression {
 
-  InsertTtlExpression ifNotExists();
+  <T extends InsertTtlExpression & InsertTimestampExpression> T ifNotExists();
 }

@@ -1,9 +1,6 @@
 package ma.markware.charybdis;
 
-import com.datastax.oss.driver.api.core.CqlSession;
-import com.datastax.oss.driver.api.core.config.DriverConfigLoader;
 import com.datastax.oss.driver.api.core.config.DriverExecutionProfile;
-import com.datastax.oss.driver.internal.core.config.typesafe.DefaultDriverConfigLoader;
 import ma.markware.charybdis.dsl.delete.DeleteImpl;
 import ma.markware.charybdis.dsl.delete.DeleteInitExpression;
 import ma.markware.charybdis.dsl.insert.InsertImpl;
@@ -12,56 +9,60 @@ import ma.markware.charybdis.dsl.insert.InsertInitWithColumnsExpression;
 import ma.markware.charybdis.dsl.select.SelectImpl;
 import ma.markware.charybdis.dsl.select.SelectInitExpression;
 import ma.markware.charybdis.dsl.select.SelectWhereExpression;
+import ma.markware.charybdis.dsl.update.UpdateImpl;
 import ma.markware.charybdis.dsl.update.UpdateInitExpression;
 import ma.markware.charybdis.model.metadata.ColumnMetadata;
 import ma.markware.charybdis.model.metadata.TableMetadata;
 
 public class DefaultDslQuery implements DslQuery {
 
-  private final DriverConfigLoader driverConfigLoader;
-  private CqlSession session;
+  private final SessionFactory sessionFactory;
+
+  public DefaultDslQuery(final SessionFactory customSessionFactory) {
+    this.sessionFactory = customSessionFactory;
+  }
 
   public DefaultDslQuery() {
-    driverConfigLoader = new DefaultDriverConfigLoader();
+    this.sessionFactory = new DefaultSessionFactory();
   }
 
   public DefaultDslQuery(final String customConfiguration) {
-    driverConfigLoader = DriverConfigLoader.fromClasspath(customConfiguration);
+    this.sessionFactory = new DefaultSessionFactory(customConfiguration);
   }
 
   @Override
   public SelectInitExpression select(final ColumnMetadata... columns) {
-    return new SelectImpl(getSession()).select(columns);
+    return new SelectImpl(sessionFactory.getSession()).select(columns);
   }
 
   @Override
   public SelectWhereExpression selectFrom(final TableMetadata table) {
-    return new SelectImpl(getSession()).selectFrom(table);
+    return new SelectImpl(sessionFactory.getSession()).selectFrom(table);
   }
 
   @Override
   public InsertInitExpression insertInto(final TableMetadata table) {
-    return new InsertImpl(getSession()).insertInto(table);
+    return new InsertImpl(sessionFactory.getSession()).insertInto(table);
   }
 
   @Override
   public InsertInitWithColumnsExpression insertInto(TableMetadata table, ColumnMetadata... columns) {
-    return new InsertImpl(getSession()).insertInto(table, columns);
+    return new InsertImpl(sessionFactory.getSession()).insertInto(table, columns);
   }
 
   @Override
   public UpdateInitExpression update(TableMetadata table) {
-    return null;
+    return new UpdateImpl(sessionFactory.getSession()).update(table);
   }
 
   @Override
   public DeleteInitExpression delete() {
-    return new DeleteImpl(getSession()).delete();
+    return new DeleteImpl(sessionFactory.getSession()).delete();
   }
 
   @Override
   public DeleteInitExpression delete(final ColumnMetadata... columns) {
-    return new DeleteImpl(getSession()).delete(columns);
+    return new DeleteImpl(sessionFactory.getSession()).delete(columns);
   }
 
   @Override
@@ -72,9 +73,5 @@ public class DefaultDslQuery implements DslQuery {
   @Override
   public DslQuery using(final String executionProfile) {
     return null;
-  }
-
-  private CqlSession getSession() {
-    return session != null ? session : CqlSession.builder().withConfigLoader(driverConfigLoader).build();
   }
 }

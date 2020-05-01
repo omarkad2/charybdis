@@ -8,7 +8,7 @@ import ma.markware.charybdis.model.metadata.ColumnMetadata;
 import ma.markware.charybdis.model.metadata.TableMetadata;
 import ma.markware.charybdis.query.DeleteQuery;
 
-public class DeleteImpl implements DeleteInitExpression, DeleteUsingTimestampExpression, DeleteWhereExpression, DeleteExtraWhereExpression, DeleteOnExistExpression,
+public class DeleteImpl implements DeleteInitExpression, DeleteTimestampExpression, DeleteWhereExpression, DeleteExtraWhereExpression, DeleteOnExistExpression,
     DeleteIfExpression, DeleteExtraIfExpression, DeleteExecuteExpression {
 
   private final CqlSession session;
@@ -24,49 +24,49 @@ public class DeleteImpl implements DeleteInitExpression, DeleteUsingTimestampExp
   }
 
   public DeleteInitExpression delete(ColumnMetadata... columnsMetadata) {
-    deleteQuery.addSelectors(columnsMetadata);
+    deleteQuery.setSelectors(columnsMetadata);
     return this;
   }
 
   @Override
-  public DeleteUsingTimestampExpression from(final TableMetadata table) {
-    deleteQuery.addTable(table);
+  public DeleteTimestampExpression from(final TableMetadata table) {
+    deleteQuery.setTable(table);
     return this;
   }
 
   @Override
   public DeleteWhereExpression usingTimestamp(final Instant timestamp) {
-    deleteQuery.addTimestamp(timestamp);
+    deleteQuery.setTimestamp(timestamp);
     return this;
   }
 
   @Override
   public DeleteWhereExpression usingTimestamp(final long timestamp) {
-    deleteQuery.addTimestamp(timestamp);
+    deleteQuery.setTimestamp(timestamp);
     return this;
   }
 
   @Override
   public DeleteExtraWhereExpression where(final CriteriaExpression condition) {
-    deleteQuery.addWhere(condition);
+    deleteQuery.setWhere(condition);
     return this;
   }
 
   @Override
   public DeleteExtraWhereExpression and(final CriteriaExpression condition) {
-    deleteQuery.addWhere(condition);
+    deleteQuery.setWhere(condition);
     return this;
   }
 
   @Override
   public DeleteExtraIfExpression if_(final CriteriaExpression condition) {
-    deleteQuery.addIf(condition);
+    deleteQuery.setIf(condition);
     return this;
   }
 
   @Override
   public DeleteExtraIfExpression and_(final CriteriaExpression condition) {
-    deleteQuery.addIf(condition);
+    deleteQuery.setIf(condition);
     return this;
   }
 

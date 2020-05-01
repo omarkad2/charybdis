@@ -9,9 +9,11 @@ import com.datastax.oss.driver.api.querybuilder.QueryBuilder;
 import com.datastax.oss.driver.api.querybuilder.insert.Insert;
 import com.datastax.oss.driver.api.querybuilder.insert.InsertInto;
 import com.datastax.oss.driver.api.querybuilder.insert.RegularInsert;
+import java.time.Instant;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import ma.markware.charybdis.model.metadata.ColumnMetadata;
 import ma.markware.charybdis.model.metadata.TableMetadata;
 import org.apache.commons.lang3.StringUtils;
@@ -21,43 +23,53 @@ public class InsertQuery extends AbstractQuery {
 
   private String keyspace;
   private String table;
-  private ColumnNameValueMapping columnNameValueMapping;
+  private ColumnNameValueMapping columnNameValueMapping = new ColumnNameValueMapping();
   private Integer ttl;
+  private Long timestamp;
   private boolean ifNotExists;
 
-  public InsertQuery() {
-    this.columnNameValueMapping = new ColumnNameValueMapping();
-    this.ifNotExists = false;
-  }
-
-  public void addTable(TableMetadata tableMetadata) {
+  public void setTable(TableMetadata tableMetadata) {
     this.keyspace = tableMetadata.getKeyspaceName();
     this.table = tableMetadata.getTableName();
   }
 
-  public void addTableAndColumns(TableMetadata tableMetadata, ColumnMetadata... columnsMetadata) {
-    addTable(tableMetadata);
+  public void setTableAndColumns(TableMetadata tableMetadata, ColumnMetadata... columnsMetadata) {
+    setTable(tableMetadata);
     for (int i = 0; i < columnsMetadata.length; i++) {
       columnNameValueMapping.setColumnName(i, columnsMetadata[i].getColumnName());
     }
   }
 
-  public void addValues(Object... values) {
+  public void setValues(Object... values) {
     for (int i = 0; i < values.length; i++) {
       columnNameValueMapping.setColumnValue(i, values[i]);
     }
   }
 
-  public <T> void addSet(ColumnMetadata<T> columnMetadata, T value) {
-    columnNameValueMapping.setColumnNameAndValue(columnMetadata.getColumnName(), value);
+  public void setColumnNameValueMapping(Map<String, Object> columnNameValues) {
+    for (Entry<String, Object> entry : columnNameValues.entrySet()) {
+      columnNameValueMapping.setColumnNameAndValue(entry.getKey(), entry.getValue());
+    }
   }
 
-  public void addTtl(int ttl) {
-    this.ttl = ttl;
+  public <T> void setSet(ColumnMetadata<T> columnMetadata, T value) {
+    columnNameValueMapping.setColumnNameAndValue(columnMetadata.getColumnName(), value);
   }
 
   public void enableIfNotExists() {
     this.ifNotExists = true;
+  }
+
+  public void setTtl(int ttl) {
+    this.ttl = ttl;
+  }
+
+  public void setTimestamp(Instant timestamp) {
+    this.timestamp = timestamp.toEpochMilli();
+  }
+
+  public void setTimestamp(long timestamp) {
+    this.timestamp = timestamp;
   }
 
   @Override
@@ -74,11 +86,17 @@ public class InsertQuery extends AbstractQuery {
     }
 
     Insert insert = regularInsert;
+
+    if (ifNotExists) {
+      insert = insert.ifNotExists();
+    }
+
     if (ttl != null) {
       insert = insert.usingTtl(ttl);
     }
-    if (ifNotExists) {
-      insert = insert.ifNotExists();
+
+    if (timestamp != null) {
+      insert = insert.usingTimestamp(timestamp);
     }
 
     SimpleStatement simpleStatement = insert.build();

@@ -4,23 +4,22 @@ import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.cql.ResultSet;
 import com.datastax.oss.driver.api.core.cql.SimpleStatement;
 import com.datastax.oss.driver.api.core.metadata.schema.ClusteringOrder;
-import com.datastax.oss.driver.api.querybuilder.BindMarker;
 import com.datastax.oss.driver.api.querybuilder.QueryBuilder;
-import com.datastax.oss.driver.api.querybuilder.relation.Relation;
 import com.datastax.oss.driver.api.querybuilder.select.Select;
 import com.datastax.oss.driver.api.querybuilder.select.SelectFrom;
 import com.datastax.oss.driver.api.querybuilder.select.Selector;
 import com.datastax.oss.driver.internal.querybuilder.select.AllSelector;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import ma.markware.charybdis.dsl.CriteriaExpression;
 import ma.markware.charybdis.dsl.OrderExpression;
 import ma.markware.charybdis.model.metadata.ColumnMetadata;
 import ma.markware.charybdis.model.metadata.TableMetadata;
+import ma.markware.charybdis.query.clause.WhereClause;
 
 public class SelectQuery extends AbstractQuery {
 
@@ -28,93 +27,38 @@ public class SelectQuery extends AbstractQuery {
 
   private String keyspace;
   private String table;
-  private List<Selector> selectors;
-  private List<Relation> relations;
-  private List<Object> bindValues;
-  private Map<String, ClusteringOrder> orderings;
+  private List<Selector> selectors = new ArrayList<>();
+  private List<WhereClause> whereClauses = new ArrayList<>();
+  private Map<String, ClusteringOrder> orderings = new HashMap<>();
   private Integer limit;
   private boolean allowFiltering;
   private PageRequest pageRequest;
 
-  public SelectQuery() {
-    this.selectors = new ArrayList<>();
-    this.relations = new ArrayList<>();
-    this.bindValues = new ArrayList<>();
-    this.orderings = new HashMap<>();
-    this.allowFiltering = false;
-  }
-
-  public void addFrom(TableMetadata tableMetadata) {
+  public void setTable(TableMetadata tableMetadata) {
     this.keyspace = tableMetadata.getKeyspaceName();
     this.table = tableMetadata.getTableName();
   }
 
-  public void addSelectFrom(TableMetadata tableMetadata) {
-    addFrom(tableMetadata);
+  public void setTableAndSelectors(TableMetadata tableMetadata) {
+    setTable(tableMetadata);
     this.selectors = SELECT_ALL;
   }
 
-  public void addSelectors(ColumnMetadata... columns) {
+  public void setSelectors(ColumnMetadata... columns) {
     for(ColumnMetadata column : columns) {
       this.selectors.add(Selector.column(column.getColumnName()));
     }
   }
 
-  public void addAndCondition(CriteriaExpression criteriaExpression) {
-    String columnName = criteriaExpression.getColumnName();
-    Object[] values = criteriaExpression.getValues();
-    switch(criteriaExpression.getCriteriaOperator()) {
-      case EQ:
-        relations.add(Relation.column(columnName).isEqualTo(QueryBuilder.bindMarker()));
-        bindValues.add(values[0]);
-        break;
-      case GT:
-        relations.add(Relation.column(columnName).isGreaterThan(QueryBuilder.bindMarker()));
-        bindValues.add(values[0]);
-        break;
-      case GTE:
-        relations.add(Relation.column(columnName).isGreaterThanOrEqualTo(QueryBuilder.bindMarker()));
-        bindValues.add(values[0]);
-        break;
-      case LT:
-        relations.add(Relation.column(columnName).isLessThan(QueryBuilder.bindMarker()));
-        bindValues.add(values[0]);
-        break;
-      case LTE:
-        relations.add(Relation.column(columnName).isLessThanOrEqualTo(QueryBuilder.bindMarker()));
-        bindValues.add(values[0]);
-        break;
-      case CONTAINS:
-        relations.add(Relation.column(columnName).contains(QueryBuilder.bindMarker()));
-        bindValues.add(values[0]);
-        break;
-      case IN:
-        if (values.length > 0) {
-          final BindMarker[] bindMarkers = new BindMarker[values.length];
-          Arrays.fill(bindMarkers, QueryBuilder.bindMarker());
-          relations.add(Relation.column(columnName)
-                                .in(bindMarkers));
-          Collections.addAll(bindValues, values);
-        } else {
-          relations.add(Relation.column(columnName)
-                                .in(QueryBuilder.raw("")));
-        }
-        break;
-      default:
-        //TODO throw error unsupported criteria expression
-        break;
-    }
+  public void setWhereClause(CriteriaExpression criteriaExpression) {
+    whereClauses.add(WhereClause.from(criteriaExpression));
   }
 
-  public void addWhere(CriteriaExpression criteriaExpression) {
-    addAndCondition(criteriaExpression);
-  }
-
-  public void addOrderBy(OrderExpression orderExpression) {
+  public void setOrdering(OrderExpression orderExpression) {
     orderings.put(orderExpression.getColumnName(), orderExpression.getClusteringOrder());
   }
 
-  public void addLimit(int limit) {
+  public void setLimit(int limit) {
     this.limit = limit;
   }
 
@@ -122,13 +66,13 @@ public class SelectQuery extends AbstractQuery {
     this.allowFiltering = true;
   }
 
-  public void addPageRequest(PageRequest pageRequest) {
+  public void setPageRequest(PageRequest pageRequest) {
     this.pageRequest = pageRequest;
   }
 
   @Override
   public ResultSet execute(final CqlSession session) {
-    Select select = null;
+    Select select;
     SelectFrom selectFrom = QueryBuilder.selectFrom(keyspace, table);
 
     if (SELECT_ALL.equals(selectors)) {
@@ -137,7 +81,8 @@ public class SelectQuery extends AbstractQuery {
       select = selectFrom.selectors(selectors);
     }
 
-    select = select.where(relations).orderBy(orderings);
+    select = select.where(whereClauses.stream().map(WhereClause::getRelation).collect(Collectors.toList()))
+                   .orderBy(orderings);
 
     if (limit != null) {
       select = select.limit(limit);
@@ -148,9 +93,10 @@ public class SelectQuery extends AbstractQuery {
     }
 
     SimpleStatement simpleStatement = select.build();
+    Object[] bindValues = QueryHelper.extractWhereBindValues(whereClauses);
     if (pageRequest != null) {
-      return executeStatement(session, simpleStatement, pageRequest.getFetchSize(), pageRequest.getPagingState(), bindValues.toArray());
+      return executeStatement(session, simpleStatement, pageRequest.getFetchSize(), pageRequest.getPagingState(), bindValues);
     }
-    return executeStatement(session, simpleStatement, bindValues.toArray());
+    return executeStatement(session, simpleStatement, bindValues);
   }
 }

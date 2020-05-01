@@ -12,6 +12,7 @@ import ma.markware.charybdis.dsl.utils.RecordUtils;
 import ma.markware.charybdis.model.metadata.ColumnMetadata;
 import ma.markware.charybdis.model.metadata.TableMetadata;
 import ma.markware.charybdis.query.PageRequest;
+import ma.markware.charybdis.query.PageResult;
 import ma.markware.charybdis.query.SelectQuery;
 
 public class SelectImpl implements SelectInitExpression, SelectWhereExpression, SelectExtraWhereExpression, SelectLimitExpression, SelectOrderExpression,
@@ -28,43 +29,43 @@ public class SelectImpl implements SelectInitExpression, SelectWhereExpression, 
 
   public SelectInitExpression select(final ColumnMetadata<?>... columns) {
     this.selectedColumnsMetadata = Arrays.asList(columns);
-    selectQuery.addSelectors(columns);
+    selectQuery.setSelectors(columns);
     return this;
   }
 
   public SelectWhereExpression selectFrom(final TableMetadata tableMetadata) {
     this.selectedColumnsMetadata = tableMetadata.getColumnsMetadata().values();
-    selectQuery.addSelectFrom(tableMetadata);
+    selectQuery.setTableAndSelectors(tableMetadata);
     return this;
   }
 
   @Override
   public SelectWhereExpression from(final TableMetadata tableMetadata) {
-    selectQuery.addFrom(tableMetadata);
+    selectQuery.setTable(tableMetadata);
     return this;
   }
 
   @Override
   public SelectExtraWhereExpression where(final CriteriaExpression criteriaExpression) {
-    selectQuery.addWhere(criteriaExpression);
+    selectQuery.setWhereClause(criteriaExpression);
     return this;
   }
 
   @Override
   public SelectExtraWhereExpression and(final CriteriaExpression criteriaExpression) {
-    selectQuery.addAndCondition(criteriaExpression);
+    selectQuery.setWhereClause(criteriaExpression);
     return this;
   }
 
   @Override
   public SelectLimitExpression orderBy(final OrderExpression orderExpression) {
-    selectQuery.addOrderBy(orderExpression);
+    selectQuery.setOrdering(orderExpression);
     return this;
   }
 
   @Override
   public SelectFetchExpression limit(final int limit) {
-    selectQuery.addLimit(limit);
+    selectQuery.setLimit(limit);
     return this;
   }
 
@@ -76,7 +77,7 @@ public class SelectImpl implements SelectInitExpression, SelectWhereExpression, 
 
   @Override
   public Record fetchOne() {
-    selectQuery.addLimit(1);
+    selectQuery.setLimit(1);
     ResultSet resultSet = selectQuery.execute(session);
     if (resultSet == null) {
       // TODO: throw exception may be
@@ -100,9 +101,13 @@ public class SelectImpl implements SelectInitExpression, SelectWhereExpression, 
   }
 
   @Override
-  public Collection<Record> fetchPage(final PageRequest pageRequest) {
-    selectQuery.addPageRequest(pageRequest);
-    return fetch();
+  public PageResult<Record> fetchPage(final PageRequest pageRequest) {
+    selectQuery.setPageRequest(pageRequest);
+    ResultSet resultSet = selectQuery.execute(session);
+    if (resultSet == null) {
+      return null;
+    }
+    return new PageResult<>(RecordUtils.resultSetToRecords(resultSet, selectedColumnsMetadata), resultSet.getExecutionInfo().getPagingState());
   }
 
 }

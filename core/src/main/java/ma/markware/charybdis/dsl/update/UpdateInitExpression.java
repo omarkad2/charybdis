@@ -1,5 +1,5 @@
 package ma.markware.charybdis.dsl.update;
 
-public class UpdateInitExpression {
+public interface UpdateInitExpression extends UpdateTtlExpression, UpdateTimestampExpression {
 
 }

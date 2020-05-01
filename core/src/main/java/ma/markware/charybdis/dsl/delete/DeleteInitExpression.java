@@ -4,5 +4,5 @@ import ma.markware.charybdis.model.metadata.TableMetadata;
 
 public interface DeleteInitExpression {
 
-  DeleteUsingTimestampExpression from(TableMetadata table);
+  DeleteTimestampExpression from(TableMetadata table);
 }

@@ -2,12 +2,13 @@ package ma.markware.charybdis.dsl.insert;
 
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.cql.ResultSet;
+import java.time.Instant;
 import ma.markware.charybdis.model.metadata.ColumnMetadata;
 import ma.markware.charybdis.model.metadata.TableMetadata;
 import ma.markware.charybdis.query.InsertQuery;
 
 public class InsertImpl implements InsertInitExpression, InsertInitWithColumnsExpression, InsertValuesExpression, InsertSetExpression,
-    InsertTtlExpression, InsertOnExistExpression, InsertExecuteExpression {
+    InsertOnExistExpression, InsertTtlExpression, InsertTimestampExpression, InsertExecuteExpression {
 
   private final CqlSession session;
   private final InsertQuery insertQuery;
@@ -18,36 +19,48 @@ public class InsertImpl implements InsertInitExpression, InsertInitWithColumnsEx
   }
 
   public InsertInitExpression insertInto(TableMetadata tableMetadata) {
-    insertQuery.addTable(tableMetadata);
+    insertQuery.setTable(tableMetadata);
     return this;
   }
 
   public InsertInitWithColumnsExpression insertInto(TableMetadata tableMetadata, ColumnMetadata... columnsMetadata) {
-    insertQuery.addTableAndColumns(tableMetadata, columnsMetadata);
+    insertQuery.setTableAndColumns(tableMetadata, columnsMetadata);
     return this;
   }
 
   @Override
   public InsertValuesExpression values(final Object... values) {
-    insertQuery.addValues(values);
+    insertQuery.setValues(values);
     return this;
   }
 
   @Override
   public <T> InsertSetExpression set(final ColumnMetadata<T> columnMetadata, final T value) {
-    insertQuery.addSet(columnMetadata, value);
+    insertQuery.setSet(columnMetadata, value);
     return this;
   }
 
   @Override
-  public InsertTtlExpression ifNotExists() {
+  public <T extends InsertTtlExpression & InsertTimestampExpression> T ifNotExists() {
     insertQuery.enableIfNotExists();
-    return this;
+    return (T) this;
   }
 
   @Override
   public InsertExecuteExpression usingTtl(final int ttl) {
-    insertQuery.addTtl(ttl);
+    insertQuery.setTtl(ttl);
+    return this;
+  }
+
+  @Override
+  public InsertExecuteExpression usingTimestamp(final Instant timestamp) {
+    insertQuery.setTimestamp(timestamp);
+    return this;
+  }
+
+  @Override
+  public InsertExecuteExpression usingTimestamp(final long timestamp) {
+    insertQuery.setTimestamp(timestamp);
     return this;
   }
 

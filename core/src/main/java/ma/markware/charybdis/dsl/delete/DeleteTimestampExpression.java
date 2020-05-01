@@ -2,7 +2,7 @@ package ma.markware.charybdis.dsl.delete;
 
 import java.time.Instant;
 
-public interface DeleteUsingTimestampExpression extends DeleteWhereExpression  {
+public interface DeleteTimestampExpression extends DeleteWhereExpression  {
 
   DeleteWhereExpression usingTimestamp(Instant timestamp);
 
