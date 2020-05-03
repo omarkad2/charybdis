@@ -1,5 +1,5 @@
 package ma.markware.charybdis.model.option;
 
-public enum ClusteringOrderEnum {
+public enum ClusteringOrder {
   ASC, DESC
 }

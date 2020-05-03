@@ -62,10 +62,10 @@ abstract class AbstractEntityParser<CLASS_META_TYPE, FIELD_META_TYPE extends Abs
 
   void validateKeyspaceName(String className, String keyspaceName, AptContext aptContext) {
     if (StringUtils.isBlank(keyspaceName)) {
-      throw new CharybdisParsingException(format("Entity %s must be linked to a keyspace", className));
+      throw new CharybdisParsingException(format("Entity '%s' must be linked to a keyspace", className));
     }
     if (!aptContext.isKeyspaceExist(keyspaceName)) {
-      throw new CharybdisParsingException(format("Keyspace %s doesn't exist", keyspaceName));
+      throw new CharybdisParsingException(format("Keyspace '%s' does not exist", keyspaceName));
     }
   }
 

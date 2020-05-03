@@ -22,4 +22,10 @@ public class DefaultSessionFactory implements SessionFactory {
     return currentSession != null ? currentSession : CqlSession.builder().withConfigLoader(driverConfigLoader).build();
   }
 
+  @Override
+  public void shutdown() {
+    if (currentSession != null) {
+      currentSession.close();
+    }
+  }
 }

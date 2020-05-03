@@ -2,18 +2,18 @@ package ma.markware.charybdis.dsl;
 
 import java.util.HashMap;
 import java.util.Map;
-import ma.markware.charybdis.model.metadata.ColumnMetadata;
+import ma.markware.charybdis.model.metadata.SelectExpression;
 
 public class DefaultRecord implements Record {
 
-  private Map<String, Object> columnValueMap = new HashMap<>();
+  private Map<String, Object> fieldValueMap = new HashMap<>();
 
   @Override
-  public <T> T get(final ColumnMetadata<T> columnMetadata) {
-    return (T) columnValueMap.get(columnMetadata.getColumnName());
+  public <T> T get(final SelectExpression<T> field) {
+    return (T) fieldValueMap.get(field.getName());
   }
 
-  public void put(final ColumnMetadata columnMetadata, final Object value) {
-    columnValueMap.put(columnMetadata.getColumnName(), value);
+  public void put(final SelectExpression field, final Object value) {
+    fieldValueMap.put(field.getName(), value);
   }
 }

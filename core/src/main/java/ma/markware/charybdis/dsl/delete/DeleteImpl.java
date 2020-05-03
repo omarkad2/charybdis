@@ -3,8 +3,8 @@ package ma.markware.charybdis.dsl.delete;
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.cql.ResultSet;
 import java.time.Instant;
-import ma.markware.charybdis.dsl.CriteriaExpression;
-import ma.markware.charybdis.model.metadata.ColumnMetadata;
+import ma.markware.charybdis.model.criteria.CriteriaExpression;
+import ma.markware.charybdis.model.metadata.Field;
 import ma.markware.charybdis.model.metadata.TableMetadata;
 import ma.markware.charybdis.query.DeleteQuery;
 
@@ -23,8 +23,8 @@ public class DeleteImpl implements DeleteInitExpression, DeleteTimestampExpressi
     return this;
   }
 
-  public DeleteInitExpression delete(ColumnMetadata... columnsMetadata) {
-    deleteQuery.setSelectors(columnsMetadata);
+  public DeleteInitExpression delete(Field... fields) {
+    deleteQuery.setSelectors(fields);
     return this;
   }
 

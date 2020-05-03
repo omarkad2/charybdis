@@ -9,8 +9,8 @@ import com.datastax.oss.driver.api.querybuilder.BindMarker;
 import com.datastax.oss.driver.api.querybuilder.QueryBuilder;
 import com.datastax.oss.driver.api.querybuilder.condition.Condition;
 import java.util.List;
-import ma.markware.charybdis.dsl.CriteriaExpression;
 import ma.markware.charybdis.exception.CharybdisUnsupportedOperation;
+import ma.markware.charybdis.model.criteria.CriteriaExpression;
 
 public class ConditionClause {
 
@@ -23,7 +23,7 @@ public class ConditionClause {
   }
 
   public static ConditionClause from(CriteriaExpression criteria) {
-    String columnName = criteria.getColumnName();
+    String columnName = criteria.getFieldName();
     Object[] values = criteria.getValues();
     switch(criteria.getCriteriaOperator()) {
       case EQ:

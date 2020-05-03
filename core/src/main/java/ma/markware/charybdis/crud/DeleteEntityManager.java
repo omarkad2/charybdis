@@ -5,7 +5,7 @@ import static java.lang.String.format;
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.cql.ResultSet;
 import java.time.Instant;
-import ma.markware.charybdis.dsl.CriteriaExpression;
+import ma.markware.charybdis.model.criteria.CriteriaExpression;
 import ma.markware.charybdis.model.metadata.TableMetadata;
 import ma.markware.charybdis.query.DeleteQuery;
 import org.slf4j.Logger;
@@ -16,7 +16,6 @@ public class DeleteEntityManager<T> {
   private static final Logger log = LoggerFactory.getLogger(DeleteEntityManager.class);
 
   private final DeleteQuery deleteQuery;
-  private TableMetadata<T> tableMetadata;
   private T entity;
 
   public DeleteEntityManager() {
@@ -24,7 +23,6 @@ public class DeleteEntityManager<T> {
   }
 
   public DeleteEntityManager<T> withTableMetadata(TableMetadata<T> tableMetadata) {
-    this.tableMetadata = tableMetadata;
     deleteQuery.setTable(tableMetadata);
     return this;
   }

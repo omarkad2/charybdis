@@ -11,7 +11,7 @@ import ma.markware.charybdis.model.annotation.GeneratedValue;
 import ma.markware.charybdis.model.annotation.Index;
 import ma.markware.charybdis.model.annotation.PartitionKey;
 import ma.markware.charybdis.model.annotation.Table;
-import ma.markware.charybdis.model.option.ClusteringOrderEnum;
+import ma.markware.charybdis.model.option.ClusteringOrder;
 
 @Table(keyspace = "test_keyspace", name = "user")
 public class User extends AbstractUser {
@@ -26,8 +26,11 @@ public class User extends AbstractUser {
   private String fullname;
 
   @Column(name = "joining_date")
-  @ClusteringKey(index = 1, order = ClusteringOrderEnum.DESC)
+  @ClusteringKey(index = 1, order = ClusteringOrder.DESC)
   private Instant joiningDate;
+
+  @Column
+  private int age;
 
   @Column
   private String email;
@@ -76,6 +79,14 @@ public class User extends AbstractUser {
 
   public void setJoiningDate(Instant joiningDate) {
     this.joiningDate = joiningDate;
+  }
+
+  public int getAge() {
+    return age;
+  }
+
+  public void setAge(final int age) {
+    this.age = age;
   }
 
   public String getEmail() {

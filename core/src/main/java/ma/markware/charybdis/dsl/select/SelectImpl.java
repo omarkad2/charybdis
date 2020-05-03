@@ -2,15 +2,18 @@ package ma.markware.charybdis.dsl.select;
 
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.cql.ResultSet;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
-import ma.markware.charybdis.dsl.CriteriaExpression;
 import ma.markware.charybdis.dsl.OrderExpression;
 import ma.markware.charybdis.dsl.Record;
 import ma.markware.charybdis.dsl.utils.RecordUtils;
+import ma.markware.charybdis.model.criteria.CriteriaExpression;
 import ma.markware.charybdis.model.metadata.ColumnMetadata;
+import ma.markware.charybdis.model.metadata.SelectExpression;
 import ma.markware.charybdis.model.metadata.TableMetadata;
+import ma.markware.charybdis.model.metadata.UdtNestedField;
 import ma.markware.charybdis.query.PageRequest;
 import ma.markware.charybdis.query.PageResult;
 import ma.markware.charybdis.query.SelectQuery;
@@ -20,21 +23,27 @@ public class SelectImpl implements SelectInitExpression, SelectWhereExpression, 
 
   private final CqlSession session;
   private final SelectQuery selectQuery;
-  private Collection<ColumnMetadata> selectedColumnsMetadata;
+  private List<SelectExpression> selectedFields;
 
   public SelectImpl(final CqlSession session) {
     this.session = session;
     this.selectQuery = new SelectQuery();
   }
 
-  public SelectInitExpression select(final ColumnMetadata<?>... columns) {
-    this.selectedColumnsMetadata = Arrays.asList(columns);
-    selectQuery.setSelectors(columns);
+  public SelectInitExpression select(final ColumnMetadata... fields) {
+    this.selectedFields = Arrays.asList(fields);
+    selectQuery.setSelectors(fields);
+    return this;
+  }
+
+  public SelectInitExpression select(final UdtNestedField... fields) {
+    this.selectedFields = Arrays.asList(fields);
+    selectQuery.setSelectors(fields);
     return this;
   }
 
   public SelectWhereExpression selectFrom(final TableMetadata tableMetadata) {
-    this.selectedColumnsMetadata = tableMetadata.getColumnsMetadata().values();
+    this.selectedFields = new ArrayList<>(tableMetadata.getColumnsMetadata().values());
     selectQuery.setTableAndSelectors(tableMetadata);
     return this;
   }
@@ -83,7 +92,7 @@ public class SelectImpl implements SelectInitExpression, SelectWhereExpression, 
       // TODO: throw exception may be
       return null;
     }
-    return RecordUtils.rowToRecord(resultSet.one(), selectedColumnsMetadata);
+    return RecordUtils.rowToRecord(resultSet.one(), selectedFields);
   }
 
   @Override
@@ -92,12 +101,12 @@ public class SelectImpl implements SelectInitExpression, SelectWhereExpression, 
   }
 
   @Override
-  public Collection<Record> fetch() {
+  public List<Record> fetch() {
     ResultSet resultSet = selectQuery.execute(session);
     if (resultSet == null) {
       return null;
     }
-    return RecordUtils.resultSetToRecords(resultSet, selectedColumnsMetadata);
+    return RecordUtils.resultSetToRecords(resultSet, selectedFields);
   }
 
   @Override
@@ -107,7 +116,7 @@ public class SelectImpl implements SelectInitExpression, SelectWhereExpression, 
     if (resultSet == null) {
       return null;
     }
-    return new PageResult<>(RecordUtils.resultSetToRecords(resultSet, selectedColumnsMetadata), resultSet.getExecutionInfo().getPagingState());
+    return new PageResult<>(RecordUtils.resultSetToRecords(resultSet, selectedFields), resultSet.getExecutionInfo().getPagingState());
   }
 
 }

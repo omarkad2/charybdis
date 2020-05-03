@@ -53,7 +53,7 @@ class ProcessorValidationTest extends AbstractProcessorTest {
     // Compilation fails
     CompilationResult processResult = process(sources, TARGET);
     assertThat(processResult.getCode()).isNotEqualTo(0);
-    assertThat(processResult.getErr()).contains("Keyspace test_keyspace doesn't exist");
+    assertThat(processResult.getErr()).contains("Keyspace 'test_keyspace' does not exist");
   }
 
   @Test

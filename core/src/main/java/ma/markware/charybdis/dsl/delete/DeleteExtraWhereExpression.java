@@ -1,6 +1,6 @@
 package ma.markware.charybdis.dsl.delete;
 
-import ma.markware.charybdis.dsl.CriteriaExpression;
+import ma.markware.charybdis.model.criteria.CriteriaExpression;
 
 public interface DeleteExtraWhereExpression extends DeleteOnExistExpression, DeleteIfExpression {
 

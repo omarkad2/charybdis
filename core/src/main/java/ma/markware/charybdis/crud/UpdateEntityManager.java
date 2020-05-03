@@ -5,7 +5,7 @@ import static java.lang.String.format;
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.cql.ResultSet;
 import java.time.Instant;
-import ma.markware.charybdis.dsl.CriteriaExpression;
+import ma.markware.charybdis.model.criteria.CriteriaExpression;
 import ma.markware.charybdis.model.metadata.TableMetadata;
 import ma.markware.charybdis.query.UpdateQuery;
 import org.slf4j.Logger;

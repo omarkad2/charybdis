@@ -23,8 +23,8 @@ public class InsertImpl implements InsertInitExpression, InsertInitWithColumnsEx
     return this;
   }
 
-  public InsertInitWithColumnsExpression insertInto(TableMetadata tableMetadata, ColumnMetadata... columnsMetadata) {
-    insertQuery.setTableAndColumns(tableMetadata, columnsMetadata);
+  public InsertInitWithColumnsExpression insertInto(TableMetadata table, ColumnMetadata... columns) {
+    insertQuery.setTableAndColumns(table, columns);
     return this;
   }
 

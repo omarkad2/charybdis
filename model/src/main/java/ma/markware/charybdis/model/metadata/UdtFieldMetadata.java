@@ -1,14 +1,21 @@
 package ma.markware.charybdis.model.metadata;
 
-public class UdtFieldMetadata {
+import com.datastax.oss.driver.api.core.cql.Row;
+import com.datastax.oss.driver.api.core.data.UdtValue;
 
-  private String name;
+public interface UdtFieldMetadata<T> extends Field<T> {
 
-  public UdtFieldMetadata(final String name) {
-    this.name = name;
+  T deserialize(UdtValue udtValue);
+
+  T deserialize(String path, Row row);
+
+  default <U> UdtFieldEntries<U> entry(UdtFieldEntries<U> udtFieldEntries) {
+    return udtFieldEntries.add(this);
   }
 
-  public String getName() {
-    return name;
+  default <U> UdtFieldEntries<U> entry(UdtFieldMetadata<U> udtFieldMetadata) {
+    UdtFieldEntries<U> udtFieldEntries = new UdtFieldEntries<>(udtFieldMetadata);
+    udtFieldEntries.add(this);
+    return udtFieldEntries;
   }
 }

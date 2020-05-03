@@ -1,8 +1,8 @@
 package ma.markware.charybdis.dsl;
 
-import ma.markware.charybdis.model.metadata.ColumnMetadata;
+import ma.markware.charybdis.model.metadata.SelectExpression;
 
 public interface Record {
 
-  <T> T get(ColumnMetadata<T> columnMetadata);
+  <T> T get(SelectExpression<T> field);
 }

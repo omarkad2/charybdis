@@ -15,7 +15,7 @@ public class AssignmentClause {
   }
 
   public static AssignmentClause from(final ColumnMetadata columnMetadata, final Object value) {
-    return from(columnMetadata.getColumnName(), value);
+    return from(columnMetadata.getName(), value);
   }
 
   public static AssignmentClause from(final String columnName, final Object value) {

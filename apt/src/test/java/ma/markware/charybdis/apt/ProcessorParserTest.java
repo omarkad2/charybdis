@@ -31,7 +31,7 @@ import ma.markware.charybdis.apt.metatype.TypeDetail.TypeDetailEnum;
 import ma.markware.charybdis.apt.metatype.UdtFieldMetaType;
 import ma.markware.charybdis.apt.metatype.UdtMetaType;
 import ma.markware.charybdis.model.annotation.Udt;
-import ma.markware.charybdis.model.option.ClusteringOrderEnum;
+import ma.markware.charybdis.model.option.ClusteringOrder;
 import ma.markware.charybdis.model.option.Replication;
 import ma.markware.charybdis.model.option.SequenceModelEnum;
 import org.junit.jupiter.api.BeforeEach;
@@ -109,12 +109,15 @@ class ProcessorParserTest {
             tuple("id", true, 0, false, null, null, false, null, SequenceModelEnum.UUID, false, false,
                   "id", buildTypeDetail(UUID.class.getCanonicalName(), TypeDetail.TypeDetailEnum.NORMAL), EMPTY_LIST,
                   "getId", "setId"),
-            tuple("fullname", false, null, true, 0, ClusteringOrderEnum.ASC, false, null, null, false, false,
+            tuple("fullname", false, null, true, 0, ClusteringOrder.ASC, false, null, null, false, false,
                   "fullname", buildTypeDetail(String.class.getCanonicalName(), TypeDetail.TypeDetailEnum.NORMAL), EMPTY_LIST,
                   "getFullname", "setFullname"),
-            tuple("joining_date", false, null, true, 1, ClusteringOrderEnum.DESC, false, null, null, false, false,
+            tuple("joining_date", false, null, true, 1, ClusteringOrder.DESC, false, null, null, false, false,
                   "joiningDate", buildTypeDetail(Instant.class.getCanonicalName(), TypeDetail.TypeDetailEnum.NORMAL), EMPTY_LIST,
                   "getJoiningDate", "setJoiningDate"),
+            tuple("age", false, null, false, null, null, false, null, null, false, false,
+                  "age", buildTypeDetail(int.class.getCanonicalName(), TypeDetail.TypeDetailEnum.NORMAL), EMPTY_LIST,
+                  "getAge", "setAge"),
             tuple("email", false, null, false, null, null, false, null, null, false, false,
                   "email", buildTypeDetail(String.class.getCanonicalName(), TypeDetail.TypeDetailEnum.NORMAL), EMPTY_LIST,
                   "getEmail", "setEmail"),

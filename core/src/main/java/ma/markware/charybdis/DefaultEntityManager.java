@@ -7,7 +7,7 @@ import ma.markware.charybdis.crud.CreateEntityManager;
 import ma.markware.charybdis.crud.DeleteEntityManager;
 import ma.markware.charybdis.crud.ReadEntityManager;
 import ma.markware.charybdis.crud.UpdateEntityManager;
-import ma.markware.charybdis.dsl.CriteriaExpression;
+import ma.markware.charybdis.model.criteria.CriteriaExpression;
 import ma.markware.charybdis.model.metadata.TableMetadata;
 import ma.markware.charybdis.query.PageRequest;
 import ma.markware.charybdis.query.PageResult;

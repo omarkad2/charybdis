@@ -1,6 +1,7 @@
 package ma.markware.charybdis.apt.domain;
 
 import com.datastax.oss.driver.api.core.cql.Row;
+import com.datastax.oss.driver.api.core.data.UdtValue;
 import java.lang.Integer;
 import java.lang.Object;
 import java.lang.String;
@@ -10,464 +11,217 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import ma.markware.charybdis.model.metadata.ClusteringKeyColumnMetadata;
 import ma.markware.charybdis.model.metadata.ColumnMetadata;
+import ma.markware.charybdis.model.metadata.IndexColumnMetadata;
+import ma.markware.charybdis.model.metadata.PartitionKeyColumnMetadata;
 import ma.markware.charybdis.model.metadata.TableMetadata;
-import ma.markware.charybdis.model.option.ClusteringOrderEnum;
+import ma.markware.charybdis.model.option.ClusteringOrder;
 import ma.markware.charybdis.model.option.SequenceModelEnum;
 
 public class User_Table implements TableMetadata<User> {
-  public static final ColumnMetadata<UUID> id = new ColumnMetadata<UUID>() {
-    public String getColumnName() {
+  public static final PartitionKeyColumnMetadata<UUID> id = new PartitionKeyColumnMetadata<UUID>() {
+    public String getName() {
       return "id";
     }
 
-    public boolean isPartitionKey() {
-      return true;
-    }
-
-    public Integer getPartitionKeyIndex() {
+    public int getPartitionKeyIndex() {
       return 0;
     }
 
-    public boolean isClusteringKey() {
-      return false;
+    public UUID serialize(UUID field) {
+      return field;
     }
 
-    public Integer getClusteringKeyIndex() {
-      return null;
-    }
-
-    public ClusteringOrderEnum getClusteringOrder() {
-      return null;
-    }
-
-    public boolean isIndexed() {
-      return false;
-    }
-
-    public String getIndexName() {
-      return null;
-    }
-
-    public UUID getColumnValue(Row row) {
+    public UUID deserialize(Row row) {
       return row.get("id", java.util.UUID.class);
     }
   };
 
-  public static final ColumnMetadata<String> fullname = new ColumnMetadata<String>() {
-    public String getColumnName() {
+  public static final ClusteringKeyColumnMetadata<String> fullname = new ClusteringKeyColumnMetadata<String>() {
+    public String getName() {
       return "fullname";
     }
 
-    public boolean isPartitionKey() {
-      return false;
-    }
-
-    public Integer getPartitionKeyIndex() {
-      return null;
-    }
-
-    public boolean isClusteringKey() {
-      return true;
-    }
-
-    public Integer getClusteringKeyIndex() {
+    public int getClusteringKeyIndex() {
       return 0;
     }
 
-    public ClusteringOrderEnum getClusteringOrder() {
-      return ClusteringOrderEnum.ASC;
+    public ClusteringOrder getClusteringOrder() {
+      return ClusteringOrder.ASC;
     }
 
-    public boolean isIndexed() {
-      return false;
+    public String serialize(String field) {
+      return field;
     }
 
-    public String getIndexName() {
-      return null;
-    }
-
-    public String getColumnValue(Row row) {
+    public String deserialize(Row row) {
       return row.get("fullname", java.lang.String.class);
     }
   };
 
-  public static final ColumnMetadata<Instant> joiningDate = new ColumnMetadata<Instant>() {
-    public String getColumnName() {
+  public static final ClusteringKeyColumnMetadata<Instant> joiningDate = new ClusteringKeyColumnMetadata<Instant>() {
+    public String getName() {
       return "joining_date";
     }
 
-    public boolean isPartitionKey() {
-      return false;
-    }
-
-    public Integer getPartitionKeyIndex() {
-      return null;
-    }
-
-    public boolean isClusteringKey() {
-      return true;
-    }
-
-    public Integer getClusteringKeyIndex() {
+    public int getClusteringKeyIndex() {
       return 1;
     }
 
-    public ClusteringOrderEnum getClusteringOrder() {
-      return ClusteringOrderEnum.DESC;
+    public ClusteringOrder getClusteringOrder() {
+      return ClusteringOrder.DESC;
     }
 
-    public boolean isIndexed() {
-      return false;
+    public Instant serialize(Instant field) {
+      return field;
     }
 
-    public String getIndexName() {
-      return null;
-    }
-
-    public Instant getColumnValue(Row row) {
+    public Instant deserialize(Row row) {
       return row.get("joining_date", java.time.Instant.class);
     }
   };
 
+  public static final ColumnMetadata<Integer> age = new ColumnMetadata<Integer>() {
+    public String getName() {
+      return "age";
+    }
+
+    public Integer serialize(Integer field) {
+      return field;
+    }
+
+    public Integer deserialize(Row row) {
+      return row.get("age", int.class);
+    }
+  };
+
   public static final ColumnMetadata<String> email = new ColumnMetadata<String>() {
-    public String getColumnName() {
+    public String getName() {
       return "email";
     }
 
-    public boolean isPartitionKey() {
-      return false;
+    public String serialize(String field) {
+      return field;
     }
 
-    public Integer getPartitionKeyIndex() {
-      return null;
-    }
-
-    public boolean isClusteringKey() {
-      return false;
-    }
-
-    public Integer getClusteringKeyIndex() {
-      return null;
-    }
-
-    public ClusteringOrderEnum getClusteringOrder() {
-      return null;
-    }
-
-    public boolean isIndexed() {
-      return false;
-    }
-
-    public String getIndexName() {
-      return null;
-    }
-
-    public String getColumnValue(Row row) {
+    public String deserialize(Row row) {
       return row.get("email", java.lang.String.class);
     }
   };
 
   public static final ColumnMetadata<String> password = new ColumnMetadata<String>() {
-    public String getColumnName() {
+    public String getName() {
       return "password";
     }
 
-    public boolean isPartitionKey() {
-      return false;
+    public String serialize(String field) {
+      return field;
     }
 
-    public Integer getPartitionKeyIndex() {
-      return null;
-    }
-
-    public boolean isClusteringKey() {
-      return false;
-    }
-
-    public Integer getClusteringKeyIndex() {
-      return null;
-    }
-
-    public ClusteringOrderEnum getClusteringOrder() {
-      return null;
-    }
-
-    public boolean isIndexed() {
-      return false;
-    }
-
-    public String getIndexName() {
-      return null;
-    }
-
-    public String getColumnValue(Row row) {
+    public String deserialize(Row row) {
       return row.get("password", java.lang.String.class);
     }
   };
 
   public static final ColumnMetadata<Address> address = new ColumnMetadata<Address>() {
-    public String getColumnName() {
+    public String getName() {
       return "address";
     }
 
-    public boolean isPartitionKey() {
-      return false;
+    public UdtValue serialize(Address field) {
+      return Address_Udt.address.serialize(field);
     }
 
-    public Integer getPartitionKeyIndex() {
-      return null;
-    }
-
-    public boolean isClusteringKey() {
-      return false;
-    }
-
-    public Integer getClusteringKeyIndex() {
-      return null;
-    }
-
-    public ClusteringOrderEnum getClusteringOrder() {
-      return null;
-    }
-
-    public boolean isIndexed() {
-      return false;
-    }
-
-    public String getIndexName() {
-      return null;
-    }
-
-    public Address getColumnValue(Row row) {
+    public Address deserialize(Row row) {
       return Address_Udt.address.deserialize(row.getUdtValue("address"));
     }
   };
 
   public static final ColumnMetadata<List<UUID>> followers = new ColumnMetadata<List<UUID>>() {
-    public String getColumnName() {
+    public String getName() {
       return "followers";
     }
 
-    public boolean isPartitionKey() {
-      return false;
+    public List<UUID> serialize(List<UUID> field) {
+      return field;
     }
 
-    public Integer getPartitionKeyIndex() {
-      return null;
-    }
-
-    public boolean isClusteringKey() {
-      return false;
-    }
-
-    public Integer getClusteringKeyIndex() {
-      return null;
-    }
-
-    public ClusteringOrderEnum getClusteringOrder() {
-      return null;
-    }
-
-    public boolean isIndexed() {
-      return false;
-    }
-
-    public String getIndexName() {
-      return null;
-    }
-
-    public List<UUID> getColumnValue(Row row) {
+    public List<UUID> deserialize(Row row) {
       return row.getList("followers", java.util.UUID.class);
     }
   };
 
-  public static final ColumnMetadata<RoleEnum> role = new ColumnMetadata<RoleEnum>() {
-    public String getColumnName() {
+  public static final IndexColumnMetadata<RoleEnum> role = new IndexColumnMetadata<RoleEnum>() {
+    public String getName() {
       return "role";
-    }
-
-    public boolean isPartitionKey() {
-      return false;
-    }
-
-    public Integer getPartitionKeyIndex() {
-      return null;
-    }
-
-    public boolean isClusteringKey() {
-      return false;
-    }
-
-    public Integer getClusteringKeyIndex() {
-      return null;
-    }
-
-    public ClusteringOrderEnum getClusteringOrder() {
-      return null;
-    }
-
-    public boolean isIndexed() {
-      return true;
     }
 
     public String getIndexName() {
       return "user_role_idx";
     }
 
-    public RoleEnum getColumnValue(Row row) {
+    public String serialize(RoleEnum field) {
+      return field != null ? field.name() : null;
+    }
+
+    public RoleEnum deserialize(Row row) {
       return row.getString("role") != null ? ma.markware.charybdis.apt.domain.RoleEnum.valueOf(row.getString("role")) : null;
     }
   };
 
   public static final ColumnMetadata<Set<Instant>> accessLogs = new ColumnMetadata<Set<Instant>>() {
-    public String getColumnName() {
+    public String getName() {
       return "access_logs";
     }
 
-    public boolean isPartitionKey() {
-      return false;
+    public Set<Instant> serialize(Set<Instant> field) {
+      return field;
     }
 
-    public Integer getPartitionKeyIndex() {
-      return null;
-    }
-
-    public boolean isClusteringKey() {
-      return false;
-    }
-
-    public Integer getClusteringKeyIndex() {
-      return null;
-    }
-
-    public ClusteringOrderEnum getClusteringOrder() {
-      return null;
-    }
-
-    public boolean isIndexed() {
-      return false;
-    }
-
-    public String getIndexName() {
-      return null;
-    }
-
-    public Set<Instant> getColumnValue(Row row) {
+    public Set<Instant> deserialize(Row row) {
       return row.getSet("access_logs", java.time.Instant.class);
     }
   };
 
   public static final ColumnMetadata<Map<String, String>> metadata = new ColumnMetadata<Map<String, String>>() {
-    public String getColumnName() {
+    public String getName() {
       return "metadata";
     }
 
-    public boolean isPartitionKey() {
-      return false;
+    public Map<String, String> serialize(Map<String, String> field) {
+      return field;
     }
 
-    public Integer getPartitionKeyIndex() {
-      return null;
-    }
-
-    public boolean isClusteringKey() {
-      return false;
-    }
-
-    public Integer getClusteringKeyIndex() {
-      return null;
-    }
-
-    public ClusteringOrderEnum getClusteringOrder() {
-      return null;
-    }
-
-    public boolean isIndexed() {
-      return false;
-    }
-
-    public String getIndexName() {
-      return null;
-    }
-
-    public Map<String, String> getColumnValue(Row row) {
+    public Map<String, String> deserialize(Row row) {
       return row.getMap("metadata", java.lang.String.class, java.lang.String.class);
     }
   };
 
   public static final ColumnMetadata<Instant> creationDate = new ColumnMetadata<Instant>() {
-    public String getColumnName() {
+    public String getName() {
       return "creation_date";
     }
 
-    public boolean isPartitionKey() {
-      return false;
+    public Instant serialize(Instant field) {
+      return field;
     }
 
-    public Integer getPartitionKeyIndex() {
-      return null;
-    }
-
-    public boolean isClusteringKey() {
-      return false;
-    }
-
-    public Integer getClusteringKeyIndex() {
-      return null;
-    }
-
-    public ClusteringOrderEnum getClusteringOrder() {
-      return null;
-    }
-
-    public boolean isIndexed() {
-      return false;
-    }
-
-    public String getIndexName() {
-      return null;
-    }
-
-    public Instant getColumnValue(Row row) {
+    public Instant deserialize(Row row) {
       return row.get("creation_date", java.time.Instant.class);
     }
   };
 
   public static final ColumnMetadata<Instant> lastUpdatedDate = new ColumnMetadata<Instant>() {
-    public String getColumnName() {
+    public String getName() {
       return "last_updated_date";
     }
 
-    public boolean isPartitionKey() {
-      return false;
+    public Instant serialize(Instant field) {
+      return field;
     }
 
-    public Integer getPartitionKeyIndex() {
-      return null;
-    }
-
-    public boolean isClusteringKey() {
-      return false;
-    }
-
-    public Integer getClusteringKeyIndex() {
-      return null;
-    }
-
-    public ClusteringOrderEnum getClusteringOrder() {
-      return null;
-    }
-
-    public boolean isIndexed() {
-      return false;
-    }
-
-    public String getIndexName() {
-      return null;
-    }
-
-    public Instant getColumnValue(Row row) {
+    public Instant deserialize(Row row) {
       return row.get("last_updated_date", java.time.Instant.class);
     }
   };
@@ -494,6 +248,7 @@ public class User_Table implements TableMetadata<User> {
     results.put("id", id);
     results.put("fullname", fullname);
     results.put("joining_date", joiningDate);
+    results.put("age", age);
     results.put("email", email);
     results.put("password", password);
     results.put("address", address);
@@ -555,35 +310,37 @@ public class User_Table implements TableMetadata<User> {
 
   public Map<String, Object> serialize(User entity) {
     Map<String, Object> columnValueMap = new HashMap<>();
-    columnValueMap.put("id", entity.getId());
-    columnValueMap.put("fullname", entity.getFullname());
-    columnValueMap.put("joining_date", entity.getJoiningDate());
-    columnValueMap.put("email", entity.getEmail());
-    columnValueMap.put("password", entity.getPassword());
-    columnValueMap.put("address", Address_Udt.address.serialize(entity.getAddress()));
-    columnValueMap.put("followers", entity.getFollowers());
-    columnValueMap.put("role", entity.getRole() != null ? entity.getRole().name() : null);
-    columnValueMap.put("access_logs", entity.getAccessLogs());
-    columnValueMap.put("metadata", entity.getMetadata());
-    columnValueMap.put("creation_date", entity.getCreationDate());
-    columnValueMap.put("last_updated_date", entity.getLastUpdatedDate());
+    columnValueMap.put("id", id.serialize(entity.getId()));
+    columnValueMap.put("fullname", fullname.serialize(entity.getFullname()));
+    columnValueMap.put("joining_date", joiningDate.serialize(entity.getJoiningDate()));
+    columnValueMap.put("age", age.serialize(entity.getAge()));
+    columnValueMap.put("email", email.serialize(entity.getEmail()));
+    columnValueMap.put("password", password.serialize(entity.getPassword()));
+    columnValueMap.put("address", address.serialize(entity.getAddress()));
+    columnValueMap.put("followers", followers.serialize(entity.getFollowers()));
+    columnValueMap.put("role", role.serialize(entity.getRole()));
+    columnValueMap.put("access_logs", accessLogs.serialize(entity.getAccessLogs()));
+    columnValueMap.put("metadata", metadata.serialize(entity.getMetadata()));
+    columnValueMap.put("creation_date", creationDate.serialize(entity.getCreationDate()));
+    columnValueMap.put("last_updated_date", lastUpdatedDate.serialize(entity.getLastUpdatedDate()));
     return columnValueMap;
   }
 
   public User deserialize(Row row) {
     User entity = new User();
-    entity.setId(id.getColumnValue(row));
-    entity.setFullname(fullname.getColumnValue(row));
-    entity.setJoiningDate(joiningDate.getColumnValue(row));
-    entity.setEmail(email.getColumnValue(row));
-    entity.setPassword(password.getColumnValue(row));
-    entity.setAddress(address.getColumnValue(row));
-    entity.setFollowers(followers.getColumnValue(row));
-    entity.setRole(role.getColumnValue(row));
-    entity.setAccessLogs(accessLogs.getColumnValue(row));
-    entity.setMetadata(metadata.getColumnValue(row));
-    entity.setCreationDate(creationDate.getColumnValue(row));
-    entity.setLastUpdatedDate(lastUpdatedDate.getColumnValue(row));
+    entity.setId(id.deserialize(row));
+    entity.setFullname(fullname.deserialize(row));
+    entity.setJoiningDate(joiningDate.deserialize(row));
+    entity.setAge(age.deserialize(row));
+    entity.setEmail(email.deserialize(row));
+    entity.setPassword(password.deserialize(row));
+    entity.setAddress(address.deserialize(row));
+    entity.setFollowers(followers.deserialize(row));
+    entity.setRole(role.deserialize(row));
+    entity.setAccessLogs(accessLogs.deserialize(row));
+    entity.setMetadata(metadata.deserialize(row));
+    entity.setCreationDate(creationDate.deserialize(row));
+    entity.setLastUpdatedDate(lastUpdatedDate.deserialize(row));
     return entity;
   }
 }

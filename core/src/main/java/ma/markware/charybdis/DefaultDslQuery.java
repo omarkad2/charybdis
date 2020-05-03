@@ -12,7 +12,9 @@ import ma.markware.charybdis.dsl.select.SelectWhereExpression;
 import ma.markware.charybdis.dsl.update.UpdateImpl;
 import ma.markware.charybdis.dsl.update.UpdateInitExpression;
 import ma.markware.charybdis.model.metadata.ColumnMetadata;
+import ma.markware.charybdis.model.metadata.Field;
 import ma.markware.charybdis.model.metadata.TableMetadata;
+import ma.markware.charybdis.model.metadata.UdtNestedField;
 
 public class DefaultDslQuery implements DslQuery {
 
@@ -31,8 +33,13 @@ public class DefaultDslQuery implements DslQuery {
   }
 
   @Override
-  public SelectInitExpression select(final ColumnMetadata... columns) {
-    return new SelectImpl(sessionFactory.getSession()).select(columns);
+  public SelectInitExpression select(final ColumnMetadata... fields) {
+    return new SelectImpl(sessionFactory.getSession()).select(fields);
+  }
+
+  @Override
+  public SelectInitExpression select(final UdtNestedField... fields) {
+    return new SelectImpl(sessionFactory.getSession()).select(fields);
   }
 
   @Override
@@ -61,8 +68,8 @@ public class DefaultDslQuery implements DslQuery {
   }
 
   @Override
-  public DeleteInitExpression delete(final ColumnMetadata... columns) {
-    return new DeleteImpl(sessionFactory.getSession()).delete(columns);
+  public DeleteInitExpression delete(final Field... fields) {
+    return new DeleteImpl(sessionFactory.getSession()).delete(fields);
   }
 
   @Override

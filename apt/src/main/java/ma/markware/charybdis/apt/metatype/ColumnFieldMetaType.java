@@ -1,6 +1,6 @@
 package ma.markware.charybdis.apt.metatype;
 
-import ma.markware.charybdis.model.option.ClusteringOrderEnum;
+import ma.markware.charybdis.model.option.ClusteringOrder;
 import ma.markware.charybdis.model.option.SequenceModelEnum;
 
 public class ColumnFieldMetaType extends AbstractFieldMetaType {
@@ -10,7 +10,7 @@ public class ColumnFieldMetaType extends AbstractFieldMetaType {
   private Integer partitionKeyIndex;
   private boolean isClusteringKey;
   private Integer clusteringKeyIndex;
-  private ClusteringOrderEnum clusteringOrder;
+  private ClusteringOrder clusteringOrder;
   private boolean isIndexed;
   private String indexName;
   private SequenceModelEnum sequenceModel;
@@ -61,11 +61,11 @@ public class ColumnFieldMetaType extends AbstractFieldMetaType {
     this.clusteringKeyIndex = clusteringKeyIndex;
   }
 
-  public ClusteringOrderEnum getClusteringOrder() {
+  public ClusteringOrder getClusteringOrder() {
     return clusteringOrder;
   }
 
-  public void setClusteringOrder(final ClusteringOrderEnum clusteringOrder) {
+  public void setClusteringOrder(final ClusteringOrder clusteringOrder) {
     this.clusteringOrder = clusteringOrder;
   }
 

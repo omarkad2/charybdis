@@ -14,7 +14,7 @@ final class SerializationConstants {
   static final String GET_KEYSPACE_NAME_METHOD = "getKeyspaceName";
   static final String GET_UDT_NAME_METHOD = "getUdtName";
   static final String GET_TABLE_NAME_METHOD = "getTableName";
-  static final String GET_COLUMN_NAME_METHOD = "getColumnName";
+  static final String GET_NAME_METHOD = "getName";
   static final String IS_PARTITION_KEY_METHOD = "isPartitionKey";
   static final String GET_PARTITION_KEY_INDEX_METHOD = "getPartitionKeyIndex";
   static final String IS_CLUSTERING_KEY_METHOD = "isClusteringKey";
@@ -22,7 +22,9 @@ final class SerializationConstants {
   static final String GET_CLUSTERING_ORDER_METHOD = "getClusteringOrder";
   static final String IS_INDEXED_METHOD = "isIndexed";
   static final String GET_INDEX_NAME_METHOD = "getIndexName";
-  static final String GET_COLUMN_VALUE_METHOD = "getColumnValue";
+  static final String SERIALIZE_FIELD_METHOD = "serialize";
+  static final String DESERIALIZE_UDT_VALUE_METHOD = "deserialize";
+  static final String DESERIALIZE_ROW_METHOD = "deserialize";
   static final String GET_COLUMNS_METADATA_METHOD = "getColumnsMetadata";
   static final String GET_PARTITION_KEY_COLUMNS_METHOD = "getPartitionKeyColumns";
   static final String GET_CLUSTERING_KEY_COLUMNS_METHOD = "getClusteringKeyColumns";

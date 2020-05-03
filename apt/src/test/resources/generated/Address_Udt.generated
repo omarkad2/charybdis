@@ -1,13 +1,88 @@
 package ma.markware.charybdis.apt.domain;
 
+import com.datastax.oss.driver.api.core.cql.Row;
 import com.datastax.oss.driver.api.core.data.UdtValue;
 import com.datastax.oss.driver.api.core.type.UserDefinedType;
 import com.datastax.oss.driver.internal.core.type.UserDefinedTypeBuilder;
+import java.lang.Integer;
 import java.lang.String;
 import ma.markware.charybdis.model.datatype.DataTypeMapper;
+import ma.markware.charybdis.model.metadata.UdtFieldMetadata;
 import ma.markware.charybdis.model.metadata.UdtMetadata;
 
 public class Address_Udt implements UdtMetadata<Address> {
+  public static final UdtFieldMetadata<Integer> number = new UdtFieldMetadata<Integer>() {
+    public String getName() {
+      return "number";
+    }
+
+    public Integer serialize(Integer field) {
+      return field;
+    }
+
+    public Integer deserialize(UdtValue udtValue) {
+      return udtValue.get("number", int.class);
+    }
+
+    public Integer deserialize(String path, Row row) {
+      return row.get(path, int.class);
+    }
+  };
+
+  public static final UdtFieldMetadata<String> street = new UdtFieldMetadata<String>() {
+    public String getName() {
+      return "street";
+    }
+
+    public String serialize(String field) {
+      return field;
+    }
+
+    public String deserialize(UdtValue udtValue) {
+      return udtValue.get("street", java.lang.String.class);
+    }
+
+    public String deserialize(String path, Row row) {
+      return row.get(path, java.lang.String.class);
+    }
+  };
+
+  public static final UdtFieldMetadata<String> city = new UdtFieldMetadata<String>() {
+    public String getName() {
+      return "city";
+    }
+
+    public String serialize(String field) {
+      return field;
+    }
+
+    public String deserialize(UdtValue udtValue) {
+      return udtValue.get("city", java.lang.String.class);
+    }
+
+    public String deserialize(String path, Row row) {
+      return row.get(path, java.lang.String.class);
+    }
+  };
+
+  public static final UdtFieldMetadata<Country> country = new UdtFieldMetadata<Country>() {
+    public String getName() {
+      return "country";
+    }
+
+    public UdtValue serialize(Country field) {
+      return Country_Udt.country.serialize(field);
+    }
+
+    public Country deserialize(UdtValue udtValue) {
+      return Country_Udt.country.deserialize(udtValue.getUdtValue("country"));
+    }
+
+    public Country deserialize(String path, Row row) {
+      return Country_Udt.country.deserialize(row.getUdtValue(path));
+    }
+  };
+
   public static final Address_Udt address = new Address_Udt();
 
   public static final String KEYSPACE_NAME = "test_keyspace";
@@ -41,10 +116,10 @@ public class Address_Udt implements UdtMetadata<Address> {
 
   public Address deserialize(UdtValue udtValue) {
     Address entity = new Address();
-    entity.setNumber(udtValue.get("number", int.class));
-    entity.setStreet(udtValue.get("street", java.lang.String.class));
-    entity.setCity(udtValue.get("city", java.lang.String.class));
-    entity.setCountry(Country_Udt.country.deserialize(udtValue.getUdtValue("country")));
+    entity.setNumber(number.deserialize(udtValue));
+    entity.setStreet(street.deserialize(udtValue));
+    entity.setCity(city.deserialize(udtValue));
+    entity.setCountry(country.deserialize(udtValue));
     return entity;
   }
 }

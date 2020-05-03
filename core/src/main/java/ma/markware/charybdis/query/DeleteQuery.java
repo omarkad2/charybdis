@@ -10,8 +10,8 @@ import com.datastax.oss.driver.api.querybuilder.select.Selector;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import ma.markware.charybdis.dsl.CriteriaExpression;
-import ma.markware.charybdis.model.metadata.ColumnMetadata;
+import ma.markware.charybdis.model.criteria.CriteriaExpression;
+import ma.markware.charybdis.model.metadata.Field;
 import ma.markware.charybdis.model.metadata.TableMetadata;
 import ma.markware.charybdis.query.clause.ConditionClause;
 import ma.markware.charybdis.query.clause.WhereClause;
@@ -32,9 +32,9 @@ public class DeleteQuery extends AbstractQuery {
     this.table = tableMetadata.getTableName();
   }
 
-  public void setSelectors(ColumnMetadata... columnsMetadata) {
-    for(ColumnMetadata column : columnsMetadata) {
-      this.selectors.add(Selector.column(column.getColumnName()));
+  public void setSelectors(Field... fields) {
+    for(Field field : fields) {
+      this.selectors.add(Selector.column(field.getName()));
     }
   }
 

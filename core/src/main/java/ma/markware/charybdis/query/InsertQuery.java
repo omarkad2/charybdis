@@ -33,10 +33,10 @@ public class InsertQuery extends AbstractQuery {
     this.table = tableMetadata.getTableName();
   }
 
-  public void setTableAndColumns(TableMetadata tableMetadata, ColumnMetadata... columnsMetadata) {
+  public void setTableAndColumns(TableMetadata tableMetadata, ColumnMetadata... columns) {
     setTable(tableMetadata);
-    for (int i = 0; i < columnsMetadata.length; i++) {
-      columnNameValueMapping.setColumnName(i, columnsMetadata[i].getColumnName());
+    for (int i = 0; i < columns.length; i++) {
+      columnNameValueMapping.setColumnName(i, columns[i].getName());
     }
   }
 
@@ -53,7 +53,7 @@ public class InsertQuery extends AbstractQuery {
   }
 
   public <T> void setSet(ColumnMetadata<T> columnMetadata, T value) {
-    columnNameValueMapping.setColumnNameAndValue(columnMetadata.getColumnName(), value);
+    columnNameValueMapping.setColumnNameAndValue(columnMetadata.getName(), value);
   }
 
   public void enableIfNotExists() {

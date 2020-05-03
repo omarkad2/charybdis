@@ -1,13 +1,51 @@
 package ma.markware.charybdis.apt.domain;
 
+import com.datastax.oss.driver.api.core.cql.Row;
 import com.datastax.oss.driver.api.core.data.UdtValue;
 import com.datastax.oss.driver.api.core.type.UserDefinedType;
 import com.datastax.oss.driver.internal.core.type.UserDefinedTypeBuilder;
 import java.lang.String;
 import ma.markware.charybdis.model.datatype.DataTypeMapper;
+import ma.markware.charybdis.model.metadata.UdtFieldMetadata;
 import ma.markware.charybdis.model.metadata.UdtMetadata;
 
 public class Country_Udt implements UdtMetadata<Country> {
+  public static final UdtFieldMetadata<String> name = new UdtFieldMetadata<String>() {
+    public String getName() {
+      return "name";
+    }
+
+    public String serialize(String field) {
+      return field;
+    }
+
+    public String deserialize(UdtValue udtValue) {
+      return udtValue.get("name", java.lang.String.class);
+    }
+
+    public String deserialize(String path, Row row) {
+      return row.get(path, java.lang.String.class);
+    }
+  };
+
+  public static final UdtFieldMetadata<String> countryCode = new UdtFieldMetadata<String>() {
+    public String getName() {
+      return "countrycode";
+    }
+
+    public String serialize(String field) {
+      return field;
+    }
+
+    public String deserialize(UdtValue udtValue) {
+      return udtValue.get("countrycode", java.lang.String.class);
+    }
+
+    public String deserialize(String path, Row row) {
+      return row.get(path, java.lang.String.class);
+    }
+  };
+
   public static final Country_Udt country = new Country_Udt();
 
   public static final String KEYSPACE_NAME = "test_keyspace";
@@ -37,8 +75,8 @@ public class Country_Udt implements UdtMetadata<Country> {
 
   public Country deserialize(UdtValue udtValue) {
     Country entity = new Country();
-    entity.setName(udtValue.get("name", java.lang.String.class));
-    entity.setCountryCode(udtValue.get("countrycode", java.lang.String.class));
+    entity.setName(name.deserialize(udtValue));
+    entity.setCountryCode(countryCode.deserialize(udtValue));
     return entity;
   }
 }

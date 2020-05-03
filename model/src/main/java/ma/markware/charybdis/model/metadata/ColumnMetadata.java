@@ -1,25 +1,56 @@
 package ma.markware.charybdis.model.metadata;
 
 import com.datastax.oss.driver.api.core.cql.Row;
-import ma.markware.charybdis.model.option.ClusteringOrderEnum;
+import java.util.stream.Stream;
+import ma.markware.charybdis.model.criteria.CriteriaExpression;
+import ma.markware.charybdis.model.criteria.CriteriaExpressionImpl;
+import ma.markware.charybdis.model.criteria.CriteriaOperator;
 
-public interface ColumnMetadata<T> {
+public interface ColumnMetadata<T> extends SelectExpression<T> {
 
-  String getColumnName();
+  String getName();
 
-  boolean isPartitionKey();
+  Object serialize(T field);
 
-  Integer getPartitionKeyIndex();
+  T deserialize(Row row);
 
-  boolean isClusteringKey();
+  default MapNestedField entry(String entryName) {
+    return new MapNestedField(this, entryName);
+  }
 
-  Integer getClusteringKeyIndex();
+  default <U> UdtNestedField<U> entry(UdtFieldMetadata<U> udtFieldMetadata) {
+    return new UdtNestedField<>(this, udtFieldMetadata);
+  }
 
-  ClusteringOrderEnum getClusteringOrder();
+  default <U> UdtNestedField<U> entry(UdtFieldEntries<U> udtFieldEntries) {
+    return new UdtNestedField<>(this, udtFieldEntries);
+  }
 
-  boolean isIndexed();
+  default CriteriaExpression eq(T value) {
+    return new CriteriaExpressionImpl(getName(), CriteriaOperator.EQ, serialize(value));
+  }
 
-  String getIndexName();
+  default CriteriaExpression gt(T value) {
+    return new CriteriaExpressionImpl(getName(), CriteriaOperator.GT, serialize(value));
+  }
 
-  T getColumnValue(Row row);
+  default CriteriaExpression gte(T value) {
+    return new CriteriaExpressionImpl(getName(), CriteriaOperator.GTE, serialize(value));
+  }
+
+  default CriteriaExpression lt(T value) {
+    return new CriteriaExpressionImpl(getName(), CriteriaOperator.LT, serialize(value));
+  }
+
+  default CriteriaExpression lte(T value) {
+    return new CriteriaExpressionImpl(getName(), CriteriaOperator.LTE, serialize(value));
+  }
+
+  default CriteriaExpression in(T[] values) {
+    return new CriteriaExpressionImpl(getName(), CriteriaOperator.IN, Stream.of(values).map(this::serialize).toArray());
+  }
+
+  default CriteriaExpression contains(T[] values) {
+    return new CriteriaExpressionImpl(getName(), CriteriaOperator.CONTAINS, Stream.of(values).map(this::serialize).toArray());
+  }
 }
