@@ -1,4 +1,4 @@
-package ma.markware.charybdis.model.metadata;
+package ma.markware.charybdis.model.field.metadata;
 
 public interface KeyspaceMetadata {
 

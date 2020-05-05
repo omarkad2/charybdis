@@ -4,7 +4,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import ma.markware.charybdis.model.criteria.CriteriaExpression;
-import ma.markware.charybdis.model.metadata.TableMetadata;
+import ma.markware.charybdis.model.field.metadata.TableMetadata;
 import ma.markware.charybdis.query.PageRequest;
 import ma.markware.charybdis.query.PageResult;
 

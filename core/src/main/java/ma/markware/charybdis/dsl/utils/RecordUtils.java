@@ -6,29 +6,22 @@ import java.util.ArrayList;
 import java.util.List;
 import ma.markware.charybdis.dsl.DefaultRecord;
 import ma.markware.charybdis.dsl.Record;
-import ma.markware.charybdis.model.metadata.ColumnMetadata;
-import ma.markware.charybdis.model.metadata.SelectExpression;
-import ma.markware.charybdis.model.metadata.UdtNestedField;
+import ma.markware.charybdis.model.field.SelectableField;
 
 public class RecordUtils {
 
-  public static Record rowToRecord(final Row row, final List<SelectExpression> selectedFields) {
+  public static Record rowToRecord(final Row row, final List<SelectableField> selectedFields) {
     DefaultRecord record = new DefaultRecord();
-    selectedFields.forEach(field -> {
-      if (field instanceof ColumnMetadata) {
-        record.put(field, ((ColumnMetadata) field).deserialize(row));
-      } else if (field instanceof UdtNestedField) {
-        UdtNestedField udtNestedField = (UdtNestedField) field;
-        record.put(field, udtNestedField.deserialize(row));
-      }
-    });
+    selectedFields.forEach(field ->
+        record.put(field, field.deserialize(row))
+    );
     return record;
   }
 
-  public static List<Record> resultSetToRecords(final ResultSet resultSet, final List<SelectExpression> selectedColumns) {
+  public static List<Record> resultSetToRecords(final ResultSet resultSet, final List<SelectableField> selectedFields) {
     List<Record> records = new ArrayList<>();
     for (Row row : resultSet) {
-      records.add(rowToRecord(row, selectedColumns));
+      records.add(rowToRecord(row, selectedFields));
     }
     return records;
   }

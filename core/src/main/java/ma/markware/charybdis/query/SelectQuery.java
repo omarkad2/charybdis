@@ -17,10 +17,10 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import ma.markware.charybdis.dsl.OrderExpression;
 import ma.markware.charybdis.model.criteria.CriteriaExpression;
-import ma.markware.charybdis.model.metadata.ColumnMetadata;
-import ma.markware.charybdis.model.metadata.TableMetadata;
-import ma.markware.charybdis.model.metadata.UdtFieldMetadata;
-import ma.markware.charybdis.model.metadata.UdtNestedField;
+import ma.markware.charybdis.model.field.SelectableField;
+import ma.markware.charybdis.model.field.UdtNestedField;
+import ma.markware.charybdis.model.field.metadata.TableMetadata;
+import ma.markware.charybdis.model.field.metadata.UdtFieldMetadata;
 import ma.markware.charybdis.query.clause.WhereClause;
 
 public class SelectQuery extends AbstractQuery {
@@ -46,20 +46,19 @@ public class SelectQuery extends AbstractQuery {
     this.selectors = SELECT_ALL;
   }
 
-  public void setSelectors(ColumnMetadata... fields) {
-    for(ColumnMetadata field : fields) {
-      this.selectors.add(Selector.column(field.getName()));
-    }
-  }
-
-  public void setSelectors(UdtNestedField... fields) {
-    for(UdtNestedField<?> field : fields) {
-      String columnName = field.getSourceColumn().getName();
-      Selector selector = null;
-      for (UdtFieldMetadata udtField : field.getEntries()) {
-        selector = selector == null ? Selector.field(columnName, udtField.getName()) : Selector.field(selector, udtField.getName());
+  public void setSelectors(SelectableField... fields) {
+    for(SelectableField field : fields) {
+      if (field instanceof UdtNestedField) {
+        UdtNestedField<?> udtNestedField = (UdtNestedField<?>) field;
+        String columnName = udtNestedField.getSourceColumn().getName();
+        Selector selector = null;
+        for (UdtFieldMetadata udtField : udtNestedField.getUdtFieldChain()) {
+          selector = selector == null ? Selector.field(columnName, udtField.getName()) : Selector.field(selector, udtField.getName());
+        }
+        this.selectors.add(selector);
+      } else {
+        this.selectors.add(Selector.column(field.getName()));
       }
-      this.selectors.add(selector);
     }
   }
 

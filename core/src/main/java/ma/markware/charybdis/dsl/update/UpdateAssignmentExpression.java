@@ -1,6 +1,6 @@
 package ma.markware.charybdis.dsl.update;
 
-import ma.markware.charybdis.model.metadata.ColumnMetadata;
+import ma.markware.charybdis.model.field.metadata.ColumnMetadata;
 
 public interface UpdateAssignmentExpression {
 

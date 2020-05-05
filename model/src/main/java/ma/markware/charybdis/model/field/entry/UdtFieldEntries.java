@@ -1,7 +1,8 @@
-package ma.markware.charybdis.model.metadata;
+package ma.markware.charybdis.model.field.entry;
 
 import java.util.LinkedList;
 import java.util.stream.Collectors;
+import ma.markware.charybdis.model.field.metadata.UdtFieldMetadata;
 
 public class UdtFieldEntries<T> implements EntryExpression {
 
@@ -12,7 +13,7 @@ public class UdtFieldEntries<T> implements EntryExpression {
     this.principalUdtField = udtField;
   }
 
-  public LinkedList<UdtFieldMetadata> getAllEntries() {
+  public LinkedList<UdtFieldMetadata> getUdtFieldChain() {
     LinkedList<UdtFieldMetadata> allEntries = new LinkedList<>(intermediateUdtFields);
     allEntries.addLast(principalUdtField);
     return allEntries;

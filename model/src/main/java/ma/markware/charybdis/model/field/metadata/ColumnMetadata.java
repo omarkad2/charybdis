@@ -1,18 +1,16 @@
-package ma.markware.charybdis.model.metadata;
+package ma.markware.charybdis.model.field.metadata;
 
-import com.datastax.oss.driver.api.core.cql.Row;
 import java.util.stream.Stream;
 import ma.markware.charybdis.model.criteria.CriteriaExpression;
 import ma.markware.charybdis.model.criteria.CriteriaExpressionImpl;
 import ma.markware.charybdis.model.criteria.CriteriaOperator;
+import ma.markware.charybdis.model.field.Field;
+import ma.markware.charybdis.model.field.MapNestedField;
+import ma.markware.charybdis.model.field.SelectableField;
+import ma.markware.charybdis.model.field.UdtNestedField;
+import ma.markware.charybdis.model.field.entry.UdtFieldEntries;
 
-public interface ColumnMetadata<T> extends SelectExpression<T> {
-
-  String getName();
-
-  Object serialize(T field);
-
-  T deserialize(Row row);
+public interface ColumnMetadata<T> extends Field<T>, SelectableField<T> {
 
   default MapNestedField entry(String entryName) {
     return new MapNestedField(this, entryName);

@@ -6,8 +6,8 @@ import com.datastax.oss.driver.api.core.type.UserDefinedType;
 import com.datastax.oss.driver.internal.core.type.UserDefinedTypeBuilder;
 import java.lang.String;
 import ma.markware.charybdis.model.datatype.DataTypeMapper;
-import ma.markware.charybdis.model.metadata.UdtFieldMetadata;
-import ma.markware.charybdis.model.metadata.UdtMetadata;
+import ma.markware.charybdis.model.field.metadata.UdtFieldMetadata;
+import ma.markware.charybdis.model.field.metadata.UdtMetadata;
 
 public class Country_Udt implements UdtMetadata<Country> {
   public static final UdtFieldMetadata<String> name = new UdtFieldMetadata<String>() {

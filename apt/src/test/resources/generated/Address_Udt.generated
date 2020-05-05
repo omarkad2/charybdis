@@ -7,8 +7,8 @@ import com.datastax.oss.driver.internal.core.type.UserDefinedTypeBuilder;
 import java.lang.Integer;
 import java.lang.String;
 import ma.markware.charybdis.model.datatype.DataTypeMapper;
-import ma.markware.charybdis.model.metadata.UdtFieldMetadata;
-import ma.markware.charybdis.model.metadata.UdtMetadata;
+import ma.markware.charybdis.model.field.metadata.UdtFieldMetadata;
+import ma.markware.charybdis.model.field.metadata.UdtMetadata;
 
 public class Address_Udt implements UdtMetadata<Address> {
   public static final UdtFieldMetadata<Integer> number = new UdtFieldMetadata<Integer>() {

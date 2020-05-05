@@ -10,10 +10,8 @@ import ma.markware.charybdis.dsl.OrderExpression;
 import ma.markware.charybdis.dsl.Record;
 import ma.markware.charybdis.dsl.utils.RecordUtils;
 import ma.markware.charybdis.model.criteria.CriteriaExpression;
-import ma.markware.charybdis.model.metadata.ColumnMetadata;
-import ma.markware.charybdis.model.metadata.SelectExpression;
-import ma.markware.charybdis.model.metadata.TableMetadata;
-import ma.markware.charybdis.model.metadata.UdtNestedField;
+import ma.markware.charybdis.model.field.SelectableField;
+import ma.markware.charybdis.model.field.metadata.TableMetadata;
 import ma.markware.charybdis.query.PageRequest;
 import ma.markware.charybdis.query.PageResult;
 import ma.markware.charybdis.query.SelectQuery;
@@ -23,26 +21,20 @@ public class SelectImpl implements SelectInitExpression, SelectWhereExpression, 
 
   private final CqlSession session;
   private final SelectQuery selectQuery;
-  private List<SelectExpression> selectedFields;
+  private List<SelectableField> selectedFields;
 
   public SelectImpl(final CqlSession session) {
     this.session = session;
     this.selectQuery = new SelectQuery();
   }
 
-  public SelectInitExpression select(final ColumnMetadata... fields) {
+  public SelectInitExpression select(final SelectableField... fields) {
     this.selectedFields = Arrays.asList(fields);
     selectQuery.setSelectors(fields);
     return this;
   }
 
-  public SelectInitExpression select(final UdtNestedField... fields) {
-    this.selectedFields = Arrays.asList(fields);
-    selectQuery.setSelectors(fields);
-    return this;
-  }
-
-  public SelectWhereExpression selectFrom(final TableMetadata tableMetadata) {
+  public SelectWhereExpression selectFrom(final TableMetadata<?> tableMetadata) {
     this.selectedFields = new ArrayList<>(tableMetadata.getColumnsMetadata().values());
     selectQuery.setTableAndSelectors(tableMetadata);
     return this;

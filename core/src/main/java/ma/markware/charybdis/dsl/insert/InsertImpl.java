@@ -3,8 +3,8 @@ package ma.markware.charybdis.dsl.insert;
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.cql.ResultSet;
 import java.time.Instant;
-import ma.markware.charybdis.model.metadata.ColumnMetadata;
-import ma.markware.charybdis.model.metadata.TableMetadata;
+import ma.markware.charybdis.model.field.metadata.ColumnMetadata;
+import ma.markware.charybdis.model.field.metadata.TableMetadata;
 import ma.markware.charybdis.query.InsertQuery;
 
 public class InsertImpl implements InsertInitExpression, InsertInitWithColumnsExpression, InsertValuesExpression, InsertSetExpression,

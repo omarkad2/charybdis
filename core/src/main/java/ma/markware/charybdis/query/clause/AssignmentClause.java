@@ -2,7 +2,7 @@ package ma.markware.charybdis.query.clause;
 
 import com.datastax.oss.driver.api.querybuilder.QueryBuilder;
 import com.datastax.oss.driver.api.querybuilder.update.Assignment;
-import ma.markware.charybdis.model.metadata.ColumnMetadata;
+import ma.markware.charybdis.model.field.metadata.ColumnMetadata;
 
 public class AssignmentClause {
 

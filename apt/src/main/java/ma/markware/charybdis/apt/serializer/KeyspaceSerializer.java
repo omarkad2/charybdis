@@ -6,7 +6,7 @@ import javax.annotation.processing.Filer;
 import javax.lang.model.element.Modifier;
 import ma.markware.charybdis.apt.AptContext;
 import ma.markware.charybdis.apt.metatype.KeyspaceMetaType;
-import ma.markware.charybdis.model.metadata.KeyspaceMetadata;
+import ma.markware.charybdis.model.field.metadata.KeyspaceMetadata;
 
 public class KeyspaceSerializer implements Serializer<KeyspaceMetaType> {
 

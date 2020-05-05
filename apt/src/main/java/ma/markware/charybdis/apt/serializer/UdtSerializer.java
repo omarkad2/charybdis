@@ -24,8 +24,8 @@ import ma.markware.charybdis.apt.metatype.TypeDetail;
 import ma.markware.charybdis.apt.metatype.UdtFieldMetaType;
 import ma.markware.charybdis.apt.metatype.UdtMetaType;
 import ma.markware.charybdis.model.datatype.DataTypeMapper;
-import ma.markware.charybdis.model.metadata.UdtFieldMetadata;
-import ma.markware.charybdis.model.metadata.UdtMetadata;
+import ma.markware.charybdis.model.field.metadata.UdtFieldMetadata;
+import ma.markware.charybdis.model.field.metadata.UdtMetadata;
 import ma.markware.charybdis.model.utils.ClassUtils;
 import org.apache.commons.lang3.ArrayUtils;
 

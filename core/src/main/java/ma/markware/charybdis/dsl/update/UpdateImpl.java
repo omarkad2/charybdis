@@ -4,8 +4,8 @@ import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.cql.ResultSet;
 import java.time.Instant;
 import ma.markware.charybdis.model.criteria.CriteriaExpression;
-import ma.markware.charybdis.model.metadata.ColumnMetadata;
-import ma.markware.charybdis.model.metadata.TableMetadata;
+import ma.markware.charybdis.model.field.metadata.ColumnMetadata;
+import ma.markware.charybdis.model.field.metadata.TableMetadata;
 import ma.markware.charybdis.query.UpdateQuery;
 
 public class UpdateImpl implements UpdateInitExpression, UpdateTtlExpression, UpdateTimestampExpression, UpdateAssignmentExpression, UpdateWhereExpression,

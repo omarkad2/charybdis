@@ -1,7 +1,9 @@
-package ma.markware.charybdis.model.metadata;
+package ma.markware.charybdis.model.field.metadata;
 
 import com.datastax.oss.driver.api.core.cql.Row;
 import com.datastax.oss.driver.api.core.data.UdtValue;
+import ma.markware.charybdis.model.field.Field;
+import ma.markware.charybdis.model.field.entry.UdtFieldEntries;
 
 public interface UdtFieldMetadata<T> extends Field<T> {
 

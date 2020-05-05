@@ -7,16 +7,13 @@ import ma.markware.charybdis.dsl.insert.InsertInitWithColumnsExpression;
 import ma.markware.charybdis.dsl.select.SelectInitExpression;
 import ma.markware.charybdis.dsl.select.SelectWhereExpression;
 import ma.markware.charybdis.dsl.update.UpdateInitExpression;
-import ma.markware.charybdis.model.metadata.ColumnMetadata;
-import ma.markware.charybdis.model.metadata.Field;
-import ma.markware.charybdis.model.metadata.TableMetadata;
-import ma.markware.charybdis.model.metadata.UdtNestedField;
+import ma.markware.charybdis.model.field.SelectableField;
+import ma.markware.charybdis.model.field.metadata.ColumnMetadata;
+import ma.markware.charybdis.model.field.metadata.TableMetadata;
 
 public interface DslQuery {
 
-  SelectInitExpression select(ColumnMetadata... fields);
-
-  SelectInitExpression select(UdtNestedField... fields);
+  SelectInitExpression select(SelectableField... fields);
 
   SelectWhereExpression selectFrom(TableMetadata table);
 
@@ -28,7 +25,7 @@ public interface DslQuery {
 
   DeleteInitExpression delete();
 
-  DeleteInitExpression delete(Field... fields);
+  DeleteInitExpression delete(ColumnMetadata... fields);
 
   DslQuery using(DriverExecutionProfile executionProfile);
 
