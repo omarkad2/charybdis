@@ -10,15 +10,14 @@ import com.datastax.oss.driver.api.querybuilder.update.UpdateWithAssignments;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
+import java.util.function.Function;
+import java.util.stream.Stream;
 import ma.markware.charybdis.model.criteria.CriteriaExpression;
 import ma.markware.charybdis.model.field.metadata.ColumnMetadata;
 import ma.markware.charybdis.model.field.metadata.TableMetadata;
 import ma.markware.charybdis.query.clause.AssignmentClause;
 import ma.markware.charybdis.query.clause.ConditionClause;
 import ma.markware.charybdis.query.clause.WhereClause;
-import org.apache.commons.lang3.ArrayUtils;
 
 public class UpdateQuery extends AbstractQuery {
 
@@ -40,10 +39,8 @@ public class UpdateQuery extends AbstractQuery {
     assignmentClauses.add(AssignmentClause.from(columnMetadata, value));
   }
 
-  public void setAssignments(Map<String, Object> columnNameValues) {
-    for (Entry<String, Object> entry : columnNameValues.entrySet()) {
-      assignmentClauses.add(AssignmentClause.from(entry.getKey(), entry.getValue()));
-    }
+  public void setAssignment(String columnName, Object value) {
+    assignmentClauses.add(AssignmentClause.from(columnName, value));
   }
 
   public void setWhere(CriteriaExpression criteriaExpression) {
@@ -93,8 +90,10 @@ public class UpdateQuery extends AbstractQuery {
     update = update.if_(QueryHelper.extractConditions(conditionClauses));
 
     SimpleStatement simpleStatement = update.build();
-    return executeStatement(session, simpleStatement, ArrayUtils.addAll(QueryHelper.extractAssignmentBindValues(assignmentClauses),
-                                                                        QueryHelper.extractWhereBindValues(whereClauses),
-                                                                        QueryHelper.extractConditionBindValues(conditionClauses)));
+    return executeStatement(session, simpleStatement, Stream.of(QueryHelper.extractAssignmentBindValues(assignmentClauses),
+                                                                QueryHelper.extractWhereBindValues(whereClauses),
+                                                                QueryHelper.extractConditionBindValues(conditionClauses))
+                                                            .flatMap(Function.identity())
+                                                            .toArray());
   }
 }

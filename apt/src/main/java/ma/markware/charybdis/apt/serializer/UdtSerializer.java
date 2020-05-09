@@ -74,6 +74,7 @@ public class UdtSerializer implements Serializer<UdtMetaType> {
                                                                          .addSuperinterface(fieldType)
                                                                          .addMethods(Arrays.asList(
                                                                              buildUdtFieldGetNameMethod(udtFieldMetaType),
+                                                                             buildUdtFieldGetFieldClassMethod(udtFieldMetaType),
                                                                              buildUdtFieldSerializeMethod(udtFieldMetaType, aptContext),
                                                                              buildUdtFieldDeserializeUdtValueMethod(udtFieldMetaType, aptContext),
                                                                              buildUdtFieldDeserializeRowMethod(udtFieldMetaType, aptContext)
@@ -94,6 +95,14 @@ public class UdtSerializer implements Serializer<UdtMetaType> {
                      .addModifiers(Modifier.PUBLIC)
                      .returns(String.class)
                      .addStatement("return $S", udtFieldMetaType.getUdtFieldName())
+                     .build();
+  }
+
+  private MethodSpec buildUdtFieldGetFieldClassMethod(UdtFieldMetaType udtFieldMetaType) {
+    return MethodSpec.methodBuilder(SerializationConstants.GET_FIELD_CLASS_METHOD)
+                     .addModifiers(Modifier.PUBLIC)
+                     .returns(Class.class)
+                     .addStatement("return $L.class", udtFieldMetaType.getFieldType().getTypeCanonicalName())
                      .build();
   }
 

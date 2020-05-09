@@ -14,6 +14,14 @@ public interface TableMetadata<ENTITY> {
 
   Map<String, ColumnMetadata> getColumnsMetadata();
 
+  Map<String, ColumnMetadata> getPartitionKeyColumns();
+
+  Map<String, ColumnMetadata> getClusteringKeyColumns();
+
+  Map<String, ColumnMetadata> getPrimaryKeys();
+
+  boolean isPrimaryKey(String columnName);
+
   int getPrimaryKeySize();
 
   int getColumnsSize();

@@ -11,6 +11,8 @@ public interface UdtFieldMetadata<T> extends Field<T> {
 
   T deserialize(String path, Row row);
 
+  Class<T> getFieldClass();
+
   default <U> UdtFieldEntries<U> entry(UdtFieldEntries<U> udtFieldEntries) {
     return udtFieldEntries.add(this);
   }

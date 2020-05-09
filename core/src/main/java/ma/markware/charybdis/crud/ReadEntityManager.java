@@ -6,6 +6,7 @@ import com.datastax.oss.driver.api.core.cql.Row;
 import java.util.ArrayList;
 import java.util.List;
 import ma.markware.charybdis.model.criteria.CriteriaExpression;
+import ma.markware.charybdis.model.criteria.ExtendedCriteriaExpression;
 import ma.markware.charybdis.model.field.metadata.TableMetadata;
 import ma.markware.charybdis.query.PageRequest;
 import ma.markware.charybdis.query.PageResult;
@@ -26,8 +27,10 @@ public class ReadEntityManager<T> {
     return this;
   }
 
-  public ReadEntityManager<T> withCriteria(CriteriaExpression criteria) {
-    selectQuery.setWhereClause(criteria);
+  public ReadEntityManager<T> withConditions(ExtendedCriteriaExpression conditions) {
+    for (CriteriaExpression condition : conditions.getCriterias()) {
+      selectQuery.setWhereClause(condition);
+    }
     return this;
   }
 

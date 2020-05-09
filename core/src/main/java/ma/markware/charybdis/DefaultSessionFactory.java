@@ -9,11 +9,11 @@ public class DefaultSessionFactory implements SessionFactory {
   private final DriverConfigLoader driverConfigLoader;
   private CqlSession currentSession;
 
-  DefaultSessionFactory() {
+  public DefaultSessionFactory() {
     driverConfigLoader = new DefaultDriverConfigLoader();
   }
 
-  DefaultSessionFactory(final String customConfiguration) {
+  public DefaultSessionFactory(final String customConfiguration) {
     driverConfigLoader = DriverConfigLoader.fromClasspath(customConfiguration);
   }
 

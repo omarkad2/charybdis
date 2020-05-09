@@ -15,12 +15,10 @@ final class SerializationConstants {
   static final String GET_UDT_NAME_METHOD = "getUdtName";
   static final String GET_TABLE_NAME_METHOD = "getTableName";
   static final String GET_NAME_METHOD = "getName";
-  static final String IS_PARTITION_KEY_METHOD = "isPartitionKey";
+  static final String GET_FIELD_CLASS_METHOD = "getFieldClass";
   static final String GET_PARTITION_KEY_INDEX_METHOD = "getPartitionKeyIndex";
-  static final String IS_CLUSTERING_KEY_METHOD = "isClusteringKey";
   static final String GET_CLUSTERING_KEY_INDEX_METHOD = "getClusteringKeyIndex";
   static final String GET_CLUSTERING_ORDER_METHOD = "getClusteringOrder";
-  static final String IS_INDEXED_METHOD = "isIndexed";
   static final String GET_INDEX_NAME_METHOD = "getIndexName";
   static final String SERIALIZE_FIELD_METHOD = "serialize";
   static final String DESERIALIZE_UDT_VALUE_METHOD = "deserialize";
@@ -31,6 +29,7 @@ final class SerializationConstants {
   static final String GET_COLUMN_METADATA_METHOD = "getColumnMetadata";
   static final String IS_PRIMARY_KEY_COLUMN_METHOD = "isPrimaryKey";
   static final String GET_PRIMARY_KEY_SIZE_METHOD = "getPrimaryKeySize";
+  static final String GET_PRIMARY_KEYS_METHOD = "getPrimaryKeys";
   static final String GET_COLUMNS_SIZE_METHOD = "getColumnsSize";
   static final String SET_GENERATED_VALUES_METHOD = "setGeneratedValues";
   static final String SET_CREATION_DATE_METHOD = "setCreationDate";

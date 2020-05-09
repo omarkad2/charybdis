@@ -18,9 +18,7 @@ import java.util.stream.Collectors;
 import ma.markware.charybdis.dsl.OrderExpression;
 import ma.markware.charybdis.model.criteria.CriteriaExpression;
 import ma.markware.charybdis.model.field.SelectableField;
-import ma.markware.charybdis.model.field.UdtNestedField;
 import ma.markware.charybdis.model.field.metadata.TableMetadata;
-import ma.markware.charybdis.model.field.metadata.UdtFieldMetadata;
 import ma.markware.charybdis.query.clause.WhereClause;
 
 public class SelectQuery extends AbstractQuery {
@@ -48,17 +46,7 @@ public class SelectQuery extends AbstractQuery {
 
   public void setSelectors(SelectableField... fields) {
     for(SelectableField field : fields) {
-      if (field instanceof UdtNestedField) {
-        UdtNestedField<?> udtNestedField = (UdtNestedField<?>) field;
-        String columnName = udtNestedField.getSourceColumn().getName();
-        Selector selector = null;
-        for (UdtFieldMetadata udtField : udtNestedField.getUdtFieldChain()) {
-          selector = selector == null ? Selector.field(columnName, udtField.getName()) : Selector.field(selector, udtField.getName());
-        }
-        this.selectors.add(selector);
-      } else {
-        this.selectors.add(Selector.column(field.getName()));
-      }
+      this.selectors.add(field.toSelector());
     }
   }
 
@@ -105,7 +93,7 @@ public class SelectQuery extends AbstractQuery {
     }
 
     SimpleStatement simpleStatement = select.build();
-    Object[] bindValues = QueryHelper.extractWhereBindValues(whereClauses);
+    Object[] bindValues = QueryHelper.extractWhereBindValues(whereClauses).toArray();
     if (pageRequest != null) {
       return executeStatement(session, simpleStatement, pageRequest.getFetchSize(), pageRequest.getPagingState(), bindValues);
     }

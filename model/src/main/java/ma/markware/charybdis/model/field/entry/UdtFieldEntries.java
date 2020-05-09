@@ -2,6 +2,7 @@ package ma.markware.charybdis.model.field.entry;
 
 import java.util.LinkedList;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import ma.markware.charybdis.model.field.metadata.UdtFieldMetadata;
 
 public class UdtFieldEntries<T> implements EntryExpression {
@@ -26,8 +27,9 @@ public class UdtFieldEntries<T> implements EntryExpression {
 
   @Override
   public String getName() {
-    return intermediateUdtFields.stream().map(UdtFieldMetadata::getName).collect(Collectors.joining(".")) + "." +
-        principalUdtField.getName();
+    return Stream.concat(intermediateUdtFields.stream(), Stream.of(principalUdtField))
+                 .map(UdtFieldMetadata::getName)
+                 .collect(Collectors.joining("."));
   }
 
   public UdtFieldMetadata<T> getPrincipalUdtField() {

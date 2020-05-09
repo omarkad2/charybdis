@@ -5,7 +5,10 @@ import static java.lang.String.format;
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.cql.ResultSet;
 import java.time.Instant;
+import java.util.Map;
+import java.util.Map.Entry;
 import ma.markware.charybdis.model.criteria.CriteriaExpression;
+import ma.markware.charybdis.model.criteria.CriteriaOperator;
 import ma.markware.charybdis.model.field.metadata.TableMetadata;
 import ma.markware.charybdis.query.UpdateQuery;
 import org.slf4j.Logger;
@@ -64,7 +67,18 @@ public class UpdateEntityManager<T> {
   public T save(CqlSession session) {
     Instant now = Instant.now();
     tableMetadata.setLastUpdatedDate(entity, now);
-    updateQuery.setAssignments(tableMetadata.serialize(entity));
+
+    Map<String, Object> columnValueMap = tableMetadata.serialize(entity);
+    for (Entry<String, Object> columnEntry : columnValueMap.entrySet()) {
+      String columnName = columnEntry.getKey();
+      Object value = columnEntry.getValue();
+      if (value != null && tableMetadata.isPrimaryKey(columnName)) {
+        updateQuery.setWhere(new CriteriaExpression(columnName, CriteriaOperator.EQ, value));
+      } else {
+        updateQuery.setAssignment(columnName, value);
+      }
+    }
+
     ResultSet resultSet = updateQuery.execute(session);
     if (resultSet.wasApplied()) {
       return entity;

@@ -1,8 +1,8 @@
 package ma.markware.charybdis.model.field.metadata;
 
+import com.datastax.oss.driver.api.querybuilder.select.Selector;
 import java.util.stream.Stream;
 import ma.markware.charybdis.model.criteria.CriteriaExpression;
-import ma.markware.charybdis.model.criteria.CriteriaExpressionImpl;
 import ma.markware.charybdis.model.criteria.CriteriaOperator;
 import ma.markware.charybdis.model.field.Field;
 import ma.markware.charybdis.model.field.MapNestedField;
@@ -25,30 +25,35 @@ public interface ColumnMetadata<T> extends Field<T>, SelectableField<T> {
   }
 
   default CriteriaExpression eq(T value) {
-    return new CriteriaExpressionImpl(getName(), CriteriaOperator.EQ, serialize(value));
+    return new CriteriaExpression(getName(), CriteriaOperator.EQ, serialize(value));
   }
 
   default CriteriaExpression gt(T value) {
-    return new CriteriaExpressionImpl(getName(), CriteriaOperator.GT, serialize(value));
+    return new CriteriaExpression(getName(), CriteriaOperator.GT, serialize(value));
   }
 
   default CriteriaExpression gte(T value) {
-    return new CriteriaExpressionImpl(getName(), CriteriaOperator.GTE, serialize(value));
+    return new CriteriaExpression(getName(), CriteriaOperator.GTE, serialize(value));
   }
 
   default CriteriaExpression lt(T value) {
-    return new CriteriaExpressionImpl(getName(), CriteriaOperator.LT, serialize(value));
+    return new CriteriaExpression(getName(), CriteriaOperator.LT, serialize(value));
   }
 
   default CriteriaExpression lte(T value) {
-    return new CriteriaExpressionImpl(getName(), CriteriaOperator.LTE, serialize(value));
+    return new CriteriaExpression(getName(), CriteriaOperator.LTE, serialize(value));
   }
 
   default CriteriaExpression in(T[] values) {
-    return new CriteriaExpressionImpl(getName(), CriteriaOperator.IN, Stream.of(values).map(this::serialize).toArray());
+    return new CriteriaExpression(getName(), CriteriaOperator.IN, Stream.of(values).map(this::serialize).toArray());
   }
 
   default CriteriaExpression contains(T[] values) {
-    return new CriteriaExpressionImpl(getName(), CriteriaOperator.CONTAINS, Stream.of(values).map(this::serialize).toArray());
+    return new CriteriaExpression(getName(), CriteriaOperator.CONTAINS, Stream.of(values).map(this::serialize).toArray());
+  }
+
+  @Override
+  default Selector toSelector(boolean useAlias) {
+    return Selector.column(getName());
   }
 }

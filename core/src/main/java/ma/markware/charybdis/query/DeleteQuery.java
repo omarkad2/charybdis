@@ -10,12 +10,13 @@ import com.datastax.oss.driver.api.querybuilder.select.Selector;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Stream;
 import ma.markware.charybdis.model.criteria.CriteriaExpression;
 import ma.markware.charybdis.model.field.Field;
 import ma.markware.charybdis.model.field.metadata.TableMetadata;
 import ma.markware.charybdis.query.clause.ConditionClause;
 import ma.markware.charybdis.query.clause.WhereClause;
-import org.apache.commons.lang3.ArrayUtils;
 
 public class DeleteQuery extends AbstractQuery {
 
@@ -79,7 +80,9 @@ public class DeleteQuery extends AbstractQuery {
     delete = delete.if_(QueryHelper.extractConditions(conditionClauses));
 
     SimpleStatement simpleStatement = delete.build();
-    return executeStatement(session, simpleStatement, ArrayUtils.addAll(QueryHelper.extractWhereBindValues(whereClauses),
-                                                                        QueryHelper.extractConditionBindValues(conditionClauses)));
+    return executeStatement(session, simpleStatement, Stream.of(QueryHelper.extractWhereBindValues(whereClauses),
+                                                                QueryHelper.extractConditionBindValues(conditionClauses))
+                                                            .flatMap(Function.identity())
+                                                            .toArray());
   }
 }

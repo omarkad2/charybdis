@@ -60,7 +60,7 @@ public class CreateEntityManager<T> {
     tableMetadata.setGeneratedValues(entity);
     tableMetadata.setCreationDate(entity, now);
     tableMetadata.setLastUpdatedDate(entity, now);
-    insertQuery.setValues(tableMetadata.serialize(entity));
+    insertQuery.setColumnNameValueMapping(tableMetadata.serialize(entity));
     ResultSet resultSet = insertQuery.execute(session);
     if (resultSet.wasApplied()) {
       return entity;

@@ -63,6 +63,7 @@ public class TableSerializer implements Serializer<TableMetaType> {
                                                       buildColumnsGetterMethod(SerializationConstants.GET_COLUMNS_METADATA_METHOD, tableMetaType.getColumns()),
                                                       buildColumnsGetterMethod(SerializationConstants.GET_PARTITION_KEY_COLUMNS_METHOD, tableMetaType.getPartitionKeyColumns()),
                                                       buildColumnsGetterMethod(SerializationConstants.GET_CLUSTERING_KEY_COLUMNS_METHOD, tableMetaType.getClusteringKeyColumns()),
+                                                      buildGetPrimaryKeysMethod(),
                                                       buildGetColumnMetadata(),
                                                       buildIsPrimaryKeyMethod(),
                                                       buildGetPrimaryKeySizeMethod(),
@@ -96,6 +97,7 @@ public class TableSerializer implements Serializer<TableMetaType> {
                                              .addSuperinterface(fieldType)
                                              .addMethods(Arrays.asList(
                                                  buildColumnMetadataGetNameMethod(columnFieldMetaType),
+                                                 buildColumnMetadataGetFieldClassMethod(columnFieldMetaType),
                                                  buildColumnMetadataGetPartitionKeyIndexMethod(columnFieldMetaType),
                                                  buildColumnMetadataSerializeMethod(columnFieldMetaType, aptContext),
                                                  buildColumnMetadataDeserializeMethod(columnFieldMetaType, aptContext)
@@ -108,6 +110,7 @@ public class TableSerializer implements Serializer<TableMetaType> {
                                              .addSuperinterface(fieldType)
                                              .addMethods(Arrays.asList(
                                                  buildColumnMetadataGetNameMethod(columnFieldMetaType),
+                                                 buildColumnMetadataGetFieldClassMethod(columnFieldMetaType),
                                                  buildColumnMetadataGetClusteringKeyIndexMethod(columnFieldMetaType),
                                                  buildColumnMetadataGetClusteringKeyOrderMethod(columnFieldMetaType),
                                                  buildColumnMetadataSerializeMethod(columnFieldMetaType, aptContext),
@@ -121,6 +124,7 @@ public class TableSerializer implements Serializer<TableMetaType> {
                                              .addSuperinterface(fieldType)
                                              .addMethods(Arrays.asList(
                                                  buildColumnMetadataGetNameMethod(columnFieldMetaType),
+                                                 buildColumnMetadataGetFieldClassMethod(columnFieldMetaType),
                                                  buildColumnMetadataGetIndexNameMethod(columnFieldMetaType),
                                                  buildColumnMetadataSerializeMethod(columnFieldMetaType, aptContext),
                                                  buildColumnMetadataDeserializeMethod(columnFieldMetaType, aptContext)
@@ -131,13 +135,12 @@ public class TableSerializer implements Serializer<TableMetaType> {
                            .addSuperinterface(fieldType)
                            .addMethods(Arrays.asList(
                                buildColumnMetadataGetNameMethod(columnFieldMetaType),
+                               buildColumnMetadataGetFieldClassMethod(columnFieldMetaType),
                                buildColumnMetadataSerializeMethod(columnFieldMetaType, aptContext),
                                buildColumnMetadataDeserializeMethod(columnFieldMetaType, aptContext)
                            ))
                            .build());
       }
-
-
 
       columnFieldSpecs[i] = (FieldSpec.builder(fieldType, columnFieldMetaType.getFieldName())
                                     .addModifiers(Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)
@@ -153,6 +156,14 @@ public class TableSerializer implements Serializer<TableMetaType> {
                      .addModifiers(Modifier.PUBLIC)
                      .returns(String.class)
                      .addStatement("return $S",columnFieldMetaType.getColumnName())
+                     .build();
+  }
+
+  private MethodSpec buildColumnMetadataGetFieldClassMethod(ColumnFieldMetaType columnFieldMetaType) {
+    return MethodSpec.methodBuilder(SerializationConstants.GET_FIELD_CLASS_METHOD)
+                     .addModifiers(Modifier.PUBLIC)
+                     .returns(Class.class)
+                     .addStatement("return $L.class", columnFieldMetaType.getFieldType().getTypeCanonicalName())
                      .build();
   }
 
@@ -205,7 +216,7 @@ public class TableSerializer implements Serializer<TableMetaType> {
           throw new CharybdisSerializationException(format("Column '%s' has a user defined type, yet the type metadata is not found", columnName));
         }
         returnType = TypeName.get(UdtValue.class);
-        returnStatement.addStatement("return $L.$L.$L($N)", udtContext.getUdtMetadataClassName(),
+        returnStatement.addStatement("return $N != null ? $L.$L.$L($N) : null", parameterName, udtContext.getUdtMetadataClassName(),
                                       udtContext.getUdtName(), SerializationConstants.SERIALIZE_METHOD, parameterName);
         break;
       case ENUM:
@@ -234,18 +245,18 @@ public class TableSerializer implements Serializer<TableMetaType> {
     switch (columnFieldType.getTypeDetailEnum()) {
       case LIST:
         TypeDetail listSubType = columnFieldSubTypes.get(0);
-        returnStatement.addStatement("return $N.getList($S, $L.class)", parameterName, columnName,
+        returnStatement.addStatement("return $N != null ? $N.getList($S, $L.class): null", parameterName, parameterName, columnName,
                                       listSubType.getTypeCanonicalName());
         break;
       case SET:
         TypeDetail setSubType = columnFieldSubTypes.get(0);
-        returnStatement.addStatement("return $N.getSet($S, $L.class)", parameterName, columnName,
+        returnStatement.addStatement("return $N != null ? $N.getSet($S, $L.class) : null", parameterName, parameterName, columnName,
                                       setSubType.getTypeCanonicalName());
         break;
       case MAP:
         TypeDetail fieldSubTypeKey = columnFieldSubTypes.get(0);
         TypeDetail fieldSubTypeValue = columnFieldSubTypes.get(1);
-        returnStatement.addStatement("return $N.getMap($S, $L.class, $L.class)", parameterName, columnName,
+        returnStatement.addStatement("return $N != null ? $N.getMap($S, $L.class, $L.class) : null", parameterName, parameterName, columnName,
                                       fieldSubTypeKey.getTypeCanonicalName(), fieldSubTypeValue.getTypeCanonicalName());
         break;
       case UDT:
@@ -253,16 +264,17 @@ public class TableSerializer implements Serializer<TableMetaType> {
         if (udtContext == null) {
           throw new CharybdisSerializationException(format("Column '%s' has a user defined type, yet the type metadata is not found", columnName));
         }
-        returnStatement.addStatement("return $L.$L.$L($N.getUdtValue($S))",
+        returnStatement.addStatement("return $N != null ? $L.$L.$L($N.getUdtValue($S)) : null", parameterName,
                                       udtContext.getUdtMetadataClassName(), udtContext.getUdtName(), SerializationConstants.DESERIALIZE_METHOD,
                                       parameterName, columnName);
         break;
       case ENUM:
-        returnStatement.addStatement("return $N.getString($S) != null ? $L.valueOf($N.getString($S)) : null",
+        returnStatement.addStatement("return $N != null && $N.getString($S) != null ? $L.valueOf($N.getString($S)) : null", parameterName,
                                       parameterName, columnName, columnFieldType.getTypeCanonicalName(), parameterName, columnName);
         break;
       default:
-        returnStatement.addStatement("return $N.get($S, $L.class)", parameterName, columnName, columnFieldType.getTypeCanonicalName());
+        returnStatement.addStatement("return $N != null ? $N.get($S, $L.class) : null", parameterName, parameterName, columnName,
+                                     columnFieldType.getTypeCanonicalName());
         break;
     }
     return MethodSpec.methodBuilder(SerializationConstants.DESERIALIZE_METHOD)
@@ -307,6 +319,19 @@ public class TableSerializer implements Serializer<TableMetaType> {
                      .addStatement("return $L().containsKey($N) || $L().containsKey($N)",
                                    SerializationConstants.GET_PARTITION_KEY_COLUMNS_METHOD, parameterName,
                                    SerializationConstants.GET_CLUSTERING_KEY_COLUMNS_METHOD, parameterName)
+                     .build();
+  }
+
+  private MethodSpec buildGetPrimaryKeysMethod() {
+    ParameterizedTypeName returnType = ParameterizedTypeName.get(ClassName.get(Map.class), ClassName.get(String.class),
+                                                                 ClassName.get(ColumnMetadata.class));
+    return MethodSpec.methodBuilder(SerializationConstants.GET_PRIMARY_KEYS_METHOD)
+                     .addModifiers(Modifier.PUBLIC)
+                     .returns(returnType)
+                     .addStatement("$T result = new $T<>()", returnType, HashMap.class)
+                     .addStatement("result.putAll($L())", SerializationConstants.GET_PARTITION_KEY_COLUMNS_METHOD)
+                     .addStatement("result.putAll($L())", SerializationConstants.GET_CLUSTERING_KEY_COLUMNS_METHOD)
+                     .addStatement("return result")
                      .build();
   }
 

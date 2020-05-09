@@ -1,7 +1,7 @@
 package ma.markware.charybdis.model.field;
 
 import com.datastax.oss.driver.api.core.cql.Row;
-import java.util.LinkedList;
+import com.datastax.oss.driver.api.querybuilder.select.Selector;
 import ma.markware.charybdis.model.field.entry.EntryExpression;
 import ma.markware.charybdis.model.field.entry.UdtFieldEntries;
 import ma.markware.charybdis.model.field.metadata.ColumnMetadata;
@@ -47,7 +47,18 @@ public class UdtNestedField<T> implements NestedField<T>, SelectableField<T> {
     return udtFields;
   }
 
-  public LinkedList<UdtFieldMetadata> getUdtFieldChain() {
-    return udtFields.getUdtFieldChain();
+  @Override
+  public Class<T> getFieldClass() {
+    return udtFields.getPrincipalUdtField().getFieldClass();
+  }
+
+  @Override
+  public Selector toSelector(boolean useAlias) {
+    String columnName = getSourceColumn().getName();
+    Selector selector = null;
+    for (UdtFieldMetadata udtField : udtFields.getUdtFieldChain()) {
+      selector = selector == null ? Selector.field(columnName, udtField.getName()) : Selector.field(selector, udtField.getName());
+    }
+    return selector;
   }
 }
