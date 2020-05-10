@@ -1,25 +1,27 @@
 package ma.markware.charybdis.model.criteria;
 
+import ma.markware.charybdis.model.field.criteria.CriteriaField;
+
 public class CriteriaExpression {
 
-  private String fieldName;
+  private CriteriaField field;
   private CriteriaOperator criteriaOperator;
   private Object[] values;
 
-  public CriteriaExpression(final String fieldName, final CriteriaOperator criteriaOperator, final Object[] values) {
-    this.fieldName = fieldName;
+  public CriteriaExpression(final CriteriaField field, final CriteriaOperator criteriaOperator, final Object[] values) {
+    this.field = field;
     this.criteriaOperator = criteriaOperator;
     this.values = values;
   }
 
-  public CriteriaExpression(final String fieldName, final CriteriaOperator criteriaOperator, final Object value) {
-    this.fieldName = fieldName;
+  public CriteriaExpression(final CriteriaField field, final CriteriaOperator criteriaOperator, final Object value) {
+    this.field = field;
     this.criteriaOperator = criteriaOperator;
     this.values = new Object[]{ value };
   }
 
-  public String getFieldName() {
-    return fieldName;
+  public CriteriaField getField() {
+    return field;
   }
 
   public CriteriaOperator getCriteriaOperator() {

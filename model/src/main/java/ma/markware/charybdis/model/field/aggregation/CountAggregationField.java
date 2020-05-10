@@ -7,7 +7,10 @@ import ma.markware.charybdis.model.utils.StringUtils;
 
 public class CountAggregationField implements SelectableField<Long> {
 
-  private final SelectableField aggregatedField;
+  private SelectableField aggregatedField;
+
+  public CountAggregationField() {
+  }
 
   public CountAggregationField(final SelectableField aggregatedField) {
     this.aggregatedField = aggregatedField;
@@ -25,17 +28,13 @@ public class CountAggregationField implements SelectableField<Long> {
 
   @Override
   public String getName() {
-    return "count_" + aggregatedField.getName();
-  }
-
-  @Override
-  public Object serialize(final Long field) {
-    return null;
+    return aggregatedField != null ? "count_" + aggregatedField.getName() : "count_*";
   }
 
   @Override
   public Selector toSelector(boolean useAlias) {
-    Selector countSelector = Selector.function("count", aggregatedField.toSelector(false));
+    Selector countSelector = aggregatedField != null ? Selector.function("count", aggregatedField.toSelector(false)) :
+        Selector.function("count", Selector.all());
     return useAlias ? countSelector.as(resolveAlias()) : countSelector;
   }
 

@@ -2,6 +2,7 @@ package ma.markware.charybdis.apt.domain;
 
 import com.datastax.oss.driver.api.core.cql.Row;
 import com.datastax.oss.driver.api.core.data.UdtValue;
+import java.lang.Class;
 import java.lang.Integer;
 import java.lang.Object;
 import java.lang.String;
@@ -14,8 +15,10 @@ import java.util.UUID;
 import ma.markware.charybdis.model.field.metadata.ClusteringKeyColumnMetadata;
 import ma.markware.charybdis.model.field.metadata.ColumnMetadata;
 import ma.markware.charybdis.model.field.metadata.IndexColumnMetadata;
+import ma.markware.charybdis.model.field.metadata.MapColumnMetadata;
 import ma.markware.charybdis.model.field.metadata.PartitionKeyColumnMetadata;
 import ma.markware.charybdis.model.field.metadata.TableMetadata;
+import ma.markware.charybdis.model.field.metadata.UdtColumnMetadata;
 import ma.markware.charybdis.model.option.ClusteringOrder;
 import ma.markware.charybdis.model.option.SequenceModelEnum;
 
@@ -23,6 +26,10 @@ public class User_Table implements TableMetadata<User> {
   public static final PartitionKeyColumnMetadata<UUID> id = new PartitionKeyColumnMetadata<UUID>() {
     public String getName() {
       return "id";
+    }
+
+    public Class getFieldClass() {
+      return java.util.UUID.class;
     }
 
     public int getPartitionKeyIndex() {
@@ -34,13 +41,17 @@ public class User_Table implements TableMetadata<User> {
     }
 
     public UUID deserialize(Row row) {
-      return row.get("id", java.util.UUID.class);
+      return row != null ? row.get("id", java.util.UUID.class) : null;
     }
   };
 
   public static final ClusteringKeyColumnMetadata<String> fullname = new ClusteringKeyColumnMetadata<String>() {
     public String getName() {
       return "fullname";
+    }
+
+    public Class getFieldClass() {
+      return java.lang.String.class;
     }
 
     public int getClusteringKeyIndex() {
@@ -56,13 +67,17 @@ public class User_Table implements TableMetadata<User> {
     }
 
     public String deserialize(Row row) {
-      return row.get("fullname", java.lang.String.class);
+      return row != null ? row.get("fullname", java.lang.String.class) : null;
     }
   };
 
   public static final ClusteringKeyColumnMetadata<Instant> joiningDate = new ClusteringKeyColumnMetadata<Instant>() {
     public String getName() {
       return "joining_date";
+    }
+
+    public Class getFieldClass() {
+      return java.time.Instant.class;
     }
 
     public int getClusteringKeyIndex() {
@@ -78,7 +93,7 @@ public class User_Table implements TableMetadata<User> {
     }
 
     public Instant deserialize(Row row) {
-      return row.get("joining_date", java.time.Instant.class);
+      return row != null ? row.get("joining_date", java.time.Instant.class) : null;
     }
   };
 
@@ -87,12 +102,16 @@ public class User_Table implements TableMetadata<User> {
       return "age";
     }
 
+    public Class getFieldClass() {
+      return int.class;
+    }
+
     public Integer serialize(Integer field) {
       return field;
     }
 
     public Integer deserialize(Row row) {
-      return row.get("age", int.class);
+      return row != null ? row.get("age", int.class) : null;
     }
   };
 
@@ -101,12 +120,16 @@ public class User_Table implements TableMetadata<User> {
       return "email";
     }
 
+    public Class getFieldClass() {
+      return java.lang.String.class;
+    }
+
     public String serialize(String field) {
       return field;
     }
 
     public String deserialize(Row row) {
-      return row.get("email", java.lang.String.class);
+      return row != null ? row.get("email", java.lang.String.class) : null;
     }
   };
 
@@ -115,26 +138,34 @@ public class User_Table implements TableMetadata<User> {
       return "password";
     }
 
+    public Class getFieldClass() {
+      return java.lang.String.class;
+    }
+
     public String serialize(String field) {
       return field;
     }
 
     public String deserialize(Row row) {
-      return row.get("password", java.lang.String.class);
+      return row != null ? row.get("password", java.lang.String.class) : null;
     }
   };
 
-  public static final ColumnMetadata<Address> address = new ColumnMetadata<Address>() {
+  public static final UdtColumnMetadata<Address> address = new UdtColumnMetadata<Address>() {
     public String getName() {
       return "address";
     }
 
+    public Class getFieldClass() {
+      return ma.markware.charybdis.apt.domain.Address.class;
+    }
+
     public UdtValue serialize(Address field) {
-      return Address_Udt.address.serialize(field);
+      return field != null ? Address_Udt.address.serialize(field) : null;
     }
 
     public Address deserialize(Row row) {
-      return Address_Udt.address.deserialize(row.getUdtValue("address"));
+      return row != null ? Address_Udt.address.deserialize(row.getUdtValue("address")) : null;
     }
   };
 
@@ -143,18 +174,26 @@ public class User_Table implements TableMetadata<User> {
       return "followers";
     }
 
+    public Class getFieldClass() {
+      return java.util.List.class;
+    }
+
     public List<UUID> serialize(List<UUID> field) {
       return field;
     }
 
     public List<UUID> deserialize(Row row) {
-      return row.getList("followers", java.util.UUID.class);
+      return row != null ? row.getList("followers", java.util.UUID.class): null;
     }
   };
 
   public static final IndexColumnMetadata<RoleEnum> role = new IndexColumnMetadata<RoleEnum>() {
     public String getName() {
       return "role";
+    }
+
+    public Class getFieldClass() {
+      return ma.markware.charybdis.apt.domain.RoleEnum.class;
     }
 
     public String getIndexName() {
@@ -166,7 +205,7 @@ public class User_Table implements TableMetadata<User> {
     }
 
     public RoleEnum deserialize(Row row) {
-      return row.getString("role") != null ? ma.markware.charybdis.apt.domain.RoleEnum.valueOf(row.getString("role")) : null;
+      return row != null && row.getString("role") != null ? ma.markware.charybdis.apt.domain.RoleEnum.valueOf(row.getString("role")) : null;
     }
   };
 
@@ -175,18 +214,26 @@ public class User_Table implements TableMetadata<User> {
       return "access_logs";
     }
 
+    public Class getFieldClass() {
+      return java.util.Set.class;
+    }
+
     public Set<Instant> serialize(Set<Instant> field) {
       return field;
     }
 
     public Set<Instant> deserialize(Row row) {
-      return row.getSet("access_logs", java.time.Instant.class);
+      return row != null ? row.getSet("access_logs", java.time.Instant.class) : null;
     }
   };
 
-  public static final ColumnMetadata<Map<String, String>> metadata = new ColumnMetadata<Map<String, String>>() {
+  public static final MapColumnMetadata<String, String> metadata = new MapColumnMetadata<String, String>() {
     public String getName() {
       return "metadata";
+    }
+
+    public Class getFieldClass() {
+      return java.util.Map.class;
     }
 
     public Map<String, String> serialize(Map<String, String> field) {
@@ -194,7 +241,7 @@ public class User_Table implements TableMetadata<User> {
     }
 
     public Map<String, String> deserialize(Row row) {
-      return row.getMap("metadata", java.lang.String.class, java.lang.String.class);
+      return row != null ? row.getMap("metadata", java.lang.String.class, java.lang.String.class) : null;
     }
   };
 
@@ -203,12 +250,16 @@ public class User_Table implements TableMetadata<User> {
       return "creation_date";
     }
 
+    public Class getFieldClass() {
+      return java.time.Instant.class;
+    }
+
     public Instant serialize(Instant field) {
       return field;
     }
 
     public Instant deserialize(Row row) {
-      return row.get("creation_date", java.time.Instant.class);
+      return row != null ? row.get("creation_date", java.time.Instant.class) : null;
     }
   };
 
@@ -217,12 +268,16 @@ public class User_Table implements TableMetadata<User> {
       return "last_updated_date";
     }
 
+    public Class getFieldClass() {
+      return java.time.Instant.class;
+    }
+
     public Instant serialize(Instant field) {
       return field;
     }
 
     public Instant deserialize(Row row) {
-      return row.get("last_updated_date", java.time.Instant.class);
+      return row != null ? row.get("last_updated_date", java.time.Instant.class) : null;
     }
   };
 
@@ -272,6 +327,13 @@ public class User_Table implements TableMetadata<User> {
     results.put("fullname", fullname);
     results.put("joining_date", joiningDate);
     return results;
+  }
+
+  public Map<String, ColumnMetadata> getPrimaryKeys() {
+    Map<String, ColumnMetadata> result = new HashMap<>();
+    result.putAll(getPartitionKeyColumns());
+    result.putAll(getClusteringKeyColumns());
+    return result;
   }
 
   public ColumnMetadata getColumnMetadata(String columnName) {

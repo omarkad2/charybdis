@@ -42,6 +42,7 @@ public class UpdateImpl implements UpdateInitExpression, UpdateTtlExpression, Up
     return this;
   }
 
+  //TODO: add more possibilities for maps, lists and sets
   @Override
   public <T> UpdateWhereExpression set(ColumnMetadata<T> columnMetadata, T value) {
     updateQuery.setAssignment(columnMetadata, value);

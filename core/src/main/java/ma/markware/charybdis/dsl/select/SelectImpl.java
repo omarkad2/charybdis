@@ -4,6 +4,7 @@ import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.cql.ResultSet;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import ma.markware.charybdis.dsl.OrderExpression;
@@ -11,6 +12,7 @@ import ma.markware.charybdis.dsl.Record;
 import ma.markware.charybdis.dsl.utils.RecordUtils;
 import ma.markware.charybdis.model.criteria.CriteriaExpression;
 import ma.markware.charybdis.model.field.SelectableField;
+import ma.markware.charybdis.model.field.metadata.PartitionKeyColumnMetadata;
 import ma.markware.charybdis.model.field.metadata.TableMetadata;
 import ma.markware.charybdis.query.PageRequest;
 import ma.markware.charybdis.query.PageResult;
@@ -31,6 +33,12 @@ public class SelectImpl implements SelectInitExpression, SelectWhereExpression, 
   public SelectInitExpression select(final SelectableField... fields) {
     this.selectedFields = Arrays.asList(fields);
     selectQuery.setSelectors(fields);
+    return this;
+  }
+
+  public SelectInitExpression selectDistinct(final PartitionKeyColumnMetadata... fields) {
+    this.selectedFields = Arrays.asList(fields);
+    selectQuery.setSelectDistinct(fields);
     return this;
   }
 
@@ -96,7 +104,7 @@ public class SelectImpl implements SelectInitExpression, SelectWhereExpression, 
   public List<Record> fetch() {
     ResultSet resultSet = selectQuery.execute(session);
     if (resultSet == null) {
-      return null;
+      return Collections.emptyList();
     }
     return RecordUtils.resultSetToRecords(resultSet, selectedFields);
   }

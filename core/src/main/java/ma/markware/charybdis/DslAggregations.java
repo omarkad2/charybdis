@@ -13,6 +13,10 @@ public class DslAggregations {
     return new CountAggregationField(selectableField);
   }
 
+  public static SelectableField<?> count() {
+    return new CountAggregationField();
+  }
+
   public static SelectableField<?> max(SelectableField<?> selectableField) {
     return new MaxAggregationField<>(selectableField);
   }

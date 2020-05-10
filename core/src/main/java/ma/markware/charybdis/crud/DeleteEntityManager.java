@@ -44,11 +44,6 @@ public class DeleteEntityManager<T> {
     return this;
   }
 
-  public DeleteEntityManager<T> withCondition(CriteriaExpression criteria) {
-    deleteQuery.setIf(criteria);
-    return this;
-  }
-
   public DeleteEntityManager<T> withTimestamp(Instant timestamp) {
     deleteQuery.setTimestamp(timestamp);
     return this;
@@ -65,7 +60,7 @@ public class DeleteEntityManager<T> {
       String columnName = columnEntry.getKey();
       Object value = columnEntry.getValue();
       if (value != null && tableMetadata.isPrimaryKey(columnName)) {
-        deleteQuery.setWhere(new CriteriaExpression(columnName, CriteriaOperator.EQ, value));
+        deleteQuery.setWhere(new CriteriaExpression(tableMetadata.getColumnMetadata(columnName), CriteriaOperator.EQ, value));
       }
     }
     ResultSet resultSet = deleteQuery.execute(session);

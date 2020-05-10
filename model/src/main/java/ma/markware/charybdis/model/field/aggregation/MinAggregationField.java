@@ -29,11 +29,6 @@ public class MinAggregationField<T> implements SelectableField<T> {
   }
 
   @Override
-  public Object serialize(final T field) {
-    return null;
-  }
-
-  @Override
   public Selector toSelector(boolean useAlias) {
     Selector minSelector = Selector.function("min", aggregatedField.toSelector(false));
     return useAlias ? minSelector.as(resolveAlias()) : minSelector;

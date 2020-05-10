@@ -29,11 +29,6 @@ public class MaxAggregationField<T> implements SelectableField<T> {
   }
 
   @Override
-  public Object serialize(final T field) {
-    return null;
-  }
-
-  @Override
   public Selector toSelector(boolean useAlias) {
     Selector maxSelector = Selector.function("max", aggregatedField.toSelector(false));
     return useAlias ? maxSelector.as(resolveAlias()) : maxSelector;

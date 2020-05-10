@@ -30,11 +30,6 @@ public class WriteTimeFunctionField implements SelectableField<Long> {
   }
 
   @Override
-  public Object serialize(final Long field) {
-    return null;
-  }
-
-  @Override
   public Selector toSelector(boolean useAlias) {
     Selector ttlSelector = Selector.function("writetime", columnMetadata.toSelector(false));
     return useAlias ? ttlSelector.as(resolveAlias()) : ttlSelector;

@@ -29,11 +29,6 @@ public class SumAggregationField<T> implements SelectableField<T> {
   }
 
   @Override
-  public Object serialize(final T field) {
-    return null;
-  }
-
-  @Override
   public Selector toSelector(boolean useAlias) {
     Selector sumSelector = Selector.function("sum", aggregatedField.toSelector(false));
     return useAlias ? sumSelector.as(resolveAlias()) : sumSelector;

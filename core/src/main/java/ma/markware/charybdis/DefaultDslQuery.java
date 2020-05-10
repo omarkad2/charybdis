@@ -13,6 +13,7 @@ import ma.markware.charybdis.dsl.update.UpdateImpl;
 import ma.markware.charybdis.dsl.update.UpdateInitExpression;
 import ma.markware.charybdis.model.field.SelectableField;
 import ma.markware.charybdis.model.field.metadata.ColumnMetadata;
+import ma.markware.charybdis.model.field.metadata.PartitionKeyColumnMetadata;
 import ma.markware.charybdis.model.field.metadata.TableMetadata;
 
 public class DefaultDslQuery implements DslQuery {
@@ -34,6 +35,11 @@ public class DefaultDslQuery implements DslQuery {
   @Override
   public SelectInitExpression select(final SelectableField... fields) {
     return new SelectImpl(sessionFactory.getSession()).select(fields);
+  }
+
+  @Override
+  public SelectInitExpression selectDistinct(final PartitionKeyColumnMetadata... fields) {
+    return new SelectImpl(sessionFactory.getSession()).selectDistinct(fields);
   }
 
   @Override

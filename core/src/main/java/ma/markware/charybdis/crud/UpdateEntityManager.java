@@ -44,11 +44,6 @@ public class UpdateEntityManager<T> {
     return this;
   }
 
-  public UpdateEntityManager<T> withCondition(CriteriaExpression criteria) {
-    updateQuery.setIf(criteria);
-    return this;
-  }
-
   public UpdateEntityManager<T> withTtl(int seconds) {
     updateQuery.setTtl(seconds);
     return this;
@@ -73,7 +68,7 @@ public class UpdateEntityManager<T> {
       String columnName = columnEntry.getKey();
       Object value = columnEntry.getValue();
       if (value != null && tableMetadata.isPrimaryKey(columnName)) {
-        updateQuery.setWhere(new CriteriaExpression(columnName, CriteriaOperator.EQ, value));
+        updateQuery.setWhere(new CriteriaExpression(tableMetadata.getColumnMetadata(columnName), CriteriaOperator.EQ, value));
       } else {
         updateQuery.setAssignment(columnName, value);
       }

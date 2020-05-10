@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 import ma.markware.charybdis.dsl.OrderExpression;
 import ma.markware.charybdis.model.criteria.CriteriaExpression;
 import ma.markware.charybdis.model.field.SelectableField;
+import ma.markware.charybdis.model.field.metadata.PartitionKeyColumnMetadata;
 import ma.markware.charybdis.model.field.metadata.TableMetadata;
 import ma.markware.charybdis.query.clause.WhereClause;
 
@@ -27,6 +28,7 @@ public class SelectQuery extends AbstractQuery {
 
   private String keyspace;
   private String table;
+  private boolean isDistinct;
   private List<Selector> selectors = new ArrayList<>();
   private List<WhereClause> whereClauses = new ArrayList<>();
   private Map<String, ClusteringOrder> orderings = new HashMap<>();
@@ -42,6 +44,13 @@ public class SelectQuery extends AbstractQuery {
   public void setTableAndSelectors(TableMetadata tableMetadata) {
     setTable(tableMetadata);
     this.selectors = SELECT_ALL;
+  }
+
+  public void setSelectDistinct(PartitionKeyColumnMetadata... fields) {
+    this.isDistinct = true;
+    for(SelectableField field : fields) {
+      this.selectors.add(field.toSelector());
+    }
   }
 
   public void setSelectors(SelectableField... fields) {
@@ -74,6 +83,10 @@ public class SelectQuery extends AbstractQuery {
   public ResultSet execute(final CqlSession session) {
     Select select;
     SelectFrom selectFrom = QueryBuilder.selectFrom(keyspace, table);
+
+    if (isDistinct) {
+      selectFrom =selectFrom.distinct();
+    }
 
     if (SELECT_ALL.equals(selectors)) {
       select = selectFrom.all();

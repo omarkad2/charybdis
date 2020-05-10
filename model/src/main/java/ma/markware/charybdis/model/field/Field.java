@@ -1,8 +1,6 @@
 package ma.markware.charybdis.model.field;
 
-public interface Field<T> {
+public interface Field {
 
   String getName();
-
-  Object serialize(T field);
 }

@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.Objects;
 import javax.annotation.processing.Filer;
 import javax.lang.model.element.Modifier;
+import javax.lang.model.type.TypeMirror;
 import ma.markware.charybdis.apt.AptContext;
 import ma.markware.charybdis.apt.AptContext.UdtContext;
 import ma.markware.charybdis.apt.exception.CharybdisSerializationException;
@@ -29,8 +30,10 @@ import ma.markware.charybdis.apt.metatype.TypeDetail;
 import ma.markware.charybdis.model.field.metadata.ClusteringKeyColumnMetadata;
 import ma.markware.charybdis.model.field.metadata.ColumnMetadata;
 import ma.markware.charybdis.model.field.metadata.IndexColumnMetadata;
+import ma.markware.charybdis.model.field.metadata.MapColumnMetadata;
 import ma.markware.charybdis.model.field.metadata.PartitionKeyColumnMetadata;
 import ma.markware.charybdis.model.field.metadata.TableMetadata;
+import ma.markware.charybdis.model.field.metadata.UdtColumnMetadata;
 import ma.markware.charybdis.model.option.ClusteringOrder;
 import ma.markware.charybdis.model.option.SequenceModelEnum;
 import ma.markware.charybdis.model.utils.ClassUtils;
@@ -126,6 +129,34 @@ public class TableSerializer implements Serializer<TableMetaType> {
                                                  buildColumnMetadataGetNameMethod(columnFieldMetaType),
                                                  buildColumnMetadataGetFieldClassMethod(columnFieldMetaType),
                                                  buildColumnMetadataGetIndexNameMethod(columnFieldMetaType),
+                                                 buildColumnMetadataSerializeMethod(columnFieldMetaType, aptContext),
+                                                 buildColumnMetadataDeserializeMethod(columnFieldMetaType, aptContext)
+                                             ))
+                                             .build());
+      } else if (columnFieldMetaType.isUdt()) {
+        fieldType = ParameterizedTypeName.get(ClassName.get(UdtColumnMetadata.class), ClassUtils.primitiveToWrapper(
+            TypeName.get(columnFieldMetaType.getTypeMirror())));
+        initializerBuilder.add("$L", TypeSpec.anonymousClassBuilder("")
+                                             .addSuperinterface(fieldType)
+                                             .addMethods(Arrays.asList(
+                                                 buildColumnMetadataGetNameMethod(columnFieldMetaType),
+                                                 buildColumnMetadataGetFieldClassMethod(columnFieldMetaType),
+                                                 buildColumnMetadataSerializeMethod(columnFieldMetaType, aptContext),
+                                                 buildColumnMetadataDeserializeMethod(columnFieldMetaType, aptContext)
+                                             ))
+                                             .build());
+      } else if (columnFieldMetaType.isMap()) {
+        List<TypeDetail> fieldSubTypes = columnFieldMetaType.getFieldSubTypes();
+        TypeMirror keyType = fieldSubTypes.get(0).getTypeMirror();
+        TypeMirror valueType = fieldSubTypes.get(0).getTypeMirror();
+        fieldType = ParameterizedTypeName.get(ClassName.get(MapColumnMetadata.class),
+                                              ClassUtils.primitiveToWrapper(TypeName.get(keyType)),
+                                              ClassUtils.primitiveToWrapper(TypeName.get(valueType)));
+        initializerBuilder.add("$L", TypeSpec.anonymousClassBuilder("")
+                                             .addSuperinterface(fieldType)
+                                             .addMethods(Arrays.asList(
+                                                 buildColumnMetadataGetNameMethod(columnFieldMetaType),
+                                                 buildColumnMetadataGetFieldClassMethod(columnFieldMetaType),
                                                  buildColumnMetadataSerializeMethod(columnFieldMetaType, aptContext),
                                                  buildColumnMetadataDeserializeMethod(columnFieldMetaType, aptContext)
                                              ))

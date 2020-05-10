@@ -30,11 +30,6 @@ public class TtlFunctionField implements SelectableField<Integer> {
   }
 
   @Override
-  public Object serialize(final Integer field) {
-    return null;
-  }
-
-  @Override
   public Selector toSelector(boolean useAlias) {
     Selector ttlSelector = Selector.function("ttl", columnMetadata.toSelector(false));
     return useAlias ? ttlSelector.as(resolveAlias()) : ttlSelector;

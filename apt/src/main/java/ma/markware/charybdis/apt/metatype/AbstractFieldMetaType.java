@@ -2,6 +2,7 @@ package ma.markware.charybdis.apt.metatype;
 
 import java.util.List;
 import javax.lang.model.type.TypeMirror;
+import ma.markware.charybdis.apt.metatype.TypeDetail.TypeDetailEnum;
 
 public class AbstractFieldMetaType {
 
@@ -79,5 +80,13 @@ public class AbstractFieldMetaType {
 
   public void setSetterName(final String setterName) {
     this.setterName = setterName;
+  }
+
+  public boolean isUdt() {
+    return fieldType.getTypeDetailEnum() == TypeDetailEnum.UDT;
+  }
+
+  public boolean isMap() {
+    return fieldType.getTypeDetailEnum() == TypeDetailEnum.MAP;
   }
 }

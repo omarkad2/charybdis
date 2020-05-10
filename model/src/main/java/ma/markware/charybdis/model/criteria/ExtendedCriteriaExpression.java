@@ -12,8 +12,8 @@ public class ExtendedCriteriaExpression {
     this.criterias = new ArrayList<>(Collections.singletonList(criteria));
   }
 
-  public ExtendedCriteriaExpression and(CriteriaExpression criteriaExpression) {
-    criterias.add(criteriaExpression);
+  public ExtendedCriteriaExpression and(CriteriaExpression criteria) {
+    criterias.add(criteria);
     return this;
   }
 

@@ -29,11 +29,6 @@ public class AvgAggregationField<T> implements SelectableField<T> {
   }
 
   @Override
-  public Object serialize(final T field) {
-    return null;
-  }
-
-  @Override
   public Selector toSelector(boolean useAlias) {
     Selector selectorAvg = Selector.function("avg", aggregatedField.toSelector(false));
     return useAlias ? selectorAvg.as(resolveAlias()) : selectorAvg;

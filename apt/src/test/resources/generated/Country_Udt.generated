@@ -4,6 +4,7 @@ import com.datastax.oss.driver.api.core.cql.Row;
 import com.datastax.oss.driver.api.core.data.UdtValue;
 import com.datastax.oss.driver.api.core.type.UserDefinedType;
 import com.datastax.oss.driver.internal.core.type.UserDefinedTypeBuilder;
+import java.lang.Class;
 import java.lang.String;
 import ma.markware.charybdis.model.datatype.DataTypeMapper;
 import ma.markware.charybdis.model.field.metadata.UdtFieldMetadata;
@@ -13,6 +14,10 @@ public class Country_Udt implements UdtMetadata<Country> {
   public static final UdtFieldMetadata<String> name = new UdtFieldMetadata<String>() {
     public String getName() {
       return "name";
+    }
+
+    public Class getFieldClass() {
+      return java.lang.String.class;
     }
 
     public String serialize(String field) {
@@ -31,6 +36,10 @@ public class Country_Udt implements UdtMetadata<Country> {
   public static final UdtFieldMetadata<String> countryCode = new UdtFieldMetadata<String>() {
     public String getName() {
       return "countrycode";
+    }
+
+    public Class getFieldClass() {
+      return java.lang.String.class;
     }
 
     public String serialize(String field) {

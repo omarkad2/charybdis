@@ -28,11 +28,6 @@ public class UdtNestedField<T> implements NestedField<T>, SelectableField<T> {
   }
 
   @Override
-  public Object serialize(final T field) {
-    return udtFields.getPrincipalUdtField().serialize(field);
-  }
-
-  @Override
   public T deserialize(Row row) {
     return udtFields.getPrincipalUdtField().deserialize(getName(), row);
   }

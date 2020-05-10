@@ -9,11 +9,14 @@ import ma.markware.charybdis.dsl.select.SelectWhereExpression;
 import ma.markware.charybdis.dsl.update.UpdateInitExpression;
 import ma.markware.charybdis.model.field.SelectableField;
 import ma.markware.charybdis.model.field.metadata.ColumnMetadata;
+import ma.markware.charybdis.model.field.metadata.PartitionKeyColumnMetadata;
 import ma.markware.charybdis.model.field.metadata.TableMetadata;
 
 public interface DslQuery {
 
   SelectInitExpression select(SelectableField... fields);
+
+  SelectInitExpression selectDistinct(PartitionKeyColumnMetadata... fields);
 
   SelectWhereExpression selectFrom(TableMetadata table);
 

@@ -47,14 +47,14 @@ public class DeleteImpl implements DeleteInitExpression, DeleteTimestampExpressi
   }
 
   @Override
-  public DeleteExtraWhereExpression where(final CriteriaExpression condition) {
-    deleteQuery.setWhere(condition);
+  public DeleteExtraWhereExpression where(final CriteriaExpression criteria) {
+    deleteQuery.setWhere(criteria);
     return this;
   }
 
   @Override
-  public DeleteExtraWhereExpression and(final CriteriaExpression condition) {
-    deleteQuery.setWhere(condition);
+  public DeleteExtraWhereExpression and(final CriteriaExpression criteria) {
+    deleteQuery.setWhere(criteria);
     return this;
   }
 

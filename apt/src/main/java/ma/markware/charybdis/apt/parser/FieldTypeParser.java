@@ -31,7 +31,7 @@ public class FieldTypeParser {
   private static final Set<String> MAP_SUPPORTED_TYPES = Collections.singleton(JAVA_UTIL_MAP);
 
   TypeDetail parseFieldType(TypeMirror typeMirror, Types types, AptContext aptContext) {
-    TypeDetail typeDetail = new TypeDetail();
+    TypeDetail typeDetail = new TypeDetail(typeMirror);
 
     String canonicalName = getErasedType(typeMirror, types);
     typeDetail.setTypeCanonicalName(canonicalName);

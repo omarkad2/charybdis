@@ -1,11 +1,24 @@
 package ma.markware.charybdis.apt.metatype;
 
 import java.util.Objects;
+import javax.lang.model.type.TypeMirror;
 
 public class TypeDetail {
 
+  private TypeMirror typeMirror;
   private String typeCanonicalName;
   private TypeDetailEnum typeDetailEnum;
+
+  public TypeDetail() {
+  }
+
+  public TypeDetail(final TypeMirror typeMirror) {
+    this.typeMirror = typeMirror;
+  }
+
+  public TypeMirror getTypeMirror() {
+    return typeMirror;
+  }
 
   public String getTypeCanonicalName() {
     return typeCanonicalName;
