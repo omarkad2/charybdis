@@ -15,8 +15,10 @@ import java.util.UUID;
 import ma.markware.charybdis.model.field.metadata.ClusteringKeyColumnMetadata;
 import ma.markware.charybdis.model.field.metadata.ColumnMetadata;
 import ma.markware.charybdis.model.field.metadata.IndexColumnMetadata;
+import ma.markware.charybdis.model.field.metadata.ListColumnMetadata;
 import ma.markware.charybdis.model.field.metadata.MapColumnMetadata;
 import ma.markware.charybdis.model.field.metadata.PartitionKeyColumnMetadata;
+import ma.markware.charybdis.model.field.metadata.SetColumnMetadata;
 import ma.markware.charybdis.model.field.metadata.TableMetadata;
 import ma.markware.charybdis.model.field.metadata.UdtColumnMetadata;
 import ma.markware.charybdis.model.option.ClusteringOrder;
@@ -169,7 +171,7 @@ public class User_Table implements TableMetadata<User> {
     }
   };
 
-  public static final ColumnMetadata<List<UUID>> followers = new ColumnMetadata<List<UUID>>() {
+  public static final ListColumnMetadata<UUID> followers = new ListColumnMetadata<UUID>() {
     public String getName() {
       return "followers";
     }
@@ -209,7 +211,7 @@ public class User_Table implements TableMetadata<User> {
     }
   };
 
-  public static final ColumnMetadata<Set<Instant>> accessLogs = new ColumnMetadata<Set<Instant>>() {
+  public static final SetColumnMetadata<Instant> accessLogs = new SetColumnMetadata<Instant>() {
     public String getName() {
       return "access_logs";
     }

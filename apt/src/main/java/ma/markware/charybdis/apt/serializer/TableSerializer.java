@@ -30,8 +30,10 @@ import ma.markware.charybdis.apt.metatype.TypeDetail;
 import ma.markware.charybdis.model.field.metadata.ClusteringKeyColumnMetadata;
 import ma.markware.charybdis.model.field.metadata.ColumnMetadata;
 import ma.markware.charybdis.model.field.metadata.IndexColumnMetadata;
+import ma.markware.charybdis.model.field.metadata.ListColumnMetadata;
 import ma.markware.charybdis.model.field.metadata.MapColumnMetadata;
 import ma.markware.charybdis.model.field.metadata.PartitionKeyColumnMetadata;
+import ma.markware.charybdis.model.field.metadata.SetColumnMetadata;
 import ma.markware.charybdis.model.field.metadata.TableMetadata;
 import ma.markware.charybdis.model.field.metadata.UdtColumnMetadata;
 import ma.markware.charybdis.model.option.ClusteringOrder;
@@ -133,44 +135,37 @@ public class TableSerializer implements Serializer<TableMetaType> {
                                                  buildColumnMetadataDeserializeMethod(columnFieldMetaType, aptContext)
                                              ))
                                              .build());
-      } else if (columnFieldMetaType.isUdt()) {
-        fieldType = ParameterizedTypeName.get(ClassName.get(UdtColumnMetadata.class), ClassUtils.primitiveToWrapper(
-            TypeName.get(columnFieldMetaType.getTypeMirror())));
-        initializerBuilder.add("$L", TypeSpec.anonymousClassBuilder("")
-                                             .addSuperinterface(fieldType)
-                                             .addMethods(Arrays.asList(
-                                                 buildColumnMetadataGetNameMethod(columnFieldMetaType),
-                                                 buildColumnMetadataGetFieldClassMethod(columnFieldMetaType),
-                                                 buildColumnMetadataSerializeMethod(columnFieldMetaType, aptContext),
-                                                 buildColumnMetadataDeserializeMethod(columnFieldMetaType, aptContext)
-                                             ))
-                                             .build());
-      } else if (columnFieldMetaType.isMap()) {
-        List<TypeDetail> fieldSubTypes = columnFieldMetaType.getFieldSubTypes();
-        TypeMirror keyType = fieldSubTypes.get(0).getTypeMirror();
-        TypeMirror valueType = fieldSubTypes.get(0).getTypeMirror();
-        fieldType = ParameterizedTypeName.get(ClassName.get(MapColumnMetadata.class),
-                                              ClassUtils.primitiveToWrapper(TypeName.get(keyType)),
-                                              ClassUtils.primitiveToWrapper(TypeName.get(valueType)));
-        initializerBuilder.add("$L", TypeSpec.anonymousClassBuilder("")
-                                             .addSuperinterface(fieldType)
-                                             .addMethods(Arrays.asList(
-                                                 buildColumnMetadataGetNameMethod(columnFieldMetaType),
-                                                 buildColumnMetadataGetFieldClassMethod(columnFieldMetaType),
-                                                 buildColumnMetadataSerializeMethod(columnFieldMetaType, aptContext),
-                                                 buildColumnMetadataDeserializeMethod(columnFieldMetaType, aptContext)
-                                             ))
-                                             .build());
       } else {
+        if (columnFieldMetaType.isUdt()) {
+          fieldType = ParameterizedTypeName.get(ClassName.get(UdtColumnMetadata.class), ClassUtils.primitiveToWrapper(
+              TypeName.get(columnFieldMetaType.getTypeMirror())));
+        } else if (columnFieldMetaType.isMap()) {
+          List<TypeDetail> fieldSubTypes = columnFieldMetaType.getFieldSubTypes();
+          TypeMirror keyType = fieldSubTypes.get(0).getTypeMirror();
+          TypeMirror valueType = fieldSubTypes.get(0).getTypeMirror();
+          fieldType = ParameterizedTypeName.get(ClassName.get(MapColumnMetadata.class),
+                                                ClassUtils.primitiveToWrapper(TypeName.get(keyType)),
+                                                ClassUtils.primitiveToWrapper(TypeName.get(valueType)));
+        } else if (columnFieldMetaType.isList()) {
+          List<TypeDetail> fieldSubTypes = columnFieldMetaType.getFieldSubTypes();
+          TypeMirror subType = fieldSubTypes.get(0).getTypeMirror();
+          fieldType = ParameterizedTypeName.get(ClassName.get(ListColumnMetadata.class),
+                                                ClassUtils.primitiveToWrapper(TypeName.get(subType)));
+        }  else if (columnFieldMetaType.isSet()) {
+          List<TypeDetail> fieldSubTypes = columnFieldMetaType.getFieldSubTypes();
+          TypeMirror subType = fieldSubTypes.get(0).getTypeMirror();
+          fieldType = ParameterizedTypeName.get(ClassName.get(SetColumnMetadata.class),
+                                                ClassUtils.primitiveToWrapper(TypeName.get(subType)));
+        }
         initializerBuilder.add("$L", TypeSpec.anonymousClassBuilder("")
-                           .addSuperinterface(fieldType)
-                           .addMethods(Arrays.asList(
-                               buildColumnMetadataGetNameMethod(columnFieldMetaType),
-                               buildColumnMetadataGetFieldClassMethod(columnFieldMetaType),
-                               buildColumnMetadataSerializeMethod(columnFieldMetaType, aptContext),
-                               buildColumnMetadataDeserializeMethod(columnFieldMetaType, aptContext)
-                           ))
-                           .build());
+                                             .addSuperinterface(fieldType)
+                                             .addMethods(Arrays.asList(
+                                                 buildColumnMetadataGetNameMethod(columnFieldMetaType),
+                                                 buildColumnMetadataGetFieldClassMethod(columnFieldMetaType),
+                                                 buildColumnMetadataSerializeMethod(columnFieldMetaType, aptContext),
+                                                 buildColumnMetadataDeserializeMethod(columnFieldMetaType, aptContext)
+                                             ))
+                                             .build());
       }
 
       columnFieldSpecs[i] = (FieldSpec.builder(fieldType, columnFieldMetaType.getFieldName())

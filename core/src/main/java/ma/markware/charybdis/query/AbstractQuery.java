@@ -19,18 +19,12 @@ abstract class AbstractQuery implements Query {
   ResultSet executeStatement(final CqlSession session, final SimpleStatement statement, final int fetchSize, final ByteBuffer pagingState,
       final Object[] bindValueArray) {
     ResultSet resultSet = null;
-    boolean wasApplied = false;
     log.info("Statement query: {}", statement.getQuery());
     final PreparedStatement preparedStatement = PreparedStatementFactory.createPreparedStatement(session, statement.getQuery());
     try {
       resultSet = session.execute(preparedStatement.bind(bindValueArray).setPageSize(fetchSize).setPagingState(pagingState));
-      wasApplied = resultSet.wasApplied();
     } catch (final Exception e) {
       log.error("Error executing [{}] statement ({})", statement.getConsistencyLevel(), statement, e);
-    }
-    log.debug("Query was applied ? = {}", wasApplied);
-    if (!wasApplied) {
-      log.error("error executing [{}] statement ({}) because primary key already exists", statement.getConsistencyLevel(), statement);
     }
     return resultSet;
   }

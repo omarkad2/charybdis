@@ -12,9 +12,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Stream;
+import ma.markware.charybdis.model.assignment.AssignmentListValue;
+import ma.markware.charybdis.model.assignment.AssignmentMapValue;
+import ma.markware.charybdis.model.assignment.AssignmentSetValue;
 import ma.markware.charybdis.model.criteria.CriteriaExpression;
 import ma.markware.charybdis.model.field.metadata.ColumnMetadata;
+import ma.markware.charybdis.model.field.metadata.ListColumnMetadata;
+import ma.markware.charybdis.model.field.metadata.MapColumnMetadata;
+import ma.markware.charybdis.model.field.metadata.SetColumnMetadata;
 import ma.markware.charybdis.model.field.metadata.TableMetadata;
+import ma.markware.charybdis.model.field.nested.ListNestedField;
+import ma.markware.charybdis.model.field.nested.MapNestedField;
+import ma.markware.charybdis.model.field.nested.UdtNestedField;
 import ma.markware.charybdis.query.clause.AssignmentClause;
 import ma.markware.charybdis.query.clause.ConditionClause;
 import ma.markware.charybdis.query.clause.WhereClause;
@@ -41,6 +50,30 @@ public class UpdateQuery extends AbstractQuery {
 
   public void setAssignment(String columnName, Object value) {
     assignmentClauses.add(AssignmentClause.from(columnName, value));
+  }
+
+  public <U> void setAssignment(ListColumnMetadata<U> listColumnMetadata, AssignmentListValue<U> listValue) {
+    assignmentClauses.add(AssignmentClause.from(listColumnMetadata, listValue));
+  }
+
+  public <U> void setAssignment(SetColumnMetadata<U> setColumnMetadata, AssignmentSetValue<U> setValue) {
+    assignmentClauses.add(AssignmentClause.from(setColumnMetadata, setValue));
+  }
+
+  public <K, V> void setAssignment(MapColumnMetadata<K, V> mapColumnMetadata, AssignmentMapValue<K, V> mapValue) {
+    assignmentClauses.add(AssignmentClause.from(mapColumnMetadata, mapValue));
+  }
+
+  public <K, V> void setAssignment(MapNestedField<K, V> mapNestedField, V value) {
+    assignmentClauses.add(AssignmentClause.from(mapNestedField, value));
+  }
+
+  public <T> void setAssignment(ListNestedField<T> listNestedField, T value) {
+    assignmentClauses.add(AssignmentClause.from(listNestedField, value));
+  }
+
+  public <T> void setAssignment(UdtNestedField<T> udtNestedField, T value) {
+    assignmentClauses.add(AssignmentClause.from(udtNestedField, value));
   }
 
   public void setWhere(CriteriaExpression criteriaExpression) {

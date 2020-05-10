@@ -3,7 +3,7 @@ package ma.markware.charybdis.model.field.metadata;
 import com.datastax.oss.driver.api.core.cql.Row;
 import com.datastax.oss.driver.api.core.data.UdtValue;
 import ma.markware.charybdis.model.field.Field;
-import ma.markware.charybdis.model.field.entry.UdtFieldEntries;
+import ma.markware.charybdis.model.field.entry.UdtFieldEntry;
 
 public interface UdtFieldMetadata<T> extends Field {
 
@@ -15,13 +15,13 @@ public interface UdtFieldMetadata<T> extends Field {
 
   Class<T> getFieldClass();
 
-  default <U> UdtFieldEntries<U> entry(UdtFieldEntries<U> udtFieldEntries) {
-    return udtFieldEntries.add(this);
+  default <U> UdtFieldEntry<U> entry(UdtFieldEntry<U> udtFieldEntry) {
+    return udtFieldEntry.add(this);
   }
 
-  default <U> UdtFieldEntries<U> entry(UdtFieldMetadata<U> udtFieldMetadata) {
-    UdtFieldEntries<U> udtFieldEntries = new UdtFieldEntries<>(udtFieldMetadata);
-    udtFieldEntries.add(this);
-    return udtFieldEntries;
+  default <U> UdtFieldEntry<U> entry(UdtFieldMetadata<U> udtFieldMetadata) {
+    UdtFieldEntry<U> udtFieldEntry = new UdtFieldEntry<>(udtFieldMetadata);
+    udtFieldEntry.add(this);
+    return udtFieldEntry;
   }
 }

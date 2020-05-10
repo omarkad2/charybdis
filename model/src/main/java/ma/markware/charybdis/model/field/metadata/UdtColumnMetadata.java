@@ -1,7 +1,7 @@
 package ma.markware.charybdis.model.field.metadata;
 
-import ma.markware.charybdis.model.field.UdtNestedField;
-import ma.markware.charybdis.model.field.entry.UdtFieldEntries;
+import ma.markware.charybdis.model.field.entry.UdtFieldEntry;
+import ma.markware.charybdis.model.field.nested.UdtNestedField;
 
 public interface UdtColumnMetadata<T> extends ColumnMetadata<T> {
 
@@ -9,7 +9,7 @@ public interface UdtColumnMetadata<T> extends ColumnMetadata<T> {
     return new UdtNestedField<>(this, udtFieldMetadata);
   }
 
-  default <U> UdtNestedField<U> entry(UdtFieldEntries<U> udtFieldEntries) {
-    return new UdtNestedField<>(this, udtFieldEntries);
+  default <U> UdtNestedField<U> entry(UdtFieldEntry<U> udtFieldEntry) {
+    return new UdtNestedField<>(this, udtFieldEntry);
   }
 }

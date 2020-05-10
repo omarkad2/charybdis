@@ -3,13 +3,23 @@ package ma.markware.charybdis.dsl.update;
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.cql.ResultSet;
 import java.time.Instant;
+import ma.markware.charybdis.model.assignment.AssignmentListValue;
+import ma.markware.charybdis.model.assignment.AssignmentMapValue;
+import ma.markware.charybdis.model.assignment.AssignmentSetValue;
 import ma.markware.charybdis.model.criteria.CriteriaExpression;
 import ma.markware.charybdis.model.field.metadata.ColumnMetadata;
+import ma.markware.charybdis.model.field.metadata.ListColumnMetadata;
+import ma.markware.charybdis.model.field.metadata.MapColumnMetadata;
+import ma.markware.charybdis.model.field.metadata.SetColumnMetadata;
 import ma.markware.charybdis.model.field.metadata.TableMetadata;
+import ma.markware.charybdis.model.field.nested.ListNestedField;
+import ma.markware.charybdis.model.field.nested.MapNestedField;
+import ma.markware.charybdis.model.field.nested.UdtNestedField;
 import ma.markware.charybdis.query.UpdateQuery;
 
-public class UpdateImpl implements UpdateInitExpression, UpdateTtlExpression, UpdateTimestampExpression, UpdateAssignmentExpression, UpdateWhereExpression,
-    UpdateExtraWhereExpression, UpdateOnExistExpression, UpdateIfExpression, UpdateExtraIfExpression, UpdateExecuteExpression {
+public class UpdateImpl implements UpdateInitExpression, UpdateTtlExpression, UpdateTimestampExpression, UpdateAssignmentExpression,
+    UpdateExtraAssignmentExpression, UpdateWhereExpression, UpdateExtraWhereExpression, UpdateOnExistExpression, UpdateIfExpression,
+    UpdateExtraIfExpression, UpdateExecuteExpression {
 
   private final CqlSession session;
   private final UpdateQuery updateQuery;
@@ -42,10 +52,45 @@ public class UpdateImpl implements UpdateInitExpression, UpdateTtlExpression, Up
     return this;
   }
 
-  //TODO: add more possibilities for maps, lists and sets
   @Override
-  public <T> UpdateWhereExpression set(ColumnMetadata<T> columnMetadata, T value) {
+  public <T> UpdateExtraAssignmentExpression set(ColumnMetadata<T> columnMetadata, T value) {
     updateQuery.setAssignment(columnMetadata, value);
+    return this;
+  }
+
+  @Override
+  public <T> UpdateExtraAssignmentExpression set(final ListColumnMetadata<T> column, final AssignmentListValue<T> value) {
+    updateQuery.setAssignment(column, value);
+    return this;
+  }
+
+  @Override
+  public <T> UpdateExtraAssignmentExpression set(final SetColumnMetadata<T> column, final AssignmentSetValue<T> value) {
+    updateQuery.setAssignment(column, value);
+    return this;
+  }
+
+  @Override
+  public <K, V> UpdateExtraAssignmentExpression set(final MapColumnMetadata<K, V> column, final AssignmentMapValue<K, V> value) {
+    updateQuery.setAssignment(column, value);
+    return this;
+  }
+
+  @Override
+  public <K, V> UpdateExtraAssignmentExpression set(final MapNestedField<K, V> field, final V value) {
+    updateQuery.setAssignment(field, value);
+    return this;
+  }
+
+  @Override
+  public <T> UpdateExtraAssignmentExpression set(final ListNestedField<T> field, final T value) {
+    updateQuery.setAssignment(field, value);
+    return this;
+  }
+
+  @Override
+  public <T> UpdateExtraAssignmentExpression set(final UdtNestedField<T> field, final T value) {
+    updateQuery.setAssignment(field, value);
     return this;
   }
 

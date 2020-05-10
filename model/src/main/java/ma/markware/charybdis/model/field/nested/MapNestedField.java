@@ -1,24 +1,23 @@
-package ma.markware.charybdis.model.field;
+package ma.markware.charybdis.model.field.nested;
 
 import com.datastax.oss.driver.api.querybuilder.QueryBuilder;
 import com.datastax.oss.driver.api.querybuilder.condition.Condition;
 import com.datastax.oss.driver.api.querybuilder.relation.Relation;
 import com.datastax.oss.driver.api.querybuilder.term.Term;
 import ma.markware.charybdis.model.field.criteria.CriteriaField;
-import ma.markware.charybdis.model.field.entry.EntryExpression;
-import ma.markware.charybdis.model.field.entry.RawEntryExpression;
+import ma.markware.charybdis.model.field.entry.MapEntry;
 import ma.markware.charybdis.model.field.metadata.ColumnMetadata;
 import ma.markware.charybdis.model.field.metadata.MapColumnMetadata;
 import ma.markware.charybdis.model.utils.StringUtils;
 
-public class MapNestedField<KEY, VALUE> implements NestedField<KEY>, CriteriaField<KEY> {
+public class MapNestedField<KEY, VALUE> implements NestedField<KEY>, CriteriaField<VALUE> {
 
   private MapColumnMetadata<KEY, VALUE> sourceColumn;
-  private RawEntryExpression mapEntry;
+  private MapEntry<KEY> mapEntry;
 
-  public MapNestedField(final MapColumnMetadata<KEY, VALUE> sourceColumn, final String mapEntry) {
+  public MapNestedField(final MapColumnMetadata<KEY, VALUE> sourceColumn, final KEY mapEntry) {
     this.sourceColumn = sourceColumn;
-    this.mapEntry = new RawEntryExpression(mapEntry);
+    this.mapEntry = new MapEntry<>(mapEntry);
   }
 
   @Override
@@ -27,7 +26,7 @@ public class MapNestedField<KEY, VALUE> implements NestedField<KEY>, CriteriaFie
   }
 
   @Override
-  public Object serialize(final KEY field) {
+  public Object serialize(final VALUE field) {
     return field;
   }
 
@@ -37,13 +36,13 @@ public class MapNestedField<KEY, VALUE> implements NestedField<KEY>, CriteriaFie
   }
 
   @Override
-  public EntryExpression getEntry() {
-    return mapEntry;
+  public KEY getEntry() {
+    return mapEntry.getKey();
   }
 
   @Override
   public Relation toRelation(String operator, Term term) {
-    return Relation.mapValue(sourceColumn.getName(), QueryBuilder.literal(mapEntry.getName())).build(operator, term);
+    return Relation.mapValue(sourceColumn.getName(), QueryBuilder.literal(mapEntry.getKey())).build(operator, term);
   }
 
   @Override

@@ -1,6 +1,8 @@
 package ma.markware.charybdis.model.field.entry;
 
-public interface EntryExpression {
+public interface EntryExpression<T> {
+
+  T getKey();
 
   String getName();
 }

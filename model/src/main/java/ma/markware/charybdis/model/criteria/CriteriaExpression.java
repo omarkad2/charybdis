@@ -15,9 +15,7 @@ public class CriteriaExpression {
   }
 
   public CriteriaExpression(final CriteriaField field, final CriteriaOperator criteriaOperator, final Object value) {
-    this.field = field;
-    this.criteriaOperator = criteriaOperator;
-    this.values = new Object[]{ value };
+    this(field, criteriaOperator, new Object[]{ value });
   }
 
   public CriteriaField getField() {

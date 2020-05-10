@@ -89,4 +89,12 @@ public class AbstractFieldMetaType {
   public boolean isMap() {
     return fieldType.getTypeDetailEnum() == TypeDetailEnum.MAP;
   }
+
+  public boolean isList() {
+    return fieldType.getTypeDetailEnum() == TypeDetailEnum.LIST;
+  }
+
+  public boolean isSet() {
+    return fieldType.getTypeDetailEnum() == TypeDetailEnum.SET;
+  }
 }
