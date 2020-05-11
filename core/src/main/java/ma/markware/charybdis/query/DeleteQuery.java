@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Stream;
 import ma.markware.charybdis.model.criteria.CriteriaExpression;
-import ma.markware.charybdis.model.field.Field;
+import ma.markware.charybdis.model.field.DeletableField;
 import ma.markware.charybdis.model.field.metadata.TableMetadata;
 import ma.markware.charybdis.query.clause.ConditionClause;
 import ma.markware.charybdis.query.clause.WhereClause;
@@ -33,9 +33,9 @@ public class DeleteQuery extends AbstractQuery {
     this.table = tableMetadata.getTableName();
   }
 
-  public void setSelectors(Field... fields) {
-    for(Field field : fields) {
-      this.selectors.add(Selector.column(field.getName()));
+  public void setSelectors(DeletableField... fields) {
+    for(DeletableField field : fields) {
+      this.selectors.add(field.toDeletableSelector());
     }
   }
 

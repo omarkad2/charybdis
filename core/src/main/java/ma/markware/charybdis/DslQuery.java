@@ -7,6 +7,7 @@ import ma.markware.charybdis.dsl.insert.InsertInitWithColumnsExpression;
 import ma.markware.charybdis.dsl.select.SelectInitExpression;
 import ma.markware.charybdis.dsl.select.SelectWhereExpression;
 import ma.markware.charybdis.dsl.update.UpdateInitExpression;
+import ma.markware.charybdis.model.field.DeletableField;
 import ma.markware.charybdis.model.field.SelectableField;
 import ma.markware.charybdis.model.field.metadata.ColumnMetadata;
 import ma.markware.charybdis.model.field.metadata.PartitionKeyColumnMetadata;
@@ -28,7 +29,7 @@ public interface DslQuery {
 
   DeleteInitExpression delete();
 
-  DeleteInitExpression delete(ColumnMetadata... fields);
+  DeleteInitExpression delete(DeletableField... fields);
 
   DslQuery using(DriverExecutionProfile executionProfile);
 

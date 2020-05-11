@@ -4,18 +4,24 @@ import com.datastax.oss.driver.api.querybuilder.select.Selector;
 import java.util.stream.Stream;
 import ma.markware.charybdis.model.criteria.CriteriaExpression;
 import ma.markware.charybdis.model.criteria.CriteriaOperator;
+import ma.markware.charybdis.model.field.DeletableField;
 import ma.markware.charybdis.model.field.Field;
 import ma.markware.charybdis.model.field.SelectableField;
 import ma.markware.charybdis.model.field.criteria.CriteriaField;
 
-public interface ColumnMetadata<T> extends Field, SelectableField<T>, CriteriaField<T> {
+public interface ColumnMetadata<T> extends Field, SelectableField<T>, CriteriaField<T>, DeletableField {
 
   @Override
   default Selector toSelector(boolean useAlias) {
     return Selector.column(getName());
   }
 
-  default CriteriaExpression in(T... values) {
+  @Override
+  default Selector toDeletableSelector() {
+    return Selector.column(getName());
+  }
+
+  default CriteriaExpression in(T[] values) {
     return new CriteriaExpression(this, CriteriaOperator.IN, Stream.of(values).map(this::serialize).toArray());
   }
 

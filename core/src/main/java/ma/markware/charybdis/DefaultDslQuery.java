@@ -11,6 +11,7 @@ import ma.markware.charybdis.dsl.select.SelectInitExpression;
 import ma.markware.charybdis.dsl.select.SelectWhereExpression;
 import ma.markware.charybdis.dsl.update.UpdateImpl;
 import ma.markware.charybdis.dsl.update.UpdateInitExpression;
+import ma.markware.charybdis.model.field.DeletableField;
 import ma.markware.charybdis.model.field.SelectableField;
 import ma.markware.charybdis.model.field.metadata.ColumnMetadata;
 import ma.markware.charybdis.model.field.metadata.PartitionKeyColumnMetadata;
@@ -68,7 +69,7 @@ public class DefaultDslQuery implements DslQuery {
   }
 
   @Override
-  public DeleteInitExpression delete(final ColumnMetadata... fields) {
+  public DeleteInitExpression delete(final DeletableField... fields) {
     return new DeleteImpl(sessionFactory.getSession()).delete(fields);
   }
 

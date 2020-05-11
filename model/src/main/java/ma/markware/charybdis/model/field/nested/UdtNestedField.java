@@ -2,13 +2,14 @@ package ma.markware.charybdis.model.field.nested;
 
 import com.datastax.oss.driver.api.core.cql.Row;
 import com.datastax.oss.driver.api.querybuilder.select.Selector;
+import ma.markware.charybdis.model.field.DeletableField;
 import ma.markware.charybdis.model.field.SelectableField;
 import ma.markware.charybdis.model.field.entry.UdtFieldEntry;
 import ma.markware.charybdis.model.field.metadata.ColumnMetadata;
 import ma.markware.charybdis.model.field.metadata.UdtColumnMetadata;
 import ma.markware.charybdis.model.field.metadata.UdtFieldMetadata;
 
-public class UdtNestedField<T> implements NestedField, SelectableField<T> {
+public class UdtNestedField<T> implements NestedField, SelectableField<T>, DeletableField {
 
   private UdtColumnMetadata sourceColumn;
   private UdtFieldEntry<T> udtFields;
@@ -56,5 +57,10 @@ public class UdtNestedField<T> implements NestedField, SelectableField<T> {
       selector = selector == null ? Selector.field(columnName, udtField.getName()) : Selector.field(selector, udtField.getName());
     }
     return selector;
+  }
+
+  @Override
+  public Selector toDeletableSelector() {
+    return toSelector();
   }
 }
