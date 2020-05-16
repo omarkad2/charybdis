@@ -51,7 +51,7 @@ public class UdtSerializer implements Serializer<UdtMetaType> {
                                                     buildStaticInstance(packageName, generatedClassName, udtName),
                                                     buildEntityNameField(SerializationConstants.KEYSPACE_NAME_ATTRIBUTE, keyspaceName),
                                                     buildEntityNameField(SerializationConstants.UDT_NAME_ATTRIBUTE, udtName),
-                                                    buildUdtField(udtMetaType, aptContext))))
+                                                    buildUdtField(udtMetaType, false, aptContext))))
                                                 .addMethods(Arrays.asList(
                                                     buildPrivateConstructor(),
                                                     buildGetEntityNameMethod(SerializationConstants.GET_KEYSPACE_NAME_METHOD, SerializationConstants.KEYSPACE_NAME_ATTRIBUTE),
@@ -238,12 +238,14 @@ public class UdtSerializer implements Serializer<UdtMetaType> {
                      .build();
   }
 
-  private FieldSpec buildUdtField(UdtMetaType udtMetaType, final AptContext aptContext) {
+  private FieldSpec buildUdtField(UdtMetaType udtMetaType, boolean frozen, final AptContext aptContext) {
     CodeBlock.Builder initializerBuilder = CodeBlock.builder()
                                                     .add("new $T($N, $N)", UserDefinedTypeBuilder.class,
                                                          SerializationConstants.KEYSPACE_NAME_ATTRIBUTE,
-                                                         SerializationConstants.UDT_NAME_ATTRIBUTE)
-                                                    .add(".frozen()");
+                                                         SerializationConstants.UDT_NAME_ATTRIBUTE);
+    if (frozen) {
+      initializerBuilder.add(".frozen()");
+    }
 
     for (UdtFieldMetaType udtField : udtMetaType.getUdtFields()) {
       String udtFieldName = udtField.getUdtFieldName();
@@ -276,7 +278,7 @@ public class UdtSerializer implements Serializer<UdtMetaType> {
       }
     }
     initializerBuilder.add(".build()");
-    return FieldSpec.builder(UserDefinedType.class, SerializationConstants.UDT_ATTRIBUTE)
+    return FieldSpec.builder(UserDefinedType.class, SerializationConstants.UDT_FIELD)
                     .addModifiers(Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)
                     .initializer(initializerBuilder.build())
                     .build();
@@ -284,7 +286,7 @@ public class UdtSerializer implements Serializer<UdtMetaType> {
 
   private MethodSpec buildSerializeMethod(final UdtMetaType udtMetaType, final AptContext aptContext) {
     final String parameterName = "entity";
-    CodeBlock.Builder methodBuilder = CodeBlock.builder().add("return $N.newValue()", SerializationConstants.UDT_ATTRIBUTE);
+    CodeBlock.Builder methodBuilder = CodeBlock.builder().add("return $N.newValue()", SerializationConstants.UDT_FIELD);
     for (UdtFieldMetaType udtField : udtMetaType.getUdtFields()) {
       String udtFieldName = udtField.getUdtFieldName();
       String fieldName = udtField.getFieldName();

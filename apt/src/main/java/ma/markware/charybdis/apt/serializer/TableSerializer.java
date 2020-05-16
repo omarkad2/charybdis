@@ -136,26 +136,28 @@ public class TableSerializer implements Serializer<TableMetaType> {
                                              ))
                                              .build());
       } else {
-        if (columnFieldMetaType.isUdt()) {
-          fieldType = ParameterizedTypeName.get(ClassName.get(UdtColumnMetadata.class), ClassUtils.primitiveToWrapper(
-              TypeName.get(columnFieldMetaType.getTypeMirror())));
-        } else if (columnFieldMetaType.isMap()) {
-          List<TypeDetail> fieldSubTypes = columnFieldMetaType.getFieldSubTypes();
-          TypeMirror keyType = fieldSubTypes.get(0).getTypeMirror();
-          TypeMirror valueType = fieldSubTypes.get(0).getTypeMirror();
-          fieldType = ParameterizedTypeName.get(ClassName.get(MapColumnMetadata.class),
-                                                ClassUtils.primitiveToWrapper(TypeName.get(keyType)),
-                                                ClassUtils.primitiveToWrapper(TypeName.get(valueType)));
-        } else if (columnFieldMetaType.isList()) {
-          List<TypeDetail> fieldSubTypes = columnFieldMetaType.getFieldSubTypes();
-          TypeMirror subType = fieldSubTypes.get(0).getTypeMirror();
-          fieldType = ParameterizedTypeName.get(ClassName.get(ListColumnMetadata.class),
-                                                ClassUtils.primitiveToWrapper(TypeName.get(subType)));
-        }  else if (columnFieldMetaType.isSet()) {
-          List<TypeDetail> fieldSubTypes = columnFieldMetaType.getFieldSubTypes();
-          TypeMirror subType = fieldSubTypes.get(0).getTypeMirror();
-          fieldType = ParameterizedTypeName.get(ClassName.get(SetColumnMetadata.class),
-                                                ClassUtils.primitiveToWrapper(TypeName.get(subType)));
+        if (!columnFieldMetaType.isFrozen()) {
+          if (columnFieldMetaType.isUdt()) {
+            fieldType = ParameterizedTypeName.get(ClassName.get(UdtColumnMetadata.class), ClassUtils.primitiveToWrapper(
+                TypeName.get(columnFieldMetaType.getTypeMirror())));
+          } else if (columnFieldMetaType.isMap()) {
+            List<TypeDetail> fieldSubTypes = columnFieldMetaType.getFieldSubTypes();
+            TypeMirror keyType = fieldSubTypes.get(0).getTypeMirror();
+            TypeMirror valueType = fieldSubTypes.get(0).getTypeMirror();
+            fieldType = ParameterizedTypeName.get(ClassName.get(MapColumnMetadata.class),
+                                                  ClassUtils.primitiveToWrapper(TypeName.get(keyType)),
+                                                  ClassUtils.primitiveToWrapper(TypeName.get(valueType)));
+          } else if (columnFieldMetaType.isList()) {
+            List<TypeDetail> fieldSubTypes = columnFieldMetaType.getFieldSubTypes();
+            TypeMirror subType = fieldSubTypes.get(0).getTypeMirror();
+            fieldType = ParameterizedTypeName.get(ClassName.get(ListColumnMetadata.class),
+                                                  ClassUtils.primitiveToWrapper(TypeName.get(subType)));
+          }  else if (columnFieldMetaType.isSet()) {
+            List<TypeDetail> fieldSubTypes = columnFieldMetaType.getFieldSubTypes();
+            TypeMirror subType = fieldSubTypes.get(0).getTypeMirror();
+            fieldType = ParameterizedTypeName.get(ClassName.get(SetColumnMetadata.class),
+                                                  ClassUtils.primitiveToWrapper(TypeName.get(subType)));
+          }
         }
         initializerBuilder.add("$L", TypeSpec.anonymousClassBuilder("")
                                              .addSuperinterface(fieldType)
