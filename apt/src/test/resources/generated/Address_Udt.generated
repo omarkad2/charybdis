@@ -106,7 +106,7 @@ public class Address_Udt implements UdtMetadata<Address> {
 
   public static final String UDT_NAME = "address";
 
-  public static final UserDefinedType udt = new UserDefinedTypeBuilder(KEYSPACE_NAME, UDT_NAME).frozen()
+  public static final UserDefinedType udt = new UserDefinedTypeBuilder(KEYSPACE_NAME, UDT_NAME)
   .withField("number", DataTypeMapper.getDataType(int.class))
   .withField("street", DataTypeMapper.getDataType(java.lang.String.class))
   .withField("city", DataTypeMapper.getDataType(java.lang.String.class))

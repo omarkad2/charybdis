@@ -61,7 +61,7 @@ public class Country_Udt implements UdtMetadata<Country> {
 
   public static final String UDT_NAME = "country";
 
-  public static final UserDefinedType udt = new UserDefinedTypeBuilder(KEYSPACE_NAME, UDT_NAME).frozen()
+  public static final UserDefinedType udt = new UserDefinedTypeBuilder(KEYSPACE_NAME, UDT_NAME)
   .withField("name", DataTypeMapper.getDataType(java.lang.String.class))
   .withField("countrycode", DataTypeMapper.getDataType(java.lang.String.class)).build();
 
