@@ -13,10 +13,13 @@
   <artifactId>charybdis-apt</artifactId>
 
   <dependencies>
+    <!-- Internal modules -->
     <dependency>
       <groupId>ma.markware</groupId>
       <artifactId>charybdis-model</artifactId>
     </dependency>
+
+    <!-- Annotation processing -->
     <dependency>
       <groupId>com.google.auto.service</groupId>
       <artifactId>auto-service</artifactId>
@@ -29,11 +32,8 @@
       <groupId>com.squareup</groupId>
       <artifactId>javapoet</artifactId>
     </dependency>
-    <dependency>
-      <groupId>org.apache.velocity</groupId>
-      <artifactId>velocity</artifactId>
-    </dependency>
 
+    <!-- Test -->
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter-api</artifactId>

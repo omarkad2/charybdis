@@ -12,6 +12,8 @@
   <artifactId>charybdis-model</artifactId>
 
   <dependencies>
+
+    <!--Datastax Driver-->
     <dependency>
       <groupId>com.datastax.oss</groupId>
       <artifactId>java-driver-core</artifactId>
@@ -21,6 +23,7 @@
       <artifactId>java-driver-query-builder</artifactId>
     </dependency>
 
+    <!--Tests-->
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter-api</artifactId>

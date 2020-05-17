@@ -1,5 +1,6 @@
 package ma.markware.charybdis;
 
+import com.datastax.oss.driver.api.core.CqlSession;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
@@ -21,11 +22,15 @@ public class DefaultEntityManager implements EntityManager {
   }
 
   public DefaultEntityManager() {
-    this.sessionFactory = new DefaultSessionFactory();
+    this(new DefaultSessionFactory());
   }
 
   public DefaultEntityManager(final String customConfiguration) {
-    this.sessionFactory = new DefaultSessionFactory(customConfiguration);
+    this(new DefaultSessionFactory(customConfiguration));
+  }
+
+  public DefaultEntityManager(CqlSession session) {
+    this(new StandaloneSessionFactory(session));
   }
 
   @Override

@@ -3,57 +3,41 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <parent>
-    <groupId>ma.markware</groupId>
     <artifactId>charybdis</artifactId>
+    <groupId>ma.markware</groupId>
     <version>1.0.0-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
-  <artifactId>charybdis-core</artifactId>
+  <artifactId>charybdis-test-tools</artifactId>
 
   <dependencies>
-    <!--Internal modules-->
-    <dependency>
-      <groupId>ma.markware</groupId>
-      <artifactId>charybdis-apt</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>ma.markware</groupId>
-      <artifactId>charybdis-test-tools</artifactId>
-      <version>${project.version}</version>
-    </dependency>
 
     <!--Datastax Driver-->
     <dependency>
       <groupId>com.datastax.oss</groupId>
       <artifactId>java-driver-core</artifactId>
     </dependency>
+
+    <!-- Docker client -->
     <dependency>
-      <groupId>com.datastax.oss</groupId>
-      <artifactId>java-driver-query-builder</artifactId>
+      <groupId>com.github.docker-java</groupId>
+      <artifactId>docker-java</artifactId>
     </dependency>
 
     <!-- Test -->
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter-api</artifactId>
-      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-engine</artifactId>
     </dependency>
     <dependency>
       <groupId>org.assertj</groupId>
       <artifactId>assertj-core</artifactId>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>org.mockito</groupId>
-      <artifactId>mockito-core</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.mockito</groupId>
-      <artifactId>mockito-junit-jupiter</artifactId>
-    </dependency>
-
   </dependencies>
-
 </project>

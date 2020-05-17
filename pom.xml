@@ -42,7 +42,7 @@
     <java.version>1.8</java.version>
     <maven.compiler.target>${java.version}</maven.compiler.target>
     <maven.compiler.source>${java.version}</maven.compiler.source>
-    <slf4j.version>1.7.26</slf4j.version>
+    <slf4j.version>1.7.30</slf4j.version>
     <logback.version>1.2.3</logback.version>
     <cassandra-driver.version>4.5.1</cassandra-driver.version>
     <snakeyaml.version>1.24</snakeyaml.version>
@@ -51,9 +51,9 @@
     <compile-testing.version>0.18</compile-testing.version>
     <lz4-java.version>1.6.0</lz4-java.version>
     <snappy-java.version>1.1.7.3</snappy-java.version>
-    <velocity.version>1.7</velocity.version>
+    <docker-client.version>3.2.1</docker-client.version>
     <assertj-core.version>3.15.0</assertj-core.version>
-    <junit-jupiter-api.version>5.6.0</junit-jupiter-api.version>
+    <junit-jupiter.version>5.6.0</junit-jupiter.version>
     <apache-commons.lang3.version>3.9</apache-commons.lang3.version>
     <surefire.version>2.19.1</surefire.version>
     <junit-platform-surefire-provider.version>1.0.3</junit-platform-surefire-provider.version>
@@ -64,10 +64,13 @@
     <module>core</module>
     <module>apt</module>
     <module>model</module>
+    <module>test-tools</module>
   </modules>
 
   <dependencyManagement>
     <dependencies>
+
+      <!-- Internal Modules -->
       <dependency>
         <groupId>ma.markware</groupId>
         <artifactId>charybdis-core</artifactId>
@@ -81,6 +84,11 @@
       <dependency>
         <groupId>ma.markware</groupId>
         <artifactId>charybdis-model</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>ma.markware</groupId>
+        <artifactId>charybdis-test-tools</artifactId>
         <version>${project.version}</version>
       </dependency>
 
@@ -113,23 +121,29 @@
         <artifactId>javapoet</artifactId>
         <version>${javapoet.version}</version>
       </dependency>
+
+      <!-- Docker client -->
       <dependency>
-        <groupId>org.apache.velocity</groupId>
-        <artifactId>velocity</artifactId>
-        <version>${velocity.version}</version>
+        <groupId>com.github.docker-java</groupId>
+        <artifactId>docker-java</artifactId>
+        <version>${docker-client.version}</version>
       </dependency>
 
       <!--Tests-->
       <dependency>
         <groupId>org.junit.jupiter</groupId>
         <artifactId>junit-jupiter-api</artifactId>
-        <version>${junit-jupiter-api.version}</version>
-        <scope>test</scope>
+        <version>${junit-jupiter.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.junit.jupiter</groupId>
+        <artifactId>junit-jupiter-engine</artifactId>
+        <version>${junit-jupiter.version}</version>
       </dependency>
       <dependency>
         <groupId>org.junit.jupiter</groupId>
         <artifactId>junit-jupiter-params</artifactId>
-        <version>${junit-jupiter-api.version}</version>
+        <version>${junit-jupiter.version}</version>
         <scope>test</scope>
       </dependency>
       <dependency>
@@ -165,6 +179,25 @@
   </dependencyManagement>
 
   <dependencies>
+
+    <!-- Logging -->
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>${slf4j.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-core</artifactId>
+      <version>${logback.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+      <version>${logback.version}</version>
+    </dependency>
+
+    <!-- Apache commons -->
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>
@@ -188,7 +221,7 @@
             <dependency>
               <groupId>org.junit.jupiter</groupId>
               <artifactId>junit-jupiter-engine</artifactId>
-              <version>${junit-jupiter-api.version}</version>
+              <version>${junit-jupiter.version}</version>
             </dependency>
           </dependencies>
         </plugin>

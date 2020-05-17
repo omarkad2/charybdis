@@ -1,5 +1,6 @@
 package ma.markware.charybdis;
 
+import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.config.DriverExecutionProfile;
 import ma.markware.charybdis.dsl.delete.DeleteImpl;
 import ma.markware.charybdis.dsl.delete.DeleteInitExpression;
@@ -26,11 +27,15 @@ public class DefaultDslQuery implements DslQuery {
   }
 
   public DefaultDslQuery() {
-    this.sessionFactory = new DefaultSessionFactory();
+    this(new DefaultSessionFactory());
   }
 
   public DefaultDslQuery(final String customConfiguration) {
-    this.sessionFactory = new DefaultSessionFactory(customConfiguration);
+    this(new DefaultSessionFactory(customConfiguration));
+  }
+
+  public DefaultDslQuery(CqlSession session) {
+    this(new StandaloneSessionFactory(session));
   }
 
   @Override
