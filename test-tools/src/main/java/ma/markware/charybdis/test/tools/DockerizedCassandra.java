@@ -23,7 +23,7 @@ public class DockerizedCassandra implements AutoCloseable {
   private static final Logger logger = LoggerFactory.getLogger(DockerizedCassandra.class);
 
   private static final String DOCKER_IMAGE_NAME = "cassandra:3.11.2";
-//  private static final String DOCKER_IMAGE_NAME = "scylladb/scylla";
+//  private static final String DOCKER_IMAGE_NAME = "scylladb/scylla:3.3.2";
   private static final int CQL_PORT = 9042;
   private static final String DEFAULT_DATACENTER = "datacenter1";
 
