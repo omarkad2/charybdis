@@ -3,7 +3,10 @@ language: java
 jdk:
   - openjdk8
 
-sudo: false
+sudo: required
+
+services:
+  - docker
 
 cache:
   directories:
