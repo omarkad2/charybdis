@@ -8,9 +8,10 @@ cache:
   directories:
     - "$HOME/.m2"
 
-script:
-  - jdk_switcher use openjdk8
-  - "mvn verify"
+script: "mvn verify"
+  on:
+    branch: master
+    jdk: openjdk8
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
