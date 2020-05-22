@@ -89,7 +89,7 @@ public class AssignmentClause {
                                 new Object[]{ listNestedField.getEntry(), value });
   }
 
-  public static <T> AssignmentClause from(final UdtNestedField<T> udtNestedField, final T value) {
+  public static <T, V> AssignmentClause from(final UdtNestedField<T, V> udtNestedField, final T value) {
     return new AssignmentClause(Assignment.setField(udtNestedField.getSourceColumn().getName(), udtNestedField.getEntry().getName(),
                                                       QueryBuilder.bindMarker()), new Object[]{ value });
   }

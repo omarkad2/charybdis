@@ -13,12 +13,13 @@ import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
+import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 import ma.markware.charybdis.apt.metatype.KeyspaceMetaType;
 import ma.markware.charybdis.apt.metatype.TableMetaType;
 import ma.markware.charybdis.apt.metatype.UdtMetaType;
-import ma.markware.charybdis.apt.parser.Parser;
-import ma.markware.charybdis.apt.serializer.Serializer;
+import ma.markware.charybdis.apt.parser.EntityParser;
+import ma.markware.charybdis.apt.serializer.EntitySerializer;
 import ma.markware.charybdis.model.annotation.Keyspace;
 import ma.markware.charybdis.model.annotation.Table;
 import ma.markware.charybdis.model.annotation.Udt;
@@ -28,20 +29,18 @@ public class CharybdisProcessor extends AbstractProcessor {
 
   private static final Boolean ALLOW_OTHER_PROCESSORS_TO_CLAIM_ANNOTATIONS = Boolean.FALSE;
 
-  private Filer filer;
-  private Messager messager;
-  private Types types;
   private AptConfiguration aptConfiguration;
   private AptContext aptContext;
 
   @Override
   public synchronized void init(final ProcessingEnvironment processingEnv) {
     super.init(processingEnv);
-    filer = processingEnv.getFiler();
-    messager = processingEnv.getMessager();
-    types = processingEnv.getTypeUtils();
+    final Filer filer = processingEnv.getFiler();
+    final Messager messager = processingEnv.getMessager();
+    final Types types = processingEnv.getTypeUtils();
+    final Elements elements = processingEnv.getElementUtils();
     aptContext = new AptContext();
-    aptConfiguration = new AptDefaultConfiguration();
+    aptConfiguration = AptDefaultConfiguration.initConfig(aptContext, types, elements, filer);
   }
 
   @Override
@@ -80,45 +79,42 @@ public class CharybdisProcessor extends AbstractProcessor {
     aptContext.tableMetaTypes.addAll(parseTableClasses(roundEnv.getElementsAnnotatedWith(Table.class), aptConfiguration.getTableParser()));
   }
 
-  protected List<KeyspaceMetaType> parseKeyspaceClasses(Set<? extends Element> annotatedClasses, Parser<KeyspaceMetaType> keyspaceParser) {
+  private List<KeyspaceMetaType> parseKeyspaceClasses(Set<? extends Element> annotatedClasses, EntityParser<KeyspaceMetaType> keyspaceParser) {
     return annotatedClasses.stream()
-                           .map(annotatedClass -> keyspaceParser.parse(annotatedClass, types, aptContext))
+                           .map(keyspaceParser::parse)
                            .collect(Collectors.toList());
   }
 
-  protected List<UdtMetaType> parseUdtClasses(Set<? extends Element> annotatedClasses, Parser<UdtMetaType> udtParser) {
+  private List<UdtMetaType> parseUdtClasses(Set<? extends Element> annotatedClasses, EntityParser<UdtMetaType> udtParser) {
     return annotatedClasses.stream()
-                           .map(annotatedClass -> udtParser.parse(annotatedClass, types, aptContext))
+                           .map(udtParser::parse)
                            .collect(Collectors.toList());
   }
 
-  protected List<TableMetaType> parseTableClasses(Set<? extends Element> annotatedClasses, Parser<TableMetaType> tableParser) {
+  private List<TableMetaType> parseTableClasses(Set<? extends Element> annotatedClasses, EntityParser<TableMetaType> tableParser) {
     return annotatedClasses.stream()
-                           .map(annotatedClass -> tableParser.parse(annotatedClass, types, aptContext))
+                           .map(tableParser::parse)
                            .collect(Collectors.toList());
   }
 
   private void serialize() {
 
-    serializeKeyspaceMetadata(aptContext.keyspaceMetaTypes, aptConfiguration.getKeyspaceSerializer(), aptContext, filer);
+    serializeKeyspaceMetadata(aptContext.keyspaceMetaTypes, aptConfiguration.getKeyspaceSerializer());
 
-    serializeUdtMetadata(aptContext.udtMetaTypes, aptConfiguration.getUdtSerializer(), aptContext, filer);
+    serializeUdtMetadata(aptContext.udtMetaTypes, aptConfiguration.getUdtSerializer());
 
-    serializeTableMetadata(aptContext.tableMetaTypes, aptConfiguration.getTableSerializer(), aptContext, filer);
+    serializeTableMetadata(aptContext.tableMetaTypes, aptConfiguration.getTableSerializer());
   }
 
-  private void serializeKeyspaceMetadata(final List<KeyspaceMetaType> keyspaceMetaTypes, final Serializer<KeyspaceMetaType> keyspaceSerializer,
-      final AptContext aptContext, final Filer filer) {
-    keyspaceMetaTypes.forEach(keyspaceMetaType -> keyspaceSerializer.serialize(keyspaceMetaType, aptContext, filer));
+  private void serializeKeyspaceMetadata(final List<KeyspaceMetaType> keyspaceMetaTypes, final EntitySerializer<KeyspaceMetaType> keyspaceSerializer) {
+    keyspaceMetaTypes.forEach(keyspaceSerializer::serialize);
   }
 
-  private void serializeUdtMetadata(final List<UdtMetaType> udtMetaTypes, final Serializer<UdtMetaType> udtSerializer,
-      final AptContext aptContext, final Filer filer) {
-    udtMetaTypes.forEach(udtMetaType -> udtSerializer.serialize(udtMetaType, aptContext, filer));
+  private void serializeUdtMetadata(final List<UdtMetaType> udtMetaTypes, final EntitySerializer<UdtMetaType> udtSerializer) {
+    udtMetaTypes.forEach(udtSerializer::serialize);
   }
 
-  private void serializeTableMetadata(final List<TableMetaType> tableMetaTypes, final Serializer<TableMetaType> tableSerializer,
-      final AptContext aptContext, final Filer filer) {
-    tableMetaTypes.forEach(tableMetaType -> tableSerializer.serialize(tableMetaType, aptContext, filer));
+  private void serializeTableMetadata(final List<TableMetaType> tableMetaTypes, final EntitySerializer<TableMetaType> tableSerializer) {
+    tableMetaTypes.forEach(tableSerializer::serialize);
   }
 }

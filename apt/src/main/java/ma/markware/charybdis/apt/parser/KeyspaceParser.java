@@ -3,46 +3,52 @@ package ma.markware.charybdis.apt.parser;
 import static java.lang.String.format;
 
 import javax.lang.model.element.Element;
-import javax.lang.model.util.Types;
 import ma.markware.charybdis.apt.AptContext;
 import ma.markware.charybdis.apt.exception.CharybdisParsingException;
+import ma.markware.charybdis.apt.metatype.AbstractEntityMetaType;
 import ma.markware.charybdis.apt.metatype.KeyspaceMetaType;
 import ma.markware.charybdis.model.annotation.Keyspace;
 import ma.markware.charybdis.model.option.Replication;
 import ma.markware.charybdis.model.option.ReplicationStrategyClassEnum;
 import org.apache.commons.lang3.StringUtils;
 
-public class KeyspaceParser implements Parser<KeyspaceMetaType> {
+public class KeyspaceParser extends AbstractEntityParser<KeyspaceMetaType> {
+
+  private final AptContext aptContext;
+
+  public KeyspaceParser(AptContext aptContext) {
+    this.aptContext = aptContext;
+  }
 
   @Override
-  public KeyspaceMetaType parse(final Element annotatedClass, final Types types, final AptContext aptContext) {
+  public KeyspaceMetaType parse(final Element annotatedClass) {
     final Keyspace keyspace = annotatedClass.getAnnotation(Keyspace.class);
-    final KeyspaceMetaType keyspaceMetaType = new KeyspaceMetaType();
 
-    keyspaceMetaType.setPackageName(parsePackageName(annotatedClass));
-
-    keyspaceMetaType.setClassName(annotatedClass.asType().toString());
-
-    String keyspaceName = resolveName(keyspace.name(), annotatedClass.getSimpleName());
-    validateName(keyspaceName);
-    validateKeyspaceName(keyspaceName, annotatedClass, aptContext);
-    keyspaceMetaType.setKeyspaceName(keyspaceName);
+    AbstractEntityMetaType abstractEntityMetaType = parseGenericEntity(annotatedClass, resolveName(annotatedClass), aptContext);
+    final KeyspaceMetaType keyspaceMetaType = new KeyspaceMetaType(abstractEntityMetaType);
 
     Replication replication = parseKeyspaceReplication(keyspace);
     keyspaceMetaType.setReplication(replication);
 
-    aptContext.addKeyspaceName(keyspaceName);
+    aptContext.addKeyspaceName(keyspaceMetaType.getKeyspaceName());
 
     return keyspaceMetaType;
   }
 
-  private void validateKeyspaceName(String keyspaceName, Element annotatedClass, AptContext aptContext) {
+  @Override
+  public void validateKeyspaceName(String className, String keyspaceName, AptContext aptContext) {
     if (StringUtils.isBlank(keyspaceName)) {
-      keyspaceName = annotatedClass.getSimpleName().toString();
+      keyspaceName = className;
     }
     if (aptContext.isKeyspaceExist(keyspaceName)) {
       throw new CharybdisParsingException(format("keyspace '%s' already exist", keyspaceName));
     }
+  }
+
+  @Override
+  public String resolveName(final Element annotatedClass) {
+    final Keyspace keyspace = annotatedClass.getAnnotation(Keyspace.class);
+    return resolveName(keyspace.name(), annotatedClass.getSimpleName());
   }
 
   private Replication parseKeyspaceReplication(final Keyspace keyspace) {
@@ -58,11 +64,5 @@ public class KeyspaceParser implements Parser<KeyspaceMetaType> {
       throw new CharybdisParsingException("Replication 'NetworkTopologyStrategy' not yet supported on a particular keyspace");
     }
     return replication;
-  }
-
-  @Override
-  public String resolveName(final Element annotatedClass) {
-    final Keyspace keyspace = annotatedClass.getAnnotation(Keyspace.class);
-    return resolveName(keyspace.name(), annotatedClass.getSimpleName());
   }
 }

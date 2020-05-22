@@ -7,9 +7,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 
 public class DataTypeMapper {
@@ -37,25 +35,6 @@ public class DataTypeMapper {
   }
 
   public static DataType getDataType(final Class clazz) {
-    if (clazz.isEnum()) {
-      return DataTypes.TEXT;
-    }
     return dataTypeMap.get(clazz);
   }
-
-  public static DataType getDataType(final Class genericClazz, final Class... subClazzes) {
-    if (genericClazz != null) {
-      if (genericClazz == List.class) {
-        return DataTypes.listOf(getDataType(subClazzes[0]));
-      }
-      if (genericClazz == Set.class) {
-        return DataTypes.setOf(getDataType(subClazzes[0]));
-      }
-      if (genericClazz == Map.class) {
-        return DataTypes.mapOf(getDataType(subClazzes[0]), getDataType((subClazzes[1])));
-      }
-    }
-    return getDataType(genericClazz);
-  }
-
 }

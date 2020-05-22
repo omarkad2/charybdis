@@ -9,17 +9,17 @@ import ma.markware.charybdis.model.field.metadata.ColumnMetadata;
 import ma.markware.charybdis.model.field.metadata.UdtColumnMetadata;
 import ma.markware.charybdis.model.field.metadata.UdtFieldMetadata;
 
-public class UdtNestedField<T> implements NestedField, SelectableField<T>, DeletableField {
+public class UdtNestedField<T, V> implements NestedField, SelectableField<T>, DeletableField {
 
   private UdtColumnMetadata sourceColumn;
-  private UdtFieldEntry<T> udtFields;
+  private UdtFieldEntry<T, V> udtFields;
 
-  public UdtNestedField(final UdtColumnMetadata sourceColumn, final UdtFieldMetadata<T> udtFieldMetadata) {
+  public UdtNestedField(final UdtColumnMetadata sourceColumn, final UdtFieldMetadata<T, V> udtFieldMetadata) {
     this.sourceColumn = sourceColumn;
     this.udtFields = new UdtFieldEntry<>(udtFieldMetadata);
   }
 
-  public UdtNestedField(final UdtColumnMetadata sourceColumn, final UdtFieldEntry<T> udtFieldEntry) {
+  public UdtNestedField(final UdtColumnMetadata sourceColumn, final UdtFieldEntry<T, V> udtFieldEntry) {
     this.sourceColumn = sourceColumn;
     this.udtFields = udtFieldEntry;
   }
@@ -31,7 +31,7 @@ public class UdtNestedField<T> implements NestedField, SelectableField<T>, Delet
 
   @Override
   public T deserialize(Row row) {
-    return getEntry().deserialize(getName(), row);
+    return getEntry().deserialize(row, getName());
   }
 
   @Override
@@ -40,7 +40,7 @@ public class UdtNestedField<T> implements NestedField, SelectableField<T>, Delet
   }
 
   @Override
-  public UdtFieldMetadata<T> getEntry() {
+  public UdtFieldMetadata<T, V> getEntry() {
     return udtFields.getKey();
   }
 

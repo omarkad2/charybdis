@@ -2,20 +2,15 @@ package ma.markware.charybdis.apt.metatype;
 
 import java.util.List;
 
-public class TableMetaType extends AbstractClassMetaType {
+public class TableMetaType extends AbstractEntityMetaType {
 
-  private String keyspaceName;
   private String tableName;
   private List<ColumnFieldMetaType> columns;
   private List<ColumnFieldMetaType> partitionKeyColumns;
   private List<ColumnFieldMetaType> clusteringKeyColumns;
 
-  public String getKeyspaceName() {
-    return keyspaceName;
-  }
-
-  public void setKeyspaceName(final String keyspaceName) {
-    this.keyspaceName = keyspaceName;
+  public TableMetaType(final AbstractEntityMetaType abstractEntityMetaType) {
+    super(abstractEntityMetaType);
   }
 
   public String getTableName() {

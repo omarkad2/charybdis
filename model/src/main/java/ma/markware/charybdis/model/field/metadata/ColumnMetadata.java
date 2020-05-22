@@ -11,6 +11,10 @@ import ma.markware.charybdis.model.field.criteria.CriteriaField;
 
 public interface ColumnMetadata<T> extends Field, SelectableField<T>, CriteriaField<T>, DeletableField {
 
+  default String getIndexName() {
+    return null;
+  }
+
   @Override
   default Selector toSelector(boolean useAlias) {
     return Selector.column(getName());

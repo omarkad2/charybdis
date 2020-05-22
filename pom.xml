@@ -65,6 +65,7 @@
     <module>apt</module>
     <module>model</module>
     <module>test-tools</module>
+    <module>test-data</module>
   </modules>
 
   <dependencyManagement>
@@ -89,6 +90,11 @@
       <dependency>
         <groupId>ma.markware</groupId>
         <artifactId>charybdis-test-tools</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>ma.markware</groupId>
+        <artifactId>charybdis-test-data</artifactId>
         <version>${project.version}</version>
       </dependency>
 

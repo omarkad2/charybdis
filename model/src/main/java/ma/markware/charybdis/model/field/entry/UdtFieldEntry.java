@@ -5,12 +5,12 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import ma.markware.charybdis.model.field.metadata.UdtFieldMetadata;
 
-public class UdtFieldEntry<T> implements EntryExpression<UdtFieldMetadata<T>> {
+public class UdtFieldEntry<T, V> implements EntryExpression<UdtFieldMetadata<T, V>> {
 
   private LinkedList<UdtFieldMetadata> intermediateUdtFields = new LinkedList<>();
-  private UdtFieldMetadata<T> principalUdtField;
+  private UdtFieldMetadata<T, V> principalUdtField;
 
-  public UdtFieldEntry(final UdtFieldMetadata<T> udtField) {
+  public UdtFieldEntry(final UdtFieldMetadata<T, V> udtField) {
     this.principalUdtField = udtField;
   }
 
@@ -20,7 +20,7 @@ public class UdtFieldEntry<T> implements EntryExpression<UdtFieldMetadata<T>> {
     return allEntries;
   }
 
-  public UdtFieldEntry<T> add(UdtFieldMetadata udtFieldMetadata) {
+  public UdtFieldEntry<T, V> add(UdtFieldMetadata udtFieldMetadata) {
     intermediateUdtFields.addFirst(udtFieldMetadata);
     return this;
   }
@@ -33,7 +33,7 @@ public class UdtFieldEntry<T> implements EntryExpression<UdtFieldMetadata<T>> {
   }
 
   @Override
-  public UdtFieldMetadata<T> getKey() {
+  public UdtFieldMetadata<T, V> getKey() {
     return principalUdtField;
   }
 }

@@ -25,5 +25,5 @@ public interface UpdateAssignmentExpression {
 
   <T> UpdateExtraAssignmentExpression set(ListNestedField<T> field, T value);
 
-  <T> UpdateExtraAssignmentExpression set(UdtNestedField<T> field, T value);
+  <T, V> UpdateExtraAssignmentExpression set(UdtNestedField<T, V> field, T value);
 }
