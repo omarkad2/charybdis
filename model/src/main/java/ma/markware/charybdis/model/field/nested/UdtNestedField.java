@@ -26,7 +26,7 @@ public class UdtNestedField<T, V> implements NestedField, SelectableField<T>, De
 
   @Override
   public String getName() {
-    return sourceColumn.getName() + "." + udtFields.getKey().getName();
+    return sourceColumn.getName() + "." + udtFields.getName();
   }
 
   @Override

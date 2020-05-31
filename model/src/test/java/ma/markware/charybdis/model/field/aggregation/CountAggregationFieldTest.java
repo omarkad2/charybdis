@@ -5,7 +5,8 @@ import static org.mockito.Mockito.verify;
 
 import com.datastax.oss.driver.api.core.CqlIdentifier;
 import com.datastax.oss.driver.api.core.cql.Row;
-import ma.markware.charybdis.model.field.metadata.ColumnMetadata;
+import ma.markware.charybdis.model.field.metadata.ClusteringKeyColumnMetadata;
+import ma.markware.charybdis.model.option.ClusteringOrder;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -26,7 +27,7 @@ class CountAggregationFieldTest {
 
   @BeforeAll
   void setup() {
-    final ColumnMetadata<Float> columnMetadata = new ColumnMetadata<Float>() {
+    final ClusteringKeyColumnMetadata<Float> columnMetadata = new ClusteringKeyColumnMetadata<Float>() {
       @Override
       public Float deserialize(final Row row) {
         return row.get(getName(), Float.class);
@@ -45,6 +46,16 @@ class CountAggregationFieldTest {
       @Override
       public String getName() {
         return "column";
+      }
+
+      @Override
+      public int getClusteringKeyIndex() {
+        return 0;
+      }
+
+      @Override
+      public ClusteringOrder getClusteringOrder() {
+        return ClusteringOrder.DESC;
       }
     };
 
