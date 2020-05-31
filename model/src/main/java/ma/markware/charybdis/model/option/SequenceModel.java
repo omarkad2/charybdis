@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.Objects;
 import java.util.function.Supplier;
 
-public enum SequenceModelEnum {
+public enum SequenceModel {
 
   UUID(java.util.UUID.class, java.util.UUID::randomUUID);
 
@@ -12,13 +12,13 @@ public enum SequenceModelEnum {
 
   private Supplier<?> generationMethod;
 
-  SequenceModelEnum(final Class supportedClass, final Supplier generationMethod) {
+  SequenceModel(final Class supportedClass, final Supplier generationMethod) {
     this.supportedClass = supportedClass;
     this.generationMethod = generationMethod;
   }
 
-  public static SequenceModelEnum findSequenceModel(final Class clazz) {
-    return Arrays.stream(SequenceModelEnum.values())
+  public static SequenceModel findSequenceModel(final Class clazz) {
+    return Arrays.stream(SequenceModel.values())
                  .filter(s -> Objects.equals(s.getSupportedClass(), clazz))
                  .findAny().orElse(null);
   }

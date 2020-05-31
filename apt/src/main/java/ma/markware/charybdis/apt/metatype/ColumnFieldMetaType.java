@@ -1,7 +1,7 @@
 package ma.markware.charybdis.apt.metatype;
 
 import ma.markware.charybdis.model.option.ClusteringOrder;
-import ma.markware.charybdis.model.option.SequenceModelEnum;
+import ma.markware.charybdis.model.option.SequenceModel;
 
 public class ColumnFieldMetaType extends AbstractFieldMetaType {
 
@@ -12,7 +12,7 @@ public class ColumnFieldMetaType extends AbstractFieldMetaType {
   private ClusteringOrder clusteringOrder;
   private boolean isIndexed;
   private String indexName;
-  private SequenceModelEnum sequenceModel;
+  private SequenceModel sequenceModel;
   private boolean isCreationDate;
   private boolean isLastUpdatedDate;
 
@@ -76,11 +76,11 @@ public class ColumnFieldMetaType extends AbstractFieldMetaType {
     this.indexName = indexName;
   }
 
-  public SequenceModelEnum getSequenceModel() {
+  public SequenceModel getSequenceModel() {
     return sequenceModel;
   }
 
-  public void setSequenceModel(final SequenceModelEnum sequenceModel) {
+  public void setSequenceModel(final SequenceModel sequenceModel) {
     this.sequenceModel = sequenceModel;
   }
 

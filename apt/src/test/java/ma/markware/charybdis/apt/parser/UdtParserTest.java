@@ -3,8 +3,8 @@ package ma.markware.charybdis.apt.parser;
 import static java.util.Arrays.asList;
 import static ma.markware.charybdis.apt.parser.ParserTestHelper.buildFieldTypeMetaType;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.api.Assertions.tuple;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 import com.datastax.oss.driver.api.core.data.UdtValue;
@@ -59,6 +59,7 @@ class UdtParserTest {
   private TypeElement testUdtElement;
 
   @BeforeAll
+  @SuppressWarnings("unchecked")
   void setup(Elements elements) {
     MockitoAnnotations.initMocks(this);
     testNestedUdtElement = elements.getTypeElement(TestNestedUdt.class.getCanonicalName());
@@ -146,36 +147,36 @@ class UdtParserTest {
   @Test
   @DisplayName("Compilation should fail if a udt field's getter is missing")
   void compilation_fails_when_udtField_getter_missing(Elements elements) {
-    assertThrows(CharybdisParsingException.class,
-                 () -> configuration.getUdtParser()
-                                    .parse(elements.getTypeElement(TestUdtWithMissingGetter.class.getCanonicalName())),
-                 "Getter 'getValue' is mandatory for field 'value' in class '" + TestUdtWithMissingGetter.class.getCanonicalName() + "'");
+    assertThatExceptionOfType(CharybdisParsingException.class)
+        .isThrownBy(() -> configuration.getUdtParser()
+                                    .parse(elements.getTypeElement(TestUdtWithMissingGetter.class.getCanonicalName())))
+        .withMessage("Getter 'getValue' is mandatory for field 'value' in class '" + TestUdtWithMissingGetter.class.getSimpleName() + "'");
   }
 
   @Test
   @DisplayName("Compilation should fail if a udt field's setter is missing")
   void compilation_fails_when_udtField_setter_missing(Elements elements) {
-    assertThrows(CharybdisParsingException.class,
-                 () -> configuration.getUdtParser()
-                                    .parse(elements.getTypeElement(TestUdtWithMissingSetter.class.getCanonicalName())),
-                 "Setter 'setValue' is mandatory for field 'value' in class '" + TestUdtWithMissingGetter.class.getCanonicalName() + "'");
+    assertThatExceptionOfType(CharybdisParsingException.class)
+        .isThrownBy(() -> configuration.getUdtParser()
+                                    .parse(elements.getTypeElement(TestUdtWithMissingSetter.class.getCanonicalName())))
+        .withMessage("Setter 'setValue' is mandatory for field 'value' in class '" + TestUdtWithMissingSetter.class.getSimpleName() + "'");
   }
 
   @Test
   @DisplayName("Compilation should fail if public no-arg constructor missing")
   void compilation_fails_when_no_arg_constructor_missing(Elements elements) {
-    assertThrows(CharybdisParsingException.class,
-                 () -> configuration.getUdtParser()
-                                    .parse(elements.getTypeElement(TestUdtWithMissingPublicConstructor.class.getCanonicalName())),
-                 "Public no-arg constructor is mandatory in class  '" + TestUdtWithMissingPublicConstructor.class.getCanonicalName() + "'");
+    assertThatExceptionOfType(CharybdisParsingException.class)
+        .isThrownBy(() -> configuration.getUdtParser()
+                                    .parse(elements.getTypeElement(TestUdtWithMissingPublicConstructor.class.getCanonicalName())))
+        .withMessage("Public no-arg constructor is mandatory in class '" + TestUdtWithMissingPublicConstructor.class.getSimpleName() + "'");
   }
 
   @Test
   @DisplayName("Compilation should fail if udt has another nested udt not 'frozen'")
   void compilation_fails_when_nested_udt_not_frozen(Elements elements) {
-    assertThrows(CharybdisParsingException.class,
-                 () -> configuration.getUdtParser()
-                                    .parse(elements.getTypeElement(TestUdtWithNonFrozenNestedUdt.class.getCanonicalName())),
-                 "Error while parsing field 'udtNested'");
+    assertThatExceptionOfType(CharybdisParsingException.class)
+        .isThrownBy(() -> configuration.getUdtParser()
+                                    .parse(elements.getTypeElement(TestUdtWithNonFrozenNestedUdt.class.getCanonicalName())))
+        .withMessage("Nested UDT Field 'udtNested' should be annotated with @Frozen");
   }
 }

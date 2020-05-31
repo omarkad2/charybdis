@@ -5,13 +5,13 @@ import java.util.Objects;
 
 public class Replication {
 
-  public static Replication DEFAULT_REPLICATION = new Replication(ReplicationStrategyClassEnum.SIMPLE_STRATEGY, 1);
+  public static Replication DEFAULT_REPLICATION = new Replication(ReplicationStrategyClass.SIMPLE_STRATEGY, 1);
 
-  private ReplicationStrategyClassEnum replicationClass;
+  private ReplicationStrategyClass replicationClass;
   private int replicationFactor;
   private Map<String, Integer> datacenterReplicaMap;
 
-  private Replication(final ReplicationStrategyClassEnum replicationClass,
+  private Replication(final ReplicationStrategyClass replicationClass,
       final int replicationFactor) {
     this.replicationClass = replicationClass;
     this.replicationFactor = replicationFactor;
@@ -19,11 +19,11 @@ public class Replication {
 
   public Replication() {}
 
-  public ReplicationStrategyClassEnum getReplicationClass() {
+  public ReplicationStrategyClass getReplicationClass() {
     return replicationClass;
   }
 
-  public void setReplicationClass(final ReplicationStrategyClassEnum replicationClass) {
+  public void setReplicationClass(final ReplicationStrategyClass replicationClass) {
     this.replicationClass = replicationClass;
   }
 
@@ -51,7 +51,7 @@ public class Replication {
     if (replicationClass != that.replicationClass) {
       return false;
     }
-    if (replicationClass == ReplicationStrategyClassEnum.SIMPLE_STRATEGY) {
+    if (replicationClass == ReplicationStrategyClass.SIMPLE_STRATEGY) {
       return replicationFactor == that.replicationFactor;
     }
     return Objects.equals(datacenterReplicaMap, that.datacenterReplicaMap);
@@ -59,7 +59,7 @@ public class Replication {
 
   @Override
   public int hashCode() {
-    if (replicationClass == ReplicationStrategyClassEnum.SIMPLE_STRATEGY) {
+    if (replicationClass == ReplicationStrategyClass.SIMPLE_STRATEGY) {
       return Objects.hash(replicationClass, replicationFactor);
     }
     return Objects.hash(replicationClass, datacenterReplicaMap);

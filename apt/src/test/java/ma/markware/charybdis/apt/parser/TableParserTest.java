@@ -4,15 +4,14 @@ package ma.markware.charybdis.apt.parser;
 import static java.util.Arrays.asList;
 import static ma.markware.charybdis.apt.parser.ParserTestHelper.buildFieldTypeMetaType;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.api.Assertions.tuple;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 import com.datastax.oss.driver.api.core.data.UdtValue;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
-import java.io.IOException;
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.List;
@@ -203,10 +202,10 @@ public class TableParserTest {
 
   @Test
   @DisplayName("Compilation should fail if table_has_no_partition_key")
-  void compilation_fails_when_table_has_no_partition_key(Types types, Elements elements) throws IOException {
-    assertThrows(CharybdisParsingException.class,
-                 () -> configuration.getTableParser()
-                                    .parse(elements.getTypeElement(TestEntityWithNoPartitionKey.class.getCanonicalName())),
-                 "There should be at least one partition key defined for the table 'table_entity_no_partition_key'");
+  void compilation_fails_when_table_has_no_partition_key(Types types, Elements elements) {
+    assertThatExceptionOfType(CharybdisParsingException.class)
+        .isThrownBy(() -> configuration.getTableParser()
+                                    .parse(elements.getTypeElement(TestEntityWithNoPartitionKey.class.getCanonicalName())))
+        .withMessage("There should be at least one partition key defined for the table 'test_entity_no_partition_key'");
   }
 }

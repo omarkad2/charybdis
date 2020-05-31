@@ -5,8 +5,14 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import ma.markware.charybdis.model.assignment.AssignmentOperation;
 import ma.markware.charybdis.model.assignment.AssignmentSetValue;
+import ma.markware.charybdis.model.criteria.CriteriaExpression;
+import ma.markware.charybdis.model.criteria.CriteriaOperator;
 
-public interface SetColumnMetadata<T> extends ColumnMetadata<Set<T>> {
+public interface SetColumnMetadata<T> extends CollectionColumnMetadata<Set<T>> {
+
+  default CriteriaExpression contains(org.apache.tinkerpop.gremlin.structure.T value) {
+    return new CriteriaExpression(this, CriteriaOperator.CONTAINS, value);
+  }
 
   default AssignmentSetValue<T> append(T... values) {
     return append(Arrays.stream(values).collect(Collectors.toSet()));

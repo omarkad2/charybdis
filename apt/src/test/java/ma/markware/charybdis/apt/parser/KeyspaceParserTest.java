@@ -1,7 +1,7 @@
 package ma.markware.charybdis.apt.parser;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
@@ -66,9 +66,9 @@ class KeyspaceParserTest {
   @DisplayName("Compilation should fail if two keyspaces have the same name")
   void compilation_fails_when_duplicate_keyspace_name(Elements elements) throws IOException {
     configuration.getKeyspaceParser().parse(keyspaceTypeElement);
-    assertThrows(CharybdisParsingException.class,
-                 () -> configuration.getKeyspaceParser()
-                                    .parse(elements.getTypeElement(DuplicateKeyspaceDefinition.class.getCanonicalName())),
-                 "keyspace 'test_keyspace' already exist");
+    assertThatExceptionOfType(CharybdisParsingException.class)
+        .isThrownBy(() -> configuration.getKeyspaceParser()
+                                    .parse(elements.getTypeElement(DuplicateKeyspaceDefinition.class.getCanonicalName())))
+        .withMessage("keyspace 'test_keyspace' already exist");
   }
 }

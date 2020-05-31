@@ -23,10 +23,10 @@ import ma.markware.charybdis.apt.exception.CharybdisSerializationException;
 import ma.markware.charybdis.apt.metatype.FieldTypeMetaType;
 import ma.markware.charybdis.apt.metatype.UdtFieldMetaType;
 import ma.markware.charybdis.apt.metatype.UdtMetaType;
+import ma.markware.charybdis.apt.utils.ClassUtils;
 import ma.markware.charybdis.apt.utils.CollectionUtils;
 import ma.markware.charybdis.apt.utils.NameUtils;
 import ma.markware.charybdis.model.field.metadata.UdtMetadata;
-import ma.markware.charybdis.model.utils.ClassUtils;
 
 public class UdtSerializer implements EntitySerializer<UdtMetaType> {
 

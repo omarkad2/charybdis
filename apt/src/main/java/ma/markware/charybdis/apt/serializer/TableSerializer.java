@@ -17,11 +17,11 @@ import javax.annotation.processing.Filer;
 import javax.lang.model.element.Modifier;
 import ma.markware.charybdis.apt.metatype.ColumnFieldMetaType;
 import ma.markware.charybdis.apt.metatype.TableMetaType;
+import ma.markware.charybdis.apt.utils.ClassUtils;
 import ma.markware.charybdis.apt.utils.CollectionUtils;
 import ma.markware.charybdis.model.field.metadata.ColumnMetadata;
 import ma.markware.charybdis.model.field.metadata.TableMetadata;
-import ma.markware.charybdis.model.option.SequenceModelEnum;
-import ma.markware.charybdis.model.utils.ClassUtils;
+import ma.markware.charybdis.model.option.SequenceModel;
 
 public class TableSerializer implements EntitySerializer<TableMetaType> {
 
@@ -159,7 +159,7 @@ public class TableSerializer implements EntitySerializer<TableMetaType> {
                  .forEach(
         columnFieldMetaType -> methodBuilder.addStatement("$N.$L(($L) $T.$L.getGenerationMethod().get())",
                                                           parameterName, columnFieldMetaType.getSetterName(),
-                                                          columnFieldMetaType.getFieldType().getDeserializationTypeCanonicalName(), SequenceModelEnum.class,
+                                                          columnFieldMetaType.getFieldType().getDeserializationTypeCanonicalName(), SequenceModel.class,
                                                           columnFieldMetaType.getSequenceModel()));
     return methodBuilder.endControlFlow().build();
   }

@@ -1,6 +1,6 @@
 package ma.markware.charybdis.model.option;
 
-public enum ReplicationStrategyClassEnum {
+public enum ReplicationStrategyClass {
 
   SIMPLE_STRATEGY("SimpleStrategy"),
 
@@ -8,7 +8,7 @@ public enum ReplicationStrategyClassEnum {
 
   private String value;
 
-  ReplicationStrategyClassEnum(final String value) {
+  ReplicationStrategyClass(final String value) {
     this.value = value;
   }
 

@@ -33,15 +33,7 @@ public interface ColumnMetadata<T> extends Field, SelectableField<T>, CriteriaFi
     return new CriteriaExpression(this, CriteriaOperator.LIKE, serialize(value));
   }
 
-  default CriteriaExpression isNotNull(T value) {
-    return new CriteriaExpression(this, CriteriaOperator.IS_NOT_NULL, serialize(value));
-  }
-
-  default CriteriaExpression contains(T value) {
-    return new CriteriaExpression(this, CriteriaOperator.CONTAINS, serialize(value));
-  }
-
-  default CriteriaExpression containsKey(T value) {
-    return new CriteriaExpression(this, CriteriaOperator.CONTAINS_KEY, serialize(value));
+  default CriteriaExpression isNotNull() {
+    return new CriteriaExpression(this, CriteriaOperator.IS_NOT_NULL, null);
   }
 }

@@ -1,4 +1,4 @@
-package ma.markware.charybdis.model.utils;
+package ma.markware.charybdis.apt.utils;
 
 import com.squareup.javapoet.TypeName;
 import javax.lang.model.type.TypeMirror;

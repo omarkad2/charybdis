@@ -1,6 +1,7 @@
 package ma.marware.charybdis.model.datatype;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 import com.datastax.oss.driver.api.core.type.DataType;
 import com.datastax.oss.driver.api.core.type.DataTypes;
@@ -8,12 +9,11 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Stream;
 import ma.markware.charybdis.model.datatype.DataTypeMapper;
+import ma.markware.charybdis.model.exception.CharybdisUnknownTypeException;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -26,10 +26,11 @@ class DataTypeMapperTest {
     assertThat(DataTypeMapper.getDataType(clazz)).isEqualTo(expectedDataType);
   }
 
-  @ParameterizedTest
-  @MethodSource("getDataTypeTestGenericTypesArguments")
-  void getDataTypeTest_generic_types(Class<?> clazz, Class<?>[] subClazzes, DataType expectedDataType) {
-//    assertThat(DataTypeMapper.getDataType(clazz, subClazzes)).isEqualTo(expectedDataType);
+  @Test
+  void getDataTypeTest_when_custom_type_should_throw_exception() {
+    assertThatExceptionOfType(CharybdisUnknownTypeException.class)
+        .isThrownBy(() -> DataTypeMapper.getDataType(CustomUdt.class))
+        .withMessage("Unknown type '" + CustomUdt.class + "' to DB, make sure to declare this class as user-defined type (@Udt)");
   }
 
   private static Stream<Arguments> getDataTypeTestArguments() {
@@ -54,12 +55,16 @@ class DataTypeMapperTest {
     );
   }
 
-  private static Stream<Arguments> getDataTypeTestGenericTypesArguments() {
-    return Stream.of(
-        Arguments.of(List.class, new Class[]{String.class}, DataTypes.listOf(DataTypes.TEXT)),
-        Arguments.of(Set.class, new Class[]{UUID.class}, DataTypes.setOf(DataTypes.UUID)),
-        Arguments.of(Map.class, new Class[]{Instant.class, String.class},
-                     DataTypes.mapOf(DataTypes.TIMESTAMP, DataTypes.TEXT))
-    );
+  private static class CustomUdt {
+
+    private String name;
+
+    public String getName() {
+      return name;
+    }
+
+    public void setName(final String name) {
+      this.name = name;
+    }
   }
 }

@@ -9,7 +9,7 @@ import ma.markware.charybdis.apt.metatype.AbstractEntityMetaType;
 import ma.markware.charybdis.apt.metatype.KeyspaceMetaType;
 import ma.markware.charybdis.model.annotation.Keyspace;
 import ma.markware.charybdis.model.option.Replication;
-import ma.markware.charybdis.model.option.ReplicationStrategyClassEnum;
+import ma.markware.charybdis.model.option.ReplicationStrategyClass;
 import org.apache.commons.lang3.StringUtils;
 
 public class KeyspaceParser extends AbstractEntityParser<KeyspaceMetaType> {
@@ -53,14 +53,14 @@ public class KeyspaceParser extends AbstractEntityParser<KeyspaceMetaType> {
 
   private Replication parseKeyspaceReplication(final Keyspace keyspace) {
     final Replication replication = new Replication();
-    final ReplicationStrategyClassEnum replicationStrategy = keyspace.replicaPlacementStrategy();
+    final ReplicationStrategyClass replicationStrategy = keyspace.replicaPlacementStrategy();
     final int replicationFactor = keyspace.replicationFactor();
-    if (replicationStrategy == ReplicationStrategyClassEnum.SIMPLE_STRATEGY) {
+    if (replicationStrategy == ReplicationStrategyClass.SIMPLE_STRATEGY) {
       if (replicationFactor > 0) {
         replication.setReplicationClass(replicationStrategy);
         replication.setReplicationFactor(replicationFactor);
       }
-    } else if (replicationStrategy == ReplicationStrategyClassEnum.NETWORK_TOPOLOGY_STRATEGY) {
+    } else if (replicationStrategy == ReplicationStrategyClass.NETWORK_TOPOLOGY_STRATEGY) {
       throw new CharybdisParsingException("Replication 'NetworkTopologyStrategy' not yet supported on a particular keyspace");
     }
     return replication;

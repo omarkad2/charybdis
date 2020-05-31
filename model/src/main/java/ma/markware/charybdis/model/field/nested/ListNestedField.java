@@ -6,7 +6,6 @@ import ma.markware.charybdis.model.field.DeletableField;
 import ma.markware.charybdis.model.field.entry.ListEntry;
 import ma.markware.charybdis.model.field.metadata.ColumnMetadata;
 import ma.markware.charybdis.model.field.metadata.ListColumnMetadata;
-import ma.markware.charybdis.model.utils.StringUtils;
 
 public class ListNestedField<T> implements NestedField<Integer>, DeletableField {
 
@@ -20,7 +19,7 @@ public class ListNestedField<T> implements NestedField<Integer>, DeletableField 
 
   @Override
   public String getName() {
-    return StringUtils.quoteString(sourceColumn.getName() + "[" + listEntry.getKey() + "]");
+    return sourceColumn.getName() + "[" + listEntry.getKey() + "]";
   }
 
   @Override

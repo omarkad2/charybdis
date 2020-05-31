@@ -8,8 +8,8 @@ import java.util.List;
 import java.util.Objects;
 import javax.lang.model.type.TypeMirror;
 import ma.markware.charybdis.apt.parser.TypePosition;
+import ma.markware.charybdis.apt.utils.ClassUtils;
 import ma.markware.charybdis.apt.utils.TypeUtils;
-import ma.markware.charybdis.model.utils.ClassUtils;
 
 public class FieldTypeMetaType {
 

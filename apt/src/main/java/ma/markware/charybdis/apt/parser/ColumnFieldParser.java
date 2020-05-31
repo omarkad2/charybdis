@@ -17,7 +17,7 @@ import ma.markware.charybdis.model.annotation.GeneratedValue;
 import ma.markware.charybdis.model.annotation.Index;
 import ma.markware.charybdis.model.annotation.LastUpdatedDate;
 import ma.markware.charybdis.model.annotation.PartitionKey;
-import ma.markware.charybdis.model.option.SequenceModelEnum;
+import ma.markware.charybdis.model.option.SequenceModel;
 import org.apache.commons.lang.StringUtils;
 
 public class ColumnFieldParser extends AbstractFieldParser<ColumnFieldMetaType> {
@@ -64,8 +64,8 @@ public class ColumnFieldParser extends AbstractFieldParser<ColumnFieldMetaType> 
       final GeneratedValue generatedValue = field.getAnnotation(GeneratedValue.class);
       if (generatedValue != null) {
         try {
-          final SequenceModelEnum sequenceModel = SequenceModelEnum.findSequenceModel(Class.forName(columnMetaType.getFieldType()
-                                                                                                                  .getDeserializationTypeCanonicalName()));
+          final SequenceModel sequenceModel = SequenceModel.findSequenceModel(Class.forName(columnMetaType.getFieldType()
+                                                                                                          .getDeserializationTypeCanonicalName()));
           if (sequenceModel != null) {
             columnMetaType.setSequenceModel(sequenceModel);
           } else {

@@ -9,6 +9,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import ma.markware.charybdis.model.exception.CharybdisUnknownTypeException;
 
 public class DataTypeMapper {
 
@@ -35,6 +36,9 @@ public class DataTypeMapper {
   }
 
   public static DataType getDataType(final Class clazz) {
-    return dataTypeMap.get(clazz);
+    if (dataTypeMap.containsKey(clazz)) {
+      return dataTypeMap.get(clazz);
+    }
+    throw new CharybdisUnknownTypeException(String.format("Unknown type '%s' to DB, make sure to declare this class as user-defined type (@Udt)", clazz));
   }
 }

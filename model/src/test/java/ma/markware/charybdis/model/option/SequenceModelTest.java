@@ -9,14 +9,14 @@ class SequenceModelTest {
 
   @Test
   void generateUuidValue() {
-    SequenceModelEnum sequenceModelUuid = SequenceModelEnum.UUID;
+    SequenceModel sequenceModelUuid = SequenceModel.UUID;
     assertThat(sequenceModelUuid.getSupportedClass()).isEqualTo(UUID.class);
     assertThat(sequenceModelUuid.getGenerationMethod().get()).isInstanceOf(UUID.class);
   }
 
   @Test
   void findSequenceModelTest() {
-    assertThat(SequenceModelEnum.findSequenceModel(UUID.class)).isEqualTo(SequenceModelEnum.UUID);
-    assertThat(SequenceModelEnum.findSequenceModel(Integer.class)).isNull();
+    assertThat(SequenceModel.findSequenceModel(UUID.class)).isEqualTo(SequenceModel.UUID);
+    assertThat(SequenceModel.findSequenceModel(Integer.class)).isNull();
   }
 }
