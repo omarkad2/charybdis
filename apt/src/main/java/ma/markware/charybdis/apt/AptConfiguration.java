@@ -3,20 +3,20 @@ package ma.markware.charybdis.apt;
 import ma.markware.charybdis.apt.metatype.KeyspaceMetaType;
 import ma.markware.charybdis.apt.metatype.TableMetaType;
 import ma.markware.charybdis.apt.metatype.UdtMetaType;
-import ma.markware.charybdis.apt.parser.Parser;
-import ma.markware.charybdis.apt.serializer.Serializer;
+import ma.markware.charybdis.apt.parser.EntityParser;
+import ma.markware.charybdis.apt.serializer.EntitySerializer;
 
-interface AptConfiguration {
+public interface AptConfiguration {
 
-  Parser<KeyspaceMetaType> getKeyspaceParser();
+  EntityParser<KeyspaceMetaType> getKeyspaceParser();
 
-  Parser<UdtMetaType> getUdtParser();
+  EntityParser<UdtMetaType> getUdtParser();
 
-  Parser<TableMetaType> getTableParser();
+  EntityParser<TableMetaType> getTableParser();
 
-  Serializer<KeyspaceMetaType> getKeyspaceSerializer();
+  EntitySerializer<KeyspaceMetaType> getKeyspaceSerializer();
 
-  Serializer<UdtMetaType> getUdtSerializer();
+  EntitySerializer<UdtMetaType> getUdtSerializer();
 
-  Serializer<TableMetaType> getTableSerializer();
+  EntitySerializer<TableMetaType> getTableSerializer();
 }

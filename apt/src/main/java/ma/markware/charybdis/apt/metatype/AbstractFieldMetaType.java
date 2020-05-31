@@ -1,69 +1,47 @@
 package ma.markware.charybdis.apt.metatype;
 
-import java.util.List;
-import javax.lang.model.type.TypeMirror;
-import ma.markware.charybdis.apt.metatype.TypeDetail.TypeDetailEnum;
+import ma.markware.charybdis.apt.metatype.FieldTypeMetaType.FieldTypeKind;
 
 public class AbstractFieldMetaType {
 
-  private String fieldName;
-  private TypeMirror typeMirror;
-  private TypeDetail fieldType;
-  private List<TypeDetail> fieldSubTypes;
-  private boolean frozen;
+  private String deserializationName;
+  private String serializationName;
+  private FieldTypeMetaType fieldType;
   private String getterName;
   private String setterName;
 
   public AbstractFieldMetaType() {}
 
   AbstractFieldMetaType(AbstractFieldMetaType abstractFieldMetaType) {
-    this.fieldName = abstractFieldMetaType.fieldName;
-    this.typeMirror = abstractFieldMetaType.typeMirror;
+    this.deserializationName = abstractFieldMetaType.deserializationName;
+    this.serializationName = abstractFieldMetaType.serializationName;
     this.fieldType = abstractFieldMetaType.fieldType;
-    this.fieldSubTypes = abstractFieldMetaType.fieldSubTypes;
-    this.frozen = abstractFieldMetaType.frozen;
     this.getterName = abstractFieldMetaType.getterName;
     this.setterName = abstractFieldMetaType.setterName;
   }
 
-  public String getFieldName() {
-    return fieldName;
+  public String getDeserializationName() {
+    return deserializationName;
   }
 
-  public void setFieldName(final String fieldName) {
-    this.fieldName = fieldName;
+  public void setDeserializationName(final String deserializationName) {
+    this.deserializationName = deserializationName;
   }
 
-  public TypeMirror getTypeMirror() {
-    return typeMirror;
+  public String getSerializationName() {
+    return serializationName;
   }
 
-  public void setTypeMirror(final TypeMirror typeMirror) {
-    this.typeMirror = typeMirror;
+  public void setSerializationName(final String serializationName) {
+    this.serializationName = serializationName;
   }
 
-  public TypeDetail getFieldType() {
+  public FieldTypeMetaType getFieldType() {
     return fieldType;
   }
 
-  public void setFieldType(final TypeDetail fieldType) {
+  public void setFieldType(final FieldTypeMetaType fieldType) {
     this.fieldType = fieldType;
-  }
-
-  public List<TypeDetail> getFieldSubTypes() {
-    return fieldSubTypes;
-  }
-
-  public void setFieldSubTypes(final List<TypeDetail> fieldSubTypes) {
-    this.fieldSubTypes = fieldSubTypes;
-  }
-
-  public boolean isFrozen() {
-    return frozen;
-  }
-
-  public void setFrozen(final boolean frozen) {
-    this.frozen = frozen;
   }
 
   public String getGetterName() {
@@ -83,18 +61,18 @@ public class AbstractFieldMetaType {
   }
 
   public boolean isUdt() {
-    return fieldType.getTypeDetailEnum() == TypeDetailEnum.UDT;
+    return fieldType.getFieldTypeKind() == FieldTypeKind.UDT;
   }
 
   public boolean isMap() {
-    return fieldType.getTypeDetailEnum() == TypeDetailEnum.MAP;
+    return fieldType.getFieldTypeKind() == FieldTypeKind.MAP;
   }
 
   public boolean isList() {
-    return fieldType.getTypeDetailEnum() == TypeDetailEnum.LIST;
+    return fieldType.getFieldTypeKind() == FieldTypeKind.LIST;
   }
 
   public boolean isSet() {
-    return fieldType.getTypeDetailEnum() == TypeDetailEnum.SET;
+    return fieldType.getFieldTypeKind() == FieldTypeKind.SET;
   }
 }

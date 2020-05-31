@@ -89,7 +89,7 @@ public class UpdateImpl implements UpdateInitExpression, UpdateTtlExpression, Up
   }
 
   @Override
-  public <T> UpdateExtraAssignmentExpression set(final UdtNestedField<T> field, final T value) {
+  public <T, V> UpdateExtraAssignmentExpression set(final UdtNestedField<T, V> field, final T value) {
     updateQuery.setAssignment(field, value);
     return this;
   }

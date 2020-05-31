@@ -13,6 +13,7 @@ final class SerializationConstants {
   static final String UDT_FIELD = "udt";
   static final String GET_KEYSPACE_NAME_METHOD = "getKeyspaceName";
   static final String GET_UDT_NAME_METHOD = "getUdtName";
+  static final String GET_UDT_FIELD_DATA_TYPE_METHOD = "getDataType";
   static final String GET_TABLE_NAME_METHOD = "getTableName";
   static final String GET_NAME_METHOD = "getName";
   static final String GET_FIELD_CLASS_METHOD = "getFieldClass";

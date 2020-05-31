@@ -2,25 +2,28 @@ package ma.markware.charybdis.model.field.metadata;
 
 import com.datastax.oss.driver.api.core.cql.Row;
 import com.datastax.oss.driver.api.core.data.UdtValue;
+import com.datastax.oss.driver.api.core.type.DataType;
 import ma.markware.charybdis.model.field.Field;
 import ma.markware.charybdis.model.field.entry.UdtFieldEntry;
 
-public interface UdtFieldMetadata<T> extends Field {
+public interface UdtFieldMetadata<T, V> extends Field {
 
   T deserialize(UdtValue udtValue);
 
-  T deserialize(String path, Row row);
+  T deserialize(Row row, String path);
 
-  Object serialize(T field);
+  V serialize(T field);
 
   Class<T> getFieldClass();
 
-  default <U> UdtFieldEntry<U> entry(UdtFieldEntry<U> udtFieldEntry) {
+  DataType getDataType();
+
+  default <U, K> UdtFieldEntry<U, K> entry(UdtFieldEntry<U, K> udtFieldEntry) {
     return udtFieldEntry.add(this);
   }
 
-  default <U> UdtFieldEntry<U> entry(UdtFieldMetadata<U> udtFieldMetadata) {
-    UdtFieldEntry<U> udtFieldEntry = new UdtFieldEntry<>(udtFieldMetadata);
+  default <U, K> UdtFieldEntry<U, K> entry(UdtFieldMetadata<U, K> udtFieldMetadata) {
+    UdtFieldEntry<U, K> udtFieldEntry = new UdtFieldEntry<>(udtFieldMetadata);
     udtFieldEntry.add(this);
     return udtFieldEntry;
   }

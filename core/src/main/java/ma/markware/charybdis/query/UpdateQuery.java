@@ -72,7 +72,7 @@ public class UpdateQuery extends AbstractQuery {
     assignmentClauses.add(AssignmentClause.from(listNestedField, value));
   }
 
-  public <T> void setAssignment(UdtNestedField<T> udtNestedField, T value) {
+  public <T, V> void setAssignment(UdtNestedField<T, V> udtNestedField, T value) {
     assignmentClauses.add(AssignmentClause.from(udtNestedField, value));
   }
 

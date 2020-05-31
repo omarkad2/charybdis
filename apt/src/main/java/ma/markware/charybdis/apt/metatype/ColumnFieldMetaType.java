@@ -5,7 +5,6 @@ import ma.markware.charybdis.model.option.SequenceModelEnum;
 
 public class ColumnFieldMetaType extends AbstractFieldMetaType {
 
-  private String columnName;
   private boolean isPartitionKey;
   private Integer partitionKeyIndex;
   private boolean isClusteringKey;
@@ -19,14 +18,6 @@ public class ColumnFieldMetaType extends AbstractFieldMetaType {
 
   public ColumnFieldMetaType(AbstractFieldMetaType abstractFieldMetaType) {
     super(abstractFieldMetaType);
-  }
-
-  public String getColumnName() {
-    return columnName;
-  }
-
-  public void setColumnName(final String columnName) {
-    this.columnName = columnName;
   }
 
   public boolean isPartitionKey() {

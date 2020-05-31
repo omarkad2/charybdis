@@ -24,6 +24,7 @@ import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import javax.annotation.processing.AbstractProcessor;
+import javax.annotation.processing.Filer;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.SourceVersion;
@@ -42,21 +43,23 @@ import org.junit.jupiter.api.extension.ParameterResolutionException;
 import org.junit.jupiter.api.extension.ParameterResolver;
 
 public class CompilationExtension implements BeforeAllCallback, BeforeEachCallback, AfterAllCallback, AfterEachCallback, ParameterResolver {
+
   private static final JavaFileObject DUMMY =
       JavaFileObjects.forSourceLines("Dummy", "final class Dummy {}");
   private static final ExtensionContext.Namespace NAMESPACE =
       ExtensionContext.Namespace.create(CompilationExtension.class);
 
   private static final Executor DEFAULT_COMPILER_EXECUTOR = Executors.newCachedThreadPool(
-      new ThreadFactoryBuilder().setDaemon(true).setNameFormat("async-compiler-%d").build()
+      new ThreadFactoryBuilder().setDaemon(true).setNameFormat("charybdis-async-compiler-%d").build()
   );
 
   private static final Map<Class<?>, Function<ProcessingEnvironment, ?>> SUPPORTED_PARAMETERS;
 
   static {
     SUPPORTED_PARAMETERS = new HashMap<>();
-    SUPPORTED_PARAMETERS.put(Elements.class, ProcessingEnvironment::getElementUtils);
     SUPPORTED_PARAMETERS.put(Types.class, ProcessingEnvironment::getTypeUtils);
+    SUPPORTED_PARAMETERS.put(Elements.class, ProcessingEnvironment::getElementUtils);
+    SUPPORTED_PARAMETERS.put(Filer.class, ProcessingEnvironment::getFiler);
   }
 
   private final Executor compilerExecutor;

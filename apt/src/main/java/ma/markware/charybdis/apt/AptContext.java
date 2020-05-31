@@ -21,7 +21,7 @@ public class AptContext {
   List<UdtMetaType> udtMetaTypes;
   List<TableMetaType> tableMetaTypes;
 
-  void init(final RoundEnvironment roundEnv, final AptConfiguration configuration) {
+  public void init(final RoundEnvironment roundEnv, final AptConfiguration configuration) {
     keyspaceNames = new HashSet<>();
     udtContexts = new HashMap<>();
 

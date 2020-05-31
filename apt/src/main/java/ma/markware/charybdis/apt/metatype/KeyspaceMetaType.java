@@ -2,17 +2,12 @@ package ma.markware.charybdis.apt.metatype;
 
 import ma.markware.charybdis.model.option.Replication;
 
-public class KeyspaceMetaType extends AbstractClassMetaType {
+public class KeyspaceMetaType extends AbstractEntityMetaType {
 
-  private String keyspaceName;
   private Replication replication;
 
-  public String getKeyspaceName() {
-    return keyspaceName;
-  }
-
-  public void setKeyspaceName(final String keyspaceName) {
-    this.keyspaceName = keyspaceName;
+  public KeyspaceMetaType(final AbstractEntityMetaType abstractEntityMetaType) {
+    super(abstractEntityMetaType);
   }
 
   public Replication getReplication() {

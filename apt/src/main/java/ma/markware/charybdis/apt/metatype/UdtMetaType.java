@@ -2,18 +2,13 @@ package ma.markware.charybdis.apt.metatype;
 
 import java.util.List;
 
-public class UdtMetaType extends AbstractClassMetaType {
+public class UdtMetaType extends AbstractEntityMetaType {
 
-  private String keyspaceName;
   private String udtName;
   private List<UdtFieldMetaType> udtFields;
 
-  public String getKeyspaceName() {
-    return keyspaceName;
-  }
-
-  public void setKeyspaceName(final String keyspaceName) {
-    this.keyspaceName = keyspaceName;
+  public UdtMetaType(final AbstractEntityMetaType abstractEntityMetaType) {
+    super(abstractEntityMetaType);
   }
 
   public String getUdtName() {

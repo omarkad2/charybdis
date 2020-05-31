@@ -77,8 +77,9 @@ public class DockerizedCassandra implements AutoCloseable {
     }
 
     if (!connection) {
-      throw new IllegalStateException("Couldn't establish connexion with cassandra instance");
+      throw new IllegalStateException("Couldn't establish connection with cassandra instance");
     }
+    logger.info("Connection established with success");
   }
 
   @Override

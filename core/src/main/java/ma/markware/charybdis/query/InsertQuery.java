@@ -31,6 +31,7 @@ public class InsertQuery extends AbstractQuery {
   public void setTable(TableMetadata tableMetadata) {
     this.keyspace = tableMetadata.getKeyspaceName();
     this.table = tableMetadata.getTableName();
+    columnNameValueMapping.setTableMetadata(tableMetadata);
   }
 
   public void setTableAndColumns(TableMetadata tableMetadata, ColumnMetadata... columns) {
@@ -53,7 +54,7 @@ public class InsertQuery extends AbstractQuery {
   }
 
   public <T> void setSet(ColumnMetadata<T> columnMetadata, T value) {
-    columnNameValueMapping.setColumnNameAndValue(columnMetadata.getName(), value);
+    columnNameValueMapping.setColumnNameAndValue(columnMetadata.getName(), columnMetadata.serialize(value));
   }
 
   public void enableIfNotExists() {
@@ -105,8 +106,13 @@ public class InsertQuery extends AbstractQuery {
 
   public static final class ColumnNameValueMapping {
 
+    private TableMetadata tableMetadata;
     private int lastIndex = -1;
     private Map<Integer, Pair<String, Object>> columnNameValuePairs = new HashMap<>();
+
+    public void setTableMetadata(final TableMetadata tableMetadata) {
+      this.tableMetadata = tableMetadata;
+    }
 
     void setColumnNameAndValue(String columnName, Object value) {
       columnNameValuePairs.put(lastIndex++, Pair.of(columnName, value));
@@ -121,7 +127,9 @@ public class InsertQuery extends AbstractQuery {
       if (columnNameValuePair == null || StringUtils.isBlank(columnNameValuePair.getLeft())) {
         throw new IllegalStateException(format("Cannot bind value in position '%d' with a column", index));
       }
-      columnNameValuePair = Pair.of(columnNameValuePair.getLeft(), value);
+      String columnName = columnNameValuePair.getLeft();
+      ColumnMetadata columnMetadata = tableMetadata.getColumnMetadata(columnName);
+      columnNameValuePair = Pair.of(columnName, columnMetadata.serialize(value));
       columnNameValuePairs.put(index, columnNameValuePair);
     }
 
