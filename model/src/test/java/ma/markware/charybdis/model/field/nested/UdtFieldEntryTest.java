@@ -65,7 +65,7 @@ class UdtFieldEntryTest {
   }
 
   @Test
-  void create_nested_field() {
+  void testNestedFieldCreation() {
     assertThat(udtNestedField.getSourceColumn()).isEqualTo(udtColumnMetadata);
     assertThat(udtNestedField.getEntry()).isEqualTo(CustomUdt_Udt.name);
     assertThat(udtNestedField.getName()).isEqualTo("udtColumn.name");

@@ -3,8 +3,12 @@ package ma.markware.charybdis.model.field.nested;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
+import com.datastax.oss.driver.api.core.CqlIdentifier;
 import com.datastax.oss.driver.api.core.cql.Row;
 import com.datastax.oss.driver.api.querybuilder.QueryBuilder;
+import com.datastax.oss.driver.api.querybuilder.select.Selector;
+import com.datastax.oss.driver.internal.querybuilder.select.ColumnSelector;
+import com.datastax.oss.driver.internal.querybuilder.select.ElementSelector;
 import java.util.Map;
 import ma.markware.charybdis.model.exception.CharybdisUnsupportedExpressionException;
 import ma.markware.charybdis.model.field.metadata.MapColumnMetadata;
@@ -47,7 +51,7 @@ class MapNestedFieldTest {
   }
 
   @Test
-  void create_nested_field() {
+  void testNestedFieldCreation() {
     assertThat(mapNestedField.getSourceColumn()).isEqualTo(mapColumnMetadata);
     assertThat(mapNestedField.getEntry()).isEqualTo("key1");
     assertThat(mapNestedField.getName()).isEqualTo("mapColumn['key1']");
@@ -56,6 +60,14 @@ class MapNestedFieldTest {
   @Test
   void serialize() {
     assertThat(mapNestedField.serialize("value")).isEqualTo("value");
+  }
+
+  @Test
+  void toDeletableSelector() {
+    Selector selector = mapNestedField.toDeletableSelector();
+    assertThat(selector).isInstanceOf(ElementSelector.class);
+    assertThat(((ElementSelector) selector).getCollection()).isInstanceOf(ColumnSelector.class);
+    assertThat(((ColumnSelector) ((ElementSelector) selector).getCollection()).getColumnId()).isEqualTo(CqlIdentifier.fromCql("mapColumn"));
   }
 
   @Test
