@@ -1,6 +1,7 @@
 package ma.markware.charybdis.apt.serializer;
 
 import static java.util.Arrays.asList;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -17,12 +18,18 @@ import ma.markware.charybdis.apt.AptConfiguration;
 import ma.markware.charybdis.apt.AptContext;
 import ma.markware.charybdis.apt.AptDefaultConfiguration;
 import ma.markware.charybdis.apt.CompilationExtension;
+import ma.markware.charybdis.apt.exception.CharybdisSerializationException;
+import ma.markware.charybdis.apt.metatype.ColumnFieldMetaType;
+import ma.markware.charybdis.apt.metatype.FieldTypeMetaType;
+import ma.markware.charybdis.apt.metatype.FieldTypeMetaType.FieldTypeKind;
 import ma.markware.charybdis.apt.metatype.TableMetaType;
 import ma.markware.charybdis.model.annotation.Udt;
 import ma.markware.charybdis.test.entities.TestEntity;
 import ma.markware.charybdis.test.entities.TestKeyspaceDefinition;
 import ma.markware.charybdis.test.entities.TestNestedUdt;
 import ma.markware.charybdis.test.entities.TestUdt;
+import ma.markware.charybdis.test.entities.invalid.TestEntityWithUnknownUdt;
+import ma.markware.charybdis.test.entities.invalid.TestUnknownUdt;
 import ma.markware.charybdis.test.metadata.TestEntity_Table;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -41,6 +48,7 @@ class TableSerializerTest {
   @Mock
   private Filer filer;
 
+  private AptContext aptContext;
   private AptConfiguration configuration;
   private TableMetaType tableMetaType;
 
@@ -53,7 +61,7 @@ class TableSerializerTest {
     Set elementsAnnotatedWithUdt = new HashSet<>(asList(testNestedUdtElement, testUdtElement));
     when(roundEnvironment.getElementsAnnotatedWith(Udt.class)).thenReturn(elementsAnnotatedWithUdt);
 
-    AptContext aptContext = new AptContext();
+    aptContext = new AptContext();
     configuration = AptDefaultConfiguration.initConfig(aptContext, types, elements, filer);
     aptContext.init(roundEnvironment, configuration);
 
@@ -75,5 +83,21 @@ class TableSerializerTest {
 
     // Then
     SerializerTestHelper.assertThatFileIsGeneratedAsExpected(TestEntity_Table.class, generatedFileWriter.toString());
+  }
+
+  @Test
+  void should_throw_exception_when_udt_context_not_found(Elements elements) {
+    TableMetaType tableWithUnknownUdtMetaType = configuration.getTableParser()
+                                       .parse(elements.getTypeElement(TestEntityWithUnknownUdt.class.getCanonicalName()));
+    for (final ColumnFieldMetaType column : tableWithUnknownUdtMetaType.getColumns()) {
+      FieldTypeMetaType fieldType = column.getFieldType();
+      if (fieldType.getDeserializationTypeCanonicalName().equals(TestUnknownUdt.class.getCanonicalName())) {
+        fieldType.setFieldTypeKind(FieldTypeKind.UDT);
+      }
+    }
+
+    assertThatExceptionOfType(CharybdisSerializationException.class)
+        .isThrownBy(() -> configuration.getTableSerializer().serialize(tableWithUnknownUdtMetaType))
+        .withMessage("Field 'udt' has a user defined type, yet the type metadata is not found");
   }
 }

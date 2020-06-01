@@ -1,4 +1,4 @@
-package ma.markware.charybdis.test.entities.temp;
+package ma.markware.charybdis.apt.entities;
 
 import java.time.Instant;
 import java.util.List;
@@ -14,7 +14,7 @@ import ma.markware.charybdis.model.annotation.PartitionKey;
 import ma.markware.charybdis.model.annotation.Table;
 import ma.markware.charybdis.model.option.ClusteringOrder;
 
-@Table(keyspace = "test_keyspace", name = "user")
+@Table(keyspace = "test_apt_keyspace", name = "user")
 public class User extends AbstractUser {
 
   @Column

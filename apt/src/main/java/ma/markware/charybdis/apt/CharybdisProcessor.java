@@ -70,6 +70,10 @@ public class CharybdisProcessor extends AbstractProcessor {
     return ALLOW_OTHER_PROCESSORS_TO_CLAIM_ANNOTATIONS;
   }
 
+  public AptContext getAptContext() {
+    return aptContext;
+  }
+
   private void parse(final RoundEnvironment roundEnv) {
 
     aptContext.keyspaceMetaTypes.addAll(parseKeyspaceClasses(roundEnv.getElementsAnnotatedWith(Keyspace.class), aptConfiguration.getKeyspaceParser()));

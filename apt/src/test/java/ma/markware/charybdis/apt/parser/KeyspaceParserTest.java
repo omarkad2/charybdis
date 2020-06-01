@@ -64,7 +64,7 @@ class KeyspaceParserTest {
 
   @Test
   @DisplayName("Compilation should fail if two keyspaces have the same name")
-  void compilation_fails_when_duplicate_keyspace_name(Elements elements) throws IOException {
+  void should_throw_exception_when_duplicate_keyspace_name(Elements elements) throws IOException {
     configuration.getKeyspaceParser().parse(keyspaceTypeElement);
     assertThatExceptionOfType(CharybdisParsingException.class)
         .isThrownBy(() -> configuration.getKeyspaceParser()

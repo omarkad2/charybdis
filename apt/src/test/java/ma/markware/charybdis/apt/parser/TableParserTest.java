@@ -40,6 +40,8 @@ import ma.markware.charybdis.test.entities.TestEnum;
 import ma.markware.charybdis.test.entities.TestKeyspaceDefinition;
 import ma.markware.charybdis.test.entities.TestNestedUdt;
 import ma.markware.charybdis.test.entities.TestUdt;
+import ma.markware.charybdis.test.entities.invalid.TestEntityWithNonFrozenNestedCollectionField;
+import ma.markware.charybdis.test.entities.invalid.TestEntityWithNonFrozenNestedUdtField;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -52,7 +54,7 @@ import org.mockito.MockitoAnnotations;
 
 @TestInstance(Lifecycle.PER_CLASS)
 @ExtendWith({CompilationExtension.class})
-public class TableParserTest {
+class TableParserTest {
 
   @Mock
   private RoundEnvironment roundEnvironment;
@@ -63,6 +65,7 @@ public class TableParserTest {
   private TypeElement testEntityElement;
 
   @BeforeAll
+  @SuppressWarnings("unchecked")
   void setup(Elements elements) {
     MockitoAnnotations.initMocks(this);
     testNestedUdtElement = elements.getTypeElement(TestNestedUdt.class.getCanonicalName());
@@ -201,11 +204,29 @@ public class TableParserTest {
   }
 
   @Test
-  @DisplayName("Compilation should fail if table_has_no_partition_key")
-  void compilation_fails_when_table_has_no_partition_key(Types types, Elements elements) {
+  @DisplayName("Compilation should fail if table has no partition key")
+  void should_throw_exception_when_table_has_no_partition_key(Elements elements) {
     assertThatExceptionOfType(CharybdisParsingException.class)
         .isThrownBy(() -> configuration.getTableParser()
                                     .parse(elements.getTypeElement(TestEntityWithNoPartitionKey.class.getCanonicalName())))
         .withMessage("There should be at least one partition key defined for the table 'test_entity_no_partition_key'");
+  }
+
+  @Test
+  @DisplayName("Compilation should fail if nested collection type not frozen")
+  void should_throw_exception_when_nested_collection_field_not_frozen(Elements elements) {
+    assertThatExceptionOfType(CharybdisParsingException.class)
+        .isThrownBy(() -> configuration.getTableParser()
+                                       .parse(elements.getTypeElement(TestEntityWithNonFrozenNestedCollectionField.class.getCanonicalName())))
+        .withMessage("Error while parsing field 'shouldBeFrozenField'");
+  }
+
+  @Test
+  @DisplayName("Compilation should fail if nested user-defined type not frozen")
+  void should_throw_exception_when_nested_udt_field_not_frozen(Elements elements) {
+    assertThatExceptionOfType(CharybdisParsingException.class)
+        .isThrownBy(() -> configuration.getTableParser()
+                                       .parse(elements.getTypeElement(TestEntityWithNonFrozenNestedUdtField.class.getCanonicalName())))
+        .withMessage("Error while parsing field 'shouldBeFrozenField'");
   }
 }

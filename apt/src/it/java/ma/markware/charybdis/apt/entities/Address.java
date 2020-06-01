@@ -1,10 +1,10 @@
-package ma.markware.charybdis.test.entities.temp;
+package ma.markware.charybdis.apt.entities;
 
 import ma.markware.charybdis.model.annotation.Frozen;
 import ma.markware.charybdis.model.annotation.Udt;
 import ma.markware.charybdis.model.annotation.UdtField;
 
-@Udt(keyspace = "test_keyspace", name = "address")
+@Udt(keyspace = "test_apt_keyspace", name = "address")
 public class Address {
 
   @UdtField

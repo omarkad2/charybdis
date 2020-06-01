@@ -7,8 +7,4 @@ public class CharybdisFieldTypeParsingException extends RuntimeException {
   public CharybdisFieldTypeParsingException(String message) {
     super(message);
   }
-
-  public CharybdisFieldTypeParsingException(String message, Throwable throwable) {
-    super(message, throwable);
-  }
 }

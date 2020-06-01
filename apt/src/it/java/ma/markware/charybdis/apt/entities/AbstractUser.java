@@ -1,4 +1,4 @@
-package ma.markware.charybdis.test.entities.temp;
+package ma.markware.charybdis.apt.entities;
 
 import java.time.Instant;
 import ma.markware.charybdis.model.annotation.Column;

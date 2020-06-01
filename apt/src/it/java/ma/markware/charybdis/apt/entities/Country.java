@@ -1,9 +1,9 @@
-package ma.markware.charybdis.test.entities.temp;
+package ma.markware.charybdis.apt.entities;
 
 import ma.markware.charybdis.model.annotation.Udt;
 import ma.markware.charybdis.model.annotation.UdtField;
 
-@Udt(keyspace = "test_keyspace", name = "country")
+@Udt(keyspace = "test_apt_keyspace", name = "country")
 public class Country {
 
   @UdtField

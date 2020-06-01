@@ -146,7 +146,7 @@ class UdtParserTest {
 
   @Test
   @DisplayName("Compilation should fail if a udt field's getter is missing")
-  void compilation_fails_when_udtField_getter_missing(Elements elements) {
+  void should_throw_exception_when_udtField_getter_missing(Elements elements) {
     assertThatExceptionOfType(CharybdisParsingException.class)
         .isThrownBy(() -> configuration.getUdtParser()
                                     .parse(elements.getTypeElement(TestUdtWithMissingGetter.class.getCanonicalName())))
@@ -155,7 +155,7 @@ class UdtParserTest {
 
   @Test
   @DisplayName("Compilation should fail if a udt field's setter is missing")
-  void compilation_fails_when_udtField_setter_missing(Elements elements) {
+  void should_throw_exception_when_udtField_setter_missing(Elements elements) {
     assertThatExceptionOfType(CharybdisParsingException.class)
         .isThrownBy(() -> configuration.getUdtParser()
                                     .parse(elements.getTypeElement(TestUdtWithMissingSetter.class.getCanonicalName())))
@@ -164,7 +164,7 @@ class UdtParserTest {
 
   @Test
   @DisplayName("Compilation should fail if public no-arg constructor missing")
-  void compilation_fails_when_no_arg_constructor_missing(Elements elements) {
+  void should_throw_exception_when_no_arg_constructor_missing(Elements elements) {
     assertThatExceptionOfType(CharybdisParsingException.class)
         .isThrownBy(() -> configuration.getUdtParser()
                                     .parse(elements.getTypeElement(TestUdtWithMissingPublicConstructor.class.getCanonicalName())))
@@ -173,7 +173,7 @@ class UdtParserTest {
 
   @Test
   @DisplayName("Compilation should fail if udt has another nested udt not 'frozen'")
-  void compilation_fails_when_nested_udt_not_frozen(Elements elements) {
+  void should_throw_exception_when_nested_udt_not_frozen(Elements elements) {
     assertThatExceptionOfType(CharybdisParsingException.class)
         .isThrownBy(() -> configuration.getUdtParser()
                                     .parse(elements.getTypeElement(TestUdtWithNonFrozenNestedUdt.class.getCanonicalName())))

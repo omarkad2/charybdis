@@ -10,6 +10,7 @@ import java.util.UUID;
 import ma.markware.charybdis.model.annotation.ClusteringKey;
 import ma.markware.charybdis.model.annotation.Column;
 import ma.markware.charybdis.model.annotation.Frozen;
+import ma.markware.charybdis.model.annotation.Index;
 import ma.markware.charybdis.model.annotation.PartitionKey;
 import ma.markware.charybdis.model.annotation.Table;
 import ma.markware.charybdis.model.option.ClusteringOrder;
@@ -73,6 +74,7 @@ public class TestEntity extends TestSuperEntity {
   private List<@Frozen List<TestUdt>> udtNestedList;
 
   @Column
+  @Index
   private boolean flag;
 
   public TestEntity() {
