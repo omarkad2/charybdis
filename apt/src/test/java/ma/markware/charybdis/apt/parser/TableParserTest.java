@@ -194,7 +194,7 @@ class TableParserTest {
                                                                                        false, false, false))),
                   "getUdtNestedList", "setUdtNestedList", false, null, false, null, null, false, null, null, false, false),
             tuple("flag", "flag", buildFieldTypeMetaType(TypeName.get(Boolean.class), FieldTypeKind.NORMAL),
-                  "isFlag", "setFlag", false, null, false, null, null, false, null, null, false, false),
+                  "isFlag", "setFlag", false, null, false, null, null, true, "test_entity_flag_idx", null, false, false),
             // Inherited columns
             tuple("creation_date", "creationDate", buildFieldTypeMetaType(TypeName.get(Instant.class), FieldTypeKind.NORMAL),
                   "getCreationDate", "setCreationDate", false, null, false, null, null, false, null, null, true, false),

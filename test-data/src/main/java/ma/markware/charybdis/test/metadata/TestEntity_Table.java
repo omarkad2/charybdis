@@ -578,6 +578,11 @@ public class TestEntity_Table implements TableMetadata<TestEntity> {
     public Boolean deserialize(Row row) {
       return row != null ? row.get("flag", java.lang.Boolean.class) : null;
     }
+
+    @Override
+    public String getIndexName() {
+      return "test_entity_flag_idx";
+    }
   };
 
   public static final ColumnMetadata<Instant> creationDate = new ColumnMetadata<Instant>() {
