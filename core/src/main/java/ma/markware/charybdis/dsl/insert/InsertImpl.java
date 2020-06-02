@@ -18,6 +18,10 @@ public class InsertImpl implements InsertInitExpression, InsertInitWithColumnsEx
     this.insertQuery = new InsertQuery();
   }
 
+  InsertQuery getInsertQuery() {
+    return insertQuery;
+  }
+
   public InsertInitExpression insertInto(TableMetadata tableMetadata) {
     insertQuery.setTable(tableMetadata);
     return this;

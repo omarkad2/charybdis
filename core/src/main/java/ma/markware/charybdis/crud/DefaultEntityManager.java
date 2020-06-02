@@ -1,17 +1,16 @@
-package ma.markware.charybdis;
+package ma.markware.charybdis.crud;
 
 import com.datastax.oss.driver.api.core.CqlSession;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
-import ma.markware.charybdis.crud.CreateEntityManager;
-import ma.markware.charybdis.crud.DeleteEntityManager;
-import ma.markware.charybdis.crud.ReadEntityManager;
-import ma.markware.charybdis.crud.UpdateEntityManager;
 import ma.markware.charybdis.model.criteria.ExtendedCriteriaExpression;
 import ma.markware.charybdis.model.field.metadata.TableMetadata;
 import ma.markware.charybdis.query.PageRequest;
 import ma.markware.charybdis.query.PageResult;
+import ma.markware.charybdis.session.DefaultSessionFactory;
+import ma.markware.charybdis.session.SessionFactory;
+import ma.markware.charybdis.session.StandaloneSessionFactory;
 
 public class DefaultEntityManager implements EntityManager {
 

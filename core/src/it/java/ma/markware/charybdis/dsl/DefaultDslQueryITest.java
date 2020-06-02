@@ -1,4 +1,4 @@
-package ma.markware.charybdis;
+package ma.markware.charybdis.dsl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import ma.markware.charybdis.dsl.Record;
+import ma.markware.charybdis.AbstractIntegrationITest;
 import ma.markware.charybdis.test.entities.TestEntity;
 import ma.markware.charybdis.test.entities.TestEnum;
 import ma.markware.charybdis.test.entities.TestNestedUdt;
@@ -21,13 +21,9 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @TestInstance(Lifecycle.PER_CLASS)
 class DefaultDslQueryITest extends AbstractIntegrationITest {
-
-  private static final Logger logger = LoggerFactory.getLogger(DefaultDslQueryITest.class);
 
   private DslQuery dslQuery;
 
@@ -37,7 +33,7 @@ class DefaultDslQueryITest extends AbstractIntegrationITest {
   }
 
   @Test
-  void test(CqlSession session) {
+  void test() {
 
     // Given
     UUID id = UUID.randomUUID();

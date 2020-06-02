@@ -9,7 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @ExtendWith(DatabaseSetupExtension.class)
-class AbstractIntegrationITest {
+public class AbstractIntegrationITest {
 
   private static final Logger logger = LoggerFactory.getLogger(AbstractIntegrationITest.class);
 

@@ -1,4 +1,4 @@
-package ma.markware.charybdis;
+package ma.markware.charybdis.crud;
 
 import java.time.Instant;
 import java.util.List;

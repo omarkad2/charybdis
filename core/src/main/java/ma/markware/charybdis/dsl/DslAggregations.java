@@ -1,4 +1,4 @@
-package ma.markware.charybdis;
+package ma.markware.charybdis.dsl;
 
 import ma.markware.charybdis.model.field.SelectableField;
 import ma.markware.charybdis.model.field.aggregation.AvgAggregationField;

@@ -1,4 +1,4 @@
-package ma.markware.charybdis;
+package ma.markware.charybdis.crud;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

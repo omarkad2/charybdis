@@ -28,6 +28,30 @@ public class InsertQuery extends AbstractQuery {
   private Long timestamp;
   private boolean ifNotExists;
 
+  public String getKeyspace() {
+    return keyspace;
+  }
+
+  public String getTable() {
+    return table;
+  }
+
+  public ColumnNameValueMapping getColumnNameValueMapping() {
+    return columnNameValueMapping;
+  }
+
+  public Integer getTtl() {
+    return ttl;
+  }
+
+  public Long getTimestamp() {
+    return timestamp;
+  }
+
+  public boolean isIfNotExists() {
+    return ifNotExists;
+  }
+
   public void setTable(TableMetadata tableMetadata) {
     this.keyspace = tableMetadata.getKeyspaceName();
     this.table = tableMetadata.getTableName();
@@ -110,12 +134,16 @@ public class InsertQuery extends AbstractQuery {
     private int lastIndex = -1;
     private Map<Integer, Pair<String, Object>> columnNameValuePairs = new HashMap<>();
 
+    public Map<Integer, Pair<String, Object>> getColumnNameValuePairs() {
+      return columnNameValuePairs;
+    }
+
     public void setTableMetadata(final TableMetadata tableMetadata) {
       this.tableMetadata = tableMetadata;
     }
 
     void setColumnNameAndValue(String columnName, Object value) {
-      columnNameValuePairs.put(lastIndex++, Pair.of(columnName, value));
+      columnNameValuePairs.put(++lastIndex, Pair.of(columnName, value));
     }
 
     void setColumnName(int index, String columnName) {

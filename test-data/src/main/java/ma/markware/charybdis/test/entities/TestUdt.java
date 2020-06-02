@@ -102,19 +102,19 @@ public class TestUdt {
       return false;
     }
     final TestUdt testUdt = (TestUdt) o;
-    return number == testUdt.number && Objects.equals(value, testUdt.value) && Objects.equals(udtNestedList, testUdt.udtNestedList) && Objects.equals(
-        udtNestedNestedSet, testUdt.udtNestedNestedSet) && Objects.equals(udtNestedMap, testUdt.udtNestedMap) && Objects.equals(udtNested,
-                                                                                                                                testUdt.udtNested);
+    return number == testUdt.number && Objects.equals(udtNested, testUdt.udtNested) && Objects.equals(value, testUdt.value) && Objects.equals(
+        udtNestedList, testUdt.udtNestedList) && Objects.equals(udtNestedNestedSet, testUdt.udtNestedNestedSet) && Objects.equals(udtNestedMap,
+                                                                                                                                  testUdt.udtNestedMap);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(number, value, udtNestedList, udtNestedNestedSet, udtNestedMap, udtNested);
+    return Objects.hash(udtNested, number, value, udtNestedList, udtNestedNestedSet, udtNestedMap);
   }
 
   @Override
   public String toString() {
-    return "TestUdt{" + "number=" + number + ", value='" + value + '\'' + ", udtNestedList=" + udtNestedList + ", udtNestedNestedSet="
-        + udtNestedNestedSet + ", udtNestedMap=" + udtNestedMap + ", udtNested=" + udtNested + '}';
+    return "TestUdt{" + "udtNested=" + udtNested + ", number=" + number + ", value='" + value + '\'' + ", udtNestedList=" + udtNestedList
+        + ", udtNestedNestedSet=" + udtNestedNestedSet + ", udtNestedMap=" + udtNestedMap + '}';
   }
 }

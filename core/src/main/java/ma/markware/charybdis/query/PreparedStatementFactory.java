@@ -15,7 +15,7 @@ public class PreparedStatementFactory {
   private static final Map<Session, Map<String, PreparedStatement>> PREPARED_STATEMENT_CACHE = new ConcurrentHashMap<>();
 
   private static String buildKey(final String sessionName, final String query) {
-    return new StringBuilder(sessionName).append("_").append(query).toString();
+    return sessionName + "_" + query;
   }
 
   public static PreparedStatement createPreparedStatement(final CqlSession session, final String query) {

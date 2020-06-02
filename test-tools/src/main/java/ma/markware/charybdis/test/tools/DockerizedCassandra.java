@@ -30,25 +30,29 @@ public class DockerizedCassandra implements AutoCloseable {
   private final BackoffService backoffService;
   private final DockerClient dockerClient;
   private String containerId;
-  private int availablePort;
+  private int port;
   private CqlSession session;
   private boolean connection;
 
   DockerizedCassandra() throws IOException {
     this.dockerClient = DockerClientBuilder.getInstance().build();
     this.backoffService = new BackoffService(10, 10000);
-    this.availablePort = findFreePort();
+    this.port = findFreePort();
   }
 
   public CqlSession getSession() {
     return session;
   }
 
+  public int getPort() {
+    return port;
+  }
+
   void start() {
     ExposedPort tcp = ExposedPort.tcp(CQL_PORT);
 
     Ports portBindings = new Ports();
-    portBindings.bind(tcp, Ports.Binding.bindPort(availablePort));
+    portBindings.bind(tcp, Ports.Binding.bindPort(port));
 
     CreateContainerResponse containerResponse = dockerClient.createContainerCmd(DOCKER_IMAGE_NAME)
                                                             .withExposedPorts(tcp)
@@ -65,7 +69,7 @@ public class DockerizedCassandra implements AutoCloseable {
     while (backoffService.shouldRetry()) {
       try {
         session = CqlSession.builder()
-                            .addContactPoint(new InetSocketAddress(availablePort))
+                            .addContactPoint(new InetSocketAddress(port))
                             .withLocalDatacenter(DEFAULT_DATACENTER)
                             .build();
         backoffService.doNotRetry();

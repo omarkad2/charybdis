@@ -1,4 +1,4 @@
-package ma.markware.charybdis;
+package ma.markware.charybdis.dsl;
 
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.config.DriverExecutionProfile;
@@ -17,6 +17,9 @@ import ma.markware.charybdis.model.field.SelectableField;
 import ma.markware.charybdis.model.field.metadata.ColumnMetadata;
 import ma.markware.charybdis.model.field.metadata.PartitionKeyColumnMetadata;
 import ma.markware.charybdis.model.field.metadata.TableMetadata;
+import ma.markware.charybdis.session.DefaultSessionFactory;
+import ma.markware.charybdis.session.SessionFactory;
+import ma.markware.charybdis.session.StandaloneSessionFactory;
 
 public class DefaultDslQuery implements DslQuery {
 

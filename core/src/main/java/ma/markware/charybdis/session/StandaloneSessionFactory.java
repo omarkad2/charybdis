@@ -1,4 +1,4 @@
-package ma.markware.charybdis;
+package ma.markware.charybdis.session;
 
 import com.datastax.oss.driver.api.core.CqlSession;
 

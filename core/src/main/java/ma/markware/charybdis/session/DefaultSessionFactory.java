@@ -1,4 +1,4 @@
-package ma.markware.charybdis;
+package ma.markware.charybdis.session;
 
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.config.DriverConfigLoader;
@@ -19,7 +19,10 @@ public class DefaultSessionFactory implements SessionFactory {
 
   @Override
   public CqlSession getSession() {
-    return currentSession != null ? currentSession : CqlSession.builder().withConfigLoader(driverConfigLoader).build();
+    if (currentSession == null) {
+      currentSession = CqlSession.builder().withConfigLoader(driverConfigLoader).build();
+    }
+    return currentSession;
   }
 
   @Override
@@ -27,5 +30,9 @@ public class DefaultSessionFactory implements SessionFactory {
     if (currentSession != null) {
       currentSession.close();
     }
+  }
+
+  public DriverConfigLoader getDriverConfigLoader() {
+    return driverConfigLoader;
   }
 }

@@ -1,4 +1,4 @@
-package ma.markware.charybdis;
+package ma.markware.charybdis.dsl;
 
 import com.datastax.oss.driver.api.core.config.DriverExecutionProfile;
 import ma.markware.charybdis.dsl.delete.DeleteInitExpression;
