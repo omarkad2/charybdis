@@ -1,10 +1,8 @@
 package ma.markware.charybdis.dsl.insert;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.verify;
 
 import com.datastax.oss.driver.api.core.CqlSession;
-import com.datastax.oss.driver.api.core.cql.Statement;
 import com.google.common.collect.ImmutableMap;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -22,7 +20,6 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -138,11 +135,11 @@ class InsertImplTest {
     List<String> stringList = Arrays.asList("value1", "value2");
     insertImpl.insertInto(TestEntity_Table.test_entity, TestEntity_Table.id, TestEntity_Table.date, TestEntity_Table.list, TestEntity_Table.udt)
               .values(uuid, now, stringList, udt1)
-              .usingTimestamp(now.plus(1, ChronoUnit.YEARS));
+              .usingTimestamp(now.plus(1, ChronoUnit.DAYS));
 
     InsertQuery insertQuery = insertImpl.getInsertQuery();
 
-    assertThat(insertQuery.getTimestamp()).isEqualTo(now.plus(1, ChronoUnit.YEARS).toEpochMilli());
+    assertThat(insertQuery.getTimestamp()).isEqualTo(now.plus(1, ChronoUnit.DAYS).toEpochMilli());
   }
 
   @Test
@@ -152,28 +149,10 @@ class InsertImplTest {
     List<String> stringList = Arrays.asList("value1", "value2");
     insertImpl.insertInto(TestEntity_Table.test_entity, TestEntity_Table.id, TestEntity_Table.date, TestEntity_Table.list, TestEntity_Table.udt)
               .values(uuid, now, stringList, udt1)
-              .usingTimestamp(now.plus(1, ChronoUnit.YEARS).toEpochMilli());
+              .usingTimestamp(now.plus(1, ChronoUnit.DAYS).toEpochMilli());
 
     InsertQuery insertQuery = insertImpl.getInsertQuery();
 
-    assertThat(insertQuery.getTimestamp()).isEqualTo(now.plus(1, ChronoUnit.YEARS).toEpochMilli());
-  }
-
-  @Test
-  void execute() {
-
-    UUID uuid = UUID.randomUUID();
-    Instant now = Instant.now();
-    List<String> stringList = Arrays.asList("value1", "value2");
-    insertImpl.insertInto(TestEntity_Table.test_entity, TestEntity_Table.id, TestEntity_Table.date, TestEntity_Table.list, TestEntity_Table.udt)
-              .values(uuid, now, stringList, udt1)
-              .execute();
-
-    ArgumentCaptor<Statement> statement = ArgumentCaptor.forClass(Statement.class);
-    verify(session).execute(statement.capture());
-
-
-
-    assertThat(statement).isNotNull();
+    assertThat(insertQuery.getTimestamp()).isEqualTo(now.plus(1, ChronoUnit.DAYS).toEpochMilli());
   }
 }

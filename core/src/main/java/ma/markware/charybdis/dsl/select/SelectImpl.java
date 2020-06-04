@@ -7,13 +7,13 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import ma.markware.charybdis.dsl.OrderExpression;
 import ma.markware.charybdis.dsl.Record;
 import ma.markware.charybdis.dsl.utils.RecordUtils;
 import ma.markware.charybdis.model.criteria.CriteriaExpression;
 import ma.markware.charybdis.model.field.SelectableField;
 import ma.markware.charybdis.model.field.metadata.PartitionKeyColumnMetadata;
 import ma.markware.charybdis.model.field.metadata.TableMetadata;
+import ma.markware.charybdis.model.order.OrderExpression;
 import ma.markware.charybdis.query.PageRequest;
 import ma.markware.charybdis.query.PageResult;
 import ma.markware.charybdis.query.SelectQuery;
@@ -28,6 +28,10 @@ public class SelectImpl implements SelectInitExpression, SelectWhereExpression, 
   public SelectImpl(final CqlSession session) {
     this.session = session;
     this.selectQuery = new SelectQuery();
+  }
+
+  SelectQuery getSelectQuery() {
+    return selectQuery;
   }
 
   public SelectInitExpression select(final SelectableField... fields) {

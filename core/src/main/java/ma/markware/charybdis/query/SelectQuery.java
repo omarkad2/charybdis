@@ -15,16 +15,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import ma.markware.charybdis.dsl.OrderExpression;
 import ma.markware.charybdis.model.criteria.CriteriaExpression;
 import ma.markware.charybdis.model.field.SelectableField;
 import ma.markware.charybdis.model.field.metadata.PartitionKeyColumnMetadata;
 import ma.markware.charybdis.model.field.metadata.TableMetadata;
+import ma.markware.charybdis.model.order.OrderExpression;
 import ma.markware.charybdis.query.clause.WhereClause;
 
 public class SelectQuery extends AbstractQuery {
 
-  private static final List<Selector> SELECT_ALL = Collections.singletonList(AllSelector.INSTANCE);
+  public static final List<Selector> SELECT_ALL = Collections.singletonList(AllSelector.INSTANCE);
 
   private String keyspace;
   private String table;
@@ -35,6 +35,42 @@ public class SelectQuery extends AbstractQuery {
   private Integer limit;
   private boolean allowFiltering;
   private PageRequest pageRequest;
+
+  public String getKeyspace() {
+    return keyspace;
+  }
+
+  public String getTable() {
+    return table;
+  }
+
+  public boolean isDistinct() {
+    return isDistinct;
+  }
+
+  public List<Selector> getSelectors() {
+    return selectors;
+  }
+
+  public List<WhereClause> getWhereClauses() {
+    return whereClauses;
+  }
+
+  public Map<String, ClusteringOrder> getOrderings() {
+    return orderings;
+  }
+
+  public Integer getLimit() {
+    return limit;
+  }
+
+  public boolean isAllowFiltering() {
+    return allowFiltering;
+  }
+
+  public PageRequest getPageRequest() {
+    return pageRequest;
+  }
 
   public void setTable(TableMetadata tableMetadata) {
     this.keyspace = tableMetadata.getKeyspaceName();

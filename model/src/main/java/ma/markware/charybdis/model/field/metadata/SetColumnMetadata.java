@@ -10,7 +10,7 @@ import ma.markware.charybdis.model.criteria.CriteriaOperator;
 
 public interface SetColumnMetadata<T> extends CollectionColumnMetadata<Set<T>> {
 
-  default CriteriaExpression contains(org.apache.tinkerpop.gremlin.structure.T value) {
+  default CriteriaExpression contains(T value) {
     return new CriteriaExpression(this, CriteriaOperator.CONTAINS, value);
   }
 

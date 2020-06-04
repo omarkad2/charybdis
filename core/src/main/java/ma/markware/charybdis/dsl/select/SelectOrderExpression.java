@@ -1,6 +1,6 @@
 package ma.markware.charybdis.dsl.select;
 
-import ma.markware.charybdis.dsl.OrderExpression;
+import ma.markware.charybdis.model.order.OrderExpression;
 
 public interface SelectOrderExpression extends SelectLimitExpression {
 
