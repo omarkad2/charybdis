@@ -7,7 +7,6 @@ import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.MethodSpec.Builder;
 import com.squareup.javapoet.ParameterSpec;
 import com.squareup.javapoet.ParameterizedTypeName;
-import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -34,7 +33,8 @@ public class ColumnFieldSerializer extends AbstractFieldSerializer<ColumnFieldMe
   @Override
   public FieldSpec serializeField(final ColumnFieldMetaType columnFieldMetaType) {
     FieldTypeMetaType columnFieldTypeMetaType = columnFieldMetaType.getFieldType();
-    ParameterizedTypeName fieldType = ParameterizedTypeName.get(ClassName.get(ColumnMetadata.class), columnFieldTypeMetaType.getDeserializationTypeName());
+    ParameterizedTypeName fieldType = ParameterizedTypeName.get(ClassName.get(ColumnMetadata.class), columnFieldTypeMetaType.getDeserializationTypeName(),
+                                                                columnFieldTypeMetaType.getSerializationTypeName());
     ParameterSpec rowParameter = ParameterSpec.builder(Row.class, "row").build();
 
     List<MethodSpec> methods = new ArrayList<>(Arrays.asList(buildColumnMetadataGetNameMethod(columnFieldMetaType),
@@ -49,11 +49,11 @@ public class ColumnFieldSerializer extends AbstractFieldSerializer<ColumnFieldMe
     // Primary key columns are either simple or frozen collections
     if (columnFieldMetaType.isPartitionKey()) {
       fieldType = ParameterizedTypeName.get(ClassName.get(PartitionKeyColumnMetadata.class),
-          columnFieldTypeMetaType.getDeserializationTypeName());
+          columnFieldTypeMetaType.getDeserializationTypeName(), columnFieldTypeMetaType.getSerializationTypeName());
       methods.add(buildColumnMetadataGetPartitionKeyIndexMethod(columnFieldMetaType));
     } else if (columnFieldMetaType.isClusteringKey()) {
       fieldType = ParameterizedTypeName.get(ClassName.get(ClusteringKeyColumnMetadata.class),
-          columnFieldTypeMetaType.getDeserializationTypeName());
+          columnFieldTypeMetaType.getDeserializationTypeName(), columnFieldTypeMetaType.getSerializationTypeName());
       methods.add(buildColumnMetadataGetClusteringKeyIndexMethod(columnFieldMetaType));
       methods.add(buildColumnMetadataGetClusteringKeyOrderMethod(columnFieldMetaType));
     } else {
@@ -63,21 +63,26 @@ public class ColumnFieldSerializer extends AbstractFieldSerializer<ColumnFieldMe
                                                 columnFieldTypeMetaType.getDeserializationTypeName(), columnFieldTypeMetaType.getSerializationTypeName());
         } else if (columnFieldMetaType.isMap()) {
           List<FieldTypeMetaType> fieldSubTypes = columnFieldTypeMetaType.getSubTypes();
-          TypeName keyType = fieldSubTypes.get(0).getDeserializationTypeName();
-          TypeName valueType = fieldSubTypes.get(1).getDeserializationTypeName();
+          FieldTypeMetaType keyMetaType = fieldSubTypes.get(0);
+          FieldTypeMetaType valueMetaType = fieldSubTypes.get(1);
           fieldType = ParameterizedTypeName.get(ClassName.get(MapColumnMetadata.class),
-                                                keyType,
-                                                valueType);
+                                                keyMetaType.getDeserializationTypeName(), valueMetaType.getDeserializationTypeName(),
+                                                keyMetaType.getSerializationTypeName(), valueMetaType.getSerializationTypeName());
+          // Add key serialization method + value serialization method
+          methods.add(buildMapKeyMetadataSerializeMethod(keyMetaType));
+          methods.add(buildMapValueMetadataSerializeMethod(valueMetaType));
         } else if (columnFieldMetaType.isList()) {
           List<FieldTypeMetaType> fieldSubTypes = columnFieldTypeMetaType.getSubTypes();
-          TypeName subType = fieldSubTypes.get(0).getDeserializationTypeName();
+          FieldTypeMetaType itemMetaType = fieldSubTypes.get(0);
           fieldType = ParameterizedTypeName.get(ClassName.get(ListColumnMetadata.class),
-                                                subType);
+                                                itemMetaType.getDeserializationTypeName(), itemMetaType.getSerializationTypeName());
+          // Add list item serialization method
+          methods.add(buildListItemMetadataSerializeMethod(itemMetaType));
         }  else if (columnFieldMetaType.isSet()) {
           List<FieldTypeMetaType> fieldSubTypes = columnFieldTypeMetaType.getSubTypes();
-          TypeName subType = fieldSubTypes.get(0).getDeserializationTypeName();
-          fieldType = ParameterizedTypeName.get(ClassName.get(SetColumnMetadata.class),
-                                                subType);
+          FieldTypeMetaType itemMetaType = fieldSubTypes.get(0);
+          fieldType = ParameterizedTypeName.get(ClassName.get(SetColumnMetadata.class), itemMetaType.getDeserializationTypeName(),
+                                                itemMetaType.getSerializationTypeName());
         }
       }
     }
@@ -141,5 +146,17 @@ public class ColumnFieldSerializer extends AbstractFieldSerializer<ColumnFieldMe
                      .returns(String.class)
                      .addStatement("return $S",columnFieldMetaType.getIndexName())
                      .build();
+  }
+
+  private MethodSpec buildMapKeyMetadataSerializeMethod(FieldTypeMetaType fieldTypeMetaType) {
+    return buildFieldMetadataSerializeMethod(fieldTypeMetaType, SerializationConstants.SERIALIZE_MAP_KEY_METHOD);
+  }
+
+  private MethodSpec buildMapValueMetadataSerializeMethod(final FieldTypeMetaType fieldTypeMetaType) {
+    return buildFieldMetadataSerializeMethod(fieldTypeMetaType, SerializationConstants.SERIALIZE_MAP_VALUE_METHOD);
+  }
+
+  private MethodSpec buildListItemMetadataSerializeMethod(final FieldTypeMetaType fieldTypeMetaType) {
+    return buildFieldMetadataSerializeMethod(fieldTypeMetaType, SerializationConstants.SERIALIZE_LIST_ITEM_METHOD);
   }
 }

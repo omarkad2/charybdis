@@ -211,13 +211,13 @@ public class TestEntity_Table implements TableMetadata<TestEntity> {
     }
 
     @Override
-    public String serializeKey(final String keyValue) {
-      return keyValue;
+    public String serializeKey(String field) {
+      return field;
     }
 
     @Override
-    public String serializeValue(final String valueValue) {
-      return valueValue;
+    public String serializeValue(String field) {
+      return field;
     }
   };
 
@@ -287,13 +287,13 @@ public class TestEntity_Table implements TableMetadata<TestEntity> {
     }
 
     @Override
-    public String serializeKey(final String keyValue) {
-      return keyValue;
+    public String serializeKey(String field) {
+      return field;
     }
 
     @Override
-    public Map<Integer, String> serializeValue(final Map<Integer, String> valueValue) {
-      return valueValue;
+    public Map<Integer, String> serializeValue(Map<Integer, String> field) {
+      return field;
     }
   };
 
@@ -352,8 +352,8 @@ public class TestEntity_Table implements TableMetadata<TestEntity> {
     }
 
     @Override
-    public String serializeItem(final TestEnum item) {
-      return item != null ? item.name() : null;
+    public String serializeItem(TestEnum field) {
+      return field != null ? field.name() : null;
     }
   };
 
@@ -396,13 +396,13 @@ public class TestEntity_Table implements TableMetadata<TestEntity> {
     }
 
     @Override
-    public Integer serializeKey(final Integer keyValue) {
-      return keyValue;
+    public Integer serializeKey(Integer field) {
+      return field;
     }
 
     @Override
-    public String serializeValue(final TestEnum valueValue) {
-      return null;
+    public String serializeValue(TestEnum field) {
+      return field != null ? field.name() : null;
     }
   };
 
@@ -447,11 +447,11 @@ public class TestEntity_Table implements TableMetadata<TestEntity> {
     }
 
     @Override
-    public Set<String> serializeItem(final Set<TestEnum> item) {
+    public Set<String> serializeItem(Set<TestEnum> field) {
       java.util.Set<java.lang.String> result0 = new HashSet<>();
-      for (ma.markware.charybdis.test.entities.TestEnum source1 : item) {
-        java.lang.String result2 = source1.name();
-        result0.add(result2);
+      for (ma.markware.charybdis.test.entities.TestEnum source1 : field) {
+        java.lang.String result1 = source1.name();
+        result0.add(result1);
       }
       return result0;
     }
@@ -490,8 +490,8 @@ public class TestEntity_Table implements TableMetadata<TestEntity> {
     }
 
     @Override
-    public UdtValue serializeItem(final TestUdt item) {
-      return TestUdt_Udt.test_udt.serialize(item);
+    public UdtValue serializeItem(TestUdt field) {
+      return field != null ? TestUdt_Udt.test_udt.serialize(field) : null;
     }
   };
 
@@ -567,13 +567,13 @@ public class TestEntity_Table implements TableMetadata<TestEntity> {
     }
 
     @Override
-    public Integer serializeKey(final Integer keyValue) {
-      return keyValue;
+    public Integer serializeKey(Integer field) {
+      return field;
     }
 
     @Override
-    public UdtValue serializeValue(final TestUdt valueValue) {
-      return TestUdt_Udt.test_udt.serialize(valueValue);
+    public UdtValue serializeValue(TestUdt field) {
+      return field != null ? TestUdt_Udt.test_udt.serialize(field) : null;
     }
   };
 
@@ -618,9 +618,9 @@ public class TestEntity_Table implements TableMetadata<TestEntity> {
     }
 
     @Override
-    public List<UdtValue> serializeItem(final List<TestUdt> item) {
+    public List<UdtValue> serializeItem(List<TestUdt> field) {
       java.util.List<com.datastax.oss.driver.api.core.data.UdtValue> result0 = new ArrayList<>();
-      for (ma.markware.charybdis.test.entities.TestUdt source1 : item) {
+      for (ma.markware.charybdis.test.entities.TestUdt source1 : field) {
         com.datastax.oss.driver.api.core.data.UdtValue result1 = TestUdt_Udt.test_udt.serialize(source1);
         result0.add(result1);
       }

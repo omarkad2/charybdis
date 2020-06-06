@@ -91,7 +91,7 @@ public class UdtSerializer implements EntitySerializer<UdtMetaType> {
       if (udtField.isUdt()) {
         UdtContext udtContext = aptContext.getUdtContext(udtFieldType.getDeserializationTypeCanonicalName());
         if (udtContext == null) {
-          throw new CharybdisSerializationException(format("Udt field '%s' has a user defined type, yet the type metadata is not found", udtFieldName));
+          throw new CharybdisSerializationException(format("The UDT metadata is not found for type '%s'", udtFieldType.getDeserializationTypeCanonicalName()));
         }
         initializerBuilder.add(".withField($S, $L.$L.udt)", udtFieldName, udtContext.getUdtMetadataClassName(), udtContext.getUdtName());
       } else {

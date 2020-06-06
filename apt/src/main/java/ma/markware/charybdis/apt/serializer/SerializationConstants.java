@@ -22,6 +22,10 @@ final class SerializationConstants {
   static final String GET_CLUSTERING_ORDER_METHOD = "getClusteringOrder";
   static final String GET_INDEX_NAME_METHOD = "getIndexName";
   static final String SERIALIZE_FIELD_METHOD = "serialize";
+  static final String SERIALIZE_LIST_ITEM_METHOD = "serializeItem";
+  static final String SERIALIZE_MAP_KEY_METHOD = "serializeKey";
+  static final String SERIALIZE_MAP_VALUE_METHOD = "serializeValue";
+  static final String DESERIALIZE_FIELD_METHOD = "deserialize";
   static final String DESERIALIZE_UDT_VALUE_METHOD = "deserialize";
   static final String DESERIALIZE_ROW_METHOD = "deserialize";
   static final String GET_COLUMNS_METADATA_METHOD = "getColumnsMetadata";

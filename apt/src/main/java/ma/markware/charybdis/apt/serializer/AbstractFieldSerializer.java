@@ -51,9 +51,11 @@ abstract class AbstractFieldSerializer<FIELD_META_TYPE extends AbstractFieldMeta
   }
 
   MethodSpec buildFieldMetadataSerializeMethod(final AbstractFieldMetaType fieldMetaType) {
+    return buildFieldMetadataSerializeMethod(fieldMetaType.getFieldType(), SerializationConstants.SERIALIZE_FIELD_METHOD);
+  }
+
+  MethodSpec buildFieldMetadataSerializeMethod(final FieldTypeMetaType fieldType, final String methodName) {
     String parameterName = "field";
-    String storageName = fieldMetaType.getSerializationName();
-    FieldTypeMetaType fieldType = fieldMetaType.getFieldType();
     CodeBlock.Builder codeBlockBuilder = CodeBlock.builder();
     if (fieldType.isCustom()) {
       recursiveSerialize(parameterName, "result0", codeBlockBuilder, fieldType, 1, parameterName);
@@ -63,7 +65,7 @@ abstract class AbstractFieldSerializer<FIELD_META_TYPE extends AbstractFieldMeta
         case UDT:
           UdtContext udtContext = aptContext.getUdtContext(fieldType.getDeserializationTypeCanonicalName());
           if (udtContext == null) {
-            throw new CharybdisSerializationException(format("Field '%s' has a user defined type, yet the type metadata is not found", storageName));
+            throw new CharybdisSerializationException(format("The UDT metadata is not found for type '%s'", fieldType.getDeserializationTypeCanonicalName()));
           }
           codeBlockBuilder.addStatement("return $N != null ? $L.$L.$L($N) : null", parameterName, udtContext.getUdtMetadataClassName(), udtContext.getUdtName(), SerializationConstants.SERIALIZE_METHOD, parameterName);
           break;
@@ -76,7 +78,7 @@ abstract class AbstractFieldSerializer<FIELD_META_TYPE extends AbstractFieldMeta
       }
     }
 
-    return MethodSpec.methodBuilder(SerializationConstants.SERIALIZE_METHOD)
+    return MethodSpec.methodBuilder(methodName)
                      .addModifiers(Modifier.PUBLIC)
                      .addParameter(fieldType.getDeserializationTypeName(), parameterName)
                      .returns(fieldType.getSerializationTypeName())
@@ -91,40 +93,40 @@ abstract class AbstractFieldSerializer<FIELD_META_TYPE extends AbstractFieldMeta
   MethodSpec buildFieldMetadataDeserializeMethod(final AbstractFieldMetaType fieldMetaType, final ParameterSpec sourceParam, final ParameterSpec pathParam) {
     String storageParameterName = sourceParam.name;
     String pathParameterName = pathParam == null ? StringUtils.quoteString(fieldMetaType.getSerializationName()) : pathParam.name;
-    FieldTypeMetaType columnFieldType = fieldMetaType.getFieldType();
-    List<FieldTypeMetaType> columnFieldSubTypes = columnFieldType.getSubTypes();
+    FieldTypeMetaType fieldType = fieldMetaType.getFieldType();
+    List<FieldTypeMetaType> fieldSubTypes = fieldType.getSubTypes();
     CodeBlock.Builder codeBlockBuilder = CodeBlock.builder();
-    if (columnFieldType.isCustom()) {
+    if (fieldType.isCustom()) {
       String sourceElement = "rawValue";
-      codeBlockBuilder.addStatement("$L $L = $N.get($L, $N)", columnFieldType.getSerializationTypeCanonicalName(), sourceElement, storageParameterName, pathParameterName,
+      codeBlockBuilder.addStatement("$L $L = $N.get($L, $N)", fieldType.getSerializationTypeCanonicalName(), sourceElement, storageParameterName, pathParameterName,
                                     NameUtils.resolveGenericTypeName(fieldMetaType.getDeserializationName()));
-      recursiveDeserialize(sourceElement, "result0", codeBlockBuilder, columnFieldType, 1, pathParameterName);
+      recursiveDeserialize(sourceElement, "result0", codeBlockBuilder, fieldType, 1);
       codeBlockBuilder.addStatement("return result0");
-    } else if (columnFieldType.isComplex()) {
+    } else if (fieldType.isComplex()) {
       codeBlockBuilder.addStatement("return $N != null ? $N.get($L, $N) : null", storageParameterName, storageParameterName, pathParameterName,
                                     NameUtils.resolveGenericTypeName(fieldMetaType.getDeserializationName()));
     } else {
-      switch (columnFieldType.getFieldTypeKind()) {
+      switch (fieldType.getFieldTypeKind()) {
         case LIST:
-          FieldTypeMetaType listSubType = columnFieldSubTypes.get(0);
+          FieldTypeMetaType listSubType = fieldSubTypes.get(0);
           codeBlockBuilder.addStatement("return $N != null ? $N.getList($L, $L.class): null", storageParameterName, storageParameterName, pathParameterName,
                                         listSubType.getDeserializationTypeCanonicalName());
           break;
         case SET:
-          FieldTypeMetaType setSubType = columnFieldSubTypes.get(0);
+          FieldTypeMetaType setSubType = fieldSubTypes.get(0);
           codeBlockBuilder.addStatement("return $N != null ? $N.getSet($L, $L.class) : null", storageParameterName, storageParameterName, pathParameterName,
                                         setSubType.getDeserializationTypeCanonicalName());
           break;
         case MAP:
-          FieldTypeMetaType fieldSubTypeKey = columnFieldSubTypes.get(0);
-          FieldTypeMetaType fieldSubTypeValue = columnFieldSubTypes.get(1);
+          FieldTypeMetaType fieldSubTypeKey = fieldSubTypes.get(0);
+          FieldTypeMetaType fieldSubTypeValue = fieldSubTypes.get(1);
           codeBlockBuilder.addStatement("return $N != null ? $N.getMap($L, $L.class, $L.class) : null", storageParameterName, storageParameterName, pathParameterName,
                                         fieldSubTypeKey.getDeserializationTypeCanonicalName(), fieldSubTypeValue.getDeserializationTypeCanonicalName());
           break;
         case UDT:
-          UdtContext udtContext = aptContext.getUdtContext(columnFieldType.getDeserializationTypeCanonicalName());
+          UdtContext udtContext = aptContext.getUdtContext(fieldType.getDeserializationTypeCanonicalName());
           if (udtContext == null) {
-            throw new CharybdisSerializationException(format("Field '%s' has a user defined type, yet the type metadata is not found", pathParameterName));
+            throw new CharybdisSerializationException(format("The UDT metadata is not found for type '%s'", fieldType.getDeserializationTypeCanonicalName()));
           }
           codeBlockBuilder.addStatement("return $N != null ? $L.$L.$L($N.getUdtValue($L)) : null", storageParameterName,
                                         udtContext.getUdtMetadataClassName(), udtContext.getUdtName(), SerializationConstants.DESERIALIZE_METHOD,
@@ -132,52 +134,52 @@ abstract class AbstractFieldSerializer<FIELD_META_TYPE extends AbstractFieldMeta
           break;
         case ENUM:
           codeBlockBuilder.addStatement("return $N != null && $N.getString($L) != null ? $L.valueOf($N.getString($L)) : null", storageParameterName,
-                                        storageParameterName, pathParameterName, columnFieldType.getDeserializationTypeCanonicalName(), storageParameterName, pathParameterName);
+                                        storageParameterName, pathParameterName, fieldType.getDeserializationTypeCanonicalName(), storageParameterName, pathParameterName);
           break;
         default:
           codeBlockBuilder.addStatement("return $N != null ? $N.get($L, $L.class) : null", storageParameterName, storageParameterName, pathParameterName,
-                                        columnFieldType.getDeserializationTypeCanonicalName());
+                                        fieldType.getDeserializationTypeCanonicalName());
           break;
       }
     }
-    return MethodSpec.methodBuilder(SerializationConstants.DESERIALIZE_METHOD)
+    return MethodSpec.methodBuilder(SerializationConstants.DESERIALIZE_FIELD_METHOD)
                      .addModifiers(Modifier.PUBLIC)
                      .addParameters(pathParam != null ? Arrays.asList(sourceParam, pathParam) : Collections.singletonList(sourceParam))
-                     .returns(columnFieldType.getDeserializationTypeName())
+                     .returns(fieldType.getDeserializationTypeName())
                      .addCode(codeBlockBuilder.build())
                      .build();
   }
 
   private void recursiveDeserialize(final String sourceElement, final String destinationElement, final CodeBlock.Builder returnStatement,
-      final FieldTypeMetaType columnFieldType, int depth, String pathParameterName) {
+      final FieldTypeMetaType fieldType, int depth) {
     String newSourceElement;
     String newDestinationElement;
-    switch (columnFieldType.getFieldTypeKind()) {
+    switch (fieldType.getFieldTypeKind()) {
       case LIST:
-        FieldTypeMetaType listSubType = columnFieldType.getSubTypes().get(0);
-        returnStatement.addStatement("$L $N = new $T<>()", columnFieldType.getDeserializationTypeCanonicalName(), destinationElement, ArrayList.class);
+        FieldTypeMetaType listSubType = fieldType.getSubTypes().get(0);
+        returnStatement.addStatement("$L $N = new $T<>()", fieldType.getDeserializationTypeCanonicalName(), destinationElement, ArrayList.class);
         newSourceElement = "source" + depth;
         newDestinationElement = "result" + depth;
         returnStatement.beginControlFlow("for ($L $N : $N)", listSubType.getSerializationTypeCanonicalName(), newSourceElement, sourceElement);
-        recursiveDeserialize(newSourceElement, newDestinationElement, returnStatement, listSubType, ++depth, pathParameterName);
+        recursiveDeserialize(newSourceElement, newDestinationElement, returnStatement, listSubType, ++depth);
         returnStatement.addStatement("$N.add($N)", destinationElement, newDestinationElement);
         returnStatement.endControlFlow();
         break;
       case SET:
-        FieldTypeMetaType setSubType = columnFieldType.getSubTypes().get(0);
-        returnStatement.addStatement("$L $N = new $T<>()", columnFieldType.getDeserializationTypeCanonicalName(), destinationElement, HashSet.class);
+        FieldTypeMetaType setSubType = fieldType.getSubTypes().get(0);
+        returnStatement.addStatement("$L $N = new $T<>()", fieldType.getDeserializationTypeCanonicalName(), destinationElement, HashSet.class);
         newSourceElement = "source" + depth;
         newDestinationElement = "result" + depth;
         returnStatement.beginControlFlow("for ($L $N : $N)", setSubType.getSerializationTypeCanonicalName(), newSourceElement, sourceElement);
-        recursiveDeserialize(newSourceElement, newDestinationElement, returnStatement, setSubType, ++depth, pathParameterName);
+        recursiveDeserialize(newSourceElement, newDestinationElement, returnStatement, setSubType, ++depth);
         returnStatement.addStatement("$N.add($N)", destinationElement, newDestinationElement);
         returnStatement.endControlFlow();
         break;
       case MAP:
-        FieldTypeMetaType keySubType = columnFieldType.getSubTypes().get(0);
-        FieldTypeMetaType valueSubType = columnFieldType.getSubTypes().get(1);
+        FieldTypeMetaType keySubType = fieldType.getSubTypes().get(0);
+        FieldTypeMetaType valueSubType = fieldType.getSubTypes().get(1);
         String iteratorName = "entry" + depth;
-        returnStatement.addStatement("$L $N = new $T<>()", columnFieldType.getDeserializationTypeCanonicalName(), destinationElement, HashMap.class);
+        returnStatement.addStatement("$L $N = new $T<>()", fieldType.getDeserializationTypeCanonicalName(), destinationElement, HashMap.class);
         returnStatement.beginControlFlow("for ($T<$L, $L> $N : $N.entrySet())", Entry.class, keySubType.getSerializationTypeCanonicalName(),
                                          valueSubType.getSerializationTypeCanonicalName(), iteratorName, sourceElement);
         String newSourceElementKey = "sourceKey" + depth;
@@ -188,37 +190,37 @@ abstract class AbstractFieldSerializer<FIELD_META_TYPE extends AbstractFieldMeta
         returnStatement.addStatement("$L $L = $N.getKey()", keySubType.getSerializationTypeCanonicalName(), newSourceElementKey, iteratorName);
         returnStatement.addStatement("$L $L = $N.getValue()", valueSubType.getSerializationTypeCanonicalName(), newSourceElementValue, iteratorName);
         depth++;
-        recursiveDeserialize(newSourceElementKey, newDestinationKeyElement, returnStatement, keySubType, depth, pathParameterName);
-        recursiveDeserialize(newSourceElementValue, newDestinationValueElement, returnStatement, valueSubType, depth, pathParameterName);
+        recursiveDeserialize(newSourceElementKey, newDestinationKeyElement, returnStatement, keySubType, depth);
+        recursiveDeserialize(newSourceElementValue, newDestinationValueElement, returnStatement, valueSubType, depth);
         returnStatement.addStatement("$N.put($N, $N)", destinationElement, newDestinationKeyElement, newDestinationValueElement);
         returnStatement.endControlFlow();
         break;
       case UDT:
-        UdtContext udtContext = aptContext.getUdtContext(columnFieldType.getDeserializationTypeCanonicalName());
+        UdtContext udtContext = aptContext.getUdtContext(fieldType.getDeserializationTypeCanonicalName());
         if (udtContext == null) {
-          throw new CharybdisSerializationException(format("Field '%s' has a user defined type, yet the type metadata is not found", pathParameterName));
+          throw new CharybdisSerializationException(format("The UDT metadata is not found for type '%s'", fieldType.getDeserializationTypeCanonicalName()));
         }
-        returnStatement.addStatement("$L $L = $L.$L.$L($N)", columnFieldType.getDeserializationTypeCanonicalName(), destinationElement, udtContext.getUdtMetadataClassName(),
+        returnStatement.addStatement("$L $L = $L.$L.$L($N)", fieldType.getDeserializationTypeCanonicalName(), destinationElement, udtContext.getUdtMetadataClassName(),
                                      udtContext.getUdtName(), SerializationConstants.DESERIALIZE_METHOD, sourceElement);
         break;
       case ENUM:
-        returnStatement.addStatement("$L $L = $L.valueOf($N)", columnFieldType.getDeserializationTypeCanonicalName(), destinationElement,
-                                     columnFieldType.getDeserializationTypeCanonicalName(), sourceElement);
+        returnStatement.addStatement("$L $L = $L.valueOf($N)", fieldType.getDeserializationTypeCanonicalName(), destinationElement,
+                                     fieldType.getDeserializationTypeCanonicalName(), sourceElement);
         break;
       default:
-        returnStatement.addStatement("$L $L = $L", columnFieldType.getDeserializationTypeCanonicalName(), destinationElement, sourceElement);
+        returnStatement.addStatement("$L $L = $L", fieldType.getDeserializationTypeCanonicalName(), destinationElement, sourceElement);
         break;
     }
   }
 
   private void recursiveSerialize(final String sourceElement, final String destinationElement, final CodeBlock.Builder returnStatement,
-      final FieldTypeMetaType columnFieldType, int depth, String pathParameterName) {
+      final FieldTypeMetaType fieldType, int depth, String pathParameterName) {
     String newSourceElement;
     String newDestinationElement;
-    switch (columnFieldType.getFieldTypeKind()) {
+    switch (fieldType.getFieldTypeKind()) {
       case LIST:
-        FieldTypeMetaType listSubType = columnFieldType.getSubTypes().get(0);
-        returnStatement.addStatement("$L $N = new $T<>()", columnFieldType.getSerializationTypeCanonicalName(), destinationElement, ArrayList.class);
+        FieldTypeMetaType listSubType = fieldType.getSubTypes().get(0);
+        returnStatement.addStatement("$L $N = new $T<>()", fieldType.getSerializationTypeCanonicalName(), destinationElement, ArrayList.class);
         newSourceElement = "source" + depth;
         newDestinationElement = "result" + depth;
         returnStatement.beginControlFlow("for ($L $N : $N)", listSubType.getDeserializationTypeCanonicalName(), newSourceElement, sourceElement);
@@ -227,8 +229,8 @@ abstract class AbstractFieldSerializer<FIELD_META_TYPE extends AbstractFieldMeta
         returnStatement.endControlFlow();
         break;
       case SET:
-        FieldTypeMetaType setSubType = columnFieldType.getSubTypes().get(0);
-        returnStatement.addStatement("$L $N = new $T<>()", columnFieldType.getSerializationTypeCanonicalName(), destinationElement, HashSet.class);
+        FieldTypeMetaType setSubType = fieldType.getSubTypes().get(0);
+        returnStatement.addStatement("$L $N = new $T<>()", fieldType.getSerializationTypeCanonicalName(), destinationElement, HashSet.class);
         newSourceElement = "source" + depth;
         newDestinationElement = "result" + depth;
         returnStatement.beginControlFlow("for ($L $N : $N)", setSubType.getDeserializationTypeCanonicalName(), newSourceElement, sourceElement);
@@ -237,10 +239,10 @@ abstract class AbstractFieldSerializer<FIELD_META_TYPE extends AbstractFieldMeta
         returnStatement.endControlFlow();
         break;
       case MAP:
-        FieldTypeMetaType keySubType = columnFieldType.getSubTypes().get(0);
-        FieldTypeMetaType valueSubType = columnFieldType.getSubTypes().get(1);
+        FieldTypeMetaType keySubType = fieldType.getSubTypes().get(0);
+        FieldTypeMetaType valueSubType = fieldType.getSubTypes().get(1);
         String iteratorName = "entry" + depth;
-        returnStatement.addStatement("$L $N = new $T<>()", columnFieldType.getSerializationTypeCanonicalName(), destinationElement, HashMap.class);
+        returnStatement.addStatement("$L $N = new $T<>()", fieldType.getSerializationTypeCanonicalName(), destinationElement, HashMap.class);
         returnStatement.beginControlFlow("for ($T<$L, $L> $N : $N.entrySet())", Entry.class, keySubType.getDeserializationTypeCanonicalName(),
                                          valueSubType.getDeserializationTypeCanonicalName(), iteratorName, sourceElement);
         String newSourceElementKey = "sourceKey" + depth;
@@ -257,18 +259,18 @@ abstract class AbstractFieldSerializer<FIELD_META_TYPE extends AbstractFieldMeta
         returnStatement.endControlFlow();
         break;
       case UDT:
-        UdtContext udtContext = aptContext.getUdtContext(columnFieldType.getDeserializationTypeCanonicalName());
+        UdtContext udtContext = aptContext.getUdtContext(fieldType.getDeserializationTypeCanonicalName());
         if (udtContext == null) {
-          throw new CharybdisSerializationException(format("Field '%s' has a user defined type, yet the type metadata is not found", pathParameterName));
+          throw new CharybdisSerializationException(format("The UDT metadata is not found for type '%s'", fieldType.getDeserializationTypeCanonicalName()));
         }
-        returnStatement.addStatement("$L $L = $L.$L.$L($N)", columnFieldType.getSerializationTypeCanonicalName(), destinationElement, udtContext.getUdtMetadataClassName(),
+        returnStatement.addStatement("$L $L = $L.$L.$L($N)", fieldType.getSerializationTypeCanonicalName(), destinationElement, udtContext.getUdtMetadataClassName(),
                                      udtContext.getUdtName(), SerializationConstants.SERIALIZE_METHOD, sourceElement);
         break;
       case ENUM:
-        returnStatement.addStatement("$L $L = $N.name()", columnFieldType.getSerializationTypeCanonicalName(), destinationElement, sourceElement);
+        returnStatement.addStatement("$L $L = $N.name()", fieldType.getSerializationTypeCanonicalName(), destinationElement, sourceElement);
         break;
       default:
-        returnStatement.addStatement("$L $L = $L", columnFieldType.getDeserializationTypeCanonicalName(), destinationElement, sourceElement);
+        returnStatement.addStatement("$L $L = $L", fieldType.getDeserializationTypeCanonicalName(), destinationElement, sourceElement);
         break;
     }
   }

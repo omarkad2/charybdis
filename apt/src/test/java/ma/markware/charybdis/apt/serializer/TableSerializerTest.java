@@ -98,6 +98,6 @@ class TableSerializerTest {
 
     assertThatExceptionOfType(CharybdisSerializationException.class)
         .isThrownBy(() -> configuration.getTableSerializer().serialize(tableWithUnknownUdtMetaType))
-        .withMessage("Field 'udt' has a user defined type, yet the type metadata is not found");
+        .withMessage("The UDT metadata is not found for type '" + TestUnknownUdt.class.getCanonicalName() + "'");
   }
 }
