@@ -39,6 +39,34 @@ public class UpdateQuery extends AbstractQuery {
   private Long timestamp;
   private boolean ifExists;
 
+  public String getKeyspace() {
+    return keyspace;
+  }
+
+  public String getTable() {
+    return table;
+  }
+
+  public List<AssignmentClause> getAssignmentClauses() {
+    return assignmentClauses;
+  }
+
+  public List<WhereClause> getWhereClauses() {
+    return whereClauses;
+  }
+
+  public List<ConditionClause> getConditionClauses() {
+    return conditionClauses;
+  }
+
+  public Integer getTtl() {
+    return ttl;
+  }
+
+  public Long getTimestamp() {
+    return timestamp;
+  }
+
   public void setTable(TableMetadata tableMetadata) {
     keyspace = tableMetadata.getKeyspaceName();
     table = tableMetadata.getTableName();
@@ -46,10 +74,6 @@ public class UpdateQuery extends AbstractQuery {
 
   public <T> void setAssignment(ColumnMetadata<T> columnMetadata, T value) {
     assignmentClauses.add(AssignmentClause.from(columnMetadata, value));
-  }
-
-  public void setAssignment(String columnName, Object value) {
-    assignmentClauses.add(AssignmentClause.from(columnName, value));
   }
 
   public <U> void setAssignment(ListColumnMetadata<U> listColumnMetadata, AssignmentListValue<U> listValue) {

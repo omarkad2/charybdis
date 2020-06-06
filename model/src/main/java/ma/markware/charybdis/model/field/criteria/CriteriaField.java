@@ -5,11 +5,9 @@ import com.datastax.oss.driver.api.querybuilder.relation.Relation;
 import com.datastax.oss.driver.api.querybuilder.term.Term;
 import ma.markware.charybdis.model.criteria.CriteriaExpression;
 import ma.markware.charybdis.model.criteria.CriteriaOperator;
-import ma.markware.charybdis.model.field.Field;
+import ma.markware.charybdis.model.field.SerializableField;
 
-public interface CriteriaField<T> extends Field {
-
-  Object serialize(T field);
+public interface CriteriaField<T> extends SerializableField<T> {
 
   default Relation toRelation(String operator, Term term) {
     return Relation.column(getName()).build(operator, term);

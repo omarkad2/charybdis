@@ -1,7 +1,6 @@
 package ma.markware.charybdis.model.field.metadata;
 
 import java.util.Map;
-import java.util.Set;
 import ma.markware.charybdis.model.assignment.AssignmentMapValue;
 import ma.markware.charybdis.model.assignment.AssignmentOperation;
 import ma.markware.charybdis.model.criteria.CriteriaExpression;
@@ -23,10 +22,10 @@ public interface MapColumnMetadata<KEY, VALUE> extends CollectionColumnMetadata<
   }
 
   default AssignmentMapValue<KEY, VALUE> append(Map<KEY, VALUE> values) {
-    return new AssignmentMapValue<>(this, AssignmentOperation.APPEND, values);
+    return new AssignmentMapValue<>(this, AssignmentOperation.APPEND, serialize(values), null);
   }
 
-  default AssignmentMapValue<KEY, VALUE> remove(Set<KEY> values) {
-    return new AssignmentMapValue<>(this, AssignmentOperation.REMOVE, values);
+  default AssignmentMapValue<KEY, VALUE> remove(Map<KEY, VALUE> values) {
+    return new AssignmentMapValue<>(this, AssignmentOperation.REMOVE, null, serialize(values));
   }
 }

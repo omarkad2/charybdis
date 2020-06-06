@@ -29,6 +29,10 @@ public class UdtNestedField<T, V> implements NestedField, SelectableField<T>, De
     return sourceColumn.getName() + "." + udtFields.getName();
   }
 
+  public V serialize(T value) {
+    return getEntry().serialize(value);
+  }
+
   @Override
   public T deserialize(Row row) {
     return getEntry().deserialize(row, getName());

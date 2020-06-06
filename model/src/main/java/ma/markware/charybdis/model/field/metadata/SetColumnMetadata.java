@@ -19,7 +19,7 @@ public interface SetColumnMetadata<T> extends CollectionColumnMetadata<Set<T>> {
   }
 
   default AssignmentSetValue<T> append(Set<T> values) {
-    return new AssignmentSetValue<>(this, AssignmentOperation.APPEND, values);
+    return new AssignmentSetValue<>(this, AssignmentOperation.APPEND, serialize(values));
   }
 
   default AssignmentSetValue<T> prepend(T... values) {
@@ -27,7 +27,7 @@ public interface SetColumnMetadata<T> extends CollectionColumnMetadata<Set<T>> {
   }
 
   default AssignmentSetValue<T> prepend(Set<T> values) {
-    return new AssignmentSetValue<>(this, AssignmentOperation.PREPEND, values);
+    return new AssignmentSetValue<T>(this, AssignmentOperation.PREPEND, serialize(values));
   }
 
   default AssignmentSetValue<T> remove(T... values) {

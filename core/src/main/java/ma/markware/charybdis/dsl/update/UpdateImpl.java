@@ -29,6 +29,10 @@ public class UpdateImpl implements UpdateInitExpression, UpdateTtlExpression, Up
     this.updateQuery = new UpdateQuery();
   }
 
+  public UpdateQuery getUpdateQuery() {
+    return updateQuery;
+  }
+
   public UpdateInitExpression update(TableMetadata tableMetadata) {
     updateQuery.setTable(tableMetadata);
     return this;

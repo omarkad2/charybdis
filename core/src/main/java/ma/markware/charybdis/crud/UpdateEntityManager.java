@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import ma.markware.charybdis.model.criteria.CriteriaExpression;
 import ma.markware.charybdis.model.criteria.CriteriaOperator;
+import ma.markware.charybdis.model.field.metadata.ColumnMetadata;
 import ma.markware.charybdis.model.field.metadata.TableMetadata;
 import ma.markware.charybdis.query.UpdateQuery;
 import org.slf4j.Logger;
@@ -66,11 +67,12 @@ public class UpdateEntityManager<T> {
     Map<String, Object> columnValueMap = tableMetadata.serialize(entity);
     for (Entry<String, Object> columnEntry : columnValueMap.entrySet()) {
       String columnName = columnEntry.getKey();
+      ColumnMetadata columnMetadata = tableMetadata.getColumnMetadata(columnName);
       Object value = columnEntry.getValue();
       if (value != null && tableMetadata.isPrimaryKey(columnName)) {
-        updateQuery.setWhere(new CriteriaExpression(tableMetadata.getColumnMetadata(columnName), CriteriaOperator.EQ, value));
+        updateQuery.setWhere(new CriteriaExpression(columnMetadata, CriteriaOperator.EQ, value));
       } else {
-        updateQuery.setAssignment(columnName, value);
+        updateQuery.setAssignment(columnMetadata, value);
       }
     }
 

@@ -21,8 +21,8 @@ public class AssignmentMapValueTest {
       Map<K, V> appendValues, Set<K> removeValues) {
     assertThat(assignmentMapValue.getMapColumn()).isEqualTo(mapColumnMetadata);
     assertThat(assignmentMapValue.getOperation()).isEqualTo(assignmentOperation);
-    assertThat(assignmentMapValue.getAppendValues()).isEqualTo(appendValues);
-    assertThat(assignmentMapValue.getRemoveValues()).isEqualTo(removeValues);
+    assertThat(assignmentMapValue.getAppendSerializedValues()).isEqualTo(appendValues);
+    assertThat(assignmentMapValue.getRemoveSerializedValues()).isEqualTo(removeValues);
   }
 
   private static Stream<Arguments> getAssignmentMapValueTestArguments() {
@@ -51,7 +51,7 @@ public class AssignmentMapValueTest {
     return Stream.of(
         Arguments.of(mapColumnMetadata.append(ImmutableMap.of(0, "value0", 1, "value1")), mapColumnMetadata, AssignmentOperation.APPEND,
                      ImmutableMap.of(0, "value0", 1, "value1"), null),
-        Arguments.of(mapColumnMetadata.remove(Collections.singleton(0)), mapColumnMetadata, AssignmentOperation.REMOVE, null, Collections.singleton(0))
+        Arguments.of(mapColumnMetadata.remove(ImmutableMap.of(0, "value0")), mapColumnMetadata, AssignmentOperation.REMOVE, null, Collections.singleton(0))
     );
   }
 }

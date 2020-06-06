@@ -4,14 +4,16 @@ import com.datastax.oss.driver.api.core.cql.Row;
 import com.datastax.oss.driver.api.core.data.UdtValue;
 import com.datastax.oss.driver.api.core.type.DataType;
 import ma.markware.charybdis.model.field.Field;
+import ma.markware.charybdis.model.field.SerializableField;
 import ma.markware.charybdis.model.field.entry.UdtFieldEntry;
 
-public interface UdtFieldMetadata<T, V> extends Field {
+public interface UdtFieldMetadata<T, V> extends Field, SerializableField<T> {
 
   T deserialize(UdtValue udtValue);
 
   T deserialize(Row row, String path);
 
+  @Override
   V serialize(T field);
 
   Class<T> getFieldClass();

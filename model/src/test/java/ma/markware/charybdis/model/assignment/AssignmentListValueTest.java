@@ -19,7 +19,7 @@ class AssignmentListValueTest {
       List<Object> values) {
     assertThat(assignmentListValue.getListColumn()).isEqualTo(listColumnMetadata);
     assertThat(assignmentListValue.getOperation()).isEqualTo(assignmentOperation);
-    assertThat(assignmentListValue.getValues()).isEqualTo(values);
+    assertThat(assignmentListValue.getSerializedValue()).isEqualTo(values);
   }
 
   private static Stream<Arguments> getAssignmentListValueTestArguments() {

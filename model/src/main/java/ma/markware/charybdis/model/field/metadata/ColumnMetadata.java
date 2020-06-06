@@ -8,10 +8,11 @@ import ma.markware.charybdis.model.criteria.CriteriaOperator;
 import ma.markware.charybdis.model.field.DeletableField;
 import ma.markware.charybdis.model.field.Field;
 import ma.markware.charybdis.model.field.SelectableField;
+import ma.markware.charybdis.model.field.SerializableField;
 import ma.markware.charybdis.model.field.criteria.CriteriaField;
 import ma.markware.charybdis.model.order.OrderExpression;
 
-public interface ColumnMetadata<T> extends Field, SelectableField<T>, CriteriaField<T>, DeletableField {
+public interface ColumnMetadata<T> extends Field, SelectableField<T>, CriteriaField<T>, DeletableField, SerializableField<T> {
 
   default String getIndexName() {
     return null;

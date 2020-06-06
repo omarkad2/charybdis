@@ -19,6 +19,10 @@ public class DeleteImpl implements DeleteInitExpression, DeleteTimestampExpressi
     this.deleteQuery = new DeleteQuery();
   }
 
+  public DeleteQuery getDeleteQuery() {
+    return deleteQuery;
+  }
+
   public DeleteInitExpression delete() {
     return this;
   }

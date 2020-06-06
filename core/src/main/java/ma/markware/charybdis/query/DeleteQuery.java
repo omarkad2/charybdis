@@ -28,6 +28,30 @@ public class DeleteQuery extends AbstractQuery {
   private Long timestamp;
   private boolean ifExists;
 
+  public String getKeyspace() {
+    return keyspace;
+  }
+
+  public String getTable() {
+    return table;
+  }
+
+  public List<Selector> getSelectors() {
+    return selectors;
+  }
+
+  public List<WhereClause> getWhereClauses() {
+    return whereClauses;
+  }
+
+  public List<ConditionClause> getConditionClauses() {
+    return conditionClauses;
+  }
+
+  public Long getTimestamp() {
+    return timestamp;
+  }
+
   public void setTable(TableMetadata tableMetadata) {
     this.keyspace = tableMetadata.getKeyspaceName();
     this.table = tableMetadata.getTableName();

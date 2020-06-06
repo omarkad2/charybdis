@@ -21,7 +21,7 @@ class AssignmentSetValueTest {
       Set<Object> values) {
     assertThat(assignmentSetValue.getSetColumn()).isEqualTo(setColumnMetadata);
     assertThat(assignmentSetValue.getOperation()).isEqualTo(assignmentOperation);
-    assertThat(assignmentSetValue.getValues()).isEqualTo(values);
+    assertThat(assignmentSetValue.getSerializedValue()).isEqualTo(values);
   }
 
   private static Stream<Arguments> getAssignmentSetValueTestArguments() {

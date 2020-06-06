@@ -17,6 +17,10 @@ public class ListNestedField<T> implements NestedField<Integer>, DeletableField 
     this.listEntry = new ListEntry(listEntry);
   }
 
+  public Object serialize(T value) {
+    return value;
+  }
+
   @Override
   public String getName() {
     return sourceColumn.getName() + "[" + listEntry.getKey() + "]";
