@@ -3,7 +3,7 @@ package ma.markware.charybdis.model.field;
 import com.datastax.oss.driver.api.core.cql.Row;
 import com.datastax.oss.driver.api.querybuilder.select.Selector;
 
-public interface SelectableField<T> extends Field {
+public interface SelectableField<D> extends Field {
 
   default Selector toSelector() {
     return toSelector(true);
@@ -11,7 +11,7 @@ public interface SelectableField<T> extends Field {
 
   Selector toSelector(boolean useAlias);
 
-  T deserialize(Row row);
+  D deserialize(Row row);
 
-  Class<T> getFieldClass();
+  Class<D> getFieldClass();
 }

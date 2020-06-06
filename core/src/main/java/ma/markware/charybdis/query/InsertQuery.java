@@ -77,7 +77,7 @@ public class InsertQuery extends AbstractQuery {
     }
   }
 
-  public <T> void setSet(ColumnMetadata<T> columnMetadata, T value) {
+  public <D, S> void setSet(ColumnMetadata<D, S> columnMetadata, D value) {
     columnNameValueMapping.setColumnNameAndValue(columnMetadata.getName(), columnMetadata.serialize(value));
   }
 

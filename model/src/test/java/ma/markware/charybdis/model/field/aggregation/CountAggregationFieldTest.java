@@ -27,7 +27,7 @@ class CountAggregationFieldTest {
 
   @BeforeAll
   void setup() {
-    final ClusteringKeyColumnMetadata<Float> columnMetadata = new ClusteringKeyColumnMetadata<Float>() {
+    final ClusteringKeyColumnMetadata<Float, Float> columnMetadata = new ClusteringKeyColumnMetadata<Float, Float>() {
       @Override
       public Float deserialize(final Row row) {
         return row.get(getName(), Float.class);
@@ -39,7 +39,7 @@ class CountAggregationFieldTest {
       }
 
       @Override
-      public Object serialize(final Float field) {
+      public Float serialize(final Float field) {
         return field;
       }
 

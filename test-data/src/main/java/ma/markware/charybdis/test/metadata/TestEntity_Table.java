@@ -44,7 +44,7 @@ public class TestEntity_Table implements TableMetadata<TestEntity> {
 
   public static final GenericType<List<List<UdtValue>>> udtNestedListGenericType = new GenericType<java.util.List<java.util.List<com.datastax.oss.driver.api.core.data.UdtValue>>>(){};
 
-  public static final PartitionKeyColumnMetadata<UUID> id = new PartitionKeyColumnMetadata<UUID>() {
+  public static final PartitionKeyColumnMetadata<UUID, UUID> id = new PartitionKeyColumnMetadata<UUID, UUID>() {
     @Override
     public String getName() {
       return "id";
@@ -71,7 +71,7 @@ public class TestEntity_Table implements TableMetadata<TestEntity> {
     }
   };
 
-  public static final ClusteringKeyColumnMetadata<Instant> date = new ClusteringKeyColumnMetadata<Instant>() {
+  public static final ClusteringKeyColumnMetadata<Instant, Instant> date = new ClusteringKeyColumnMetadata<Instant, Instant>() {
     @Override
     public String getName() {
       return "date";
@@ -103,7 +103,7 @@ public class TestEntity_Table implements TableMetadata<TestEntity> {
     }
   };
 
-  public static final ClusteringKeyColumnMetadata<TestUdt> udt = new ClusteringKeyColumnMetadata<TestUdt>() {
+  public static final ClusteringKeyColumnMetadata<TestUdt, UdtValue> udt = new ClusteringKeyColumnMetadata<TestUdt, UdtValue>() {
     @Override
     public String getName() {
       return "udt";
@@ -135,7 +135,7 @@ public class TestEntity_Table implements TableMetadata<TestEntity> {
     }
   };
 
-  public static final ClusteringKeyColumnMetadata<List<String>> list = new ClusteringKeyColumnMetadata<List<String>>() {
+  public static final ClusteringKeyColumnMetadata<List<String>, List<String>> list = new ClusteringKeyColumnMetadata<List<String>, List<String>>() {
     @Override
     public String getName() {
       return "list";
@@ -167,7 +167,7 @@ public class TestEntity_Table implements TableMetadata<TestEntity> {
     }
   };
 
-  public static final SetColumnMetadata<Integer> se = new SetColumnMetadata<Integer>() {
+  public static final SetColumnMetadata<Integer, Integer> se = new SetColumnMetadata<Integer, Integer>() {
     @Override
     public String getName() {
       return "se";
@@ -189,7 +189,7 @@ public class TestEntity_Table implements TableMetadata<TestEntity> {
     }
   };
 
-  public static final MapColumnMetadata<String, String> map = new MapColumnMetadata<String, String>() {
+  public static final MapColumnMetadata<String, String, String, String> map = new MapColumnMetadata<String, String, String, String>() {
     @Override
     public String getName() {
       return "map";
@@ -209,9 +209,19 @@ public class TestEntity_Table implements TableMetadata<TestEntity> {
     public Map<String, String> deserialize(Row row) {
       return row != null ? row.getMap("map", java.lang.String.class, java.lang.String.class) : null;
     }
+
+    @Override
+    public String serializeKey(final String keyValue) {
+      return keyValue;
+    }
+
+    @Override
+    public String serializeValue(final String valueValue) {
+      return valueValue;
+    }
   };
 
-  public static final ColumnMetadata<List<List<Integer>>> nestedList = new ColumnMetadata<List<List<Integer>>>() {
+  public static final ColumnMetadata<List<List<Integer>>, List<List<Integer>>> nestedList = new ColumnMetadata<List<List<Integer>>, List<List<Integer>>>() {
     @Override
     public String getName() {
       return "nestedlist";
@@ -233,7 +243,7 @@ public class TestEntity_Table implements TableMetadata<TestEntity> {
     }
   };
 
-  public static final SetColumnMetadata<List<Integer>> nestedSet = new SetColumnMetadata<List<Integer>>() {
+  public static final SetColumnMetadata<List<Integer>, List<Integer>> nestedSet = new SetColumnMetadata<List<Integer>, List<Integer>>() {
     @Override
     public String getName() {
       return "nestedset";
@@ -255,7 +265,7 @@ public class TestEntity_Table implements TableMetadata<TestEntity> {
     }
   };
 
-  public static final MapColumnMetadata<String, Map<Integer, String>> nestedMap = new MapColumnMetadata<String, Map<Integer, String>>() {
+  public static final MapColumnMetadata<String, Map<Integer, String>, String, Map<Integer, String>> nestedMap = new MapColumnMetadata<String, Map<Integer, String>, String, Map<Integer, String>>() {
     @Override
     public String getName() {
       return "nestedmap";
@@ -275,9 +285,19 @@ public class TestEntity_Table implements TableMetadata<TestEntity> {
     public Map<String, Map<Integer, String>> deserialize(Row row) {
       return row != null ? row.get("nestedmap", nestedMapGenericType) : null;
     }
+
+    @Override
+    public String serializeKey(final String keyValue) {
+      return keyValue;
+    }
+
+    @Override
+    public Map<Integer, String> serializeValue(final Map<Integer, String> valueValue) {
+      return valueValue;
+    }
   };
 
-  public static final ColumnMetadata<TestEnum> enumValue = new ColumnMetadata<TestEnum>() {
+  public static final ColumnMetadata<TestEnum, String> enumValue = new ColumnMetadata<TestEnum, String>() {
     @Override
     public String getName() {
       return "enumvalue";
@@ -299,7 +319,7 @@ public class TestEntity_Table implements TableMetadata<TestEntity> {
     }
   };
 
-  public static final ListColumnMetadata<TestEnum> enumList = new ListColumnMetadata<TestEnum>() {
+  public static final ListColumnMetadata<TestEnum, String> enumList = new ListColumnMetadata<TestEnum, String>() {
     @Override
     public String getName() {
       return "enumlist";
@@ -330,9 +350,14 @@ public class TestEntity_Table implements TableMetadata<TestEntity> {
       }
       return result0;
     }
+
+    @Override
+    public String serializeItem(final TestEnum item) {
+      return item != null ? item.name() : null;
+    }
   };
 
-  public static final MapColumnMetadata<Integer, TestEnum> enumMap = new MapColumnMetadata<Integer, TestEnum>() {
+  public static final MapColumnMetadata<Integer, TestEnum, Integer, String> enumMap = new MapColumnMetadata<Integer, TestEnum, Integer, String>() {
     @Override
     public String getName() {
       return "enummap";
@@ -369,9 +394,19 @@ public class TestEntity_Table implements TableMetadata<TestEntity> {
       }
       return result0;
     }
+
+    @Override
+    public Integer serializeKey(final Integer keyValue) {
+      return keyValue;
+    }
+
+    @Override
+    public String serializeValue(final TestEnum valueValue) {
+      return null;
+    }
   };
 
-  public static final ListColumnMetadata<Set<TestEnum>> enumNestedList = new ListColumnMetadata<Set<TestEnum>>() {
+  public static final ListColumnMetadata<Set<TestEnum>, Set<String>> enumNestedList = new ListColumnMetadata<Set<TestEnum>, Set<String>>() {
     @Override
     public String getName() {
       return "enumnestedlist";
@@ -410,9 +445,19 @@ public class TestEntity_Table implements TableMetadata<TestEntity> {
       }
       return result0;
     }
+
+    @Override
+    public Set<String> serializeItem(final Set<TestEnum> item) {
+      java.util.Set<java.lang.String> result0 = new HashSet<>();
+      for (ma.markware.charybdis.test.entities.TestEnum source1 : item) {
+        java.lang.String result2 = source1.name();
+        result0.add(result2);
+      }
+      return result0;
+    }
   };
 
-  public static final ListColumnMetadata<TestUdt> udtList = new ListColumnMetadata<TestUdt>() {
+  public static final ListColumnMetadata<TestUdt, UdtValue> udtList = new ListColumnMetadata<TestUdt, UdtValue>() {
     @Override
     public String getName() {
       return "udtlist";
@@ -443,9 +488,14 @@ public class TestEntity_Table implements TableMetadata<TestEntity> {
       }
       return result0;
     }
+
+    @Override
+    public UdtValue serializeItem(final TestUdt item) {
+      return TestUdt_Udt.test_udt.serialize(item);
+    }
   };
 
-  public static final SetColumnMetadata<TestUdt> udtSet = new SetColumnMetadata<TestUdt>() {
+  public static final SetColumnMetadata<TestUdt, UdtValue> udtSet = new SetColumnMetadata<TestUdt, UdtValue>() {
     @Override
     public String getName() {
       return "udtset";
@@ -478,7 +528,7 @@ public class TestEntity_Table implements TableMetadata<TestEntity> {
     }
   };
 
-  public static final MapColumnMetadata<Integer, TestUdt> udtMap = new MapColumnMetadata<Integer, TestUdt>() {
+  public static final MapColumnMetadata<Integer, TestUdt, Integer, UdtValue> udtMap = new MapColumnMetadata<Integer, TestUdt, Integer, UdtValue>() {
     @Override
     public String getName() {
       return "udtmap";
@@ -515,9 +565,19 @@ public class TestEntity_Table implements TableMetadata<TestEntity> {
       }
       return result0;
     }
+
+    @Override
+    public Integer serializeKey(final Integer keyValue) {
+      return keyValue;
+    }
+
+    @Override
+    public UdtValue serializeValue(final TestUdt valueValue) {
+      return TestUdt_Udt.test_udt.serialize(valueValue);
+    }
   };
 
-  public static final ListColumnMetadata<List<TestUdt>> udtNestedList = new ListColumnMetadata<List<TestUdt>>() {
+  public static final ListColumnMetadata<List<TestUdt>, List<UdtValue>> udtNestedList = new ListColumnMetadata<List<TestUdt>, List<UdtValue>>() {
     @Override
     public String getName() {
       return "udtnestedlist";
@@ -556,9 +616,19 @@ public class TestEntity_Table implements TableMetadata<TestEntity> {
       }
       return result0;
     }
+
+    @Override
+    public List<UdtValue> serializeItem(final List<TestUdt> item) {
+      java.util.List<com.datastax.oss.driver.api.core.data.UdtValue> result0 = new ArrayList<>();
+      for (ma.markware.charybdis.test.entities.TestUdt source1 : item) {
+        com.datastax.oss.driver.api.core.data.UdtValue result1 = TestUdt_Udt.test_udt.serialize(source1);
+        result0.add(result1);
+      }
+      return result0;
+    }
   };
 
-  public static final ColumnMetadata<Boolean> flag = new ColumnMetadata<Boolean>() {
+  public static final ColumnMetadata<Boolean, Boolean> flag = new ColumnMetadata<Boolean, Boolean>() {
     @Override
     public String getName() {
       return "flag";
@@ -585,7 +655,7 @@ public class TestEntity_Table implements TableMetadata<TestEntity> {
     }
   };
 
-  public static final ColumnMetadata<Instant> creationDate = new ColumnMetadata<Instant>() {
+  public static final ColumnMetadata<Instant, Instant> creationDate = new ColumnMetadata<Instant, Instant>() {
     @Override
     public String getName() {
       return "creation_date";
@@ -607,7 +677,7 @@ public class TestEntity_Table implements TableMetadata<TestEntity> {
     }
   };
 
-  public static final ColumnMetadata<Instant> lastUpdatedDate = new ColumnMetadata<Instant>() {
+  public static final ColumnMetadata<Instant, Instant> lastUpdatedDate = new ColumnMetadata<Instant, Instant>() {
     @Override
     public String getName() {
       return "last_updated_date";

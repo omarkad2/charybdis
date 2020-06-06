@@ -2,6 +2,7 @@ package ma.markware.charybdis.model.field.nested;
 
 import com.datastax.oss.driver.api.core.cql.Row;
 import com.datastax.oss.driver.api.querybuilder.select.Selector;
+import ma.markware.charybdis.model.field.AssignableField;
 import ma.markware.charybdis.model.field.DeletableField;
 import ma.markware.charybdis.model.field.SelectableField;
 import ma.markware.charybdis.model.field.entry.UdtFieldEntry;
@@ -9,17 +10,17 @@ import ma.markware.charybdis.model.field.metadata.ColumnMetadata;
 import ma.markware.charybdis.model.field.metadata.UdtColumnMetadata;
 import ma.markware.charybdis.model.field.metadata.UdtFieldMetadata;
 
-public class UdtNestedField<T, V> implements NestedField, SelectableField<T>, DeletableField {
+public class UdtNestedField<D, S> implements NestedField, SelectableField<D>, DeletableField, AssignableField<D, S> {
 
   private UdtColumnMetadata sourceColumn;
-  private UdtFieldEntry<T, V> udtFields;
+  private UdtFieldEntry<D, S> udtFields;
 
-  public UdtNestedField(final UdtColumnMetadata sourceColumn, final UdtFieldMetadata<T, V> udtFieldMetadata) {
+  public UdtNestedField(final UdtColumnMetadata sourceColumn, final UdtFieldMetadata<D, S> udtFieldMetadata) {
     this.sourceColumn = sourceColumn;
     this.udtFields = new UdtFieldEntry<>(udtFieldMetadata);
   }
 
-  public UdtNestedField(final UdtColumnMetadata sourceColumn, final UdtFieldEntry<T, V> udtFieldEntry) {
+  public UdtNestedField(final UdtColumnMetadata sourceColumn, final UdtFieldEntry<D, S> udtFieldEntry) {
     this.sourceColumn = sourceColumn;
     this.udtFields = udtFieldEntry;
   }
@@ -29,12 +30,13 @@ public class UdtNestedField<T, V> implements NestedField, SelectableField<T>, De
     return sourceColumn.getName() + "." + udtFields.getName();
   }
 
-  public V serialize(T value) {
+  @Override
+  public S serialize(D value) {
     return getEntry().serialize(value);
   }
 
   @Override
-  public T deserialize(Row row) {
+  public D deserialize(Row row) {
     return getEntry().deserialize(row, getName());
   }
 
@@ -44,12 +46,12 @@ public class UdtNestedField<T, V> implements NestedField, SelectableField<T>, De
   }
 
   @Override
-  public UdtFieldMetadata<T, V> getEntry() {
+  public UdtFieldMetadata<D, S> getEntry() {
     return udtFields.getKey();
   }
 
   @Override
-  public Class<T> getFieldClass() {
+  public Class<D> getFieldClass() {
     return getEntry().getFieldClass();
   }
 

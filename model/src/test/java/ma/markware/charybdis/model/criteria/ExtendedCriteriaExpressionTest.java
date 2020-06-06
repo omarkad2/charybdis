@@ -10,7 +10,7 @@ class ExtendedCriteriaExpressionTest {
 
   @Test
   void test() {
-    ColumnMetadata<Integer> simpleColumnMetadata = new ColumnMetadata<Integer>() {
+    ColumnMetadata<Integer, Integer> simpleColumnMetadata = new ColumnMetadata<Integer, Integer>() {
       @Override
       public Integer deserialize(final Row row) {
         return row.get(getName(), Integer.class);
@@ -22,7 +22,7 @@ class ExtendedCriteriaExpressionTest {
       }
 
       @Override
-      public Object serialize(final Integer field) {
+      public Integer serialize(final Integer field) {
         return field;
       }
 

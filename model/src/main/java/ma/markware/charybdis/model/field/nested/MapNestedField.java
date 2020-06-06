@@ -6,18 +6,20 @@ import com.datastax.oss.driver.api.querybuilder.relation.Relation;
 import com.datastax.oss.driver.api.querybuilder.select.Selector;
 import com.datastax.oss.driver.api.querybuilder.term.Term;
 import ma.markware.charybdis.model.exception.CharybdisUnsupportedExpressionException;
+import ma.markware.charybdis.model.field.AssignableField;
 import ma.markware.charybdis.model.field.DeletableField;
 import ma.markware.charybdis.model.field.criteria.CriteriaField;
 import ma.markware.charybdis.model.field.entry.MapEntry;
 import ma.markware.charybdis.model.field.metadata.ColumnMetadata;
 import ma.markware.charybdis.model.field.metadata.MapColumnMetadata;
 
-public class MapNestedField<KEY, VALUE> implements NestedField<KEY>, CriteriaField<VALUE>, DeletableField {
+public class MapNestedField<D_KEY, D_VALUE, S_KEY, S_VALUE> implements NestedField<D_KEY>, CriteriaField<D_VALUE, S_VALUE>, DeletableField,
+    AssignableField<D_VALUE, S_VALUE> {
 
-  private MapColumnMetadata<KEY, VALUE> sourceColumn;
-  private MapEntry<KEY> mapEntry;
+  private MapColumnMetadata<D_KEY, D_VALUE, S_KEY, S_VALUE> sourceColumn;
+  private MapEntry<D_KEY> mapEntry;
 
-  public MapNestedField(final MapColumnMetadata<KEY, VALUE> sourceColumn, final KEY mapEntry) {
+  public MapNestedField(final MapColumnMetadata<D_KEY, D_VALUE, S_KEY, S_VALUE> sourceColumn, final D_KEY mapEntry) {
     this.sourceColumn = sourceColumn;
     this.mapEntry = new MapEntry<>(mapEntry);
   }
@@ -28,8 +30,8 @@ public class MapNestedField<KEY, VALUE> implements NestedField<KEY>, CriteriaFie
   }
 
   @Override
-  public Object serialize(final VALUE field) {
-    return field;
+  public S_VALUE serialize(final D_VALUE field) {
+    return sourceColumn.serializeValue(field);
   }
 
   @Override
@@ -38,7 +40,7 @@ public class MapNestedField<KEY, VALUE> implements NestedField<KEY>, CriteriaFie
   }
 
   @Override
-  public KEY getEntry() {
+  public D_KEY getEntry() {
     return mapEntry.getKey();
   }
 

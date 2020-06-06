@@ -17,12 +17,12 @@ import org.junit.jupiter.api.TestInstance.Lifecycle;
 @TestInstance(Lifecycle.PER_CLASS)
 class ListNestedFieldTest {
 
-  private ListColumnMetadata<Integer> listColumnMetadata;
-  private ListNestedField<Integer> listNestedField;
+  private ListColumnMetadata<Integer, Integer> listColumnMetadata;
+  private ListNestedField<Integer, Integer> listNestedField;
 
   @BeforeAll
   void setup() {
-    listColumnMetadata = new ListColumnMetadata<Integer>() {
+    listColumnMetadata = new ListColumnMetadata<Integer, Integer>() {
       @Override
       public List<Integer> deserialize(final Row row) {
         return null;
@@ -34,13 +34,18 @@ class ListNestedFieldTest {
       }
 
       @Override
-      public Object serialize(final List<Integer> field) {
-        return null;
+      public List<Integer> serialize(final List<Integer> field) {
+        return field;
       }
 
       @Override
       public String getName() {
         return "listColumn";
+      }
+
+      @Override
+      public Integer serializeItem(final Integer item) {
+        return item;
       }
     };
 

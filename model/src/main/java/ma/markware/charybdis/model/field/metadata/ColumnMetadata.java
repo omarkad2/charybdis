@@ -12,7 +12,7 @@ import ma.markware.charybdis.model.field.SerializableField;
 import ma.markware.charybdis.model.field.criteria.CriteriaField;
 import ma.markware.charybdis.model.order.OrderExpression;
 
-public interface ColumnMetadata<T> extends Field, SelectableField<T>, CriteriaField<T>, DeletableField, SerializableField<T> {
+public interface ColumnMetadata<D, S> extends Field, SelectableField<D>, CriteriaField<D, S>, DeletableField, SerializableField<D, S> {
 
   default String getIndexName() {
     return null;
@@ -29,11 +29,11 @@ public interface ColumnMetadata<T> extends Field, SelectableField<T>, CriteriaFi
   }
 
   @SuppressWarnings("unchecked")
-  default CriteriaExpression in(T... values) {
+  default CriteriaExpression in(D... values) {
     return new CriteriaExpression(this, CriteriaOperator.IN, Stream.of(values).map(this::serialize).toArray());
   }
 
-  default CriteriaExpression like(T value) {
+  default CriteriaExpression like(D value) {
     return new CriteriaExpression(this, CriteriaOperator.LIKE, serialize(value));
   }
 

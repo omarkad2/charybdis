@@ -27,16 +27,16 @@ public class AssignmentClause {
     this.bindValues = bindValues;
   }
 
-  public static <U> AssignmentClause from(final ColumnMetadata<U> columnMetadata, final U value) {
+  public static <D, S> AssignmentClause from(final ColumnMetadata<D, S> columnMetadata, final S value) {
     return new AssignmentClause(Assignment.setColumn(columnMetadata.getName(), QueryBuilder.bindMarker()),
-                                new Object[] { columnMetadata.serialize(value) });
+                                new Object[] { value });
   }
 
-  public static <U> AssignmentClause from(final String columnName, final U value) {
+  public static <D, S> AssignmentClause from(final String columnName, final S value) {
     return new AssignmentClause(Assignment.setColumn(columnName, QueryBuilder.bindMarker()), new Object[]{ value });
   }
 
-  public static <U> AssignmentClause from(final ListColumnMetadata<U> listColumnMetadata, final AssignmentListValue<U> listValue) {
+  public static <D, S> AssignmentClause from(final ListColumnMetadata<D, S> listColumnMetadata, final AssignmentListValue<D, S> listValue) {
     AssignmentOperation operation = listValue.getOperation();
     Object value = listValue.getSerializedValue();
     switch(operation) {
@@ -51,7 +51,7 @@ public class AssignmentClause {
     }
   }
 
-  public static <U> AssignmentClause from(final SetColumnMetadata<U> setColumnMetadata, final AssignmentSetValue<U> setValue) {
+  public static <D, S> AssignmentClause from(final SetColumnMetadata<D, S> setColumnMetadata, final AssignmentSetValue<D, S> setValue) {
     AssignmentOperation operation = setValue.getOperation();
     Object value = setValue.getSerializedValue();
     switch(operation) {
@@ -66,7 +66,8 @@ public class AssignmentClause {
     }
   }
 
-  public static <K, V> AssignmentClause from(final MapColumnMetadata<K, V> mapColumnMetadata, final AssignmentMapValue<K, V> mapValue) {
+  public static <D_KEY, D_VALUE, S_KEY, S_VALUE> AssignmentClause from(final MapColumnMetadata<D_KEY, D_VALUE, S_KEY, S_VALUE> mapColumnMetadata,
+      final AssignmentMapValue<D_KEY, D_VALUE, S_KEY, S_VALUE> mapValue) {
     AssignmentOperation operation = mapValue.getOperation();
     switch(operation) {
       case APPEND:
@@ -78,19 +79,19 @@ public class AssignmentClause {
     }
   }
 
-  public static <V, K> AssignmentClause from(final MapNestedField<K, V> mapNestedField, final V value) {
+  public static <D_KEY, D_VALUE, S_KEY, S_VALUE> AssignmentClause from(final MapNestedField<D_KEY, D_VALUE, S_KEY, S_VALUE> mapNestedField, final S_VALUE value) {
     return new AssignmentClause(Assignment.setMapValue(mapNestedField.getSourceColumn().getName(), QueryBuilder.bindMarker(), QueryBuilder.bindMarker()),
-                                new Object[]{ mapNestedField.getEntry(), mapNestedField.serialize(value) });
+                                new Object[]{ mapNestedField.getEntry(), value });
   }
 
-  public static <T> AssignmentClause from(final ListNestedField<T> listNestedField, final T value) {
+  public static <D, S> AssignmentClause from(final ListNestedField<D, S> listNestedField, final S value) {
     return new AssignmentClause(Assignment.setListValue(listNestedField.getSourceColumn().getName(), QueryBuilder.bindMarker(), QueryBuilder.bindMarker()),
-                                new Object[]{ listNestedField.getEntry(), listNestedField.serialize(value) });
+                                new Object[]{ listNestedField.getEntry(), value });
   }
 
-  public static <T, V> AssignmentClause from(final UdtNestedField<T, V> udtNestedField, final T value) {
+  public static <D, S> AssignmentClause from(final UdtNestedField<D, S> udtNestedField, final S value) {
     return new AssignmentClause(Assignment.setField(udtNestedField.getSourceColumn().getName(), udtNestedField.getEntry().getName(),
-                                                      QueryBuilder.bindMarker()), new Object[]{ udtNestedField.serialize(value) });
+                                                    QueryBuilder.bindMarker()), new Object[]{ value });
   }
 
   public Assignment getAssignment() {

@@ -22,7 +22,7 @@ public class ConditionClause {
 
   public static ConditionClause from(CriteriaExpression criteria) {
     CriteriaField field = criteria.getField();
-    Object[] values = criteria.getValues();
+    Object[] values = criteria.getSerializedValues();
     switch(criteria.getCriteriaOperator()) {
       case EQ:
         return new ConditionClause(field.toCondition("=", QueryBuilder.bindMarker()), values);

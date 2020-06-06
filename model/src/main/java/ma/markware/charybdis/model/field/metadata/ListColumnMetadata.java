@@ -8,40 +8,42 @@ import ma.markware.charybdis.model.criteria.CriteriaExpression;
 import ma.markware.charybdis.model.criteria.CriteriaOperator;
 import ma.markware.charybdis.model.field.nested.ListNestedField;
 
-public interface ListColumnMetadata<T> extends CollectionColumnMetadata<List<T>> {
+public interface ListColumnMetadata<D, S> extends CollectionColumnMetadata<List<D>, List<S>> {
 
-  default CriteriaExpression contains(T value) {
+  S serializeItem(D item);
+
+  default CriteriaExpression contains(D value) {
     return new CriteriaExpression(this, CriteriaOperator.CONTAINS, value);
   }
 
-  default ListNestedField<T> entry(int index) {
+  default ListNestedField<D, S> entry(int index) {
     return new ListNestedField<>(this, index);
   }
 
   @SuppressWarnings("unchecked")
-  default AssignmentListValue<T> append(T... values) {
+  default AssignmentListValue<D, S> append(D... values) {
     return append(Arrays.asList(values));
   }
 
-  default AssignmentListValue<T> append(List<T> values) {
-    return new AssignmentListValue<>(this, AssignmentOperation.APPEND, values);
+  default AssignmentListValue<D, S> append(List<D> values) {
+    return new AssignmentListValue<D, S>(this, AssignmentOperation.APPEND, serialize(values));
   }
 
   @SuppressWarnings("unchecked")
-  default AssignmentListValue<T> prepend(T... values) {
+  default AssignmentListValue<D, S> prepend(D... values) {
     return prepend(Arrays.asList(values));
   }
 
-  default AssignmentListValue<T> prepend(List<T> values) {
-    return new AssignmentListValue<>(this, AssignmentOperation.PREPEND, values);
+  default AssignmentListValue<D, S> prepend(List<D> values) {
+    return new AssignmentListValue<>(this, AssignmentOperation.PREPEND, serialize(values));
   }
 
   @SuppressWarnings("unchecked")
-  default AssignmentListValue<T> remove(T... values) {
+  default AssignmentListValue<D, S> remove(D... values) {
     return remove(Arrays.asList(values));
   }
 
-  default AssignmentListValue<T> remove(List<T> values) {
-    return new AssignmentListValue<>(this, AssignmentOperation.REMOVE, values);
+  default AssignmentListValue<D, S> remove(List<D> values) {
+    return new AssignmentListValue<>(this, AssignmentOperation.REMOVE, serialize(values));
   }
 }

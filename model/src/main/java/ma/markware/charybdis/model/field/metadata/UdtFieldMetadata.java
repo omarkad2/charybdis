@@ -7,16 +7,16 @@ import ma.markware.charybdis.model.field.Field;
 import ma.markware.charybdis.model.field.SerializableField;
 import ma.markware.charybdis.model.field.entry.UdtFieldEntry;
 
-public interface UdtFieldMetadata<T, V> extends Field, SerializableField<T> {
+public interface UdtFieldMetadata<D, S> extends Field, SerializableField<D, S> {
 
-  T deserialize(UdtValue udtValue);
+  D deserialize(UdtValue udtValue);
 
-  T deserialize(Row row, String path);
+  D deserialize(Row row, String path);
 
   @Override
-  V serialize(T field);
+  S serialize(D field);
 
-  Class<T> getFieldClass();
+  Class<D> getFieldClass();
 
   DataType getDataType();
 

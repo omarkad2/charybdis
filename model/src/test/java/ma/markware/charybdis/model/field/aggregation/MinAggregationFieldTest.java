@@ -26,7 +26,7 @@ class MinAggregationFieldTest {
 
   @BeforeAll
   void setup() {
-    final ColumnMetadata<Double> columnMetadata = new ColumnMetadata<Double>() {
+    final ColumnMetadata<Double, Double> columnMetadata = new ColumnMetadata<Double, Double>() {
       @Override
       public Double deserialize(final Row row) {
         return row.get(getName(), Double.class);
@@ -38,7 +38,7 @@ class MinAggregationFieldTest {
       }
 
       @Override
-      public Object serialize(final Double field) {
+      public Double serialize(final Double field) {
         return field;
       }
 

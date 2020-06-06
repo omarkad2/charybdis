@@ -26,7 +26,7 @@ public class WriteTimeFunctionFieldTest {
 
   @BeforeAll
   void setup() {
-    final ColumnMetadata<Integer> columnMetadata = new ColumnMetadata<Integer>() {
+    final ColumnMetadata<Integer, Integer> columnMetadata = new ColumnMetadata<Integer, Integer>() {
       @Override
       public Integer deserialize(final Row row) {
         return row.get(getName(), Integer.class);
@@ -38,7 +38,7 @@ public class WriteTimeFunctionFieldTest {
       }
 
       @Override
-      public Object serialize(final Integer field) {
+      public Integer serialize(final Integer field) {
         return field;
       }
 

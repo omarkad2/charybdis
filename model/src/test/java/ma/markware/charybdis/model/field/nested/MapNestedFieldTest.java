@@ -20,12 +20,12 @@ import org.junit.jupiter.api.TestInstance.Lifecycle;
 @TestInstance(Lifecycle.PER_CLASS)
 class MapNestedFieldTest {
 
-  private MapColumnMetadata<String, String> mapColumnMetadata;
-  private MapNestedField<String, String> mapNestedField;
+  private MapColumnMetadata<String, String, String, String> mapColumnMetadata;
+  private MapNestedField<String, String, String, String> mapNestedField;
 
   @BeforeAll
   void setup() {
-    mapColumnMetadata = new MapColumnMetadata<String, String>() {
+    mapColumnMetadata = new MapColumnMetadata<String, String, String, String>() {
       @Override
       public Map<String, String> deserialize(final Row row) {
         return null;
@@ -37,13 +37,23 @@ class MapNestedFieldTest {
       }
 
       @Override
-      public Object serialize(final Map<String, String> field) {
+      public Map<String, String> serialize(final Map<String, String> field) {
         return null;
       }
 
       @Override
       public String getName() {
         return "mapColumn";
+      }
+
+      @Override
+      public String serializeKey(final String keyValue) {
+        return keyValue;
+      }
+
+      @Override
+      public String serializeValue(final String valueValue) {
+        return valueValue;
       }
     };
 

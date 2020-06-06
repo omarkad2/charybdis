@@ -72,32 +72,33 @@ public class UpdateQuery extends AbstractQuery {
     table = tableMetadata.getTableName();
   }
 
-  public <T> void setAssignment(ColumnMetadata<T> columnMetadata, T value) {
-    assignmentClauses.add(AssignmentClause.from(columnMetadata, value));
+  public <D, S> void setAssignment(ColumnMetadata<D, S> columnMetadata, D value) {
+    assignmentClauses.add(AssignmentClause.from(columnMetadata, columnMetadata.serialize(value)));
   }
 
-  public <U> void setAssignment(ListColumnMetadata<U> listColumnMetadata, AssignmentListValue<U> listValue) {
+  public <D, S> void setAssignment(ListColumnMetadata<D, S> listColumnMetadata, AssignmentListValue<D, S> listValue) {
     assignmentClauses.add(AssignmentClause.from(listColumnMetadata, listValue));
   }
 
-  public <U> void setAssignment(SetColumnMetadata<U> setColumnMetadata, AssignmentSetValue<U> setValue) {
+  public <D, S> void setAssignment(SetColumnMetadata<D, S> setColumnMetadata, AssignmentSetValue<D, S> setValue) {
     assignmentClauses.add(AssignmentClause.from(setColumnMetadata, setValue));
   }
 
-  public <K, V> void setAssignment(MapColumnMetadata<K, V> mapColumnMetadata, AssignmentMapValue<K, V> mapValue) {
+  public <D_KEY, D_VALUE, S_KEY, S_VALUE> void setAssignment(MapColumnMetadata<D_KEY, D_VALUE, S_KEY, S_VALUE> mapColumnMetadata,
+      AssignmentMapValue<D_KEY, D_VALUE, S_KEY, S_VALUE> mapValue) {
     assignmentClauses.add(AssignmentClause.from(mapColumnMetadata, mapValue));
   }
 
-  public <K, V> void setAssignment(MapNestedField<K, V> mapNestedField, V value) {
-    assignmentClauses.add(AssignmentClause.from(mapNestedField, value));
+  public <D_KEY, D_VALUE, S_KEY, S_VALUE> void setAssignment(MapNestedField<D_KEY, D_VALUE, S_KEY, S_VALUE> mapNestedField, D_VALUE value) {
+    assignmentClauses.add(AssignmentClause.from(mapNestedField, mapNestedField.serialize(value)));
   }
 
-  public <T> void setAssignment(ListNestedField<T> listNestedField, T value) {
-    assignmentClauses.add(AssignmentClause.from(listNestedField, value));
+  public <D, S> void setAssignment(ListNestedField<D, S> listNestedField, D value) {
+    assignmentClauses.add(AssignmentClause.from(listNestedField, listNestedField.serialize(value)));
   }
 
-  public <T, V> void setAssignment(UdtNestedField<T, V> udtNestedField, T value) {
-    assignmentClauses.add(AssignmentClause.from(udtNestedField, value));
+  public <D, S> void setAssignment(UdtNestedField<D, S> udtNestedField, D value) {
+    assignmentClauses.add(AssignmentClause.from(udtNestedField, udtNestedField.serialize(value)));
   }
 
   public void setWhere(CriteriaExpression criteriaExpression) {

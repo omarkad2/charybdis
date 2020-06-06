@@ -13,17 +13,18 @@ import ma.markware.charybdis.model.field.nested.UdtNestedField;
 
 public interface UpdateAssignmentExpression {
 
-  <T> UpdateExtraAssignmentExpression set(ColumnMetadata<T> column, T value);
+  <D, S> UpdateExtraAssignmentExpression set(ColumnMetadata<D, S> column, D value);
 
-  <T> UpdateExtraAssignmentExpression set(ListColumnMetadata<T> column, AssignmentListValue<T> value);
+  <D, S> UpdateExtraAssignmentExpression set(ListColumnMetadata<D, S> column, AssignmentListValue<D, S> value);
 
-  <T> UpdateExtraAssignmentExpression set(SetColumnMetadata<T> column, AssignmentSetValue<T> value);
+  <D, S> UpdateExtraAssignmentExpression set(SetColumnMetadata<D, S> column, AssignmentSetValue<D, S> value);
 
-  <K, V> UpdateExtraAssignmentExpression set(MapColumnMetadata<K, V> column, AssignmentMapValue<K, V> value);
+  <D_KEY, D_VALUE, S_KEY, S_VALUE> UpdateExtraAssignmentExpression set(MapColumnMetadata<D_KEY, D_VALUE, S_KEY, S_VALUE> column,
+      AssignmentMapValue<D_KEY, D_VALUE, S_KEY, S_VALUE> value);
 
-  <K, V> UpdateExtraAssignmentExpression set(MapNestedField<K, V> field, V value);
+  <D_KEY, D_VALUE, S_KEY, S_VALUE> UpdateExtraAssignmentExpression set(MapNestedField<D_KEY, D_VALUE, S_KEY, S_VALUE> field, D_VALUE value);
 
-  <T> UpdateExtraAssignmentExpression set(ListNestedField<T> field, T value);
+  <D, S> UpdateExtraAssignmentExpression set(ListNestedField<D, S> field, D value);
 
-  <T, V> UpdateExtraAssignmentExpression set(UdtNestedField<T, V> field, T value);
+  <D, S> UpdateExtraAssignmentExpression set(UdtNestedField<D, S> field, D value);
 }

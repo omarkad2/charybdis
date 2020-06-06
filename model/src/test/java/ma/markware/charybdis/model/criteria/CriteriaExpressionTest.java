@@ -27,12 +27,12 @@ class CriteriaExpressionTest {
   void testCriteriaExpression(CriteriaExpression criteriaExpression, CriteriaField field, CriteriaOperator criteriaOperator, Object[] values) {
     assertThat(criteriaExpression.getField()).isEqualTo(field);
     assertThat(criteriaExpression.getCriteriaOperator()).isEqualTo(criteriaOperator);
-    assertThat(criteriaExpression.getValues()).isEqualTo(values);
+    assertThat(criteriaExpression.getSerializedValues()).isEqualTo(values);
   }
 
   @Test
   void shouldThrowExceptionWhenUnsupportedCriteriaOnCollection() {
-    SetColumnMetadata<Integer> setColumnMetadata = new SetColumnMetadata<Integer>() {
+    SetColumnMetadata<Integer, Integer> setColumnMetadata = new SetColumnMetadata<Integer, Integer>() {
       @Override
       public Set<Integer> deserialize(final Row row) {
         return row.getSet(getName(), Integer.class);
@@ -44,7 +44,7 @@ class CriteriaExpressionTest {
       }
 
       @Override
-      public Object serialize(final Set<Integer> field) {
+      public Set<Integer> serialize(final Set<Integer> field) {
         return field;
       }
 
@@ -72,7 +72,7 @@ class CriteriaExpressionTest {
   }
 
   private static Stream<Arguments> getCriteriaTestArguments() {
-    ColumnMetadata<String> simpleColumnMetadata = new ColumnMetadata<String>() {
+    ColumnMetadata<String, String> simpleColumnMetadata = new ColumnMetadata<String, String>() {
       @Override
       public String deserialize(final Row row) {
         return row.get(getName(), String.class);
@@ -84,7 +84,7 @@ class CriteriaExpressionTest {
       }
 
       @Override
-      public Object serialize(final String field) {
+      public String serialize(final String field) {
         return field;
       }
 
@@ -94,7 +94,7 @@ class CriteriaExpressionTest {
       }
     };
 
-    ListColumnMetadata<Integer> listColumnMetadata = new ListColumnMetadata<Integer>() {
+    ListColumnMetadata<Integer, Integer> listColumnMetadata = new ListColumnMetadata<Integer, Integer>() {
       @Override
       public List<Integer> deserialize(final Row row) {
         return row.getList(getName(), Integer.class);
@@ -106,7 +106,7 @@ class CriteriaExpressionTest {
       }
 
       @Override
-      public Object serialize(final List<Integer> field) {
+      public List<Integer> serialize(final List<Integer> field) {
         return field;
       }
 
@@ -114,9 +114,14 @@ class CriteriaExpressionTest {
       public String getName() {
         return "list";
       }
+
+      @Override
+      public Integer serializeItem(final Integer item) {
+        return item;
+      }
     };
 
-    MapColumnMetadata<Integer, String> mapColumnMetadata = new MapColumnMetadata<Integer, String>() {
+    MapColumnMetadata<Integer, String, Integer, String> mapColumnMetadata = new MapColumnMetadata<Integer, String, Integer, String>() {
       @Override
       public Map<Integer, String> deserialize(final Row row) {
         return row.getMap(getName(), Integer.class, String.class);
@@ -128,13 +133,23 @@ class CriteriaExpressionTest {
       }
 
       @Override
-      public Object serialize(final Map<Integer, String> field) {
+      public Map<Integer, String> serialize(final Map<Integer, String> field) {
         return field;
       }
 
       @Override
       public String getName() {
         return "map";
+      }
+
+      @Override
+      public Integer serializeKey(final Integer keyValue) {
+        return keyValue;
+      }
+
+      @Override
+      public String serializeValue(final String valueValue) {
+        return valueValue;
       }
     };
 

@@ -1,20 +1,21 @@
 package ma.markware.charybdis.model.assignment;
 
+import java.util.Set;
 import ma.markware.charybdis.model.field.metadata.SetColumnMetadata;
 
-public class AssignmentSetValue<T> {
+public class AssignmentSetValue<D, S> {
 
-  private final SetColumnMetadata<T> setColumn;
+  private final SetColumnMetadata<D, S> setColumn;
   private AssignmentOperation operation;
-  private final Object serializedValue;
+  private final Set<S> serializedValue;
 
-  public AssignmentSetValue(final SetColumnMetadata<T> setColumn, final AssignmentOperation operation, final Object serializedValue) {
+  public AssignmentSetValue(final SetColumnMetadata<D, S> setColumn, final AssignmentOperation operation, final Set<S> serializedValue) {
     this.setColumn = setColumn;
     this.operation = operation;
     this.serializedValue = serializedValue;
   }
 
-  SetColumnMetadata<T> getSetColumn() {
+  SetColumnMetadata<D, S> getSetColumn() {
     return setColumn;
   }
 
@@ -22,7 +23,7 @@ public class AssignmentSetValue<T> {
     return operation;
   }
 
-  public Object getSerializedValue() {
+  public Set<S> getSerializedValue() {
     return serializedValue;
   }
 }

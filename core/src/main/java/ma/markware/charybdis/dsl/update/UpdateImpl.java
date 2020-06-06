@@ -29,7 +29,7 @@ public class UpdateImpl implements UpdateInitExpression, UpdateTtlExpression, Up
     this.updateQuery = new UpdateQuery();
   }
 
-  public UpdateQuery getUpdateQuery() {
+  UpdateQuery getUpdateQuery() {
     return updateQuery;
   }
 
@@ -57,43 +57,44 @@ public class UpdateImpl implements UpdateInitExpression, UpdateTtlExpression, Up
   }
 
   @Override
-  public <T> UpdateExtraAssignmentExpression set(ColumnMetadata<T> columnMetadata, T value) {
+  public <D, S> UpdateExtraAssignmentExpression set(ColumnMetadata<D, S> columnMetadata, D value) {
     updateQuery.setAssignment(columnMetadata, value);
     return this;
   }
 
   @Override
-  public <T> UpdateExtraAssignmentExpression set(final ListColumnMetadata<T> column, final AssignmentListValue<T> value) {
+  public <D, S> UpdateExtraAssignmentExpression set(final ListColumnMetadata<D, S> column, final AssignmentListValue<D, S> value) {
     updateQuery.setAssignment(column, value);
     return this;
   }
 
   @Override
-  public <T> UpdateExtraAssignmentExpression set(final SetColumnMetadata<T> column, final AssignmentSetValue<T> value) {
+  public <D, S> UpdateExtraAssignmentExpression set(final SetColumnMetadata<D, S> column, final AssignmentSetValue<D, S> value) {
     updateQuery.setAssignment(column, value);
     return this;
   }
 
   @Override
-  public <K, V> UpdateExtraAssignmentExpression set(final MapColumnMetadata<K, V> column, final AssignmentMapValue<K, V> value) {
+  public <D_KEY, D_VALUE, S_KEY, S_VALUE> UpdateExtraAssignmentExpression set(final MapColumnMetadata<D_KEY, D_VALUE, S_KEY, S_VALUE> column,
+      final AssignmentMapValue<D_KEY, D_VALUE, S_KEY, S_VALUE> value) {
     updateQuery.setAssignment(column, value);
     return this;
   }
 
   @Override
-  public <K, V> UpdateExtraAssignmentExpression set(final MapNestedField<K, V> field, final V value) {
+  public <D_KEY, D_VALUE, S_KEY, S_VALUE> UpdateExtraAssignmentExpression set(final MapNestedField<D_KEY, D_VALUE, S_KEY, S_VALUE> field, final D_VALUE value) {
     updateQuery.setAssignment(field, value);
     return this;
   }
 
   @Override
-  public <T> UpdateExtraAssignmentExpression set(final ListNestedField<T> field, final T value) {
+  public <D, S> UpdateExtraAssignmentExpression set(final ListNestedField<D, S> field, final D value) {
     updateQuery.setAssignment(field, value);
     return this;
   }
 
   @Override
-  public <T, V> UpdateExtraAssignmentExpression set(final UdtNestedField<T, V> field, final T value) {
+  public <D, S> UpdateExtraAssignmentExpression set(final UdtNestedField<D, S> field, final D value) {
     updateQuery.setAssignment(field, value);
     return this;
   }

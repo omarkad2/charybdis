@@ -3,30 +3,30 @@ package ma.markware.charybdis.model.field.metadata;
 import ma.markware.charybdis.model.criteria.CriteriaExpression;
 import ma.markware.charybdis.model.exception.CharybdisUnsupportedCriteriaExpressionException;
 
-public interface CollectionColumnMetadata<T> extends ColumnMetadata<T> {
+public interface CollectionColumnMetadata<D, S> extends ColumnMetadata<D, S> {
 
   @Override
-  default CriteriaExpression gt(T value) {
+  default CriteriaExpression gt(D value) {
     throw new CharybdisUnsupportedCriteriaExpressionException("Unsupported criteria 'greater than' on Collection types");
   }
 
   @Override
-  default CriteriaExpression gte(T value) {
+  default CriteriaExpression gte(D value) {
     throw new CharybdisUnsupportedCriteriaExpressionException("Unsupported criteria 'greater than or equal' on Collection types");
   }
 
   @Override
-  default CriteriaExpression lt(T value) {
+  default CriteriaExpression lt(D value) {
     throw new CharybdisUnsupportedCriteriaExpressionException("Unsupported criteria 'lesser than' on Collection types");
   }
 
   @Override
-  default CriteriaExpression lte(T value) {
+  default CriteriaExpression lte(D value) {
     throw new CharybdisUnsupportedCriteriaExpressionException("Unsupported criteria 'lesser than or equal' on Collection types");
   }
 
   @Override
-  default CriteriaExpression like(T value) {
+  default CriteriaExpression like(D value) {
     throw new CharybdisUnsupportedCriteriaExpressionException("Unsupported criteria 'like' on Collection types");
   }
 }

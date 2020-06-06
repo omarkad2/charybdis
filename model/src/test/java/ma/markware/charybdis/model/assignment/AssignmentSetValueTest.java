@@ -25,7 +25,7 @@ class AssignmentSetValueTest {
   }
 
   private static Stream<Arguments> getAssignmentSetValueTestArguments() {
-    SetColumnMetadata<Integer> setColumnMetadata = new SetColumnMetadata<Integer>() {
+    SetColumnMetadata<Integer, Integer> setColumnMetadata = new SetColumnMetadata<Integer, Integer>() {
       @Override
       public Set<Integer> deserialize(final Row row) {
         return row.getSet(getName(), Integer.class);
@@ -37,7 +37,7 @@ class AssignmentSetValueTest {
       }
 
       @Override
-      public Object serialize(final Set<Integer> field) {
+      public Set<Integer> serialize(final Set<Integer> field) {
         return field;
       }
 

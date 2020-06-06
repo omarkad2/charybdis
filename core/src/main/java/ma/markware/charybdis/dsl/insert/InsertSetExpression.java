@@ -4,5 +4,5 @@ import ma.markware.charybdis.model.field.metadata.ColumnMetadata;
 
 public interface InsertSetExpression extends InsertOnExistExpression {
 
-  <T> InsertSetExpression set(ColumnMetadata<T> columnMetadata, T value);
+  <D, S> InsertSetExpression set(ColumnMetadata<D, S> columnMetadata, D value);
 }

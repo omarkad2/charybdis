@@ -17,8 +17,9 @@ public class AssignmentMapValueTest {
 
   @ParameterizedTest
   @MethodSource("getAssignmentMapValueTestArguments")
-  <K, V> void testAssignmentListValue(AssignmentMapValue<K, V> assignmentMapValue, MapColumnMetadata<K, V> mapColumnMetadata, AssignmentOperation assignmentOperation,
-      Map<K, V> appendValues, Set<K> removeValues) {
+  <D_KEY, D_VALUE, S_KEY, S_VALUE> void testAssignmentListValue(AssignmentMapValue<D_KEY, D_VALUE, S_KEY, S_VALUE> assignmentMapValue,
+      MapColumnMetadata<D_KEY, D_VALUE, S_KEY, S_VALUE> mapColumnMetadata, AssignmentOperation assignmentOperation,
+      Map<S_KEY, S_VALUE> appendValues, Set<S_VALUE> removeValues) {
     assertThat(assignmentMapValue.getMapColumn()).isEqualTo(mapColumnMetadata);
     assertThat(assignmentMapValue.getOperation()).isEqualTo(assignmentOperation);
     assertThat(assignmentMapValue.getAppendSerializedValues()).isEqualTo(appendValues);
@@ -26,7 +27,7 @@ public class AssignmentMapValueTest {
   }
 
   private static Stream<Arguments> getAssignmentMapValueTestArguments() {
-    MapColumnMetadata<Integer, String> mapColumnMetadata = new MapColumnMetadata<Integer, String>() {
+    MapColumnMetadata<Integer, String, Integer, String> mapColumnMetadata = new MapColumnMetadata<Integer, String, Integer, String>() {
       @Override
       public Map<Integer, String> deserialize(final Row row) {
         return row.getMap(getName(), Integer.class, String.class);
@@ -38,7 +39,7 @@ public class AssignmentMapValueTest {
       }
 
       @Override
-      public Object serialize(final Map<Integer, String> field) {
+      public Map<Integer, String> serialize(final Map<Integer, String> field) {
         return field;
       }
 
@@ -46,12 +47,22 @@ public class AssignmentMapValueTest {
       public String getName() {
         return "map";
       }
+
+      @Override
+      public Integer serializeKey(final Integer keyValue) {
+        return keyValue;
+      }
+
+      @Override
+      public String serializeValue(final String valueValue) {
+        return valueValue;
+      }
     };
 
     return Stream.of(
         Arguments.of(mapColumnMetadata.append(ImmutableMap.of(0, "value0", 1, "value1")), mapColumnMetadata, AssignmentOperation.APPEND,
                      ImmutableMap.of(0, "value0", 1, "value1"), null),
-        Arguments.of(mapColumnMetadata.remove(ImmutableMap.of(0, "value0")), mapColumnMetadata, AssignmentOperation.REMOVE, null, Collections.singleton(0))
+        Arguments.of(mapColumnMetadata.remove(Collections.singleton(0)), mapColumnMetadata, AssignmentOperation.REMOVE, null, Collections.singleton(0))
     );
   }
 }

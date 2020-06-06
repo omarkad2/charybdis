@@ -31,13 +31,13 @@ class UdtFieldEntryTest {
   @Mock
   private Row row;
 
-  private UdtColumnMetadata<CustomUdt> udtColumnMetadata;
+  private UdtColumnMetadata<CustomUdt, UdtValue> udtColumnMetadata;
   private UdtNestedField<String, String> udtNestedField;
   private UdtNestedField<String, String> complexUdtNestedField;
 
   @BeforeEach
   void setup() {
-    udtColumnMetadata = new UdtColumnMetadata<CustomUdt>() {
+    udtColumnMetadata = new UdtColumnMetadata<CustomUdt, UdtValue>() {
 
       @Override
       public Class<CustomUdt> getFieldClass() {

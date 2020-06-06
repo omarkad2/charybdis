@@ -1,6 +1,6 @@
 package ma.markware.charybdis.model.field;
 
-public interface SerializableField<T> extends Field  {
+public interface SerializableField<D, S> extends Field  {
 
-  Object serialize(T value);
+  S serialize(D value);
 }

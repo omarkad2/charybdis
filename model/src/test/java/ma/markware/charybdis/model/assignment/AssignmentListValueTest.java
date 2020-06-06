@@ -23,7 +23,7 @@ class AssignmentListValueTest {
   }
 
   private static Stream<Arguments> getAssignmentListValueTestArguments() {
-    ListColumnMetadata<Integer> listColumnMetadata = new ListColumnMetadata<Integer>() {
+    ListColumnMetadata<Integer, Integer> listColumnMetadata = new ListColumnMetadata<Integer, Integer>() {
       @Override
       public List<Integer> deserialize(final Row row) {
         return row.getList(getName(), Integer.class);
@@ -35,13 +35,18 @@ class AssignmentListValueTest {
       }
 
       @Override
-      public Object serialize(final List<Integer> field) {
+      public List<Integer> serialize(final List<Integer> field) {
         return field;
       }
 
       @Override
       public String getName() {
         return "list";
+      }
+
+      @Override
+      public Integer serializeItem(final Integer item) {
+        return item;
       }
     };
 

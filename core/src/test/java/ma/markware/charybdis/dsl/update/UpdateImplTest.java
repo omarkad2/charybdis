@@ -15,6 +15,7 @@ import com.google.common.collect.ImmutableMap;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -133,9 +134,12 @@ class UpdateImplTest {
   @Test
   void set_append() {
     ImmutableMap<String, Map<Integer, String>> nestedMapAppendValue = ImmutableMap.of("key1", ImmutableMap.of(0, "value1"));
+    Set<Integer> seValues = new HashSet<>();
+    seValues.add(1);
+    seValues.add(2);
     updateImpl.update(TestEntity_Table.test_entity)
               .set(TestEntity_Table.udtList, TestEntity_Table.udtList.append(udt1, udt2))
-              .set(TestEntity_Table.se, TestEntity_Table.se.append(1, 2, 3))
+              .set(TestEntity_Table.se, TestEntity_Table.se.append(seValues))
               .set(TestEntity_Table.nestedMap, TestEntity_Table.nestedMap.append(nestedMapAppendValue));
 
     UpdateQuery updateQuery = updateImpl.getUpdateQuery();
@@ -143,8 +147,8 @@ class UpdateImplTest {
         .extracting(assignmentClause -> ((AppendAssignment) assignmentClause.getAssignment()).getColumnId(),
                     AssignmentClause::getBindValues)
         .containsExactlyInAnyOrder(
-            tuple(CqlIdentifier.fromCql(TestEntity_Table.udtList.getName()), new Object[] { new Object[] { TestEntity_Table.udt.serialize(udt1), TestEntity_Table.udt.serialize(udt2) }}),
-            tuple(CqlIdentifier.fromCql(TestEntity_Table.se.getName()), new Object[] { new Object[] { 1, 2, 3 }}),
+            tuple(CqlIdentifier.fromCql(TestEntity_Table.udtList.getName()), new Object[] { Arrays.asList(TestEntity_Table.udt.serialize(udt1), TestEntity_Table.udt.serialize(udt2)) }),
+            tuple(CqlIdentifier.fromCql(TestEntity_Table.se.getName()), new Object[] { seValues }),
             tuple(CqlIdentifier.fromCql(TestEntity_Table.nestedMap.getName()), new Object[] { nestedMapAppendValue })
         );
   }

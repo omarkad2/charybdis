@@ -8,12 +8,12 @@ public class CriteriaExpression {
 
   private CriteriaField field;
   private CriteriaOperator criteriaOperator;
-  private Object[] values;
+  private Object[] serializedValues;
 
-  public CriteriaExpression(final CriteriaField field, final CriteriaOperator criteriaOperator, final Object[] values) {
+  public CriteriaExpression(final CriteriaField field, final CriteriaOperator criteriaOperator, final Object[] serializedValues) {
     this.field = field;
     this.criteriaOperator = criteriaOperator;
-    this.values = values;
+    this.serializedValues = serializedValues;
   }
 
   public CriteriaExpression(final CriteriaField field, final CriteriaOperator criteriaOperator, final Object value) {
@@ -28,8 +28,8 @@ public class CriteriaExpression {
     return criteriaOperator;
   }
 
-  public Object[] getValues() {
-    return values;
+  public Object[] getSerializedValues() {
+    return serializedValues;
   }
 
   public ExtendedCriteriaExpression and(CriteriaExpression criteriaExpression) {
@@ -45,18 +45,18 @@ public class CriteriaExpression {
       return false;
     }
     final CriteriaExpression that = (CriteriaExpression) o;
-    return Objects.equals(field, that.field) && criteriaOperator == that.criteriaOperator && Arrays.equals(values, that.values);
+    return Objects.equals(field, that.field) && criteriaOperator == that.criteriaOperator && Arrays.equals(serializedValues, that.serializedValues);
   }
 
   @Override
   public int hashCode() {
     int result = Objects.hash(field, criteriaOperator);
-    result = 31 * result + Arrays.hashCode(values);
+    result = 31 * result + Arrays.hashCode(serializedValues);
     return result;
   }
 
   @Override
   public String toString() {
-    return "CriteriaExpression{" + "field=" + field + ", criteriaOperator=" + criteriaOperator + ", values=" + Arrays.toString(values) + '}';
+    return "CriteriaExpression{" + "field=" + field + ", criteriaOperator=" + criteriaOperator + ", serializedValues=" + Arrays.toString(serializedValues) + '}';
   }
 }

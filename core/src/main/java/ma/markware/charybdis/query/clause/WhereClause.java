@@ -22,34 +22,34 @@ public class WhereClause {
 
   public static WhereClause from(CriteriaExpression criteria) {
     CriteriaField field = criteria.getField();
-    Object[] values = criteria.getValues();
+    Object[] serializedValues = criteria.getSerializedValues();
     switch(criteria.getCriteriaOperator()) {
       case EQ:
-        return new WhereClause(field.toRelation("=", QueryBuilder.bindMarker()), values);
+        return new WhereClause(field.toRelation("=", QueryBuilder.bindMarker()), serializedValues);
       case NOT_EQ:
-        return new WhereClause(field.toRelation("!=", QueryBuilder.bindMarker()), values);
+        return new WhereClause(field.toRelation("!=", QueryBuilder.bindMarker()), serializedValues);
       case GT:
-        return new WhereClause(field.toRelation(">", QueryBuilder.bindMarker()), values);
+        return new WhereClause(field.toRelation(">", QueryBuilder.bindMarker()), serializedValues);
       case GTE:
-        return new WhereClause(field.toRelation(">=", QueryBuilder.bindMarker()), values);
+        return new WhereClause(field.toRelation(">=", QueryBuilder.bindMarker()), serializedValues);
       case LT:
-        return new WhereClause(field.toRelation("<", QueryBuilder.bindMarker()), values);
+        return new WhereClause(field.toRelation("<", QueryBuilder.bindMarker()), serializedValues);
       case LTE:
-        return new WhereClause(field.toRelation("<=", QueryBuilder.bindMarker()), values);
+        return new WhereClause(field.toRelation("<=", QueryBuilder.bindMarker()), serializedValues);
       case IN:
-        if (values.length > 0) {
-          BindMarker[] bindMarkers = new BindMarker[values.length];
+        if (serializedValues.length > 0) {
+          BindMarker[] bindMarkers = new BindMarker[serializedValues.length];
           fill(bindMarkers, QueryBuilder.bindMarker());
-          return new WhereClause(field.toRelation(" IN ", QueryBuilder.tuple(bindMarkers)), values);
+          return new WhereClause(field.toRelation(" IN ", QueryBuilder.tuple(bindMarkers)), serializedValues);
         } else {
           return new WhereClause(field.toRelation(" IN ", QueryBuilder.raw("")), null);
         }
       case CONTAINS:
-        return new WhereClause(field.toRelation(" CONTAINS ", QueryBuilder.bindMarker()), values);
+        return new WhereClause(field.toRelation(" CONTAINS ", QueryBuilder.bindMarker()), serializedValues);
       case CONTAINS_KEY:
-        return new WhereClause(field.toRelation(" CONTAINS KEY ", QueryBuilder.bindMarker()), values);
+        return new WhereClause(field.toRelation(" CONTAINS KEY ", QueryBuilder.bindMarker()), serializedValues);
       case LIKE:
-        return new WhereClause(field.toRelation(" LIKE ", QueryBuilder.bindMarker()), values);
+        return new WhereClause(field.toRelation(" LIKE ", QueryBuilder.bindMarker()), serializedValues);
       case IS_NOT_NULL:
         return new WhereClause(field.toRelation(" IS NOT NULL ", null), null);
       default:

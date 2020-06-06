@@ -8,33 +8,36 @@ import ma.markware.charybdis.model.assignment.AssignmentSetValue;
 import ma.markware.charybdis.model.criteria.CriteriaExpression;
 import ma.markware.charybdis.model.criteria.CriteriaOperator;
 
-public interface SetColumnMetadata<T> extends CollectionColumnMetadata<Set<T>> {
+public interface SetColumnMetadata<D, S> extends CollectionColumnMetadata<Set<D>, Set<S>> {
 
-  default CriteriaExpression contains(T value) {
+  default CriteriaExpression contains(D value) {
     return new CriteriaExpression(this, CriteriaOperator.CONTAINS, value);
   }
 
-  default AssignmentSetValue<T> append(T... values) {
+  @SuppressWarnings("unchecked")
+  default AssignmentSetValue<D, S> append(D... values) {
     return append(Arrays.stream(values).collect(Collectors.toSet()));
   }
 
-  default AssignmentSetValue<T> append(Set<T> values) {
+  default AssignmentSetValue<D, S> append(Set<D> values) {
     return new AssignmentSetValue<>(this, AssignmentOperation.APPEND, serialize(values));
   }
 
-  default AssignmentSetValue<T> prepend(T... values) {
+  @SuppressWarnings("unchecked")
+  default AssignmentSetValue<D, S> prepend(D... values) {
     return prepend(Arrays.stream(values).collect(Collectors.toSet()));
   }
 
-  default AssignmentSetValue<T> prepend(Set<T> values) {
-    return new AssignmentSetValue<T>(this, AssignmentOperation.PREPEND, serialize(values));
+  default AssignmentSetValue<D, S> prepend(Set<D> values) {
+    return new AssignmentSetValue<>(this, AssignmentOperation.PREPEND, serialize(values));
   }
 
-  default AssignmentSetValue<T> remove(T... values) {
+  @SuppressWarnings("unchecked")
+  default AssignmentSetValue<D, S> remove(D... values) {
     return remove(Arrays.stream(values).collect(Collectors.toSet()));
   }
 
-  default AssignmentSetValue<T> remove(Set<T> values) {
-    return new AssignmentSetValue<>(this, AssignmentOperation.REMOVE, values);
+  default AssignmentSetValue<D, S> remove(Set<D> values) {
+    return new AssignmentSetValue<>(this, AssignmentOperation.REMOVE, serialize(values));
   }
 }

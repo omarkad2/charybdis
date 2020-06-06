@@ -7,7 +7,7 @@ import ma.markware.charybdis.model.criteria.CriteriaExpression;
 import ma.markware.charybdis.model.criteria.CriteriaOperator;
 import ma.markware.charybdis.model.field.SerializableField;
 
-public interface CriteriaField<T> extends SerializableField<T> {
+public interface CriteriaField<D, S> extends SerializableField<D, S> {
 
   default Relation toRelation(String operator, Term term) {
     return Relation.column(getName()).build(operator, term);
@@ -17,27 +17,27 @@ public interface CriteriaField<T> extends SerializableField<T> {
     return Condition.column(getName()).build(operator, term);
   }
 
-  default CriteriaExpression eq(T value) {
+  default CriteriaExpression eq(D value) {
     return new CriteriaExpression(this, CriteriaOperator.EQ, serialize(value));
   }
 
-  default CriteriaExpression neq(T value) {
+  default CriteriaExpression neq(D value) {
     return new CriteriaExpression(this, CriteriaOperator.NOT_EQ, serialize(value));
   }
 
-  default CriteriaExpression gt(T value) {
+  default CriteriaExpression gt(D value) {
     return new CriteriaExpression(this, CriteriaOperator.GT, serialize(value));
   }
 
-  default CriteriaExpression gte(T value) {
+  default CriteriaExpression gte(D value) {
     return new CriteriaExpression(this, CriteriaOperator.GTE, serialize(value));
   }
 
-  default CriteriaExpression lt(T value) {
+  default CriteriaExpression lt(D value) {
     return new CriteriaExpression(this, CriteriaOperator.LT, serialize(value));
   }
 
-  default CriteriaExpression lte(T value) {
+  default CriteriaExpression lte(D value) {
     return new CriteriaExpression(this, CriteriaOperator.LTE, serialize(value));
   }
 }

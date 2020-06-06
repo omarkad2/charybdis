@@ -39,11 +39,12 @@ public class InsertImpl implements InsertInitExpression, InsertInitWithColumnsEx
   }
 
   @Override
-  public <T> InsertSetExpression set(final ColumnMetadata<T> columnMetadata, final T value) {
+  public <D, S> InsertSetExpression set(final ColumnMetadata<D, S> columnMetadata, final D value) {
     insertQuery.setSet(columnMetadata, value);
     return this;
   }
 
+  // TODO to delete
   @Override
   public <T extends InsertTtlExpression & InsertTimestampExpression> T ifNotExists() {
     insertQuery.enableIfNotExists();

@@ -10,8 +10,8 @@ public class DefaultRecord implements Record {
 
   @Override
   @SuppressWarnings("unchecked")
-  public <T> T get(final SelectableField<T> field) {
-    return (T) fieldValueMap.get(field.getName());
+  public <D> D get(final SelectableField<D> field) {
+    return (D) fieldValueMap.get(field.getName());
   }
 
   public void put(final SelectableField field, final Object value) {
