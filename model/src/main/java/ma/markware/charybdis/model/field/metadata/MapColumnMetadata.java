@@ -31,7 +31,7 @@ public interface MapColumnMetadata<D_KEY, D_VALUE, S_KEY, S_VALUE> extends Colle
     return new AssignmentMapValue<>(this, AssignmentOperation.APPEND, serialize(values));
   }
 
-  default AssignmentMapValue<D_KEY, D_VALUE, S_KEY, S_VALUE> remove(Set<D_KEY> values) {
-    return new AssignmentMapValue<>(this, AssignmentOperation.REMOVE, values.stream().map(this::serializeKey).collect(Collectors.toSet()));
+  default AssignmentMapValue<D_KEY, D_VALUE, S_KEY, S_VALUE> remove(Set<D_KEY> keys) {
+    return new AssignmentMapValue<>(this, AssignmentOperation.REMOVE, keys.stream().map(this::serializeKey).collect(Collectors.toSet()));
   }
 }

@@ -3,6 +3,7 @@ package ma.markware.charybdis.model.criteria;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.datastax.oss.driver.api.core.cql.Row;
+import java.util.List;
 import ma.markware.charybdis.model.field.metadata.ColumnMetadata;
 import org.junit.jupiter.api.Test;
 
@@ -35,9 +36,15 @@ class ExtendedCriteriaExpressionTest {
     ExtendedCriteriaExpression extendedCriteriaExpression = simpleColumnMetadata.gte(1)
                                                          .and(simpleColumnMetadata.lt(100));
 
-    assertThat(extendedCriteriaExpression.getCriterias()).containsExactlyInAnyOrder(
-      new CriteriaExpression(simpleColumnMetadata, CriteriaOperator.GTE, 1),
-      new CriteriaExpression(simpleColumnMetadata, CriteriaOperator.LT, 100)
-    );
+    List<CriteriaExpression> criterias = extendedCriteriaExpression.getCriterias();
+    assertThat(criterias).hasSize(2);
+
+    assertThat(criterias.get(0).getField()).isEqualTo(simpleColumnMetadata);
+    assertThat(criterias.get(0).getCriteriaOperator()).isEqualTo(CriteriaOperator.GTE);
+    assertThat(criterias.get(0).getSerializedValues()).isEqualTo(new Object[]{ 1 });
+
+    assertThat(criterias.get(1).getField()).isEqualTo(simpleColumnMetadata);
+    assertThat(criterias.get(1).getCriteriaOperator()).isEqualTo(CriteriaOperator.LT);
+    assertThat(criterias.get(1).getSerializedValues()).isEqualTo(new Object[]{ 100 });
   }
 }

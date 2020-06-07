@@ -11,6 +11,8 @@ import com.datastax.oss.driver.internal.querybuilder.lhs.ColumnLeftOperand;
 import com.datastax.oss.driver.internal.querybuilder.relation.DefaultRelation;
 import com.datastax.oss.driver.internal.querybuilder.update.AppendAssignment;
 import com.datastax.oss.driver.internal.querybuilder.update.DefaultAssignment;
+import com.datastax.oss.driver.internal.querybuilder.update.PrependAssignment;
+import com.datastax.oss.driver.internal.querybuilder.update.RemoveAssignment;
 import com.google.common.collect.ImmutableMap;
 import java.time.Instant;
 import java.util.Arrays;
@@ -150,6 +152,49 @@ class UpdateImplTest {
             tuple(CqlIdentifier.fromCql(TestEntity_Table.udtList.getName()), new Object[] { Arrays.asList(TestEntity_Table.udt.serialize(udt1), TestEntity_Table.udt.serialize(udt2)) }),
             tuple(CqlIdentifier.fromCql(TestEntity_Table.se.getName()), new Object[] { seValues }),
             tuple(CqlIdentifier.fromCql(TestEntity_Table.nestedMap.getName()), new Object[] { nestedMapAppendValue })
+        );
+  }
+
+  @Test
+  void set_prepend() {
+    Set<Integer> seValues = new HashSet<>();
+    seValues.add(1);
+    seValues.add(2);
+    updateImpl.update(TestEntity_Table.test_entity)
+              .set(TestEntity_Table.udtList, TestEntity_Table.udtList.prepend(udt1, udt2))
+              .set(TestEntity_Table.se, TestEntity_Table.se.prepend(seValues));
+
+    UpdateQuery updateQuery = updateImpl.getUpdateQuery();
+    assertThat(updateQuery.getAssignmentClauses())
+        .extracting(assignmentClause -> ((PrependAssignment) assignmentClause.getAssignment()).getColumnId(),
+                    AssignmentClause::getBindValues)
+        .containsExactlyInAnyOrder(
+            tuple(CqlIdentifier.fromCql(TestEntity_Table.udtList.getName()), new Object[] { Arrays.asList(TestEntity_Table.udt.serialize(udt1), TestEntity_Table.udt.serialize(udt2)) }),
+            tuple(CqlIdentifier.fromCql(TestEntity_Table.se.getName()), new Object[] { seValues })
+        );
+  }
+
+  @Test
+  void set_remove() {
+    Set<Integer> seValuesToRemove = new HashSet<>();
+    seValuesToRemove.add(1);
+    seValuesToRemove.add(2);
+    Set<String> mapKeysToRemove = new HashSet<>();
+    mapKeysToRemove.add("key0");
+    mapKeysToRemove.add("key1");
+    updateImpl.update(TestEntity_Table.test_entity)
+              .set(TestEntity_Table.udtList, TestEntity_Table.udtList.remove(udt2))
+              .set(TestEntity_Table.se, TestEntity_Table.se.remove(seValuesToRemove))
+              .set(TestEntity_Table.nestedMap, TestEntity_Table.nestedMap.remove(mapKeysToRemove));
+
+    UpdateQuery updateQuery = updateImpl.getUpdateQuery();
+    assertThat(updateQuery.getAssignmentClauses())
+        .extracting(assignmentClause -> ((RemoveAssignment) assignmentClause.getAssignment()).getColumnId(),
+                    AssignmentClause::getBindValues)
+        .containsExactlyInAnyOrder(
+            tuple(CqlIdentifier.fromCql(TestEntity_Table.udtList.getName()), new Object[] { Collections.singletonList(TestEntity_Table.udt.serialize(udt2))}),
+            tuple(CqlIdentifier.fromCql(TestEntity_Table.se.getName()), new Object[] { seValuesToRemove }),
+            tuple(CqlIdentifier.fromCql(TestEntity_Table.nestedMap.getName()), new Object[] { mapKeysToRemove })
         );
   }
 
