@@ -4,7 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 //@TestInstance(Lifecycle.PER_CLASS)
-public class DefaultEntityManagerITest/* extends AbstractIntegrationITest*/ {
+class DefaultEntityManagerITest/* extends AbstractIntegrationITest*/ {
 
   private static final Logger logger = LoggerFactory.getLogger(DefaultEntityManagerITest.class);
 

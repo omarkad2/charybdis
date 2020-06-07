@@ -21,7 +21,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 class DefaultSessionFactoryITest {
 
   @Test
-  void load_default_configuration_if_none_specified(int port) {
+  void load_default_configuration_if_none_specified() {
     DefaultSessionFactory defaultSessionFactory = new DefaultSessionFactory();
     DriverConfig initialConfig = defaultSessionFactory.getDriverConfigLoader().getInitialConfig();
 
@@ -30,12 +30,11 @@ class DefaultSessionFactoryITest {
   }
 
   @Test
-  void load_custom_configuration_if_specified(int port) {
+  void load_custom_configuration_if_specified() {
     // customConfiguration.conf overrides one option and adds a profile
     DefaultSessionFactory defaultSessionFactory = new DefaultSessionFactory("customConfiguration.conf");
     DriverConfig initialConfig = defaultSessionFactory.getDriverConfigLoader().getInitialConfig();
 
-    assertThat(initialConfig.getDefaultProfile().getString(DefaultDriverOption.PROTOCOL_VERSION)).isEqualTo("V4");
     assertThat(initialConfig.getProfile("slow")).isNotNull();
     assertThat(initialConfig.getProfile("slow").getDuration(DefaultDriverOption.REQUEST_TIMEOUT)).isEqualTo(Duration.ofSeconds(10));
 

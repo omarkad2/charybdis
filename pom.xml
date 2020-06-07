@@ -61,7 +61,7 @@
     <!-- maven plugins -->
     <build-helper-maven-plugin.version>1.9.1</build-helper-maven-plugin.version>
     <maven-surefire-plugin.version>2.19.1</maven-surefire-plugin.version>
-    <maven-failsafe-plugin.version>2.22.0</maven-failsafe-plugin.version>
+    <maven-failsafe-plugin.version>2.19.1</maven-failsafe-plugin.version>
     <jacoco-maven-plugin.version>0.8.5</jacoco-maven-plugin.version>
   </properties>
 
@@ -219,13 +219,6 @@
   </dependencies>
 
   <build>
-    <pluginManagement>
-      <plugins>
-
-
-      </plugins>
-    </pluginManagement>
-
     <plugins>
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
@@ -287,6 +280,18 @@
             <include>**/*ITest.java</include>
           </includes>
         </configuration>
+        <dependencies>
+          <dependency>
+            <groupId>org.junit.platform</groupId>
+            <artifactId>junit-platform-surefire-provider</artifactId>
+            <version>${junit-platform-surefire-provider.version}</version>
+          </dependency>
+          <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>${junit-jupiter.version}</version>
+          </dependency>
+        </dependencies>
       </plugin>
 
       <plugin>

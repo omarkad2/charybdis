@@ -23,7 +23,7 @@ import ma.markware.charybdis.model.option.ClusteringOrder;
 import ma.markware.charybdis.model.option.SequenceModel;
 
 public class User_Table implements TableMetadata<User> {
-  public static final PartitionKeyColumnMetadata<UUID> id = new PartitionKeyColumnMetadata<UUID>() {
+  public static final PartitionKeyColumnMetadata<UUID, UUID> id = new PartitionKeyColumnMetadata<UUID, UUID>() {
     public String getName() {
       return "id";
     }
@@ -45,7 +45,7 @@ public class User_Table implements TableMetadata<User> {
     }
   };
 
-  public static final ClusteringKeyColumnMetadata<String> fullname = new ClusteringKeyColumnMetadata<String>() {
+  public static final ClusteringKeyColumnMetadata<String, String> fullname = new ClusteringKeyColumnMetadata<String, String>() {
     public String getName() {
       return "fullname";
     }
@@ -71,7 +71,7 @@ public class User_Table implements TableMetadata<User> {
     }
   };
 
-  public static final ClusteringKeyColumnMetadata<Instant> joiningDate = new ClusteringKeyColumnMetadata<Instant>() {
+  public static final ClusteringKeyColumnMetadata<Instant, Instant> joiningDate = new ClusteringKeyColumnMetadata<Instant, Instant>() {
     public String getName() {
       return "joining_date";
     }
@@ -97,7 +97,7 @@ public class User_Table implements TableMetadata<User> {
     }
   };
 
-  public static final ColumnMetadata<Integer> age = new ColumnMetadata<Integer>() {
+  public static final ColumnMetadata<Integer, Integer> age = new ColumnMetadata<Integer, Integer>() {
     public String getName() {
       return "age";
     }
@@ -115,7 +115,7 @@ public class User_Table implements TableMetadata<User> {
     }
   };
 
-  public static final ColumnMetadata<String> email = new ColumnMetadata<String>() {
+  public static final ColumnMetadata<String, String> email = new ColumnMetadata<String, String>() {
     public String getName() {
       return "email";
     }
@@ -133,7 +133,7 @@ public class User_Table implements TableMetadata<User> {
     }
   };
 
-  public static final ColumnMetadata<String> password = new ColumnMetadata<String>() {
+  public static final ColumnMetadata<String, String> password = new ColumnMetadata<String, String>() {
     public String getName() {
       return "password";
     }
@@ -151,7 +151,7 @@ public class User_Table implements TableMetadata<User> {
     }
   };
 
-  public static final ColumnMetadata<Address> address = new ColumnMetadata<Address>() {
+  public static final ColumnMetadata<Address, UdtValue> address = new ColumnMetadata<Address, UdtValue>() {
     public String getName() {
       return "address";
     }
@@ -169,7 +169,7 @@ public class User_Table implements TableMetadata<User> {
     }
   };
 
-  public static final ListColumnMetadata<UUID> followers = new ListColumnMetadata<UUID>() {
+  public static final ListColumnMetadata<UUID, UUID> followers = new ListColumnMetadata<UUID, UUID>() {
     public String getName() {
       return "followers";
     }
@@ -185,9 +185,13 @@ public class User_Table implements TableMetadata<User> {
     public List<UUID> deserialize(Row row) {
       return row != null ? row.getList("followers", java.util.UUID.class): null;
     }
+
+    public UUID serializeItem(UUID field) {
+      return field;
+    }
   };
 
-  public static final ColumnMetadata<RoleEnum> role = new ColumnMetadata<RoleEnum>() {
+  public static final ColumnMetadata<RoleEnum, String> role = new ColumnMetadata<RoleEnum, String>() {
     public String getName() {
       return "role";
     }
@@ -209,7 +213,7 @@ public class User_Table implements TableMetadata<User> {
     }
   };
 
-  public static final SetColumnMetadata<Instant> accessLogs = new SetColumnMetadata<Instant>() {
+  public static final SetColumnMetadata<Instant, Instant> accessLogs = new SetColumnMetadata<Instant, Instant>() {
     public String getName() {
       return "access_logs";
     }
@@ -227,7 +231,7 @@ public class User_Table implements TableMetadata<User> {
     }
   };
 
-  public static final MapColumnMetadata<String, String> metadata = new MapColumnMetadata<String, String>() {
+  public static final MapColumnMetadata<String, String, String, String> metadata = new MapColumnMetadata<String, String, String, String>() {
     public String getName() {
       return "metadata";
     }
@@ -243,9 +247,17 @@ public class User_Table implements TableMetadata<User> {
     public Map<String, String> deserialize(Row row) {
       return row != null ? row.getMap("metadata", java.lang.String.class, java.lang.String.class) : null;
     }
+
+    public String serializeKey(String field) {
+      return field;
+    }
+
+    public String serializeValue(String field) {
+      return field;
+    }
   };
 
-  public static final ColumnMetadata<Instant> creationDate = new ColumnMetadata<Instant>() {
+  public static final ColumnMetadata<Instant, Instant> creationDate = new ColumnMetadata<Instant, Instant>() {
     public String getName() {
       return "creation_date";
     }
@@ -263,7 +275,7 @@ public class User_Table implements TableMetadata<User> {
     }
   };
 
-  public static final ColumnMetadata<Instant> lastUpdatedDate = new ColumnMetadata<Instant>() {
+  public static final ColumnMetadata<Instant, Instant> lastUpdatedDate = new ColumnMetadata<Instant, Instant>() {
     public String getName() {
       return "last_updated_date";
     }
