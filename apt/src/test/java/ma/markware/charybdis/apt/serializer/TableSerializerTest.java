@@ -25,6 +25,7 @@ import ma.markware.charybdis.apt.metatype.FieldTypeMetaType.FieldTypeKind;
 import ma.markware.charybdis.apt.metatype.TableMetaType;
 import ma.markware.charybdis.model.annotation.Udt;
 import ma.markware.charybdis.test.entities.TestEntity;
+import ma.markware.charybdis.test.entities.TestExtraUdt;
 import ma.markware.charybdis.test.entities.TestKeyspaceDefinition;
 import ma.markware.charybdis.test.entities.TestNestedUdt;
 import ma.markware.charybdis.test.entities.TestUdt;
@@ -48,20 +49,21 @@ class TableSerializerTest {
   @Mock
   private Filer filer;
 
-  private AptContext aptContext;
   private AptConfiguration configuration;
   private TableMetaType tableMetaType;
 
   @BeforeAll
+  @SuppressWarnings("unchecked")
   void setup(Types types, Elements elements) {
     MockitoAnnotations.initMocks(this);
 
     TypeElement testNestedUdtElement = elements.getTypeElement(TestNestedUdt.class.getCanonicalName());
     TypeElement testUdtElement = elements.getTypeElement(TestUdt.class.getCanonicalName());
-    Set elementsAnnotatedWithUdt = new HashSet<>(asList(testNestedUdtElement, testUdtElement));
+    TypeElement testExtraUdtElement = elements.getTypeElement(TestExtraUdt.class.getCanonicalName());
+    Set elementsAnnotatedWithUdt = new HashSet<>(asList(testNestedUdtElement, testUdtElement, testExtraUdtElement));
     when(roundEnvironment.getElementsAnnotatedWith(Udt.class)).thenReturn(elementsAnnotatedWithUdt);
 
-    aptContext = new AptContext();
+    final AptContext aptContext = new AptContext();
     configuration = AptDefaultConfiguration.initConfig(aptContext, types, elements, filer);
     aptContext.init(roundEnvironment, configuration);
 

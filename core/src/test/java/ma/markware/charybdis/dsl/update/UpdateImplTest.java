@@ -8,6 +8,7 @@ import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.internal.querybuilder.condition.DefaultCondition;
 import com.datastax.oss.driver.internal.querybuilder.lhs.ColumnComponentLeftOperand;
 import com.datastax.oss.driver.internal.querybuilder.lhs.ColumnLeftOperand;
+import com.datastax.oss.driver.internal.querybuilder.lhs.FieldLeftOperand;
 import com.datastax.oss.driver.internal.querybuilder.relation.DefaultRelation;
 import com.datastax.oss.driver.internal.querybuilder.update.AppendAssignment;
 import com.datastax.oss.driver.internal.querybuilder.update.DefaultAssignment;
@@ -27,9 +28,11 @@ import ma.markware.charybdis.query.clause.AssignmentClause;
 import ma.markware.charybdis.query.clause.ConditionClause;
 import ma.markware.charybdis.query.clause.WhereClause;
 import ma.markware.charybdis.test.entities.TestEnum;
+import ma.markware.charybdis.test.entities.TestExtraUdt;
 import ma.markware.charybdis.test.entities.TestNestedUdt;
 import ma.markware.charybdis.test.entities.TestUdt;
 import ma.markware.charybdis.test.metadata.TestEntity_Table;
+import ma.markware.charybdis.test.metadata.TestExtraUdt_Udt;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -98,10 +101,12 @@ class UpdateImplTest {
     Set<Integer> setValue = Collections.singleton(1);
     List<String> listValue = Arrays.asList("test1", "test2");
     ImmutableMap<Integer, TestEnum> enumMapValue = ImmutableMap.of(0, TestEnum.TYPE_A, 1, TestEnum.TYPE_B);
+    TestExtraUdt extraUdt = new TestExtraUdt(10, 12.12);
     updateImpl.update(TestEntity_Table.test_entity)
               .set(TestEntity_Table.se, setValue)
               .set(TestEntity_Table.list, listValue)
               .set(TestEntity_Table.enumMap, enumMapValue)
+              .set(TestEntity_Table.extraUdt, extraUdt)
               .set(TestEntity_Table.flag, true);
 
     UpdateQuery updateQuery = updateImpl.getUpdateQuery();
@@ -112,12 +117,13 @@ class UpdateImplTest {
           tuple(CqlIdentifier.fromCql(TestEntity_Table.se.getName()), new Object[] { setValue }),
           tuple(CqlIdentifier.fromCql(TestEntity_Table.list.getName()), new Object[] { listValue }),
           tuple(CqlIdentifier.fromCql(TestEntity_Table.enumMap.getName()), new Object[] { ImmutableMap.of(0, "TYPE_A", 1, "TYPE_B") }),
+          tuple(CqlIdentifier.fromCql(TestEntity_Table.extraUdt.getName()), new Object[] { TestEntity_Table.extraUdt.serialize(extraUdt) }),
           tuple(CqlIdentifier.fromCql(TestEntity_Table.flag.getName()), new Object[] { true })
         );
   }
 
   @Test
-  void set_nested_fields() {
+  void set_nested_collection_fields() {
     ImmutableMap<Integer, String> mapValue = ImmutableMap.of(0, "value1");
     updateImpl.update(TestEntity_Table.test_entity)
               .set(TestEntity_Table.udtList.entry(0), udt2)
@@ -130,6 +136,22 @@ class UpdateImplTest {
         .containsExactlyInAnyOrder(
             tuple(CqlIdentifier.fromCql(TestEntity_Table.udtList.getName()), new Object[] { 0, TestEntity_Table.udt.serialize(udt2) }),
             tuple(CqlIdentifier.fromCql(TestEntity_Table.nestedMap.getName()), new Object[] { "key0", mapValue })
+        );
+  }
+
+  @Test
+  void set_nested_udt_field() {
+    updateImpl.update(TestEntity_Table.test_entity)
+              .set(TestEntity_Table.extraUdt.entry(TestExtraUdt_Udt.doubleValue), 10.123456);
+
+    UpdateQuery updateQuery = updateImpl.getUpdateQuery();
+    assertThat(updateQuery.getAssignmentClauses())
+        .extracting(assignmentClause -> ((FieldLeftOperand) ((DefaultAssignment) assignmentClause.getAssignment()).getLeftOperand()).getColumnId(),
+                    assignmentClause -> ((FieldLeftOperand) ((DefaultAssignment) assignmentClause.getAssignment()).getLeftOperand()).getFieldId(),
+                    AssignmentClause::getBindValues)
+        .containsExactlyInAnyOrder(
+            tuple(CqlIdentifier.fromCql(TestEntity_Table.extraUdt.getName()), CqlIdentifier.fromCql(TestExtraUdt_Udt.doubleValue.getName()),
+                  new Object[] { 10.123456 })
         );
   }
 

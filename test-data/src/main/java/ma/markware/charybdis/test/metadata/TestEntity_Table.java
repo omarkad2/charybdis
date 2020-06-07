@@ -18,9 +18,11 @@ import ma.markware.charybdis.model.field.metadata.MapColumnMetadata;
 import ma.markware.charybdis.model.field.metadata.PartitionKeyColumnMetadata;
 import ma.markware.charybdis.model.field.metadata.SetColumnMetadata;
 import ma.markware.charybdis.model.field.metadata.TableMetadata;
+import ma.markware.charybdis.model.field.metadata.UdtColumnMetadata;
 import ma.markware.charybdis.model.option.ClusteringOrder;
 import ma.markware.charybdis.test.entities.TestEntity;
 import ma.markware.charybdis.test.entities.TestEnum;
+import ma.markware.charybdis.test.entities.TestExtraUdt;
 import ma.markware.charybdis.test.entities.TestUdt;
 
 public class TestEntity_Table implements TableMetadata<TestEntity> {
@@ -457,6 +459,28 @@ public class TestEntity_Table implements TableMetadata<TestEntity> {
     }
   };
 
+  public static final UdtColumnMetadata<TestExtraUdt, UdtValue> extraUdt = new UdtColumnMetadata<TestExtraUdt, UdtValue>() {
+    @Override
+    public String getName() {
+      return "extraudt";
+    }
+
+    @Override
+    public Class getFieldClass() {
+      return ma.markware.charybdis.test.entities.TestExtraUdt.class;
+    }
+
+    @Override
+    public UdtValue serialize(TestExtraUdt field) {
+      return field != null ? TestExtraUdt_Udt.test_extra_udt.serialize(field) : null;
+    }
+
+    @Override
+    public TestExtraUdt deserialize(Row row) {
+      return row != null ? TestExtraUdt_Udt.test_extra_udt.deserialize(row.getUdtValue("extraudt")) : null;
+    }
+  };
+
   public static final ListColumnMetadata<TestUdt, UdtValue> udtList = new ListColumnMetadata<TestUdt, UdtValue>() {
     @Override
     public String getName() {
@@ -734,6 +758,7 @@ public class TestEntity_Table implements TableMetadata<TestEntity> {
     results.put("enumlist", enumList);
     results.put("enummap", enumMap);
     results.put("enumnestedlist", enumNestedList);
+    results.put("extraudt", extraUdt);
     results.put("udtlist", udtList);
     results.put("udtset", udtSet);
     results.put("udtmap", udtMap);
@@ -824,6 +849,7 @@ public class TestEntity_Table implements TableMetadata<TestEntity> {
     columnValueMap.put("enumlist", enumList.serialize(entity.getEnumList()));
     columnValueMap.put("enummap", enumMap.serialize(entity.getEnumMap()));
     columnValueMap.put("enumnestedlist", enumNestedList.serialize(entity.getEnumNestedList()));
+    columnValueMap.put("extraudt", extraUdt.serialize(entity.getExtraUdt()));
     columnValueMap.put("udtlist", udtList.serialize(entity.getUdtList()));
     columnValueMap.put("udtset", udtSet.serialize(entity.getUdtSet()));
     columnValueMap.put("udtmap", udtMap.serialize(entity.getUdtMap()));
@@ -850,6 +876,7 @@ public class TestEntity_Table implements TableMetadata<TestEntity> {
     entity.setEnumList(enumList.deserialize(row));
     entity.setEnumMap(enumMap.deserialize(row));
     entity.setEnumNestedList(enumNestedList.deserialize(row));
+    entity.setExtraUdt(extraUdt.deserialize(row));
     entity.setUdtList(udtList.deserialize(row));
     entity.setUdtSet(udtSet.deserialize(row));
     entity.setUdtMap(udtMap.deserialize(row));

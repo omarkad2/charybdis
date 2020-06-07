@@ -37,6 +37,7 @@ import ma.markware.charybdis.model.option.ClusteringOrder;
 import ma.markware.charybdis.test.entities.TestEntity;
 import ma.markware.charybdis.test.entities.TestEntityWithNoPartitionKey;
 import ma.markware.charybdis.test.entities.TestEnum;
+import ma.markware.charybdis.test.entities.TestExtraUdt;
 import ma.markware.charybdis.test.entities.TestKeyspaceDefinition;
 import ma.markware.charybdis.test.entities.TestNestedUdt;
 import ma.markware.charybdis.test.entities.TestUdt;
@@ -62,6 +63,7 @@ class TableParserTest {
   private AptConfiguration configuration;
   private TypeElement testNestedUdtElement;
   private TypeElement testUdtElement;
+  private TypeElement testExtraUdtElement;
   private TypeElement testEntityElement;
 
   @BeforeAll
@@ -70,7 +72,8 @@ class TableParserTest {
     MockitoAnnotations.initMocks(this);
     testNestedUdtElement = elements.getTypeElement(TestNestedUdt.class.getCanonicalName());
     testUdtElement = elements.getTypeElement(TestUdt.class.getCanonicalName());
-    Set elementsAnnotatedWithUdt = new HashSet<>(asList(testNestedUdtElement, testUdtElement));
+    testExtraUdtElement = elements.getTypeElement(TestExtraUdt.class.getCanonicalName());
+    Set elementsAnnotatedWithUdt = new HashSet<>(asList(testNestedUdtElement, testUdtElement, testExtraUdtElement));
     when(roundEnvironment.getElementsAnnotatedWith(Udt.class)).thenReturn(elementsAnnotatedWithUdt);
     testEntityElement = elements.getTypeElement(TestEntity.class.getCanonicalName());
   }
@@ -172,6 +175,9 @@ class TableParserTest {
                                                                  buildFieldTypeMetaType(TypeName.get(TestUdt.class), TypeName.get(UdtValue.class), FieldTypeKind.UDT,
                                                                                         true, false, false)),
                   "getUdtList", "setUdtList", false, null, false, null, null, false, null, null, false, false),
+            tuple("extraudt", "extraUdt", buildFieldTypeMetaType(TypeName.get(TestExtraUdt.class), TypeName.get(UdtValue.class), FieldTypeKind.UDT,
+                                                                 false, false, false),
+                  "getExtraUdt", "setExtraUdt", false, null, false, null, null, false, null, null, false, false),
             tuple("udtset", "udtSet", buildFieldTypeMetaType(ParameterizedTypeName.get(Set.class, TestUdt.class), ParameterizedTypeName.get(Set.class, UdtValue.class),
                                                                FieldTypeKind.SET, false, true, false,
                                                                buildFieldTypeMetaType(TypeName.get(TestUdt.class), TypeName.get(UdtValue.class), FieldTypeKind.UDT,

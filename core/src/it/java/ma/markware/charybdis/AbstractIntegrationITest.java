@@ -17,6 +17,9 @@ public class AbstractIntegrationITest {
   static void initDb(CqlSession session) {
     logger.info("Start creating Keyspaces/Udts/Tables");
     session.execute("CREATE KEYSPACE IF NOT EXISTS test_keyspace WITH REPLICATION = { 'class' : 'SimpleStrategy', 'replication_factor' : 1 };");
+    session.execute("CREATE TYPE IF NOT EXISTS test_keyspace.test_extra_udt ("
+                        + "intvalue int, "
+                        + "doublevalue double);");
     session.execute("CREATE TYPE IF NOT EXISTS test_keyspace.test_nested_udt ("
                         + "name text, "
                         + "value text, "
@@ -41,6 +44,7 @@ public class AbstractIntegrationITest {
                         + "enumvalue text, enumlist list<text>, "
                         + "enummap map<int,text>, "
                         + "enumnestedlist list<frozen<set<text>>>, "
+                        + "extraudt test_keyspace.test_extra_udt, "
                         + "udtlist list<frozen<test_keyspace.test_udt>>, "
                         + "udtset set<frozen<test_keyspace.test_udt>>, "
                         + "udtmap map<int,frozen<test_keyspace.test_udt>>, "

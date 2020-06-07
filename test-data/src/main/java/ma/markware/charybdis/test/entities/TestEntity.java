@@ -1,7 +1,6 @@
 package ma.markware.charybdis.test.entities;
 
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -62,6 +61,9 @@ public class TestEntity extends TestSuperEntity {
   private List<@Frozen Set<TestEnum>> enumNestedList;
 
   @Column
+  private TestExtraUdt extraUdt;
+
+  @Column
   private List<@Frozen TestUdt> udtList;
 
   @Column
@@ -83,9 +85,9 @@ public class TestEntity extends TestSuperEntity {
   public TestEntity(final UUID id, final Instant date, @Frozen final TestUdt udt, @Frozen final List<String> list, final Set<Integer> se,
       final Map<String, String> map, @Frozen final List<List<Integer>> nestedList, final Set<@Frozen List<Integer>> nestedSet,
       final Map<String, @Frozen Map<Integer, String>> nestedMap, final TestEnum enumValue, final List<TestEnum> enumList,
-      final Map<Integer, TestEnum> enumMap, final List<@Frozen Set<TestEnum>> enumNestedList, final List<@Frozen TestUdt> udtList,
-      final Set<@Frozen TestUdt> udtSet, final Map<Integer, @Frozen TestUdt> udtMap, final List<@Frozen List<TestUdt>> udtNestedList,
-      final boolean flag) {
+      final Map<Integer, TestEnum> enumMap, final List<@Frozen Set<TestEnum>> enumNestedList, final TestExtraUdt extraUdt,
+      final List<@Frozen TestUdt> udtList, final Set<@Frozen TestUdt> udtSet, final Map<Integer, @Frozen TestUdt> udtMap,
+      final List<@Frozen List<TestUdt>> udtNestedList, final boolean flag) {
     this.id = id;
     this.date = date;
     this.udt = udt;
@@ -99,6 +101,7 @@ public class TestEntity extends TestSuperEntity {
     this.enumList = enumList;
     this.enumMap = enumMap;
     this.enumNestedList = enumNestedList;
+    this.extraUdt = extraUdt;
     this.udtList = udtList;
     this.udtSet = udtSet;
     this.udtMap = udtMap;
@@ -210,6 +213,14 @@ public class TestEntity extends TestSuperEntity {
     this.udt = udt;
   }
 
+  public TestExtraUdt getExtraUdt() {
+    return extraUdt;
+  }
+
+  public void setExtraUdt(final TestExtraUdt extraUdt) {
+    this.extraUdt = extraUdt;
+  }
+
   public List<TestUdt> getUdtList() {
     return udtList;
   }
@@ -259,25 +270,26 @@ public class TestEntity extends TestSuperEntity {
       return false;
     }
     final TestEntity that = (TestEntity) o;
-    return flag == that.flag && Objects.equals(id, that.id) && Objects.equals(date.truncatedTo(ChronoUnit.MILLIS), that.date.truncatedTo(ChronoUnit.MILLIS))
-        && Objects.equals(udt, that.udt) && Objects.equals(list, that.list) && Objects.equals(se, that.se) && Objects.equals(map, that.map)
-        && Objects.equals(nestedList, that.nestedList) && Objects.equals(nestedSet, that.nestedSet) && Objects.equals(nestedMap, that.nestedMap)
-        && enumValue == that.enumValue && Objects.equals(enumList, that.enumList) && Objects.equals(enumMap, that.enumMap)
-        && Objects.equals(enumNestedList, that.enumNestedList) && Objects.equals(udtList, that.udtList) && Objects.equals(udtSet, that.udtSet)
-        && Objects.equals(udtMap, that.udtMap) && Objects.equals(udtNestedList,that.udtNestedList);
+    return flag == that.flag && Objects.equals(id, that.id) && Objects.equals(date, that.date) && Objects.equals(udt, that.udt) && Objects.equals(
+        list, that.list) && Objects.equals(se, that.se) && Objects.equals(map, that.map) && Objects.equals(nestedList, that.nestedList)
+        && Objects.equals(nestedSet, that.nestedSet) && Objects.equals(nestedMap, that.nestedMap) && enumValue == that.enumValue && Objects.equals(
+        enumList, that.enumList) && Objects.equals(enumMap, that.enumMap) && Objects.equals(enumNestedList, that.enumNestedList) && Objects.equals(
+        extraUdt, that.extraUdt) && Objects.equals(udtList, that.udtList) && Objects.equals(udtSet, that.udtSet) && Objects.equals(udtMap,
+                                                                                                                                   that.udtMap)
+        && Objects.equals(udtNestedList, that.udtNestedList);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, date, udt, list, se, map, nestedList, nestedSet, nestedMap, enumValue, enumList, enumMap, enumNestedList, udtList, udtSet,
-                        udtMap, udtNestedList, flag);
+    return Objects.hash(id, date, udt, list, se, map, nestedList, nestedSet, nestedMap, enumValue, enumList, enumMap, enumNestedList, extraUdt,
+                        udtList, udtSet, udtMap, udtNestedList, flag);
   }
 
   @Override
   public String toString() {
     return "TestEntity{" + "id=" + id + ", date=" + date + ", udt=" + udt + ", list=" + list + ", se=" + se + ", map=" + map + ", nestedList="
         + nestedList + ", nestedSet=" + nestedSet + ", nestedMap=" + nestedMap + ", enumValue=" + enumValue + ", enumList=" + enumList + ", enumMap="
-        + enumMap + ", enumNestedList=" + enumNestedList + ", udtList=" + udtList + ", udtSet=" + udtSet + ", udtMap=" + udtMap + ", udtNestedList="
-        + udtNestedList + ", flag=" + flag + '}';
+        + enumMap + ", enumNestedList=" + enumNestedList + ", extraUdt=" + extraUdt + ", udtList=" + udtList + ", udtSet=" + udtSet + ", udtMap="
+        + udtMap + ", udtNestedList=" + udtNestedList + ", flag=" + flag + '}';
   }
 }

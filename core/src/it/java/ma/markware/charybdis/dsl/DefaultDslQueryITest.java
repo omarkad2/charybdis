@@ -14,6 +14,7 @@ import java.util.UUID;
 import ma.markware.charybdis.AbstractIntegrationITest;
 import ma.markware.charybdis.test.entities.TestEntity;
 import ma.markware.charybdis.test.entities.TestEnum;
+import ma.markware.charybdis.test.entities.TestExtraUdt;
 import ma.markware.charybdis.test.entities.TestNestedUdt;
 import ma.markware.charybdis.test.entities.TestUdt;
 import ma.markware.charybdis.test.metadata.TestEntity_Table;
@@ -59,6 +60,7 @@ class DefaultDslQueryITest extends AbstractIntegrationITest {
     TestUdt udt2 = new TestUdt(2, "test2", Arrays.asList(nestedUdt2, nestedUdt3, nestedUdt4), Collections.singleton(Collections.singletonList(nestedUdt5)),
                                ImmutableMap.of(TestEnum.TYPE_A, Arrays.asList(nestedUdt5, nestedUdt3), TestEnum.TYPE_B, Arrays.asList(nestedUdt1, nestedUdt2, nestedUdt3)),
                                nestedUdt1);
+    TestExtraUdt extraUdt = new TestExtraUdt(100, 100.23);
     List<TestUdt> udtList = Arrays.asList(udt1, udt2);
     Set<TestUdt> udtSet = Collections.singleton(udt1);
     Map<Integer, TestUdt> udtMap = ImmutableMap.of(1, udt1);
@@ -66,7 +68,7 @@ class DefaultDslQueryITest extends AbstractIntegrationITest {
     boolean flag = true;
 
     TestEntity expected = new TestEntity(id, date, udt1, list, se, map, nestedList, nestedSet, nestedMap, enumValue, enumList, enumMap,
-                                         enumNestedList, udtList, udtSet, udtMap, udtNestedList, flag);
+                                         enumNestedList, extraUdt, udtList, udtSet, udtMap, udtNestedList, flag);
 
     // When
     boolean applied = dslQuery.insertInto(TestEntity_Table.test_entity)
@@ -83,6 +85,7 @@ class DefaultDslQueryITest extends AbstractIntegrationITest {
                               .set(TestEntity_Table.enumList, enumList)
                               .set(TestEntity_Table.enumMap, enumMap)
                               .set(TestEntity_Table.enumNestedList, enumNestedList)
+                              .set(TestEntity_Table.extraUdt, extraUdt)
                               .set(TestEntity_Table.udtList, udtList)
                               .set(TestEntity_Table.udtSet, udtSet)
                               .set(TestEntity_Table.udtMap, udtMap)
@@ -98,13 +101,14 @@ class DefaultDslQueryITest extends AbstractIntegrationITest {
                             .fetchOne();
 
     TestEntity actual = new TestEntity(record.get(TestEntity_Table.id), record.get(TestEntity_Table.date), record.get(TestEntity_Table.udt),
-                                           record.get(TestEntity_Table.list), record.get(TestEntity_Table.se), record.get(TestEntity_Table.map),
-                                           record.get(TestEntity_Table.nestedList), record.get(TestEntity_Table.nestedSet),
-                                           record.get(TestEntity_Table.nestedMap), record.get(TestEntity_Table.enumValue),
-                                           record.get(TestEntity_Table.enumList), record.get(TestEntity_Table.enumMap),
-                                           record.get(TestEntity_Table.enumNestedList), record.get(TestEntity_Table.udtList),
-                                           record.get(TestEntity_Table.udtSet), record.get(TestEntity_Table.udtMap),
-                                           record.get(TestEntity_Table.udtNestedList), record.get(TestEntity_Table.flag));
+                                       record.get(TestEntity_Table.list), record.get(TestEntity_Table.se), record.get(TestEntity_Table.map),
+                                       record.get(TestEntity_Table.nestedList), record.get(TestEntity_Table.nestedSet),
+                                       record.get(TestEntity_Table.nestedMap), record.get(TestEntity_Table.enumValue),
+                                       record.get(TestEntity_Table.enumList), record.get(TestEntity_Table.enumMap),
+                                       record.get(TestEntity_Table.enumNestedList), record.get(TestEntity_Table.extraUdt),
+                                       record.get(TestEntity_Table.udtList), record.get(TestEntity_Table.udtSet),
+                                       record.get(TestEntity_Table.udtMap), record.get(TestEntity_Table.udtNestedList),
+                                       record.get(TestEntity_Table.flag));
 
     assertThat(actual).isEqualTo(expected);
   }

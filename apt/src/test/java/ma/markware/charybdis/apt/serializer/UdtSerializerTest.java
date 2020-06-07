@@ -20,6 +20,7 @@ import ma.markware.charybdis.apt.AptDefaultConfiguration;
 import ma.markware.charybdis.apt.CompilationExtension;
 import ma.markware.charybdis.apt.metatype.UdtMetaType;
 import ma.markware.charybdis.model.annotation.Udt;
+import ma.markware.charybdis.test.entities.TestExtraUdt;
 import ma.markware.charybdis.test.entities.TestKeyspaceDefinition;
 import ma.markware.charybdis.test.entities.TestNestedUdt;
 import ma.markware.charybdis.test.entities.TestUdt;
@@ -49,12 +50,14 @@ class UdtSerializerTest {
   private UdtMetaType testUdtMetaType;
 
   @BeforeAll
+  @SuppressWarnings("unchecked")
   void setup(Types types, Elements elements) {
     MockitoAnnotations.initMocks(this);
 
     TypeElement testNestedUdtElement = elements.getTypeElement(TestNestedUdt.class.getCanonicalName());
     TypeElement testUdtElement = elements.getTypeElement(TestUdt.class.getCanonicalName());
-    Set elementsAnnotatedWithUdt = new HashSet<>(asList(testNestedUdtElement, testUdtElement));
+    TypeElement testExtraUdtElement = elements.getTypeElement(TestExtraUdt.class.getCanonicalName());
+    Set elementsAnnotatedWithUdt = new HashSet<>(asList(testNestedUdtElement, testUdtElement, testExtraUdtElement));
     when(roundEnvironment.getElementsAnnotatedWith(Udt.class)).thenReturn(elementsAnnotatedWithUdt);
 
     AptContext aptContext = new AptContext();
