@@ -10,6 +10,7 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.testing.compile.Compilation;
 import com.google.testing.compile.Compiler;
 import com.google.testing.compile.JavaFileObjects;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -342,7 +343,8 @@ public class CompilationExtension implements BeforeAllCallback, BeforeEachCallba
     @Override
     public Compilation apply(JavaFileObject inputObject) {
       try {
-        return Compiler.javac().withProcessors(this).compile(inputObject);
+        Iterable<String> options = Arrays.asList("-d", "target/test-classes");
+        return Compiler.javac().withProcessors(this).withOptions(options).compile(inputObject);
       } finally {
         syncBarrier.forceTermination();
       }

@@ -34,9 +34,10 @@ class CharybdisProcessorITest {
             new File(PACKAGE_PATH, "Address.java")
         ));
 
+    Iterable<String> options = Arrays.asList("-d", "target/test-classes");
     CharybdisProcessor charybdisProcessor = new CharybdisProcessor();
     final CompilationTask task = compiler.getTask(null, manager, diagnostics,
-                                                  null, null, sources );
+                                                  options, null, sources );
     task.setProcessors(Collections.singletonList(charybdisProcessor));
     assertThat(task.call()).isTrue();
   }
