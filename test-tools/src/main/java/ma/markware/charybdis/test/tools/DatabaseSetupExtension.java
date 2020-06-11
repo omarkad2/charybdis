@@ -25,6 +25,7 @@ public class DatabaseSetupExtension implements BeforeAllCallback, AfterAllCallba
   public void beforeAll(final ExtensionContext extensionContext) throws Exception {
     dockerizedCassandra = new DockerizedCassandra();
     dockerizedCassandra.start();
+    System.setProperty("datastax-java-driver.basic.request.timeout", "10 minutes");
     System.setProperty("datastax-java-driver.basic.contact-points.0", "127.0.0.1:" + dockerizedCassandra.getPort());
     System.setProperty("datastax-java-driver.basic.load-balancing-policy.local-datacenter", "datacenter1");
   }
@@ -32,6 +33,7 @@ public class DatabaseSetupExtension implements BeforeAllCallback, AfterAllCallba
   @Override
   public void afterAll(final ExtensionContext extensionContext) throws Exception {
     dockerizedCassandra.close();
+    System.clearProperty("datastax-java-driver.basic.request.timeout");
     System.clearProperty("datastax-java-driver.basic.contact-points.0");
     System.clearProperty("datastax-java-driver.basic.load-balancing-policy.local-datacenter");
   }

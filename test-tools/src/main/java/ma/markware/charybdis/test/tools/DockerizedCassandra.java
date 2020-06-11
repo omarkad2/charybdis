@@ -87,11 +87,12 @@ public class DockerizedCassandra implements AutoCloseable {
   }
 
   @Override
-  public synchronized void close() throws IOException {
+  public synchronized void close() {
     if (session != null && !session.isClosed()) {
       session.close();
     }
     if (isContainerExists(dockerClient, containerId)) {
+      logger.info("Kill & Remove Container");
       dockerClient.killContainerCmd(containerId).exec();
       dockerClient.removeContainerCmd(containerId).exec();
     }

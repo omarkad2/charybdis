@@ -3,22 +3,18 @@ package ma.markware.charybdis.dsl;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.datastax.oss.driver.api.core.CqlSession;
-import com.google.common.collect.ImmutableMap;
+import com.datastax.oss.driver.api.core.cql.SimpleStatement;
+import com.datastax.oss.driver.api.querybuilder.QueryBuilder;
 import java.time.Instant;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.Collection;
 import java.util.UUID;
 import ma.markware.charybdis.AbstractIntegrationITest;
+import ma.markware.charybdis.DataSet1;
 import ma.markware.charybdis.test.entities.TestEntity;
-import ma.markware.charybdis.test.entities.TestEnum;
-import ma.markware.charybdis.test.entities.TestExtraUdt;
-import ma.markware.charybdis.test.entities.TestNestedUdt;
-import ma.markware.charybdis.test.entities.TestUdt;
 import ma.markware.charybdis.test.metadata.TestEntity_Table;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
@@ -33,83 +29,108 @@ class DefaultDslQueryITest extends AbstractIntegrationITest {
     dslQuery = new DefaultDslQuery(session);
   }
 
-  @Test
-  void test() {
+  @Nested
+  @DisplayName("DSL select queries")
+  class DslSelectQueryITest {
 
-    // Given
-    UUID id = UUID.randomUUID();
-    Instant date = Instant.now();
-    List<String> list = Arrays.asList("elt1", "elt2");
-    Set<Integer> se = Collections.singleton(1);
-    Map<String, String> map = ImmutableMap.of("key1", "value1", "key2", "value2");
-    List<List<Integer>> nestedList = Arrays.asList(Arrays.asList(1, 2), Arrays.asList(3, 4));
-    Set<List<Integer>> nestedSet = Collections.singleton(Arrays.asList(41, 42));
-    Map<String, Map<Integer, String>> nestedMap = ImmutableMap.of("key", ImmutableMap.of(0, "nestedValue"));
-    TestEnum enumValue = TestEnum.TYPE_A;
-    List<Set<TestEnum>> enumNestedList = Collections.singletonList(Collections.singleton(TestEnum.TYPE_A));
-    ImmutableMap<Integer, TestEnum> enumMap = ImmutableMap.of(1, TestEnum.TYPE_A);
-    List<TestEnum> enumList = Arrays.asList(TestEnum.TYPE_A, TestEnum.TYPE_B);
-    TestNestedUdt nestedUdt1 = new TestNestedUdt("nestedName1", "nestedValue1", Arrays.asList(12, 13));
-    TestNestedUdt nestedUdt2 = new TestNestedUdt("nestedName2", "nestedValue2", Arrays.asList(14, 15, 16));
-    TestNestedUdt nestedUdt3 = new TestNestedUdt("nestedName3", "nestedValue3", Arrays.asList(17, 18));
-    TestNestedUdt nestedUdt4 = new TestNestedUdt("nestedName4", "nestedValue4", Arrays.asList(19, 20, 21));
-    TestNestedUdt nestedUdt5 = new TestNestedUdt("nestedName5", "nestedValue5", Arrays.asList(22, 23, 24));
-    TestUdt udt1 = new TestUdt(1, "test1", Arrays.asList(nestedUdt1, nestedUdt2), Collections.singleton(Arrays.asList(nestedUdt3, nestedUdt4)),
-                               ImmutableMap.of(TestEnum.TYPE_A, Arrays.asList(nestedUdt1, nestedUdt5), TestEnum.TYPE_B, Collections.singletonList(nestedUdt4)),
-                               new TestNestedUdt());
-    TestUdt udt2 = new TestUdt(2, "test2", Arrays.asList(nestedUdt2, nestedUdt3, nestedUdt4), Collections.singleton(Collections.singletonList(nestedUdt5)),
-                               ImmutableMap.of(TestEnum.TYPE_A, Arrays.asList(nestedUdt5, nestedUdt3), TestEnum.TYPE_B, Arrays.asList(nestedUdt1, nestedUdt2, nestedUdt3)),
-                               nestedUdt1);
-    TestExtraUdt extraUdt = new TestExtraUdt(100, 100.23);
-    List<TestUdt> udtList = Arrays.asList(udt1, udt2);
-    Set<TestUdt> udtSet = Collections.singleton(udt1);
-    Map<Integer, TestUdt> udtMap = ImmutableMap.of(1, udt1);
-    List<List<TestUdt>> udtNestedList = Arrays.asList(udtList, Collections.singletonList(udt1));
-    boolean flag = true;
+    @Test
+    void select(CqlSession session) {
 
-    TestEntity expected = new TestEntity(id, date, udt1, list, se, map, nestedList, nestedSet, nestedMap, enumValue, enumList, enumMap,
-                                         enumNestedList, extraUdt, udtList, udtSet, udtMap, udtNestedList, flag);
+      // Given
+      SimpleStatement statement =
+          QueryBuilder.insertInto(TestEntity_Table.test_entity.getKeyspaceName(), TestEntity_Table.test_entity.getTableName())
+                      .value(TestEntity_Table.id.getName(), QueryBuilder.literal(TestEntity_Table.id.serialize(DataSet1.id)))
+                      .value(TestEntity_Table.date.getName(), QueryBuilder.literal(TestEntity_Table.date.serialize(DataSet1.date)))
+                      .value(TestEntity_Table.udt.getName(), QueryBuilder.literal(TestEntity_Table.udt.serialize(DataSet1.udt1)))
+                      .value(TestEntity_Table.list.getName(), QueryBuilder.literal(TestEntity_Table.list.serialize(DataSet1.list)))
+                      .value(TestEntity_Table.se.getName(), QueryBuilder.literal(TestEntity_Table.se.serialize(DataSet1.se)))
+                      .value(TestEntity_Table.map.getName(), QueryBuilder.literal(TestEntity_Table.map.serialize(DataSet1.map)))
+                      .value(TestEntity_Table.nestedList.getName(), QueryBuilder.literal(TestEntity_Table.nestedList.serialize(DataSet1.nestedList)))
+                      .value(TestEntity_Table.nestedSet.getName(), QueryBuilder.literal(TestEntity_Table.nestedSet.serialize(DataSet1.nestedSet)))
+                      .value(TestEntity_Table.nestedMap.getName(), QueryBuilder.literal(TestEntity_Table.nestedMap.serialize(DataSet1.nestedMap)))
+                      .value(TestEntity_Table.enumValue.getName(), QueryBuilder.literal(TestEntity_Table.enumValue.serialize(DataSet1.enumValue)))
+                      .value(TestEntity_Table.enumList.getName(), QueryBuilder.literal(TestEntity_Table.enumList.serialize(DataSet1.enumList)))
+                      .value(TestEntity_Table.enumMap.getName(), QueryBuilder.literal(TestEntity_Table.enumMap.serialize(DataSet1.enumMap)))
+                      .value(TestEntity_Table.enumNestedList.getName(), QueryBuilder.literal(TestEntity_Table.enumNestedList.serialize(DataSet1.enumNestedList)))
+                      .value(TestEntity_Table.extraUdt.getName(), QueryBuilder.literal(TestEntity_Table.extraUdt.serialize(DataSet1.extraUdt)))
+                      .value(TestEntity_Table.udtList.getName(), QueryBuilder.literal(TestEntity_Table.udtList.serialize(DataSet1.udtList)))
+                      .value(TestEntity_Table.udtSet.getName(), QueryBuilder.literal(TestEntity_Table.udtSet.serialize(DataSet1.udtSet)))
+                      .value(TestEntity_Table.udtMap.getName(), QueryBuilder.literal(TestEntity_Table.udtMap.serialize(DataSet1.udtMap)))
+                      .value(TestEntity_Table.udtNestedList.getName(), QueryBuilder.literal(TestEntity_Table.udtNestedList.serialize(DataSet1.udtNestedList)))
+                      .value(TestEntity_Table.flag.getName(), QueryBuilder.literal(TestEntity_Table.flag.serialize(DataSet1.flag)))
+                      .build();
+      session.execute(statement);
 
-    // When
-    boolean applied = dslQuery.insertInto(TestEntity_Table.test_entity)
-                              .set(TestEntity_Table.id, id)
-                              .set(TestEntity_Table.date, date)
-                              .set(TestEntity_Table.udt, udt1)
-                              .set(TestEntity_Table.list, list)
-                              .set(TestEntity_Table.se, se)
-                              .set(TestEntity_Table.map, map)
-                              .set(TestEntity_Table.nestedList, nestedList)
-                              .set(TestEntity_Table.nestedSet, nestedSet)
-                              .set(TestEntity_Table.nestedMap, nestedMap)
-                              .set(TestEntity_Table.enumValue, enumValue)
-                              .set(TestEntity_Table.enumList, enumList)
-                              .set(TestEntity_Table.enumMap, enumMap)
-                              .set(TestEntity_Table.enumNestedList, enumNestedList)
-                              .set(TestEntity_Table.extraUdt, extraUdt)
-                              .set(TestEntity_Table.udtList, udtList)
-                              .set(TestEntity_Table.udtSet, udtSet)
-                              .set(TestEntity_Table.udtMap, udtMap)
-                              .set(TestEntity_Table.udtNestedList, udtNestedList)
-                              .set(TestEntity_Table.flag, flag)
-                              .execute();
+      // When
+      Record record = dslQuery.selectFrom(TestEntity_Table.test_entity)
+                              .where(TestEntity_Table.id.eq(DataSet1.id))
+                              .fetchOne();
 
-    // Then
-    assertThat(applied).isTrue();
+      // Then
+      TestEntity actual = new TestEntity(record.get(TestEntity_Table.id),
+                                         record.get(TestEntity_Table.date), record.get(TestEntity_Table.udt),
+                                         record.get(TestEntity_Table.list), record.get(TestEntity_Table.se), record.get(TestEntity_Table.map),
+                                         record.get(TestEntity_Table.nestedList), record.get(TestEntity_Table.nestedSet),
+                                         record.get(TestEntity_Table.nestedMap), record.get(TestEntity_Table.enumValue),
+                                         record.get(TestEntity_Table.enumList), record.get(TestEntity_Table.enumMap),
+                                         record.get(TestEntity_Table.enumNestedList), record.get(TestEntity_Table.extraUdt),
+                                         record.get(TestEntity_Table.udtList), record.get(TestEntity_Table.udtSet),
+                                         record.get(TestEntity_Table.udtMap), record.get(TestEntity_Table.udtNestedList),
+                                         record.get(TestEntity_Table.flag));
+      assertThat(actual).isEqualTo(DataSet1.entity1);
+    }
 
-    Record record = dslQuery.selectFrom(TestEntity_Table.test_entity)
-                            .where(TestEntity_Table.id.eq(id))
-                            .fetchOne();
+    @Test
+    void selectDistinct(CqlSession session) {
 
-    TestEntity actual = new TestEntity(record.get(TestEntity_Table.id), record.get(TestEntity_Table.date), record.get(TestEntity_Table.udt),
-                                       record.get(TestEntity_Table.list), record.get(TestEntity_Table.se), record.get(TestEntity_Table.map),
-                                       record.get(TestEntity_Table.nestedList), record.get(TestEntity_Table.nestedSet),
-                                       record.get(TestEntity_Table.nestedMap), record.get(TestEntity_Table.enumValue),
-                                       record.get(TestEntity_Table.enumList), record.get(TestEntity_Table.enumMap),
-                                       record.get(TestEntity_Table.enumNestedList), record.get(TestEntity_Table.extraUdt),
-                                       record.get(TestEntity_Table.udtList), record.get(TestEntity_Table.udtSet),
-                                       record.get(TestEntity_Table.udtMap), record.get(TestEntity_Table.udtNestedList),
-                                       record.get(TestEntity_Table.flag));
+      // Given
+      UUID id1 = UUID.randomUUID();
+      UUID id2 = UUID.randomUUID();
+      UUID id3 = UUID.randomUUID();
+      SimpleStatement statement1 =
+          QueryBuilder.insertInto(TestEntity_Table.test_entity.getKeyspaceName(), TestEntity_Table.test_entity.getTableName())
+                      .value(TestEntity_Table.id.getName(), QueryBuilder.literal(TestEntity_Table.id.serialize(id1)))
+                      .value(TestEntity_Table.date.getName(), QueryBuilder.literal(TestEntity_Table.date.serialize(DataSet1.date)))
+                      .value(TestEntity_Table.udt.getName(), QueryBuilder.literal(TestEntity_Table.udt.serialize(DataSet1.udt1)))
+                      .value(TestEntity_Table.list.getName(), QueryBuilder.literal(TestEntity_Table.list.serialize(DataSet1.list)))
+                      .build();
+      session.execute(statement1);
 
-    assertThat(actual).isEqualTo(expected);
+      SimpleStatement statement2 =
+          QueryBuilder.insertInto(TestEntity_Table.test_entity.getKeyspaceName(), TestEntity_Table.test_entity.getTableName())
+                      .value(TestEntity_Table.id.getName(), QueryBuilder.literal(TestEntity_Table.id.serialize(id1)))
+                      .value(TestEntity_Table.date.getName(), QueryBuilder.literal(TestEntity_Table.date.serialize(Instant.now())))
+                      .value(TestEntity_Table.udt.getName(), QueryBuilder.literal(TestEntity_Table.udt.serialize(DataSet1.udt1)))
+                      .value(TestEntity_Table.list.getName(), QueryBuilder.literal(TestEntity_Table.list.serialize(DataSet1.list)))
+                      .build();
+      session.execute(statement2);
+
+      SimpleStatement statement3 =
+          QueryBuilder.insertInto(TestEntity_Table.test_entity.getKeyspaceName(), TestEntity_Table.test_entity.getTableName())
+                      .value(TestEntity_Table.id.getName(), QueryBuilder.literal(TestEntity_Table.id.serialize(id2)))
+                      .value(TestEntity_Table.date.getName(), QueryBuilder.literal(TestEntity_Table.date.serialize(DataSet1.date)))
+                      .value(TestEntity_Table.udt.getName(), QueryBuilder.literal(TestEntity_Table.udt.serialize(DataSet1.udt1)))
+                      .value(TestEntity_Table.list.getName(), QueryBuilder.literal(TestEntity_Table.list.serialize(DataSet1.list)))
+                      .build();
+      session.execute(statement3);
+
+      SimpleStatement statement4 =
+          QueryBuilder.insertInto(TestEntity_Table.test_entity.getKeyspaceName(), TestEntity_Table.test_entity.getTableName())
+                      .value(TestEntity_Table.id.getName(), QueryBuilder.literal(TestEntity_Table.id.serialize(id3)))
+                      .value(TestEntity_Table.date.getName(), QueryBuilder.literal(TestEntity_Table.date.serialize(DataSet1.date)))
+                      .value(TestEntity_Table.udt.getName(), QueryBuilder.literal(TestEntity_Table.udt.serialize(DataSet1.udt1)))
+                      .value(TestEntity_Table.list.getName(), QueryBuilder.literal(TestEntity_Table.list.serialize(DataSet1.list)))
+                      .build();
+      session.execute(statement4);
+
+      // When
+      Collection<Record> records = dslQuery.selectDistinct(TestEntity_Table.id)
+                                           .from(TestEntity_Table.test_entity)
+                                           .fetch();
+
+      assertThat(records).hasSize(3);
+      assertThat(records).extracting(record -> record.get(TestEntity_Table.id))
+                         .containsExactlyInAnyOrder(id1, id2, id3);
+    }
   }
 }

@@ -2,7 +2,9 @@ package ma.markware.charybdis;
 
 
 import com.datastax.oss.driver.api.core.CqlSession;
+import com.datastax.oss.driver.api.core.cql.SimpleStatement;
 import ma.markware.charybdis.test.tools.DatabaseSetupExtension;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
@@ -54,5 +56,11 @@ public class AbstractIntegrationITest {
                         + "last_updated_date timestamp, "
                         + "PRIMARY KEY ((id), date, udt, list));");
     logger.info("End creating Keyspaces/Udts/Tables");
+  }
+
+  @AfterEach
+  void cleanDatabase(CqlSession session) {
+    session.execute(SimpleStatement.builder("TRUNCATE test_keyspace.test_entity;")
+                                           .build());
   }
 }
