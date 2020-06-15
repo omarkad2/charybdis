@@ -199,7 +199,8 @@ public class TableSerializer implements EntitySerializer<TableMetaType> {
     final String parameterName = "entity";
     ParameterizedTypeName methodReturnType = ParameterizedTypeName.get(ClassName.get(Map.class), ClassName.get(String.class),
                                                                        ClassName.get(Object.class));
-    CodeBlock.Builder codeBlockBuilder = CodeBlock.builder().addStatement("$T columnValueMap = new $T<>()", methodReturnType, HashMap.class);
+    CodeBlock.Builder codeBlockBuilder = CodeBlock.builder().addStatement("if ($N == null) return null", parameterName);
+    codeBlockBuilder.addStatement("$T columnValueMap = new $T<>()", methodReturnType, HashMap.class);
     for (ColumnFieldMetaType columnField : tableMetaType.getColumns()) {
       String columnName = columnField.getSerializationName();
       String columnGetterName = columnField.getGetterName();
@@ -217,8 +218,8 @@ public class TableSerializer implements EntitySerializer<TableMetaType> {
 
   private static MethodSpec buildDeserializeMethod(TableMetaType tableMetaType) {
     final String parameterName = "row";
-    CodeBlock.Builder codeBlockBuilder = CodeBlock.builder().addStatement("$T entity = new $T()", tableMetaType.getTypeName(),
-                                                                          tableMetaType.getTypeName());
+    CodeBlock.Builder codeBlockBuilder = CodeBlock.builder().addStatement("if ($N == null) return null", parameterName);
+    codeBlockBuilder.addStatement("$T entity = new $T()", tableMetaType.getTypeName(), tableMetaType.getTypeName());
     for (ColumnFieldMetaType columnField : tableMetaType.getColumns()) {
       String columnSetterName = columnField.getSetterName();
       codeBlockBuilder.addStatement("entity.$L($L.$L($N))", columnSetterName, columnField.getDeserializationName(), SerializationConstants.DESERIALIZE_ROW_METHOD,

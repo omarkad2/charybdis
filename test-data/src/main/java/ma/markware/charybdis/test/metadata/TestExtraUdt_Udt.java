@@ -29,12 +29,14 @@ public class TestExtraUdt_Udt implements UdtMetadata<TestExtraUdt> {
 
     @Override
     public Integer deserialize(UdtValue udtValue) {
-      return udtValue != null ? udtValue.get("intvalue", java.lang.Integer.class) : null;
+      if (udtValue == null || udtValue.isNull("intvalue")) return null;
+      return udtValue.get("intvalue", java.lang.Integer.class);
     }
 
     @Override
     public Integer deserialize(Row row, String path) {
-      return row != null ? row.get(path, java.lang.Integer.class) : null;
+      if (row == null || row.isNull(path)) return null;
+      return row.get(path, Integer.class);
     }
 
     @Override
@@ -61,12 +63,14 @@ public class TestExtraUdt_Udt implements UdtMetadata<TestExtraUdt> {
 
     @Override
     public Double deserialize(UdtValue udtValue) {
-      return udtValue != null ? udtValue.get("doublevalue", java.lang.Double.class) : null;
+      if (udtValue == null || udtValue.isNull("doublevalue")) return null;
+      return udtValue.get("doublevalue", Double.class);
     }
 
     @Override
     public Double deserialize(Row row, String path) {
-      return row != null ? row.get(path, java.lang.Double.class) : null;
+      if (row == null || row.isNull(path)) return null;
+      return row.get(path, Double.class);
     }
 
     @Override
@@ -100,13 +104,26 @@ public class TestExtraUdt_Udt implements UdtMetadata<TestExtraUdt> {
 
   @Override
   public UdtValue serialize(TestExtraUdt entity) {
-    return udt.newValue()
-              .set("intvalue", intValue.serialize(entity.getIntValue()), java.lang.Integer.class)
-              .set("doublevalue", doubleValue.serialize(entity.getDoubleValue()), java.lang.Double.class);
+    if (entity == null) return null;
+    UdtValue udtValue = udt.newValue();
+    java.lang.Integer intValueValue = intValue.serialize(entity.getIntValue());
+    if (intValueValue == null) {
+      udtValue.setToNull("intvalue");
+    } else {
+      udtValue.set("intvalue", intValue.serialize(entity.getIntValue()), java.lang.Integer.class);
+    }
+    java.lang.Double doubleValueValue = doubleValue.serialize(entity.getDoubleValue());
+    if (doubleValueValue == null) {
+      udtValue.setToNull("doublevalue");
+    } else {
+      udtValue.set("doublevalue", doubleValue.serialize(entity.getDoubleValue()), java.lang.Double.class);
+    }
+    return udtValue;
   }
 
   @Override
   public TestExtraUdt deserialize(UdtValue udtValue) {
+    if (udtValue == null) return null;
     TestExtraUdt entity = new TestExtraUdt();
     entity.setIntValue(intValue.deserialize(udtValue));
     entity.setDoubleValue(doubleValue.deserialize(udtValue));

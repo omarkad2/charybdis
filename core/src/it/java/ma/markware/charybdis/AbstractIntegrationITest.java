@@ -3,9 +3,12 @@ package ma.markware.charybdis;
 
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.cql.SimpleStatement;
+import com.datastax.oss.driver.api.querybuilder.QueryBuilder;
+import com.datastax.oss.driver.api.querybuilder.term.Term;
+import java.util.Map;
 import ma.markware.charybdis.test.tools.DatabaseSetupExtension;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,9 +61,13 @@ public class AbstractIntegrationITest {
     logger.info("End creating Keyspaces/Udts/Tables");
   }
 
-  @AfterEach
+  @BeforeEach
   void cleanDatabase(CqlSession session) {
     session.execute(SimpleStatement.builder("TRUNCATE test_keyspace.test_entity;")
                                            .build());
+  }
+
+  protected void insertRow(CqlSession session, String keyspaceName, String tableName, Map<String, Term> values) {
+    session.execute(QueryBuilder.insertInto(keyspaceName, tableName).values(values).build());
   }
 }

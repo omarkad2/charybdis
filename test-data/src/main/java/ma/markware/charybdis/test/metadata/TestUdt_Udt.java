@@ -40,17 +40,20 @@ public class TestUdt_Udt implements UdtMetadata<TestUdt> {
 
     @Override
     public UdtValue serialize(TestNestedUdt field) {
-      return field != null ? TestNestedUdt_Udt.test_nested_udt.serialize(field) : null;
+      if (field == null) return null;
+      return TestNestedUdt_Udt.test_nested_udt.serialize(field);
     }
 
     @Override
     public TestNestedUdt deserialize(UdtValue udtValue) {
-      return udtValue != null ? TestNestedUdt_Udt.test_nested_udt.deserialize(udtValue.getUdtValue("udtnested")) : null;
+      if (udtValue == null || udtValue.isNull("udtnested")) return null;
+      return TestNestedUdt_Udt.test_nested_udt.deserialize(udtValue.getUdtValue("udtnested"));
     }
 
     @Override
     public TestNestedUdt deserialize(Row row, String path) {
-      return row != null ? TestNestedUdt_Udt.test_nested_udt.deserialize(row.getUdtValue(path)) : null;
+      if (row == null || row.isNull(path)) return null;
+      return TestNestedUdt_Udt.test_nested_udt.deserialize(row.getUdtValue(path));
     }
 
     @Override
@@ -77,12 +80,14 @@ public class TestUdt_Udt implements UdtMetadata<TestUdt> {
 
     @Override
     public Integer deserialize(UdtValue udtValue) {
-      return udtValue != null ? udtValue.get("number", java.lang.Integer.class) : null;
+      if (udtValue == null || udtValue.isNull("number")) return null;
+      return udtValue.get("number", Integer.class);
     }
 
     @Override
     public Integer deserialize(Row row, String path) {
-      return row != null ? row.get(path, java.lang.Integer.class) : null;
+      if (row == null || row.isNull(path)) return null;
+      return row.get(path, Integer.class);
     }
 
     @Override
@@ -109,12 +114,14 @@ public class TestUdt_Udt implements UdtMetadata<TestUdt> {
 
     @Override
     public String deserialize(UdtValue udtValue) {
-      return udtValue != null ? udtValue.get("value", java.lang.String.class) : null;
+      if (udtValue == null || udtValue.isNull("value")) return null;
+      return udtValue.get("value", String.class);
     }
 
     @Override
     public String deserialize(Row row, String path) {
-      return row != null ? row.get(path, java.lang.String.class) : null;
+      if (row == null || row.isNull(path)) return null;
+      return row.get(path, String.class);
     }
 
     @Override
@@ -136,32 +143,43 @@ public class TestUdt_Udt implements UdtMetadata<TestUdt> {
 
     @Override
     public List<UdtValue> serialize(List<TestNestedUdt> field) {
-      java.util.List<com.datastax.oss.driver.api.core.data.UdtValue> result0 = new ArrayList<>();
-      for (ma.markware.charybdis.test.entities.TestNestedUdt source1 : field) {
-        com.datastax.oss.driver.api.core.data.UdtValue result1 = TestNestedUdt_Udt.test_nested_udt.serialize(source1);
-        result0.add(result1);
+      java.util.List<com.datastax.oss.driver.api.core.data.UdtValue> result0 = null;
+      if (field != null) {
+        result0 = new ArrayList<>();
+        for (ma.markware.charybdis.test.entities.TestNestedUdt source1 : field) {
+          com.datastax.oss.driver.api.core.data.UdtValue result1 = TestNestedUdt_Udt.test_nested_udt.serialize(source1);
+          result0.add(result1);
+        }
       }
       return result0;
     }
 
     @Override
     public List<TestNestedUdt> deserialize(UdtValue udtValue) {
+      if (udtValue == null || udtValue.isNull("udtnestedlist")) return null;
       java.util.List<com.datastax.oss.driver.api.core.data.UdtValue> rawValue = udtValue.get("udtnestedlist", udtNestedListGenericType);
-      java.util.List<ma.markware.charybdis.test.entities.TestNestedUdt> result0 = new ArrayList<>();
-      for (com.datastax.oss.driver.api.core.data.UdtValue source1 : rawValue) {
-        ma.markware.charybdis.test.entities.TestNestedUdt result1 = TestNestedUdt_Udt.test_nested_udt.deserialize(source1);
-        result0.add(result1);
+      java.util.List<ma.markware.charybdis.test.entities.TestNestedUdt> result0 = null;
+      if (rawValue != null) {
+        result0 = new ArrayList<>();
+        for (com.datastax.oss.driver.api.core.data.UdtValue source1 : rawValue) {
+          ma.markware.charybdis.test.entities.TestNestedUdt result1 = TestNestedUdt_Udt.test_nested_udt.deserialize(source1);
+          result0.add(result1);
+        }
       }
       return result0;
     }
 
     @Override
     public List<TestNestedUdt> deserialize(Row row, String path) {
+      if (row == null || row.isNull(path)) return null;
       java.util.List<com.datastax.oss.driver.api.core.data.UdtValue> rawValue = row.get(path, udtNestedListGenericType);
-      java.util.List<ma.markware.charybdis.test.entities.TestNestedUdt> result0 = new ArrayList<>();
-      for (com.datastax.oss.driver.api.core.data.UdtValue source1 : rawValue) {
-        ma.markware.charybdis.test.entities.TestNestedUdt result1 = TestNestedUdt_Udt.test_nested_udt.deserialize(source1);
-        result0.add(result1);
+      java.util.List<ma.markware.charybdis.test.entities.TestNestedUdt> result0 = null;
+      if (rawValue != null) {
+        result0 = new ArrayList<>();
+        for (com.datastax.oss.driver.api.core.data.UdtValue source1 : rawValue) {
+          ma.markware.charybdis.test.entities.TestNestedUdt result1 = TestNestedUdt_Udt.test_nested_udt.deserialize(source1);
+          result0.add(result1);
+        }
       }
       return result0;
     }
@@ -185,44 +203,64 @@ public class TestUdt_Udt implements UdtMetadata<TestUdt> {
 
     @Override
     public Set<List<UdtValue>> serialize(Set<List<TestNestedUdt>> field) {
-      java.util.Set<java.util.List<com.datastax.oss.driver.api.core.data.UdtValue>> result0 = new HashSet<>();
-      for (java.util.List<ma.markware.charybdis.test.entities.TestNestedUdt> source1 : field) {
-        java.util.List<com.datastax.oss.driver.api.core.data.UdtValue> result1 = new ArrayList<>();
-        for (ma.markware.charybdis.test.entities.TestNestedUdt source2 : source1) {
-          com.datastax.oss.driver.api.core.data.UdtValue result2 = TestNestedUdt_Udt.test_nested_udt.serialize(source2);
-          result1.add(result2);
+      java.util.Set<java.util.List<com.datastax.oss.driver.api.core.data.UdtValue>> result0 = null;
+      if (field != null) {
+        result0 = new HashSet<>();
+        for (java.util.List<ma.markware.charybdis.test.entities.TestNestedUdt> source1 : field) {
+          java.util.List<com.datastax.oss.driver.api.core.data.UdtValue> result1 = null;
+          if (source1 != null) {
+            result1 = new ArrayList<>();
+            for (ma.markware.charybdis.test.entities.TestNestedUdt source2 : source1) {
+              com.datastax.oss.driver.api.core.data.UdtValue result2 = TestNestedUdt_Udt.test_nested_udt.serialize(source2);
+              result1.add(result2);
+            }
+          }
+          result0.add(result1);
         }
-        result0.add(result1);
       }
       return result0;
     }
 
     @Override
     public Set<List<TestNestedUdt>> deserialize(UdtValue udtValue) {
+      if (udtValue == null || udtValue.isNull("udtnestednestedset")) return null;
       java.util.Set<java.util.List<com.datastax.oss.driver.api.core.data.UdtValue>> rawValue = udtValue.get("udtnestednestedset", udtNestedNestedSetGenericType);
-      java.util.Set<java.util.List<ma.markware.charybdis.test.entities.TestNestedUdt>> result0 = new HashSet<>();
-      for (java.util.List<com.datastax.oss.driver.api.core.data.UdtValue> source1 : rawValue) {
-        java.util.List<ma.markware.charybdis.test.entities.TestNestedUdt> result1 = new ArrayList<>();
-        for (com.datastax.oss.driver.api.core.data.UdtValue source2 : source1) {
-          ma.markware.charybdis.test.entities.TestNestedUdt result2 = TestNestedUdt_Udt.test_nested_udt.deserialize(source2);
-          result1.add(result2);
+      java.util.Set<java.util.List<ma.markware.charybdis.test.entities.TestNestedUdt>> result0 = null;
+      if (rawValue != null) {
+        result0 = new HashSet<>();
+        for (java.util.List<com.datastax.oss.driver.api.core.data.UdtValue> source1 : rawValue) {
+          java.util.List<ma.markware.charybdis.test.entities.TestNestedUdt> result1 = null;
+          if (source1 != null) {
+            result1 = new ArrayList<>();
+            for (com.datastax.oss.driver.api.core.data.UdtValue source2 : source1) {
+              ma.markware.charybdis.test.entities.TestNestedUdt result2 = TestNestedUdt_Udt.test_nested_udt.deserialize(source2);
+              result1.add(result2);
+            }
+          }
+          result0.add(result1);
         }
-        result0.add(result1);
       }
       return result0;
     }
 
     @Override
     public Set<List<TestNestedUdt>> deserialize(Row row, String path) {
+      if (row == null || row.isNull(path)) return null;
       java.util.Set<java.util.List<com.datastax.oss.driver.api.core.data.UdtValue>> rawValue = row.get(path, udtNestedNestedSetGenericType);
-      java.util.Set<java.util.List<ma.markware.charybdis.test.entities.TestNestedUdt>> result0 = new HashSet<>();
-      for (java.util.List<com.datastax.oss.driver.api.core.data.UdtValue> source1 : rawValue) {
-        java.util.List<ma.markware.charybdis.test.entities.TestNestedUdt> result1 = new ArrayList<>();
-        for (com.datastax.oss.driver.api.core.data.UdtValue source2 : source1) {
-          ma.markware.charybdis.test.entities.TestNestedUdt result2 = TestNestedUdt_Udt.test_nested_udt.deserialize(source2);
-          result1.add(result2);
+      java.util.Set<java.util.List<ma.markware.charybdis.test.entities.TestNestedUdt>> result0 = null;
+      if (rawValue != null) {
+        result0 = new HashSet<>();
+        for (java.util.List<com.datastax.oss.driver.api.core.data.UdtValue> source1 : rawValue) {
+          java.util.List<ma.markware.charybdis.test.entities.TestNestedUdt> result1 = null;
+          if (source1 != null) {
+            result1 = new ArrayList<>();
+            for (com.datastax.oss.driver.api.core.data.UdtValue source2 : source1) {
+              ma.markware.charybdis.test.entities.TestNestedUdt result2 = TestNestedUdt_Udt.test_nested_udt.deserialize(source2);
+              result1.add(result2);
+            }
+          }
+          result0.add(result1);
         }
-        result0.add(result1);
       }
       return result0;
     }
@@ -246,53 +284,73 @@ public class TestUdt_Udt implements UdtMetadata<TestUdt> {
 
     @Override
     public Map<String, List<UdtValue>> serialize(Map<TestEnum, List<TestNestedUdt>> field) {
-      java.util.Map<java.lang.String, java.util.List<com.datastax.oss.driver.api.core.data.UdtValue>> result0 = new HashMap<>();
-      for (Map.Entry<ma.markware.charybdis.test.entities.TestEnum, java.util.List<ma.markware.charybdis.test.entities.TestNestedUdt>> entry1 : field.entrySet()) {
-        ma.markware.charybdis.test.entities.TestEnum sourceKey1 = entry1.getKey();
-        java.util.List<ma.markware.charybdis.test.entities.TestNestedUdt> sourceValue1 = entry1.getValue();
-        java.lang.String destinationKey1 = sourceKey1.name();
-        java.util.List<com.datastax.oss.driver.api.core.data.UdtValue> destinationValue1 = new ArrayList<>();
-        for (ma.markware.charybdis.test.entities.TestNestedUdt source2 : sourceValue1) {
-          com.datastax.oss.driver.api.core.data.UdtValue result2 = TestNestedUdt_Udt.test_nested_udt.serialize(source2);
-          destinationValue1.add(result2);
+      java.util.Map<java.lang.String, java.util.List<com.datastax.oss.driver.api.core.data.UdtValue>> result0 = null;
+      if (field != null) {
+        result0 = new HashMap<>();
+        for (Map.Entry<ma.markware.charybdis.test.entities.TestEnum, java.util.List<ma.markware.charybdis.test.entities.TestNestedUdt>> entry1 : field.entrySet()) {
+          ma.markware.charybdis.test.entities.TestEnum sourceKey1 = entry1.getKey();
+          java.util.List<ma.markware.charybdis.test.entities.TestNestedUdt> sourceValue1 = entry1.getValue();
+          java.lang.String destinationKey1 = sourceKey1 != null ? sourceKey1.name() : null;
+          java.util.List<com.datastax.oss.driver.api.core.data.UdtValue> destinationValue1 = null;
+          if (sourceValue1 != null) {
+            destinationValue1 = new ArrayList<>();
+            for (ma.markware.charybdis.test.entities.TestNestedUdt source2 : sourceValue1) {
+              com.datastax.oss.driver.api.core.data.UdtValue result2 = TestNestedUdt_Udt.test_nested_udt.serialize(source2);
+              destinationValue1.add(result2);
+            }
+          }
+          result0.put(destinationKey1, destinationValue1);
         }
-        result0.put(destinationKey1, destinationValue1);
       }
       return result0;
     }
 
     @Override
     public Map<TestEnum, List<TestNestedUdt>> deserialize(UdtValue udtValue) {
+      if (udtValue == null || udtValue.isNull("udtnestedmap")) return null;
       java.util.Map<java.lang.String, java.util.List<com.datastax.oss.driver.api.core.data.UdtValue>> rawValue = udtValue.get("udtnestedmap", udtNestedMapGenericType);
-      java.util.Map<ma.markware.charybdis.test.entities.TestEnum, java.util.List<ma.markware.charybdis.test.entities.TestNestedUdt>> result0 = new HashMap<>();
-      for (Map.Entry<java.lang.String, java.util.List<com.datastax.oss.driver.api.core.data.UdtValue>> entry1 : rawValue.entrySet()) {
-        java.lang.String sourceKey1 = entry1.getKey();
-        java.util.List<com.datastax.oss.driver.api.core.data.UdtValue> sourceValue1 = entry1.getValue();
-        ma.markware.charybdis.test.entities.TestEnum destinationKey1 = ma.markware.charybdis.test.entities.TestEnum.valueOf(sourceKey1);
-        java.util.List<ma.markware.charybdis.test.entities.TestNestedUdt> destinationValue1 = new ArrayList<>();
-        for (com.datastax.oss.driver.api.core.data.UdtValue source2 : sourceValue1) {
-          ma.markware.charybdis.test.entities.TestNestedUdt result2 = TestNestedUdt_Udt.test_nested_udt.deserialize(source2);
-          destinationValue1.add(result2);
+      java.util.Map<ma.markware.charybdis.test.entities.TestEnum, java.util.List<ma.markware.charybdis.test.entities.TestNestedUdt>> result0 = null;
+      if (rawValue != null) {
+        result0 = new HashMap<>();
+        for (Map.Entry<java.lang.String, java.util.List<com.datastax.oss.driver.api.core.data.UdtValue>> entry1 : rawValue.entrySet()) {
+          java.lang.String sourceKey1 = entry1.getKey();
+          java.util.List<com.datastax.oss.driver.api.core.data.UdtValue> sourceValue1 = entry1.getValue();
+          ma.markware.charybdis.test.entities.TestEnum destinationKey1 = ma.markware.charybdis.test.entities.TestEnum.valueOf(sourceKey1);
+          java.util.List<ma.markware.charybdis.test.entities.TestNestedUdt> destinationValue1 = null;
+          if (sourceValue1 != null) {
+            destinationValue1 = new ArrayList<>();
+            for (com.datastax.oss.driver.api.core.data.UdtValue source2 : sourceValue1) {
+              ma.markware.charybdis.test.entities.TestNestedUdt result2 = TestNestedUdt_Udt.test_nested_udt.deserialize(source2);
+              destinationValue1.add(result2);
+            }
+          }
+          result0.put(destinationKey1, destinationValue1);
         }
-        result0.put(destinationKey1, destinationValue1);
       }
       return result0;
     }
 
     @Override
     public Map<TestEnum, List<TestNestedUdt>> deserialize(Row row, String path) {
+      if (row == null || row.isNull(path)) return null;
       java.util.Map<java.lang.String, java.util.List<com.datastax.oss.driver.api.core.data.UdtValue>> rawValue = row.get(path, udtNestedMapGenericType);
-      java.util.Map<ma.markware.charybdis.test.entities.TestEnum, java.util.List<ma.markware.charybdis.test.entities.TestNestedUdt>> result0 = new HashMap<>();
-      for (Map.Entry<java.lang.String, java.util.List<com.datastax.oss.driver.api.core.data.UdtValue>> entry1 : rawValue.entrySet()) {
-        java.lang.String sourceKey1 = entry1.getKey();
-        java.util.List<com.datastax.oss.driver.api.core.data.UdtValue> sourceValue1 = entry1.getValue();
-        ma.markware.charybdis.test.entities.TestEnum destinationKey1 = ma.markware.charybdis.test.entities.TestEnum.valueOf(sourceKey1);
-        java.util.List<ma.markware.charybdis.test.entities.TestNestedUdt> destinationValue1 = new ArrayList<>();
-        for (com.datastax.oss.driver.api.core.data.UdtValue source2 : sourceValue1) {
-          ma.markware.charybdis.test.entities.TestNestedUdt result2 = TestNestedUdt_Udt.test_nested_udt.deserialize(source2);
-          destinationValue1.add(result2);
+      java.util.Map<ma.markware.charybdis.test.entities.TestEnum, java.util.List<ma.markware.charybdis.test.entities.TestNestedUdt>> result0 = null;
+      if (rawValue != null) {
+        result0 = new HashMap<>();
+        for (Map.Entry<java.lang.String, java.util.List<com.datastax.oss.driver.api.core.data.UdtValue>> entry1 : rawValue.entrySet()) {
+          java.lang.String sourceKey1 = entry1.getKey();
+          java.util.List<com.datastax.oss.driver.api.core.data.UdtValue> sourceValue1 = entry1.getValue();
+          ma.markware.charybdis.test.entities.TestEnum destinationKey1 = ma.markware.charybdis.test.entities.TestEnum.valueOf(sourceKey1);
+          java.util.List<ma.markware.charybdis.test.entities.TestNestedUdt> destinationValue1 = null;
+          if (sourceValue1 != null) {
+            destinationValue1 = new ArrayList<>();
+            for (com.datastax.oss.driver.api.core.data.UdtValue source2 : sourceValue1) {
+              ma.markware.charybdis.test.entities.TestNestedUdt result2 = TestNestedUdt_Udt.test_nested_udt.deserialize(source2);
+              destinationValue1.add(result2);
+            }
+          }
+          result0.put(destinationKey1, destinationValue1);
         }
-        result0.put(destinationKey1, destinationValue1);
       }
       return result0;
     }
@@ -332,17 +390,50 @@ public class TestUdt_Udt implements UdtMetadata<TestUdt> {
 
   @Override
   public UdtValue serialize(TestUdt entity) {
-    return udt.newValue()
-              .set("udtnested", udtNested.serialize(entity.getUdtNested()), com.datastax.oss.driver.api.core.data.UdtValue.class)
-              .set("number", number.serialize(entity.getNumber()), java.lang.Integer.class)
-              .set("value", value.serialize(entity.getValue()), java.lang.String.class)
-              .setList("udtnestedlist", udtNestedList.serialize(entity.getUdtNestedList()), com.datastax.oss.driver.api.core.data.UdtValue.class)
-              .set("udtnestednestedset", udtNestedNestedSet.serialize(entity.getUdtNestedNestedSet()), udtNestedNestedSetGenericType)
-              .set("udtnestedmap", udtNestedMap.serialize(entity.getUdtNestedMap()), udtNestedMapGenericType);
+    if (entity == null) return null;
+    com.datastax.oss.driver.api.core.data.UdtValue udtValue = udt.newValue();
+    com.datastax.oss.driver.api.core.data.UdtValue udtNestedValue = udtNested.serialize(entity.getUdtNested());
+    if (udtNestedValue == null) {
+      udtValue.setToNull("udtnested");
+    } else {
+      udtValue.set("udtnested", udtNested.serialize(entity.getUdtNested()), com.datastax.oss.driver.api.core.data.UdtValue.class);
+    }
+    java.lang.Integer numberValue = number.serialize(entity.getNumber());
+    if (numberValue == null) {
+      udtValue.setToNull("number");
+    } else {
+      udtValue.set("number", number.serialize(entity.getNumber()), java.lang.Integer.class);
+    }
+    java.lang.String valueValue = value.serialize(entity.getValue());
+    if (valueValue == null) {
+      udtValue.setToNull("value");
+    } else {
+      udtValue.set("value", value.serialize(entity.getValue()), java.lang.String.class);
+    }
+    java.util.List<com.datastax.oss.driver.api.core.data.UdtValue> udtNestedListValue = udtNestedList.serialize(entity.getUdtNestedList());
+    if (udtNestedListValue == null) {
+      udtValue.setToNull("udtnestedlist");
+    } else {
+      udtValue.setList("udtnestedlist", udtNestedList.serialize(entity.getUdtNestedList()), com.datastax.oss.driver.api.core.data.UdtValue.class);
+    }
+    java.util.Set<java.util.List<com.datastax.oss.driver.api.core.data.UdtValue>> udtNestedNestedSetValue = udtNestedNestedSet.serialize(entity.getUdtNestedNestedSet());
+    if (udtNestedNestedSetValue == null) {
+      udtValue.setToNull("udtnestednestedset");
+    } else {
+      udtValue.set("udtnestednestedset", udtNestedNestedSet.serialize(entity.getUdtNestedNestedSet()), udtNestedNestedSetGenericType);
+    }
+    java.util.Map<java.lang.String, java.util.List<com.datastax.oss.driver.api.core.data.UdtValue>> udtNestedMapValue = udtNestedMap.serialize(entity.getUdtNestedMap());
+    if (udtNestedMapValue == null) {
+      udtValue.setToNull("udtnestedmap");
+    } else {
+      udtValue.set("udtnestedmap", udtNestedMap.serialize(entity.getUdtNestedMap()), udtNestedMapGenericType);
+    }
+    return udtValue;
   }
 
   @Override
   public TestUdt deserialize(UdtValue udtValue) {
+    if (udtValue == null) return null;
     TestUdt entity = new TestUdt();
     entity.setUdtNested(udtNested.deserialize(udtValue));
     entity.setNumber(number.deserialize(udtValue));

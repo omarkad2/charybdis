@@ -24,6 +24,7 @@ import ma.markware.charybdis.test.entities.TestExtraUdt;
 import ma.markware.charybdis.test.entities.TestKeyspaceDefinition;
 import ma.markware.charybdis.test.entities.TestNestedUdt;
 import ma.markware.charybdis.test.entities.TestUdt;
+import ma.markware.charybdis.test.metadata.TestExtraUdt_Udt;
 import ma.markware.charybdis.test.metadata.TestNestedUdt_Udt;
 import ma.markware.charybdis.test.metadata.TestUdt_Udt;
 import org.junit.jupiter.api.BeforeAll;
@@ -48,6 +49,7 @@ class UdtSerializerTest {
   private AptConfiguration configuration;
   private UdtMetaType testNestedUdtMetaType;
   private UdtMetaType testUdtMetaType;
+  private UdtMetaType testExtraUdtMetaType;
 
   @BeforeAll
   @SuppressWarnings("unchecked")
@@ -68,6 +70,7 @@ class UdtSerializerTest {
                  .parse(elements.getTypeElement(TestKeyspaceDefinition.class.getCanonicalName()));
     testNestedUdtMetaType = configuration.getUdtParser().parse(testNestedUdtElement);
     testUdtMetaType = configuration.getUdtParser().parse(testUdtElement);
+    testExtraUdtMetaType = configuration.getUdtParser().parse(testExtraUdtElement);
   }
 
   @ParameterizedTest
@@ -88,7 +91,8 @@ class UdtSerializerTest {
   private Stream<Arguments> getTestArguments() {
     return Stream.of(
         Arguments.of(testNestedUdtMetaType, TestNestedUdt_Udt.class),
-        Arguments.of(testUdtMetaType, TestUdt_Udt.class)
+        Arguments.of(testUdtMetaType, TestUdt_Udt.class),
+        Arguments.of(testExtraUdtMetaType, TestExtraUdt_Udt.class)
     );
   }
 }

@@ -28,11 +28,13 @@ public class TestNestedUdt_Udt implements UdtMetadata<TestNestedUdt> {
     }
     @Override
     public String deserialize(UdtValue udtValue) {
-      return udtValue != null ? udtValue.get("name", java.lang.String.class) : null;
+      if (udtValue == null || udtValue.isNull("name")) return null;
+      return udtValue.get("name", String.class);
     }
     @Override
     public String deserialize(Row row, String path) {
-      return row != null ? row.get(path, java.lang.String.class) : null;
+      if (row == null || row.isNull(path)) return null;
+      return row.get(path, String.class);
     }
     @Override
     public DataType getDataType() {
@@ -54,11 +56,13 @@ public class TestNestedUdt_Udt implements UdtMetadata<TestNestedUdt> {
     }
     @Override
     public String deserialize(UdtValue udtValue) {
-      return udtValue != null ? udtValue.get("value", java.lang.String.class) : null;
+      if (udtValue == null || udtValue.isNull("value")) return null;
+      return udtValue.get("value", String.class);
     }
     @Override
     public String deserialize(Row row, String path) {
-      return row != null ? row.get(path, java.lang.String.class) : null;
+      if (row == null || row.isNull(path)) return null;
+      return row.get(path, String.class);
     }
     @Override
     public DataType getDataType() {
@@ -80,11 +84,13 @@ public class TestNestedUdt_Udt implements UdtMetadata<TestNestedUdt> {
     }
     @Override
     public List<Integer> deserialize(UdtValue udtValue) {
-      return udtValue != null ? udtValue.getList("numbers", java.lang.Integer.class): null;
+      if (udtValue == null || udtValue.isNull("numbers")) return null;
+      return udtValue.getList("numbers", Integer.class);
     }
     @Override
     public List<Integer> deserialize(Row row, String path) {
-      return row != null ? row.getList(path, java.lang.Integer.class): null;
+      if (row == null || row.isNull(path)) return null;
+      return row.getList(path, Integer.class);
     }
     @Override
     public DataType getDataType() {
@@ -110,13 +116,31 @@ public class TestNestedUdt_Udt implements UdtMetadata<TestNestedUdt> {
   }
   @Override
   public UdtValue serialize(TestNestedUdt entity) {
-    return udt.newValue()
-              .set("name", name.serialize(entity.getName()), java.lang.String.class)
-              .set("value", value.serialize(entity.getValue()), java.lang.String.class)
-              .setList("numbers", numbers.serialize(entity.getNumbers()), java.lang.Integer.class);
+    if (entity == null) return null;
+    UdtValue udtValue = udt.newValue();
+    java.lang.String nameValue = name.serialize(entity.getName());
+    if (nameValue == null) {
+      udtValue.setToNull("name");
+    } else {
+      udtValue.set("name", name.serialize(entity.getName()), java.lang.String.class);
+    }
+    java.lang.String valueValue = value.serialize(entity.getValue());
+    if (valueValue == null) {
+      udtValue.setToNull("value");
+    } else {
+      udtValue.set("value", value.serialize(entity.getValue()), java.lang.String.class);
+    }
+    java.util.List<java.lang.Integer> numbersValue = numbers.serialize(entity.getNumbers());
+    if (numbersValue == null) {
+      udtValue.setToNull("numbers");
+    } else {
+      udtValue.setList("numbers", numbers.serialize(entity.getNumbers()), java.lang.Integer.class);
+    }
+    return udtValue;
   }
   @Override
   public TestNestedUdt deserialize(UdtValue udtValue) {
+    if (udtValue == null) return null;
     TestNestedUdt entity = new TestNestedUdt();
     entity.setName(name.deserialize(udtValue));
     entity.setValue(value.deserialize(udtValue));

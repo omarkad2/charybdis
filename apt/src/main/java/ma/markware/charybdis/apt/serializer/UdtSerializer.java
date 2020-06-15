@@ -107,55 +107,71 @@ public class UdtSerializer implements EntitySerializer<UdtMetaType> {
 
   private MethodSpec buildSerializeMethod(final UdtMetaType udtMetaType) {
     final String parameterName = "entity";
-    CodeBlock.Builder methodBuilder = CodeBlock.builder().add("return $N.newValue()", SerializationConstants.UDT_FIELD);
+    CodeBlock.Builder methodBuilder = CodeBlock.builder().addStatement("if ($N == null) return null", parameterName);
+    methodBuilder.addStatement("$T udtValue = $N.newValue()", UdtValue.class,
+                                                                       SerializationConstants.UDT_FIELD);
     for (UdtFieldMetaType udtField : udtMetaType.getUdtFields()) {
       String udtFieldName = udtField.getSerializationName();
       String fieldName = udtField.getDeserializationName();
+      String fieldValueName = fieldName + "Value";
       String udtGetterName = udtField.getGetterName();
       FieldTypeMetaType udtFieldType = udtField.getFieldType();
       List<FieldTypeMetaType> fieldSubTypes = udtFieldType.getSubTypes();
-      methodBuilder.add(SKIP_LINE);
+
+      methodBuilder.addStatement("$L $N = $N.$L($N.$L())", udtFieldType.getSerializationTypeCanonicalName(), fieldValueName, fieldName,
+                                 SerializationConstants.SERIALIZE_METHOD, parameterName, udtGetterName);
+      methodBuilder.beginControlFlow("if ($N == null)", fieldValueName);
+      methodBuilder.addStatement("udtValue = udtValue.setToNull($S)", udtFieldName);
+      methodBuilder.nextControlFlow("else");
       if (udtFieldType.isComplex()) {
-        methodBuilder.add(".set($S, $N.$L($N.$L()), $N)", udtFieldName, fieldName, SerializationConstants.SERIALIZE_METHOD,
+        methodBuilder.addStatement("udtValue = udtValue.set($S, $N.$L($N.$L()), $N)", udtFieldName, fieldName, SerializationConstants.SERIALIZE_METHOD,
                           parameterName, udtGetterName, NameUtils.resolveGenericTypeName(fieldName));
       } else {
         switch (udtFieldType.getFieldTypeKind()) {
           case LIST:
             FieldTypeMetaType listSubType = fieldSubTypes.get(0);
-            methodBuilder.add(".setList($S, $N.$L($N.$L()), $L.class)", udtFieldName, fieldName, SerializationConstants.SERIALIZE_METHOD,
-                              parameterName, udtGetterName, listSubType.getSerializationTypeCanonicalName());
+            methodBuilder.addStatement("udtValue = udtValue.setList($S, $N.$L($N.$L()), $L.class)", udtFieldName, fieldName,
+                                       SerializationConstants.SERIALIZE_METHOD, parameterName, udtGetterName,
+                                       listSubType.getSerializationTypeCanonicalName());
             break;
           case SET:
             FieldTypeMetaType setSubType = fieldSubTypes.get(0);
-            methodBuilder.add(".setSet($S, $N.$L($N.$L()), $L.class)", udtFieldName, fieldName, SerializationConstants.SERIALIZE_METHOD,
-                              parameterName, udtGetterName, setSubType.getSerializationTypeCanonicalName());
+            methodBuilder.addStatement("udtValue = udtValue.setSet($S, $N.$L($N.$L()), $L.class)", udtFieldName, fieldName,
+                                       SerializationConstants.SERIALIZE_METHOD, parameterName, udtGetterName,
+                                       setSubType.getSerializationTypeCanonicalName());
             break;
           case MAP:
             FieldTypeMetaType udtFieldSubKeyType = fieldSubTypes.get(0);
             FieldTypeMetaType udtFieldSubValueType = fieldSubTypes.get(1);
-            methodBuilder.add(".setMap($S, $N.$L($N.$L()), $L.class, $L.class)", udtFieldName, fieldName, SerializationConstants.SERIALIZE_METHOD,
-                              parameterName, udtGetterName, udtFieldSubKeyType.getSerializationTypeCanonicalName(),
+            methodBuilder.addStatement("udtValue = udtValue.setMap($S, $N.$L($N.$L()), $L.class, $L.class)", udtFieldName, fieldName,
+                              SerializationConstants.SERIALIZE_METHOD, parameterName, udtGetterName, udtFieldSubKeyType.getSerializationTypeCanonicalName(),
                               udtFieldSubValueType.getSerializationTypeCanonicalName());
             break;
           default:
-            methodBuilder.add(".set($S, $N.$L($N.$L()), $L.class)", udtFieldName, fieldName, SerializationConstants.SERIALIZE_METHOD, parameterName,
-                              udtGetterName, udtFieldType.getSerializationTypeCanonicalName());
+            methodBuilder.addStatement("udtValue = udtValue.set($S, $N.$L($N.$L()), $L.class)", udtFieldName, fieldName,
+                                       SerializationConstants.SERIALIZE_METHOD, parameterName,
+                                       udtGetterName, udtFieldType.getSerializationTypeCanonicalName());
             break;
         }
       }
+      methodBuilder.endControlFlow();
     }
+    methodBuilder.addStatement("return udtValue");
+
     return MethodSpec.methodBuilder(SerializationConstants.SERIALIZE_METHOD)
                      .addModifiers(Modifier.PUBLIC)
                      .addParameter(udtMetaType.getTypeName(), parameterName)
                      .returns(UdtValue.class)
-                     .addStatement(methodBuilder.build())
+//                     .addStatement("if ($N == null) return null", parameterName)
+                     .addCode(methodBuilder.build())
+//                     .addStatement("return udtValue")
                      .build();
   }
 
   private MethodSpec buildDeserializeMethod(final UdtMetaType udtMetaType) {
     final String parameterName = "udtValue";
-    CodeBlock.Builder methodBuilder = CodeBlock.builder().addStatement("$T entity = new $T()", udtMetaType.getTypeName(),
-                                                                          udtMetaType.getTypeName());
+    CodeBlock.Builder methodBuilder = CodeBlock.builder().addStatement("if ($N == null) return null", parameterName);
+    methodBuilder.addStatement("$T entity = new $T()", udtMetaType.getTypeName(), udtMetaType.getTypeName());
     for (UdtFieldMetaType udtField : udtMetaType.getUdtFields()) {
       String fieldName = udtField.getDeserializationName();
       String udtSetterName = udtField.getSetterName();

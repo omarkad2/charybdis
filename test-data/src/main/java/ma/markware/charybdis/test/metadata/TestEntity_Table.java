@@ -64,7 +64,8 @@ public class TestEntity_Table implements TableMetadata<TestEntity> {
 
     @Override
     public UUID deserialize(Row row) {
-      return row != null ? row.get("id", java.util.UUID.class) : null;
+      if (row == null || row.isNull("id")) return null;
+      return row.get("id", UUID.class);
     }
 
     @Override
@@ -91,7 +92,8 @@ public class TestEntity_Table implements TableMetadata<TestEntity> {
 
     @Override
     public Instant deserialize(Row row) {
-      return row != null ? row.get("date", java.time.Instant.class) : null;
+      if (row == null || row.isNull("date")) return null;
+      return row.get("date", Instant.class);
     }
 
     @Override
@@ -118,12 +120,14 @@ public class TestEntity_Table implements TableMetadata<TestEntity> {
 
     @Override
     public UdtValue serialize(TestUdt field) {
-      return field != null ? TestUdt_Udt.test_udt.serialize(field) : null;
+      if (field == null) return null;
+      return TestUdt_Udt.test_udt.serialize(field);
     }
 
     @Override
     public TestUdt deserialize(Row row) {
-      return row != null ? TestUdt_Udt.test_udt.deserialize(row.getUdtValue("udt")) : null;
+      if (row == null || row.isNull("udt")) return null;
+      return TestUdt_Udt.test_udt.deserialize(row.getUdtValue("udt"));
     }
 
     @Override
@@ -155,7 +159,8 @@ public class TestEntity_Table implements TableMetadata<TestEntity> {
 
     @Override
     public List<String> deserialize(Row row) {
-      return row != null ? row.getList("list", java.lang.String.class): null;
+      if (row == null || row.isNull("list")) return null;
+      return row.getList("list", String.class);
     }
 
     @Override
@@ -187,7 +192,8 @@ public class TestEntity_Table implements TableMetadata<TestEntity> {
 
     @Override
     public Set<Integer> deserialize(Row row) {
-      return row != null ? row.getSet("se", java.lang.Integer.class) : null;
+      if (row == null || row.isNull("se")) return null;
+      return row.getSet("se", Integer.class);
     }
   };
 
@@ -209,7 +215,8 @@ public class TestEntity_Table implements TableMetadata<TestEntity> {
 
     @Override
     public Map<String, String> deserialize(Row row) {
-      return row != null ? row.getMap("map", java.lang.String.class, java.lang.String.class) : null;
+      if (row == null || row.isNull("map")) return null;
+      return row.getMap("map", String.class, String.class);
     }
 
     @Override
@@ -241,7 +248,8 @@ public class TestEntity_Table implements TableMetadata<TestEntity> {
 
     @Override
     public List<List<Integer>> deserialize(Row row) {
-      return row != null ? row.get("nestedlist", nestedListGenericType) : null;
+      if (row == null || row.isNull("nestedlist")) return null;
+      return row.get("nestedlist", nestedListGenericType);
     }
   };
 
@@ -263,7 +271,8 @@ public class TestEntity_Table implements TableMetadata<TestEntity> {
 
     @Override
     public Set<List<Integer>> deserialize(Row row) {
-      return row != null ? row.get("nestedset", nestedSetGenericType) : null;
+      if (row == null || row.isNull("nestedset")) return null;
+      return row.get("nestedset", nestedSetGenericType);
     }
   };
 
@@ -285,7 +294,8 @@ public class TestEntity_Table implements TableMetadata<TestEntity> {
 
     @Override
     public Map<String, Map<Integer, String>> deserialize(Row row) {
-      return row != null ? row.get("nestedmap", nestedMapGenericType) : null;
+      if (row == null || row.isNull("nestedmap")) return null;
+      return row.get("nestedmap", nestedMapGenericType);
     }
 
     @Override
@@ -312,12 +322,14 @@ public class TestEntity_Table implements TableMetadata<TestEntity> {
 
     @Override
     public String serialize(TestEnum field) {
-      return field != null ? field.name() : null;
+      if (field == null) return null;
+      return field.name();
     }
 
     @Override
     public TestEnum deserialize(Row row) {
-      return row != null && row.getString("enumvalue") != null ? ma.markware.charybdis.test.entities.TestEnum.valueOf(row.getString("enumvalue")) : null;
+      if (row == null || row.isNull("enumvalue")) return null;
+      return row.getString("enumvalue") != null ? TestEnum.valueOf(row.getString("enumvalue")) : null;
     }
   };
 
@@ -334,28 +346,36 @@ public class TestEntity_Table implements TableMetadata<TestEntity> {
 
     @Override
     public List<String> serialize(List<TestEnum> field) {
-      java.util.List<java.lang.String> result0 = new ArrayList<>();
-      for (ma.markware.charybdis.test.entities.TestEnum source1 : field) {
-        java.lang.String result1 = source1.name();
-        result0.add(result1);
+      java.util.List<java.lang.String> result0 = null;
+      if (field != null) {
+        result0 = new ArrayList<>();
+        for (ma.markware.charybdis.test.entities.TestEnum source1 : field) {
+          java.lang.String result1 = source1 != null ? source1.name() : null;
+          result0.add(result1);
+        }
       }
       return result0;
     }
 
     @Override
     public List<TestEnum> deserialize(Row row) {
+      if (row == null || row.isNull("enumlist")) return null;
       java.util.List<java.lang.String> rawValue = row.get("enumlist", enumListGenericType);
-      java.util.List<ma.markware.charybdis.test.entities.TestEnum> result0 = new ArrayList<>();
-      for (java.lang.String source1 : rawValue) {
-        ma.markware.charybdis.test.entities.TestEnum result1 = ma.markware.charybdis.test.entities.TestEnum.valueOf(source1);
-        result0.add(result1);
+      java.util.List<ma.markware.charybdis.test.entities.TestEnum> result0 = null;
+      if (rawValue != null) {
+        result0 = new ArrayList<>();
+        for (java.lang.String source1 : rawValue) {
+          ma.markware.charybdis.test.entities.TestEnum result1 = ma.markware.charybdis.test.entities.TestEnum.valueOf(source1);
+          result0.add(result1);
+        }
       }
       return result0;
     }
 
     @Override
     public String serializeItem(TestEnum field) {
-      return field != null ? field.name() : null;
+      if (field == null) return null;
+      return field.name();
     }
   };
 
@@ -372,27 +392,34 @@ public class TestEntity_Table implements TableMetadata<TestEntity> {
 
     @Override
     public Map<Integer, String> serialize(Map<Integer, TestEnum> field) {
-      java.util.Map<java.lang.Integer, java.lang.String> result0 = new HashMap<>();
-      for (Map.Entry<java.lang.Integer, ma.markware.charybdis.test.entities.TestEnum> entry1 : field.entrySet()) {
-        java.lang.Integer sourceKey1 = entry1.getKey();
-        ma.markware.charybdis.test.entities.TestEnum sourceValue1 = entry1.getValue();
-        java.lang.Integer destinationKey1 = sourceKey1;
-        java.lang.String destinationValue1 = sourceValue1.name();
-        result0.put(destinationKey1, destinationValue1);
+      java.util.Map<java.lang.Integer, java.lang.String> result0 = null;
+      if (field != null) {
+        result0 = new HashMap<>();
+        for (Map.Entry<java.lang.Integer, ma.markware.charybdis.test.entities.TestEnum> entry1 : field.entrySet()) {
+          java.lang.Integer sourceKey1 = entry1.getKey();
+          ma.markware.charybdis.test.entities.TestEnum sourceValue1 = entry1.getValue();
+          java.lang.Integer destinationKey1 = sourceKey1;
+          java.lang.String destinationValue1 = sourceValue1 != null ? sourceValue1.name() : null;
+          result0.put(destinationKey1, destinationValue1);
+        }
       }
       return result0;
     }
 
     @Override
     public Map<Integer, TestEnum> deserialize(Row row) {
+      if (row == null || row.isNull("enummap")) return null;
       java.util.Map<java.lang.Integer, java.lang.String> rawValue = row.get("enummap", enumMapGenericType);
-      java.util.Map<java.lang.Integer, ma.markware.charybdis.test.entities.TestEnum> result0 = new HashMap<>();
-      for (Map.Entry<java.lang.Integer, java.lang.String> entry1 : rawValue.entrySet()) {
-        java.lang.Integer sourceKey1 = entry1.getKey();
-        java.lang.String sourceValue1 = entry1.getValue();
-        java.lang.Integer destinationKey1 = sourceKey1;
-        ma.markware.charybdis.test.entities.TestEnum destinationValue1 = ma.markware.charybdis.test.entities.TestEnum.valueOf(sourceValue1);
-        result0.put(destinationKey1, destinationValue1);
+      java.util.Map<java.lang.Integer, ma.markware.charybdis.test.entities.TestEnum> result0 = null;
+      if (rawValue != null) {
+        result0 = new HashMap<>();
+        for (Map.Entry<java.lang.Integer, java.lang.String> entry1 : rawValue.entrySet()) {
+          java.lang.Integer sourceKey1 = entry1.getKey();
+          java.lang.String sourceValue1 = entry1.getValue();
+          java.lang.Integer destinationKey1 = sourceKey1;
+          ma.markware.charybdis.test.entities.TestEnum destinationValue1 = ma.markware.charybdis.test.entities.TestEnum.valueOf(sourceValue1);
+          result0.put(destinationKey1, destinationValue1);
+        }
       }
       return result0;
     }
@@ -404,7 +431,8 @@ public class TestEntity_Table implements TableMetadata<TestEntity> {
 
     @Override
     public String serializeValue(TestEnum field) {
-      return field != null ? field.name() : null;
+      if (field == null) return null;
+      return field.name();
     }
   };
 
@@ -421,39 +449,55 @@ public class TestEntity_Table implements TableMetadata<TestEntity> {
 
     @Override
     public List<Set<String>> serialize(List<Set<TestEnum>> field) {
-      java.util.List<java.util.Set<java.lang.String>> result0 = new ArrayList<>();
-      for (java.util.Set<ma.markware.charybdis.test.entities.TestEnum> source1 : field) {
-        java.util.Set<java.lang.String> result1 = new HashSet<>();
-        for (ma.markware.charybdis.test.entities.TestEnum source2 : source1) {
-          java.lang.String result2 = source2.name();
-          result1.add(result2);
+      java.util.List<java.util.Set<java.lang.String>> result0 = null;
+      if (field != null) {
+        result0 = new ArrayList<>();
+        for (java.util.Set<ma.markware.charybdis.test.entities.TestEnum> source1 : field) {
+          java.util.Set<java.lang.String> result1 = null;
+          if (source1 != null) {
+            result1 = new HashSet<>();
+            for (ma.markware.charybdis.test.entities.TestEnum source2 : source1) {
+              java.lang.String result2 = source2 != null ? source2.name() : null;
+              result1.add(result2);
+            }
+          }
+          result0.add(result1);
         }
-        result0.add(result1);
       }
       return result0;
     }
 
     @Override
     public List<Set<TestEnum>> deserialize(Row row) {
+      if (row == null || row.isNull("enumnestedlist")) return null;
       java.util.List<java.util.Set<java.lang.String>> rawValue = row.get("enumnestedlist", enumNestedListGenericType);
-      java.util.List<java.util.Set<ma.markware.charybdis.test.entities.TestEnum>> result0 = new ArrayList<>();
-      for (java.util.Set<java.lang.String> source1 : rawValue) {
-        java.util.Set<ma.markware.charybdis.test.entities.TestEnum> result1 = new HashSet<>();
-        for (java.lang.String source2 : source1) {
-          ma.markware.charybdis.test.entities.TestEnum result2 = ma.markware.charybdis.test.entities.TestEnum.valueOf(source2);
-          result1.add(result2);
+      java.util.List<java.util.Set<ma.markware.charybdis.test.entities.TestEnum>> result0 = null;
+      if (rawValue != null) {
+        result0 = new ArrayList<>();
+        for (java.util.Set<java.lang.String> source1 : rawValue) {
+          java.util.Set<ma.markware.charybdis.test.entities.TestEnum> result1 = null;
+          if (source1 != null) {
+            result1 = new HashSet<>();
+            for (java.lang.String source2 : source1) {
+              ma.markware.charybdis.test.entities.TestEnum result2 = ma.markware.charybdis.test.entities.TestEnum.valueOf(source2);
+              result1.add(result2);
+            }
+          }
+          result0.add(result1);
         }
-        result0.add(result1);
       }
       return result0;
     }
 
     @Override
     public Set<String> serializeItem(Set<TestEnum> field) {
-      java.util.Set<java.lang.String> result0 = new HashSet<>();
-      for (ma.markware.charybdis.test.entities.TestEnum source1 : field) {
-        java.lang.String result1 = source1.name();
-        result0.add(result1);
+      java.util.Set<java.lang.String> result0 = null;
+      if (field != null) {
+        result0 = new HashSet<>();
+        for (ma.markware.charybdis.test.entities.TestEnum source1 : field) {
+          java.lang.String result1 = source1 != null ? source1.name() : null;
+          result0.add(result1);
+        }
       }
       return result0;
     }
@@ -472,12 +516,14 @@ public class TestEntity_Table implements TableMetadata<TestEntity> {
 
     @Override
     public UdtValue serialize(TestExtraUdt field) {
-      return field != null ? TestExtraUdt_Udt.test_extra_udt.serialize(field) : null;
+      if (field == null) return null;
+      return TestExtraUdt_Udt.test_extra_udt.serialize(field);
     }
 
     @Override
     public TestExtraUdt deserialize(Row row) {
-      return row != null ? TestExtraUdt_Udt.test_extra_udt.deserialize(row.getUdtValue("extraudt")) : null;
+      if (row == null || row.isNull("extraudt")) return null;
+      return TestExtraUdt_Udt.test_extra_udt.deserialize(row.getUdtValue("extraudt"));
     }
   };
 
@@ -494,28 +540,36 @@ public class TestEntity_Table implements TableMetadata<TestEntity> {
 
     @Override
     public List<UdtValue> serialize(List<TestUdt> field) {
-      java.util.List<com.datastax.oss.driver.api.core.data.UdtValue> result0 = new ArrayList<>();
-      for (ma.markware.charybdis.test.entities.TestUdt source1 : field) {
-        com.datastax.oss.driver.api.core.data.UdtValue result1 = TestUdt_Udt.test_udt.serialize(source1);
-        result0.add(result1);
+      java.util.List<com.datastax.oss.driver.api.core.data.UdtValue> result0 = null;
+      if (field != null) {
+        result0 = new ArrayList<>();
+        for (ma.markware.charybdis.test.entities.TestUdt source1 : field) {
+          com.datastax.oss.driver.api.core.data.UdtValue result1 = TestUdt_Udt.test_udt.serialize(source1);
+          result0.add(result1);
+        }
       }
       return result0;
     }
 
     @Override
     public List<TestUdt> deserialize(Row row) {
+      if (row == null || row.isNull("udtlist")) return null;
       java.util.List<com.datastax.oss.driver.api.core.data.UdtValue> rawValue = row.get("udtlist", udtListGenericType);
-      java.util.List<ma.markware.charybdis.test.entities.TestUdt> result0 = new ArrayList<>();
-      for (com.datastax.oss.driver.api.core.data.UdtValue source1 : rawValue) {
-        ma.markware.charybdis.test.entities.TestUdt result1 = TestUdt_Udt.test_udt.deserialize(source1);
-        result0.add(result1);
+      java.util.List<ma.markware.charybdis.test.entities.TestUdt> result0 = null;
+      if (rawValue != null) {
+        result0 = new ArrayList<>();
+        for (com.datastax.oss.driver.api.core.data.UdtValue source1 : rawValue) {
+          ma.markware.charybdis.test.entities.TestUdt result1 = TestUdt_Udt.test_udt.deserialize(source1);
+          result0.add(result1);
+        }
       }
       return result0;
     }
 
     @Override
     public UdtValue serializeItem(TestUdt field) {
-      return field != null ? TestUdt_Udt.test_udt.serialize(field) : null;
+      if (field == null) return null;
+      return TestUdt_Udt.test_udt.serialize(field);
     }
   };
 
@@ -532,21 +586,28 @@ public class TestEntity_Table implements TableMetadata<TestEntity> {
 
     @Override
     public Set<UdtValue> serialize(Set<TestUdt> field) {
-      java.util.Set<com.datastax.oss.driver.api.core.data.UdtValue> result0 = new HashSet<>();
-      for (ma.markware.charybdis.test.entities.TestUdt source1 : field) {
-        com.datastax.oss.driver.api.core.data.UdtValue result1 = TestUdt_Udt.test_udt.serialize(source1);
-        result0.add(result1);
+      java.util.Set<com.datastax.oss.driver.api.core.data.UdtValue> result0 = null;
+      if (field != null) {
+        result0 = new HashSet<>();
+        for (ma.markware.charybdis.test.entities.TestUdt source1 : field) {
+          com.datastax.oss.driver.api.core.data.UdtValue result1 = TestUdt_Udt.test_udt.serialize(source1);
+          result0.add(result1);
+        }
       }
       return result0;
     }
 
     @Override
     public Set<TestUdt> deserialize(Row row) {
+      if (row == null || row.isNull("udtset")) return null;
       java.util.Set<com.datastax.oss.driver.api.core.data.UdtValue> rawValue = row.get("udtset", udtSetGenericType);
-      java.util.Set<ma.markware.charybdis.test.entities.TestUdt> result0 = new HashSet<>();
-      for (com.datastax.oss.driver.api.core.data.UdtValue source1 : rawValue) {
-        ma.markware.charybdis.test.entities.TestUdt result1 = TestUdt_Udt.test_udt.deserialize(source1);
-        result0.add(result1);
+      java.util.Set<ma.markware.charybdis.test.entities.TestUdt> result0 = null;
+      if (rawValue != null) {
+        result0 = new HashSet<>();
+        for (com.datastax.oss.driver.api.core.data.UdtValue source1 : rawValue) {
+          ma.markware.charybdis.test.entities.TestUdt result1 = TestUdt_Udt.test_udt.deserialize(source1);
+          result0.add(result1);
+        }
       }
       return result0;
     }
@@ -565,27 +626,34 @@ public class TestEntity_Table implements TableMetadata<TestEntity> {
 
     @Override
     public Map<Integer, UdtValue> serialize(Map<Integer, TestUdt> field) {
-      java.util.Map<java.lang.Integer, com.datastax.oss.driver.api.core.data.UdtValue> result0 = new HashMap<>();
-      for (Map.Entry<java.lang.Integer, ma.markware.charybdis.test.entities.TestUdt> entry1 : field.entrySet()) {
-        java.lang.Integer sourceKey1 = entry1.getKey();
-        ma.markware.charybdis.test.entities.TestUdt sourceValue1 = entry1.getValue();
-        java.lang.Integer destinationKey1 = sourceKey1;
-        com.datastax.oss.driver.api.core.data.UdtValue destinationValue1 = TestUdt_Udt.test_udt.serialize(sourceValue1);
-        result0.put(destinationKey1, destinationValue1);
+      java.util.Map<java.lang.Integer, com.datastax.oss.driver.api.core.data.UdtValue> result0 = null;
+      if (field != null) {
+        result0 = new HashMap<>();
+        for (Map.Entry<java.lang.Integer, ma.markware.charybdis.test.entities.TestUdt> entry1 : field.entrySet()) {
+          java.lang.Integer sourceKey1 = entry1.getKey();
+          ma.markware.charybdis.test.entities.TestUdt sourceValue1 = entry1.getValue();
+          java.lang.Integer destinationKey1 = sourceKey1;
+          com.datastax.oss.driver.api.core.data.UdtValue destinationValue1 = TestUdt_Udt.test_udt.serialize(sourceValue1);
+          result0.put(destinationKey1, destinationValue1);
+        }
       }
       return result0;
     }
 
     @Override
     public Map<Integer, TestUdt> deserialize(Row row) {
+      if (row == null || row.isNull("udtmap")) return null;
       java.util.Map<java.lang.Integer, com.datastax.oss.driver.api.core.data.UdtValue> rawValue = row.get("udtmap", udtMapGenericType);
-      java.util.Map<java.lang.Integer, ma.markware.charybdis.test.entities.TestUdt> result0 = new HashMap<>();
-      for (Map.Entry<java.lang.Integer, com.datastax.oss.driver.api.core.data.UdtValue> entry1 : rawValue.entrySet()) {
-        java.lang.Integer sourceKey1 = entry1.getKey();
-        com.datastax.oss.driver.api.core.data.UdtValue sourceValue1 = entry1.getValue();
-        java.lang.Integer destinationKey1 = sourceKey1;
-        ma.markware.charybdis.test.entities.TestUdt destinationValue1 = TestUdt_Udt.test_udt.deserialize(sourceValue1);
-        result0.put(destinationKey1, destinationValue1);
+      java.util.Map<java.lang.Integer, ma.markware.charybdis.test.entities.TestUdt> result0 = null;
+      if (rawValue != null) {
+        result0 = new HashMap<>();
+        for (Map.Entry<java.lang.Integer, com.datastax.oss.driver.api.core.data.UdtValue> entry1 : rawValue.entrySet()) {
+          java.lang.Integer sourceKey1 = entry1.getKey();
+          com.datastax.oss.driver.api.core.data.UdtValue sourceValue1 = entry1.getValue();
+          java.lang.Integer destinationKey1 = sourceKey1;
+          ma.markware.charybdis.test.entities.TestUdt destinationValue1 = TestUdt_Udt.test_udt.deserialize(sourceValue1);
+          result0.put(destinationKey1, destinationValue1);
+        }
       }
       return result0;
     }
@@ -597,7 +665,8 @@ public class TestEntity_Table implements TableMetadata<TestEntity> {
 
     @Override
     public UdtValue serializeValue(TestUdt field) {
-      return field != null ? TestUdt_Udt.test_udt.serialize(field) : null;
+      if (field == null) return null;
+      return TestUdt_Udt.test_udt.serialize(field);
     }
   };
 
@@ -614,39 +683,55 @@ public class TestEntity_Table implements TableMetadata<TestEntity> {
 
     @Override
     public List<List<UdtValue>> serialize(List<List<TestUdt>> field) {
-      java.util.List<java.util.List<com.datastax.oss.driver.api.core.data.UdtValue>> result0 = new ArrayList<>();
-      for (java.util.List<ma.markware.charybdis.test.entities.TestUdt> source1 : field) {
-        java.util.List<com.datastax.oss.driver.api.core.data.UdtValue> result1 = new ArrayList<>();
-        for (ma.markware.charybdis.test.entities.TestUdt source2 : source1) {
-          com.datastax.oss.driver.api.core.data.UdtValue result2 = TestUdt_Udt.test_udt.serialize(source2);
-          result1.add(result2);
+      java.util.List<java.util.List<com.datastax.oss.driver.api.core.data.UdtValue>> result0 = null;
+      if (field != null) {
+        result0 = new ArrayList<>();
+        for (java.util.List<ma.markware.charybdis.test.entities.TestUdt> source1 : field) {
+          java.util.List<com.datastax.oss.driver.api.core.data.UdtValue> result1 = null;
+          if (source1 != null) {
+            result1 = new ArrayList<>();
+            for (ma.markware.charybdis.test.entities.TestUdt source2 : source1) {
+              com.datastax.oss.driver.api.core.data.UdtValue result2 = TestUdt_Udt.test_udt.serialize(source2);
+              result1.add(result2);
+            }
+          }
+          result0.add(result1);
         }
-        result0.add(result1);
       }
       return result0;
     }
 
     @Override
     public List<List<TestUdt>> deserialize(Row row) {
+      if (row == null || row.isNull("udtnestedlist")) return null;
       java.util.List<java.util.List<com.datastax.oss.driver.api.core.data.UdtValue>> rawValue = row.get("udtnestedlist", udtNestedListGenericType);
-      java.util.List<java.util.List<ma.markware.charybdis.test.entities.TestUdt>> result0 = new ArrayList<>();
-      for (java.util.List<com.datastax.oss.driver.api.core.data.UdtValue> source1 : rawValue) {
-        java.util.List<ma.markware.charybdis.test.entities.TestUdt> result1 = new ArrayList<>();
-        for (com.datastax.oss.driver.api.core.data.UdtValue source2 : source1) {
-          ma.markware.charybdis.test.entities.TestUdt result2 = TestUdt_Udt.test_udt.deserialize(source2);
-          result1.add(result2);
+      java.util.List<java.util.List<ma.markware.charybdis.test.entities.TestUdt>> result0 = null;
+      if (rawValue != null) {
+        result0 = new ArrayList<>();
+        for (java.util.List<com.datastax.oss.driver.api.core.data.UdtValue> source1 : rawValue) {
+          java.util.List<ma.markware.charybdis.test.entities.TestUdt> result1 = null;
+          if (source1 != null) {
+            result1 = new ArrayList<>();
+            for (com.datastax.oss.driver.api.core.data.UdtValue source2 : source1) {
+              ma.markware.charybdis.test.entities.TestUdt result2 = TestUdt_Udt.test_udt.deserialize(source2);
+              result1.add(result2);
+            }
+          }
+          result0.add(result1);
         }
-        result0.add(result1);
       }
       return result0;
     }
 
     @Override
     public List<UdtValue> serializeItem(List<TestUdt> field) {
-      java.util.List<com.datastax.oss.driver.api.core.data.UdtValue> result0 = new ArrayList<>();
-      for (ma.markware.charybdis.test.entities.TestUdt source1 : field) {
-        com.datastax.oss.driver.api.core.data.UdtValue result1 = TestUdt_Udt.test_udt.serialize(source1);
-        result0.add(result1);
+      java.util.List<com.datastax.oss.driver.api.core.data.UdtValue> result0 = null;
+      if (field != null) {
+        result0 = new ArrayList<>();
+        for (ma.markware.charybdis.test.entities.TestUdt source1 : field) {
+          com.datastax.oss.driver.api.core.data.UdtValue result1 = TestUdt_Udt.test_udt.serialize(source1);
+          result0.add(result1);
+        }
       }
       return result0;
     }
@@ -670,7 +755,8 @@ public class TestEntity_Table implements TableMetadata<TestEntity> {
 
     @Override
     public Boolean deserialize(Row row) {
-      return row != null ? row.get("flag", java.lang.Boolean.class) : null;
+      if (row == null || row.isNull("flag")) return null;
+      return row.get("flag", Boolean.class);
     }
 
     @Override
@@ -697,7 +783,8 @@ public class TestEntity_Table implements TableMetadata<TestEntity> {
 
     @Override
     public Instant deserialize(Row row) {
-      return row != null ? row.get("creation_date", java.time.Instant.class) : null;
+      if (row == null || row.isNull("creation_date")) return null;
+      return row.get("creation_date", Instant.class);
     }
   };
 
@@ -719,7 +806,8 @@ public class TestEntity_Table implements TableMetadata<TestEntity> {
 
     @Override
     public Instant deserialize(Row row) {
-      return row != null ? row.get("last_updated_date", java.time.Instant.class) : null;
+      if (row == null || row.isNull("last_updated_date")) return null;
+      return row.get("last_updated_date", Instant.class);
     }
   };
 
@@ -835,6 +923,7 @@ public class TestEntity_Table implements TableMetadata<TestEntity> {
 
   @Override
   public Map<String, Object> serialize(TestEntity entity) {
+    if (entity == null) return null;
     Map<String, Object> columnValueMap = new HashMap<>();
     columnValueMap.put("id", id.serialize(entity.getId()));
     columnValueMap.put("date", date.serialize(entity.getDate()));
@@ -862,6 +951,7 @@ public class TestEntity_Table implements TableMetadata<TestEntity> {
 
   @Override
   public TestEntity deserialize(Row row) {
+    if (row == null) return null;
     TestEntity entity = new TestEntity();
     entity.setId(id.deserialize(row));
     entity.setDate(date.deserialize(row));

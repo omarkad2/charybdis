@@ -9,6 +9,7 @@ import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.ParameterContext;
 import org.junit.jupiter.api.extension.ParameterResolutionException;
 import org.junit.jupiter.api.extension.ParameterResolver;
+import org.junit.platform.commons.support.ModifierSupport;
 
 public class DatabaseSetupExtension implements BeforeAllCallback, AfterAllCallback, ParameterResolver {
 
@@ -23,6 +24,12 @@ public class DatabaseSetupExtension implements BeforeAllCallback, AfterAllCallba
 
   @Override
   public void beforeAll(final ExtensionContext extensionContext) throws Exception {
+    if (extensionContext.getTestClass().isPresent()) {
+      Class<?> currentClass = extensionContext.getTestClass().get();
+      if (isNestedClass(currentClass)) {
+        return;
+      }
+    }
     dockerizedCassandra = new DockerizedCassandra();
     dockerizedCassandra.start();
     System.setProperty("datastax-java-driver.basic.request.timeout", "10 minutes");
@@ -31,7 +38,13 @@ public class DatabaseSetupExtension implements BeforeAllCallback, AfterAllCallba
   }
 
   @Override
-  public void afterAll(final ExtensionContext extensionContext) throws Exception {
+  public void afterAll(final ExtensionContext extensionContext) {
+    if (extensionContext.getTestClass().isPresent()) {
+      Class<?> currentClass = extensionContext.getTestClass().get();
+      if (isNestedClass(currentClass)) {
+        return;
+      }
+    }
     dockerizedCassandra.close();
     System.clearProperty("datastax-java-driver.basic.request.timeout");
     System.clearProperty("datastax-java-driver.basic.contact-points.0");
@@ -54,5 +67,9 @@ public class DatabaseSetupExtension implements BeforeAllCallback, AfterAllCallba
       return dockerizedCassandra.getPort();
     }
     return null;
+  }
+
+  private boolean isNestedClass(Class<?> currentClass) {
+    return !ModifierSupport.isStatic(currentClass) && currentClass.isMemberClass();
   }
 }
