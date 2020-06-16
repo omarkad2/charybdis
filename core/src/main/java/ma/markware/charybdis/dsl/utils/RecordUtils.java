@@ -11,6 +11,9 @@ import ma.markware.charybdis.model.field.SelectableField;
 public class RecordUtils {
 
   public static Record rowToRecord(final Row row, final List<SelectableField> selectedFields) {
+    if (row == null) {
+      return null;
+    }
     DefaultRecord record = new DefaultRecord();
     selectedFields.forEach(field ->
         record.put(field, field.deserialize(row))

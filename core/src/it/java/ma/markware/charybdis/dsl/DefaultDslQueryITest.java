@@ -6,18 +6,27 @@ import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.querybuilder.QueryBuilder;
 import com.datastax.oss.driver.api.querybuilder.term.Term;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import ma.markware.charybdis.AbstractIntegrationITest;
 import ma.markware.charybdis.test.entities.TestEntity;
+import ma.markware.charybdis.test.entities.TestEnum;
+import ma.markware.charybdis.test.entities.TestUdt;
 import ma.markware.charybdis.test.instances.TestEntity_INST1;
 import ma.markware.charybdis.test.instances.TestEntity_INST2;
 import ma.markware.charybdis.test.metadata.TestEntity_Table;
+import ma.markware.charybdis.test.metadata.TestExtraUdt_Udt;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -215,6 +224,347 @@ class DefaultDslQueryITest extends AbstractIntegrationITest {
                                          record.get(TestEntity_Table.udtMap), record.get(TestEntity_Table.udtNestedList),
                                          record.get(TestEntity_Table.flag));
       assertThat(actual).isEqualTo(TestEntity_INST1.entity1);
+    }
+  }
+
+  @Nested
+  @DisplayName("DSL update queries")
+  class DslUpdateQueryITest {
+
+    @BeforeEach
+    void setup() {
+
+      // Insert TestEntity_INST1 to DB
+      dslQuery.insertInto(TestEntity_Table.test_entity, TestEntity_Table.id, TestEntity_Table.date, TestEntity_Table.udt, TestEntity_Table.list, TestEntity_Table.se, TestEntity_Table.map,
+                          TestEntity_Table.nestedList, TestEntity_Table.nestedSet, TestEntity_Table.nestedMap, TestEntity_Table.enumValue, TestEntity_Table.enumList, TestEntity_Table.enumMap,
+                          TestEntity_Table.enumNestedList, TestEntity_Table.extraUdt, TestEntity_Table.udtList, TestEntity_Table.udtSet, TestEntity_Table.udtMap, TestEntity_Table.udtNestedList,
+                          TestEntity_Table.flag)
+              .values(TestEntity_INST1.id, TestEntity_INST1.date, TestEntity_INST1.udt1, TestEntity_INST1.list, TestEntity_INST1.se, TestEntity_INST1.map, TestEntity_INST1.nestedList,
+                      TestEntity_INST1.nestedSet, TestEntity_INST1.nestedMap, TestEntity_INST1.enumValue, TestEntity_INST1.enumList, TestEntity_INST1.enumMap, TestEntity_INST1.enumNestedList,
+                      TestEntity_INST1.extraUdt, TestEntity_INST1.udtList, TestEntity_INST1.udtSet, TestEntity_INST1.udtMap, null, TestEntity_INST1.flag)
+              .execute();
+
+      // Insert TestEntity_INST2 to DB
+      dslQuery.insertInto(TestEntity_Table.test_entity, TestEntity_Table.id, TestEntity_Table.date, TestEntity_Table.udt, TestEntity_Table.list, TestEntity_Table.se, TestEntity_Table.map,
+                          TestEntity_Table.nestedList, TestEntity_Table.nestedSet, TestEntity_Table.nestedMap, TestEntity_Table.enumValue, TestEntity_Table.enumList, TestEntity_Table.enumMap,
+                          TestEntity_Table.enumNestedList, TestEntity_Table.extraUdt, TestEntity_Table.udtList, TestEntity_Table.udtSet, TestEntity_Table.udtMap, TestEntity_Table.udtNestedList,
+                          TestEntity_Table.flag)
+              .values(TestEntity_INST2.id, TestEntity_INST2.date, TestEntity_INST2.udt, TestEntity_INST2.list, TestEntity_INST2.se, TestEntity_INST2.map, TestEntity_INST2.nestedList,
+                      TestEntity_INST2.nestedSet, TestEntity_INST2.nestedMap, TestEntity_INST2.enumValue, TestEntity_INST2.enumList, TestEntity_INST2.enumMap, TestEntity_INST2.enumNestedList,
+                      TestEntity_INST2.extraUdt, TestEntity_INST2.udtList, TestEntity_INST2.udtSet, TestEntity_INST2.udtMap, TestEntity_INST2.udtNestedList, TestEntity_INST2.flag)
+              .execute();
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    void update() {
+
+      // When
+      dslQuery.update(TestEntity_Table.test_entity)
+              .set(TestEntity_Table.se, TestEntity_Table.se.append(1000, 1100))
+              .set(TestEntity_Table.map, TestEntity_Table.map.append(ImmutableMap.of("appendKey", "appendValue")))
+              .set(TestEntity_Table.nestedList, null)
+              .set(TestEntity_Table.nestedSet, TestEntity_Table.nestedSet.remove(TestEntity_INST1.nestedSet))
+              .set(TestEntity_Table.nestedMap, TestEntity_Table.nestedMap.remove(Collections.singleton("key0")))
+              .set(TestEntity_Table.enumNestedList, TestEntity_Table.enumNestedList.prepend(ImmutableSet.of(TestEnum.TYPE_B)))
+              .set(TestEntity_Table.udtNestedList, TestEntity_Table.udtNestedList.prepend(
+                  Collections.singletonList(Collections.singletonList(TestEntity_INST1.udt1))))
+              .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
+              .and(TestEntity_Table.date.eq(TestEntity_INST1.date))
+              .and(TestEntity_Table.udt.eq(TestEntity_INST1.udt1))
+              .and(TestEntity_Table.list.eq(TestEntity_INST1.list))
+              .execute();
+
+      Record record = dslQuery.selectFrom(TestEntity_Table.test_entity)
+                              .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
+                              .fetchOne();
+
+      // Then
+      assertThat(record.get(TestEntity_Table.id)).isEqualTo(TestEntity_INST1.id);
+      assertThat(record.get(TestEntity_Table.date)).isEqualTo(TestEntity_INST1.date);
+      assertThat(record.get(TestEntity_Table.udt)).isEqualTo(TestEntity_INST1.udt1);
+      assertThat(record.get(TestEntity_Table.list)).isEqualTo(TestEntity_INST1.list);
+      Set<Integer> newSe = new HashSet<>(TestEntity_INST1.se);
+      newSe.add(1000);
+      newSe.add(1100);
+      assertThat(record.get(TestEntity_Table.se)).isEqualTo(newSe);
+      Map<String, String> newMap = new HashMap<>(TestEntity_INST1.map);
+      newMap.put("appendKey", "appendValue");
+      assertThat(record.get(TestEntity_Table.map)).isEqualTo(newMap);
+      assertThat(record.get(TestEntity_Table.nestedList)).isNull();
+      assertThat(record.get(TestEntity_Table.nestedSet)).isNull();
+      Map<String, Map<Integer, String>> newNestedMap = new HashMap<>(TestEntity_INST1.nestedMap);
+      newNestedMap.remove("key0");
+      assertThat(record.get(TestEntity_Table.nestedMap)).isEqualTo(newNestedMap);
+      assertThat(record.get(TestEntity_Table.enumValue)).isEqualTo(TestEntity_INST1.enumValue);
+      assertThat(record.get(TestEntity_Table.enumList)).isEqualTo(TestEntity_INST1.enumList);
+      assertThat(record.get(TestEntity_Table.enumMap)).isEqualTo(TestEntity_INST1.enumMap);
+      List<Set<TestEnum>> newEnumNestedList = new ArrayList<>(TestEntity_INST1.enumNestedList);
+      newEnumNestedList.add(0, ImmutableSet.of(TestEnum.TYPE_B));
+      assertThat(record.get(TestEntity_Table.enumNestedList)).isEqualTo(newEnumNestedList);
+      assertThat(record.get(TestEntity_Table.extraUdt)).isEqualTo(TestEntity_INST1.extraUdt);
+      assertThat(record.get(TestEntity_Table.udtList)).isEqualTo(TestEntity_INST1.udtList);
+      assertThat(record.get(TestEntity_Table.udtSet)).isEqualTo(TestEntity_INST1.udtSet);
+      assertThat(record.get(TestEntity_Table.udtMap)).isEqualTo(TestEntity_INST1.udtMap);
+      assertThat(record.get(TestEntity_Table.udtNestedList)).isEqualTo(Collections.singletonList(Collections.singletonList(TestEntity_INST1.udt1)));
+      assertThat(record.get(TestEntity_Table.flag)).isEqualTo(TestEntity_INST1.flag);
+    }
+
+    @Test
+    void update_should_be_applied_when_if_condition_true() {
+
+      // When
+      boolean applied = dslQuery.update(TestEntity_Table.test_entity)
+                                .set(TestEntity_Table.se, TestEntity_Table.se.append(1_000_000))
+                                .where(TestEntity_Table.id.eq(TestEntity_INST2.id))
+                                .and(TestEntity_Table.date.eq(TestEntity_INST2.date))
+                                .and(TestEntity_Table.udt.eq(TestEntity_INST2.udt))
+                                .and(TestEntity_Table.list.eq(TestEntity_INST2.list))
+                                .if_(TestEntity_Table.flag.eq(TestEntity_INST2.flag))
+                                .execute();
+
+      Record record = dslQuery.selectFrom(TestEntity_Table.test_entity)
+                              .where(TestEntity_Table.id.eq(TestEntity_INST2.id))
+                              .fetchOne();
+
+      // Then
+      assertThat(applied).isTrue();
+      assertThat(record.get(TestEntity_Table.id)).isEqualTo(TestEntity_INST2.id);
+      assertThat(record.get(TestEntity_Table.date)).isEqualTo(TestEntity_INST2.date);
+      assertThat(record.get(TestEntity_Table.udt)).isEqualTo(TestEntity_INST2.udt);
+      assertThat(record.get(TestEntity_Table.list)).isEqualTo(TestEntity_INST2.list);
+      assertThat(record.get(TestEntity_Table.se)).isEqualTo(Collections.singleton(1_000_000));
+    }
+
+    @Test
+    void update_should_not_be_applied_when_if_condition_false() {
+
+      // When
+      boolean applied = dslQuery.update(TestEntity_Table.test_entity)
+                                .set(TestEntity_Table.se, TestEntity_Table.se.append(1_000_000))
+                                .where(TestEntity_Table.id.eq(TestEntity_INST2.id))
+                                .and(TestEntity_Table.date.eq(TestEntity_INST2.date))
+                                .and(TestEntity_Table.udt.eq(TestEntity_INST2.udt))
+                                .and(TestEntity_Table.list.eq(TestEntity_INST2.list))
+                                .if_(TestEntity_Table.flag.eq(!TestEntity_INST2.flag))
+                                .execute();
+
+      Record record = dslQuery.selectFrom(TestEntity_Table.test_entity)
+                              .where(TestEntity_Table.id.eq(TestEntity_INST2.id))
+                              .fetchOne();
+
+      // Then
+      assertThat(applied).isFalse();
+      assertThat(record.get(TestEntity_Table.id)).isEqualTo(TestEntity_INST2.id);
+      assertThat(record.get(TestEntity_Table.date)).isEqualTo(TestEntity_INST2.date);
+      assertThat(record.get(TestEntity_Table.udt)).isEqualTo(TestEntity_INST2.udt);
+      assertThat(record.get(TestEntity_Table.list)).isEqualTo(TestEntity_INST2.list);
+      assertThat(record.get(TestEntity_Table.se)).isNotEqualTo(Collections.singleton(1_000_000));
+      assertThat(record.get(TestEntity_Table.se)).isEqualTo(TestEntity_INST2.se);
+    }
+
+    @Test
+    void update_nested_field() {
+
+      // When
+      boolean applied = dslQuery.update(TestEntity_Table.test_entity)
+                                .set(TestEntity_Table.se, TestEntity_Table.se.append(1_000_000))
+                                .where(TestEntity_Table.id.eq(TestEntity_INST2.id))
+                                .and(TestEntity_Table.date.eq(TestEntity_INST2.date))
+                                .and(TestEntity_Table.udt.eq(TestEntity_INST2.udt))
+                                .and(TestEntity_Table.list.eq(TestEntity_INST2.list))
+                                .if_(TestEntity_Table.flag.eq(!TestEntity_INST2.flag))
+                                .execute();
+
+      Record record = dslQuery.selectFrom(TestEntity_Table.test_entity)
+                              .where(TestEntity_Table.id.eq(TestEntity_INST2.id))
+                              .fetchOne();
+
+      // Then
+      assertThat(applied).isFalse();
+      assertThat(record.get(TestEntity_Table.id)).isEqualTo(TestEntity_INST2.id);
+      assertThat(record.get(TestEntity_Table.date)).isEqualTo(TestEntity_INST2.date);
+      assertThat(record.get(TestEntity_Table.udt)).isEqualTo(TestEntity_INST2.udt);
+      assertThat(record.get(TestEntity_Table.list)).isEqualTo(TestEntity_INST2.list);
+      assertThat(record.get(TestEntity_Table.se)).isNotEqualTo(Collections.singleton(1_000_000));
+      assertThat(record.get(TestEntity_Table.se)).isEqualTo(TestEntity_INST2.se);
+    }
+  }
+
+  @Nested
+  @DisplayName("DSL delete queries")
+  class DslDeleteQueryITest {
+
+    @BeforeEach
+    void setup() {
+
+      // Insert TestEntity_INST1 to DB
+      dslQuery.insertInto(TestEntity_Table.test_entity, TestEntity_Table.id, TestEntity_Table.date, TestEntity_Table.udt, TestEntity_Table.list, TestEntity_Table.se, TestEntity_Table.map,
+                          TestEntity_Table.nestedList, TestEntity_Table.nestedSet, TestEntity_Table.nestedMap, TestEntity_Table.enumValue, TestEntity_Table.enumList, TestEntity_Table.enumMap,
+                          TestEntity_Table.enumNestedList, TestEntity_Table.extraUdt, TestEntity_Table.udtList, TestEntity_Table.udtSet, TestEntity_Table.udtMap, TestEntity_Table.udtNestedList,
+                          TestEntity_Table.flag)
+              .values(TestEntity_INST1.id, TestEntity_INST1.date, TestEntity_INST1.udt1, TestEntity_INST1.list, TestEntity_INST1.se, TestEntity_INST1.map, TestEntity_INST1.nestedList,
+                      TestEntity_INST1.nestedSet, TestEntity_INST1.nestedMap, TestEntity_INST1.enumValue, TestEntity_INST1.enumList, TestEntity_INST1.enumMap, TestEntity_INST1.enumNestedList,
+                      TestEntity_INST1.extraUdt, TestEntity_INST1.udtList, TestEntity_INST1.udtSet, TestEntity_INST1.udtMap, TestEntity_INST1.udtNestedList, TestEntity_INST1.flag)
+              .execute();
+    }
+
+    @Test
+    void delete() {
+
+      // When
+      boolean applied = dslQuery.delete()
+                                .from(TestEntity_Table.test_entity)
+                                .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
+                                .and(TestEntity_Table.date.eq(TestEntity_INST1.date))
+                                .and(TestEntity_Table.udt.eq(TestEntity_INST1.udt1))
+                                .and(TestEntity_Table.list.eq(TestEntity_INST1.list))
+                                .execute();
+
+      Record record = dslQuery.selectFrom(TestEntity_Table.test_entity)
+                              .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
+                              .fetchOne();
+
+      // Then
+      assertThat(applied).isTrue();
+      assertThat(record).isNull();
+    }
+
+    @Test
+    void delete_should_delete_if_condition_true() {
+
+      // When
+      boolean applied = dslQuery.delete()
+                                .from(TestEntity_Table.test_entity)
+                                .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
+                                .and(TestEntity_Table.date.eq(TestEntity_INST1.date))
+                                .and(TestEntity_Table.udt.eq(TestEntity_INST1.udt1))
+                                .and(TestEntity_Table.list.eq(TestEntity_INST1.list))
+                                .if_(TestEntity_Table.flag.eq(TestEntity_INST1.flag))
+                                .execute();
+
+      Record record = dslQuery.selectFrom(TestEntity_Table.test_entity)
+                              .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
+                              .fetchOne();
+
+      // Then
+      assertThat(applied).isTrue();
+      assertThat(record).isNull();
+    }
+
+    @Test
+    void delete_should_not_delete_if_condition_false() {
+
+      // When
+      boolean applied = dslQuery.delete()
+                                .from(TestEntity_Table.test_entity)
+                                .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
+                                .and(TestEntity_Table.date.eq(TestEntity_INST1.date))
+                                .and(TestEntity_Table.udt.eq(TestEntity_INST1.udt1))
+                                .and(TestEntity_Table.list.eq(TestEntity_INST1.list))
+                                .if_(TestEntity_Table.flag.eq(!TestEntity_INST1.flag))
+                                .execute();
+
+      Record record = dslQuery.selectFrom(TestEntity_Table.test_entity)
+                              .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
+                              .fetchOne();
+
+      // Then
+      assertThat(applied).isFalse();
+      assertThat(record).isNotNull();
+    }
+
+    @Test
+    void delete_columns() {
+
+      // When
+      boolean applied = dslQuery.delete(TestEntity_Table.se, TestEntity_Table.map, TestEntity_Table.nestedList, TestEntity_Table.nestedSet, TestEntity_Table.nestedMap,
+                                        TestEntity_Table.enumValue, TestEntity_Table.enumList, TestEntity_Table.enumMap, TestEntity_Table.enumNestedList,
+                                        TestEntity_Table.extraUdt, TestEntity_Table.udtList, TestEntity_Table.udtSet, TestEntity_Table.udtMap, TestEntity_Table.udtNestedList,
+                                        TestEntity_Table.flag)
+                                .from(TestEntity_Table.test_entity)
+                                .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
+                                .and(TestEntity_Table.date.eq(TestEntity_INST1.date))
+                                .and(TestEntity_Table.udt.eq(TestEntity_INST1.udt1))
+                                .and(TestEntity_Table.list.eq(TestEntity_INST1.list))
+                                .execute();
+
+      Record record = dslQuery.selectFrom(TestEntity_Table.test_entity)
+                              .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
+                              .fetchOne();
+
+      // Then
+      assertThat(applied).isTrue();
+      assertThat(record).isNotNull();
+      assertThat(record.get(TestEntity_Table.se)).isNull();
+      assertThat(record.get(TestEntity_Table.map)).isNull();
+      assertThat(record.get(TestEntity_Table.nestedList)).isNull();
+      assertThat(record.get(TestEntity_Table.nestedSet)).isNull();
+      assertThat(record.get(TestEntity_Table.nestedMap)).isNull();
+      assertThat(record.get(TestEntity_Table.enumValue)).isNull();
+      assertThat(record.get(TestEntity_Table.enumList)).isNull();
+      assertThat(record.get(TestEntity_Table.enumMap)).isNull();
+      assertThat(record.get(TestEntity_Table.enumNestedList)).isNull();
+      assertThat(record.get(TestEntity_Table.extraUdt)).isNull();
+      assertThat(record.get(TestEntity_Table.udtList)).isNull();
+      assertThat(record.get(TestEntity_Table.udtSet)).isNull();
+      assertThat(record.get(TestEntity_Table.udtMap)).isNull();
+      assertThat(record.get(TestEntity_Table.udtNestedList)).isNull();
+      assertThat(record.get(TestEntity_Table.flag)).isNull();
+    }
+
+    @Test
+    void delete_nested_field() {
+
+      // When
+      boolean applied = dslQuery.delete(TestEntity_Table.map.entry("key1"), TestEntity_Table.nestedMap.entry("key1"),
+                                        TestEntity_Table.enumList.entry(0), TestEntity_Table.enumMap.entry(1),
+                                        TestEntity_Table.enumNestedList.entry(0), TestEntity_Table.extraUdt.entry(TestExtraUdt_Udt.intValue),
+                                        TestEntity_Table.udtList.entry(1), TestEntity_Table.udtMap.entry(1), TestEntity_Table.udtNestedList.entry(0))
+                                .from(TestEntity_Table.test_entity)
+                                .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
+                                .and(TestEntity_Table.date.eq(TestEntity_INST1.date))
+                                .and(TestEntity_Table.udt.eq(TestEntity_INST1.udt1))
+                                .and(TestEntity_Table.list.eq(TestEntity_INST1.list))
+                                .execute();
+
+      Record record = dslQuery.selectFrom(TestEntity_Table.test_entity)
+                              .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
+                              .fetchOne();
+
+      // Then
+      assertThat(applied).isTrue();
+      assertThat(record).isNotNull();
+      assertThat(record.get(TestEntity_Table.id)).isEqualTo(TestEntity_INST1.id);
+      assertThat(record.get(TestEntity_Table.date)).isEqualTo(TestEntity_INST1.date);
+      assertThat(record.get(TestEntity_Table.udt)).isEqualTo(TestEntity_INST1.udt1);
+      assertThat(record.get(TestEntity_Table.list)).isEqualTo(TestEntity_INST1.list);
+      assertThat(record.get(TestEntity_Table.se)).isEqualTo(TestEntity_INST1.se);
+      Map<String, String> newMap = new HashMap<>(TestEntity_INST1.map);
+      newMap.remove("key1");
+      assertThat(record.get(TestEntity_Table.map)).isEqualTo(newMap);
+      assertThat(record.get(TestEntity_Table.nestedList)).isEqualTo(TestEntity_INST1.nestedList);
+      assertThat(record.get(TestEntity_Table.nestedSet)).isEqualTo(TestEntity_INST1.nestedSet);
+      Map<String, Map<Integer, String>> newNestedMap = new HashMap<>(TestEntity_INST1.nestedMap);
+      newNestedMap.remove("key1");
+      assertThat(record.get(TestEntity_Table.nestedMap)).isEqualTo(newNestedMap);
+      assertThat(record.get(TestEntity_Table.enumValue)).isEqualTo(TestEntity_INST1.enumValue);
+      List<TestEnum> newEnumList = new ArrayList<>(TestEntity_INST1.enumList);
+      newEnumList.remove(0);
+      assertThat(record.get(TestEntity_Table.enumList)).isEqualTo(newEnumList);
+      assertThat(record.get(TestEntity_Table.enumMap)).isNull();
+      assertThat(record.get(TestEntity_Table.enumNestedList)).isNull();
+      assertThat(record.get(TestEntity_Table.extraUdt).getIntValue()).isNull();
+      assertThat(record.get(TestEntity_Table.extraUdt).getDoubleValue()).isEqualTo(TestEntity_INST1.extraUdt.getDoubleValue());
+      List<TestUdt> newUdtList = new ArrayList<>(TestEntity_INST1.udtList);
+      newUdtList.remove(1);
+      assertThat(record.get(TestEntity_Table.udtList)).isEqualTo(newUdtList);
+      assertThat(record.get(TestEntity_Table.udtSet)).isEqualTo(TestEntity_INST1.udtSet);
+      assertThat(record.get(TestEntity_Table.udtMap)).isNull();
+      List<List<TestUdt>> newUdtNestedList = new ArrayList<>(TestEntity_INST1.udtNestedList);
+      newUdtNestedList.remove(0);
+      assertThat(record.get(TestEntity_Table.udtNestedList)).isEqualTo(newUdtNestedList);
+      assertThat(record.get(TestEntity_Table.flag)).isEqualTo(TestEntity_INST1.flag);
     }
   }
 }

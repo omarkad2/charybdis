@@ -8,32 +8,32 @@ import ma.markware.charybdis.model.annotation.UdtField;
 public class TestExtraUdt {
 
   @UdtField
-  private int intValue;
+  private Integer intValue;
 
   @UdtField
-  private double doubleValue;
+  private Double doubleValue;
 
   public TestExtraUdt() {
   }
 
-  public TestExtraUdt(final int intValue, final double doubleValue) {
+  public TestExtraUdt(final Integer intValue, final Double doubleValue) {
     this.intValue = intValue;
     this.doubleValue = doubleValue;
   }
 
-  public int getIntValue() {
+  public Integer getIntValue() {
     return intValue;
   }
 
-  public void setIntValue(final int intValue) {
+  public void setIntValue(final Integer intValue) {
     this.intValue = intValue;
   }
 
-  public double getDoubleValue() {
+  public Double getDoubleValue() {
     return doubleValue;
   }
 
-  public void setDoubleValue(final double doubleValue) {
+  public void setDoubleValue(final Double doubleValue) {
     this.doubleValue = doubleValue;
   }
 
@@ -45,8 +45,8 @@ public class TestExtraUdt {
     if (!(o instanceof TestExtraUdt)) {
       return false;
     }
-    final TestExtraUdt that = (TestExtraUdt) o;
-    return intValue == that.intValue && Double.compare(that.doubleValue, doubleValue) == 0;
+    final TestExtraUdt extraUdt = (TestExtraUdt) o;
+    return Objects.equals(intValue, extraUdt.intValue) && Objects.equals(doubleValue, extraUdt.doubleValue);
   }
 
   @Override

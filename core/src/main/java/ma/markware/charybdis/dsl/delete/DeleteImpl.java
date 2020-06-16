@@ -83,6 +83,6 @@ public class DeleteImpl implements DeleteInitExpression, DeleteTimestampExpressi
   @Override
   public boolean execute() {
     ResultSet resultSet = deleteQuery.execute(session);
-    return resultSet.wasApplied();
+    return resultSet != null && resultSet.wasApplied();
   }
 }

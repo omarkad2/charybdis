@@ -23,7 +23,7 @@ public class TestEntity_INST1 {
   public final static Map<String, String> map = ImmutableMap.of("key1", "value1", "key2", "value2");
   public final static List<List<Integer>>  nestedList = Arrays.asList(Arrays.asList(1, 2), Arrays.asList(3, 4));
   public final static Set<List<Integer>>  nestedSet = Collections.singleton(Arrays.asList(41, 42));
-  public final static Map<String, Map<Integer, String>>  nestedMap = ImmutableMap.of("key", ImmutableMap.of(0, "nestedValue"));
+  public final static Map<String, Map<Integer, String>>  nestedMap = ImmutableMap.of("key0", ImmutableMap.of(0, "nestedValue0"), "key1", ImmutableMap.of(1, "nestedValue1"));
   public final static TestEnum enumValue = TestEnum.TYPE_A;
   public final static List<Set<TestEnum>> enumNestedList = Collections.singletonList(Collections.singleton(TestEnum.TYPE_A));
   public final static Map<Integer, TestEnum> enumMap = ImmutableMap.of(1, TestEnum.TYPE_A);

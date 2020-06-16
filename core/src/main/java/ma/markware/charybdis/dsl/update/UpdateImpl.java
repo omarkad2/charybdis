@@ -132,6 +132,6 @@ public class UpdateImpl implements UpdateInitExpression, UpdateTtlExpression, Up
   @Override
   public boolean execute() {
     ResultSet resultSet = updateQuery.execute(session);
-    return resultSet.wasApplied();
+    return resultSet != null && resultSet.wasApplied();
   }
 }
