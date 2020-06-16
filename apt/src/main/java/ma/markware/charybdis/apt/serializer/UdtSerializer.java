@@ -121,34 +121,34 @@ public class UdtSerializer implements EntitySerializer<UdtMetaType> {
       methodBuilder.addStatement("$L $N = $N.$L($N.$L())", udtFieldType.getSerializationTypeCanonicalName(), fieldValueName, fieldName,
                                  SerializationConstants.SERIALIZE_METHOD, parameterName, udtGetterName);
       methodBuilder.beginControlFlow("if ($N == null)", fieldValueName);
-      methodBuilder.addStatement("udtValue = udtValue.setToNull($S)", udtFieldName);
+      methodBuilder.addStatement("udtValue.setToNull($S)", udtFieldName);
       methodBuilder.nextControlFlow("else");
       if (udtFieldType.isComplex()) {
-        methodBuilder.addStatement("udtValue = udtValue.set($S, $N.$L($N.$L()), $N)", udtFieldName, fieldName, SerializationConstants.SERIALIZE_METHOD,
+        methodBuilder.addStatement("udtValue.set($S, $N.$L($N.$L()), $N)", udtFieldName, fieldName, SerializationConstants.SERIALIZE_METHOD,
                           parameterName, udtGetterName, NameUtils.resolveGenericTypeName(fieldName));
       } else {
         switch (udtFieldType.getFieldTypeKind()) {
           case LIST:
             FieldTypeMetaType listSubType = fieldSubTypes.get(0);
-            methodBuilder.addStatement("udtValue = udtValue.setList($S, $N.$L($N.$L()), $L.class)", udtFieldName, fieldName,
+            methodBuilder.addStatement("udtValue.setList($S, $N.$L($N.$L()), $L.class)", udtFieldName, fieldName,
                                        SerializationConstants.SERIALIZE_METHOD, parameterName, udtGetterName,
                                        listSubType.getSerializationTypeCanonicalName());
             break;
           case SET:
             FieldTypeMetaType setSubType = fieldSubTypes.get(0);
-            methodBuilder.addStatement("udtValue = udtValue.setSet($S, $N.$L($N.$L()), $L.class)", udtFieldName, fieldName,
+            methodBuilder.addStatement("udtValue.setSet($S, $N.$L($N.$L()), $L.class)", udtFieldName, fieldName,
                                        SerializationConstants.SERIALIZE_METHOD, parameterName, udtGetterName,
                                        setSubType.getSerializationTypeCanonicalName());
             break;
           case MAP:
             FieldTypeMetaType udtFieldSubKeyType = fieldSubTypes.get(0);
             FieldTypeMetaType udtFieldSubValueType = fieldSubTypes.get(1);
-            methodBuilder.addStatement("udtValue = udtValue.setMap($S, $N.$L($N.$L()), $L.class, $L.class)", udtFieldName, fieldName,
+            methodBuilder.addStatement("udtValue.setMap($S, $N.$L($N.$L()), $L.class, $L.class)", udtFieldName, fieldName,
                               SerializationConstants.SERIALIZE_METHOD, parameterName, udtGetterName, udtFieldSubKeyType.getSerializationTypeCanonicalName(),
                               udtFieldSubValueType.getSerializationTypeCanonicalName());
             break;
           default:
-            methodBuilder.addStatement("udtValue = udtValue.set($S, $N.$L($N.$L()), $L.class)", udtFieldName, fieldName,
+            methodBuilder.addStatement("it udtValue.set($S, $N.$L($N.$L()), $L.class)", udtFieldName, fieldName,
                                        SerializationConstants.SERIALIZE_METHOD, parameterName,
                                        udtGetterName, udtFieldType.getSerializationTypeCanonicalName());
             break;
