@@ -148,7 +148,7 @@ public class UdtSerializer implements EntitySerializer<UdtMetaType> {
                               udtFieldSubValueType.getSerializationTypeCanonicalName());
             break;
           default:
-            methodBuilder.addStatement("it udtValue.set($S, $N.$L($N.$L()), $L.class)", udtFieldName, fieldName,
+            methodBuilder.addStatement("udtValue.set($S, $N.$L($N.$L()), $L.class)", udtFieldName, fieldName,
                                        SerializationConstants.SERIALIZE_METHOD, parameterName,
                                        udtGetterName, udtFieldType.getSerializationTypeCanonicalName());
             break;

@@ -271,7 +271,7 @@ public class TestEntity extends TestSuperEntity {
       return false;
     }
     final TestEntity that = (TestEntity) o;
-    return flag == that.flag && Objects.equals(id, that.id) && Objects.equals(date.truncatedTo(ChronoUnit.SECONDS), that.date.truncatedTo(ChronoUnit.SECONDS)) && Objects.equals(udt, that.udt) && Objects.equals(
+    return flag == that.flag && Objects.equals(id, that.id) && Objects.equals(date.truncatedTo(ChronoUnit.MILLIS), that.date.truncatedTo(ChronoUnit.MILLIS)) && Objects.equals(udt, that.udt) && Objects.equals(
         list, that.list) && Objects.equals(se, that.se) && Objects.equals(map, that.map) && Objects.equals(nestedList, that.nestedList)
         && Objects.equals(nestedSet, that.nestedSet) && Objects.equals(nestedMap, that.nestedMap) && enumValue == that.enumValue && Objects.equals(
         enumList, that.enumList) && Objects.equals(enumMap, that.enumMap) && Objects.equals(enumNestedList, that.enumNestedList) && Objects.equals(
@@ -282,7 +282,7 @@ public class TestEntity extends TestSuperEntity {
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, date.truncatedTo(ChronoUnit.SECONDS), udt, list, se, map, nestedList, nestedSet, nestedMap, enumValue, enumList, enumMap, enumNestedList, extraUdt,
+    return Objects.hash(id, date.truncatedTo(ChronoUnit.MILLIS), udt, list, se, map, nestedList, nestedSet, nestedMap, enumValue, enumList, enumMap, enumNestedList, extraUdt,
                         udtList, udtSet, udtMap, udtNestedList, flag);
   }
 
