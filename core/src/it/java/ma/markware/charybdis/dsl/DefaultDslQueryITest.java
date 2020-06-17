@@ -49,6 +49,11 @@ class DefaultDslQueryITest extends AbstractIntegrationITest {
   @DisplayName("DSL select queries")
   class DslSelectQueryITest {
 
+    @BeforeEach
+    void setup(CqlSession session) {
+      cleanDatabase(session);
+    }
+
     @Test
     void select(CqlSession session) {
 
@@ -197,8 +202,8 @@ class DefaultDslQueryITest extends AbstractIntegrationITest {
   class DslInsertQueryITest {
 
     @Test
-    void insertInto() {
-
+    void insertInto(CqlSession session) {
+      cleanDatabase(session);
       // Given
       dslQuery.insertInto(TestEntity_Table.test_entity, TestEntity_Table.id, TestEntity_Table.date, TestEntity_Table.udt, TestEntity_Table.list, TestEntity_Table.se, TestEntity_Table.map,
                           TestEntity_Table.nestedList, TestEntity_Table.nestedSet, TestEntity_Table.nestedMap, TestEntity_Table.enumValue, TestEntity_Table.enumList, TestEntity_Table.enumMap,
@@ -234,8 +239,8 @@ class DefaultDslQueryITest extends AbstractIntegrationITest {
   class DslUpdateQueryITest {
 
     @BeforeEach
-    void setup() {
-
+    void setup(CqlSession session) {
+      cleanDatabase(session);
       // Insert TestEntity_INST1 to DB
       dslQuery.insertInto(TestEntity_Table.test_entity, TestEntity_Table.id, TestEntity_Table.date, TestEntity_Table.udt, TestEntity_Table.list, TestEntity_Table.se, TestEntity_Table.map,
                           TestEntity_Table.nestedList, TestEntity_Table.nestedSet, TestEntity_Table.nestedMap, TestEntity_Table.enumValue, TestEntity_Table.enumList, TestEntity_Table.enumMap,
@@ -435,8 +440,8 @@ class DefaultDslQueryITest extends AbstractIntegrationITest {
   class DslDeleteQueryITest {
 
     @BeforeEach
-    void setup() {
-
+    void setup(CqlSession session) {
+      cleanDatabase(session);
       // Insert TestEntity_INST1 to DB
       dslQuery.insertInto(TestEntity_Table.test_entity, TestEntity_Table.id, TestEntity_Table.date, TestEntity_Table.udt, TestEntity_Table.list, TestEntity_Table.se, TestEntity_Table.map,
                           TestEntity_Table.nestedList, TestEntity_Table.nestedSet, TestEntity_Table.nestedMap, TestEntity_Table.enumValue, TestEntity_Table.enumList, TestEntity_Table.enumMap,

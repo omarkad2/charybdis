@@ -7,11 +7,11 @@ import ma.markware.charybdis.model.field.metadata.ColumnMetadata;
 
 public class DslFunctions {
 
-  public static SelectableField writetime(ColumnMetadata<?, ?> columnMetadata) {
+  public static SelectableField<Long> writetime(ColumnMetadata<?, ?> columnMetadata) {
     return new WriteTimeFunctionField(columnMetadata);
   }
 
-  public static SelectableField ttl(ColumnMetadata<?, ?> columnMetadata) {
+  public static SelectableField<Integer> ttl(ColumnMetadata<?, ?> columnMetadata) {
     return new TtlFunctionField(columnMetadata);
   }
 }
