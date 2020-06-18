@@ -97,6 +97,17 @@ class UpdateImplTest {
   }
 
   @Test
+  void usingTtl() {
+    int ttlInSeconds = 86400;
+    updateImpl.update(TestEntity_Table.test_entity)
+              .usingTtl(ttlInSeconds)
+              .set(TestEntity_Table.flag, true);
+
+    UpdateQuery updateQuery = updateImpl.getUpdateQuery();
+    assertThat(updateQuery.getTtl()).isEqualTo(ttlInSeconds);
+  }
+
+  @Test
   void set() {
     Set<Integer> setValue = Collections.singleton(1);
     List<String> listValue = Arrays.asList("test1", "test2");

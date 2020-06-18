@@ -155,4 +155,18 @@ class InsertImplTest {
 
     assertThat(insertQuery.getTimestamp()).isEqualTo(now.plus(1, ChronoUnit.DAYS).toEpochMilli());
   }
+
+  @Test
+  void ifNotExists() {
+    UUID uuid = UUID.randomUUID();
+    Instant now = Instant.now();
+    List<String> stringList = Arrays.asList("value1", "value2");
+    insertImpl.insertInto(TestEntity_Table.test_entity, TestEntity_Table.id, TestEntity_Table.date, TestEntity_Table.list, TestEntity_Table.udt)
+              .values(uuid, now, stringList, udt1)
+              .ifNotExists();
+
+    InsertQuery insertQuery = insertImpl.getInsertQuery();
+
+    assertThat(insertQuery.isIfNotExists()).isTrue();
+  }
 }

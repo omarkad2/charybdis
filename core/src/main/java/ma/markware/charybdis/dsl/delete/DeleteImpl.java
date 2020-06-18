@@ -8,7 +8,7 @@ import ma.markware.charybdis.model.field.DeletableField;
 import ma.markware.charybdis.model.field.metadata.TableMetadata;
 import ma.markware.charybdis.query.DeleteQuery;
 
-public class DeleteImpl implements DeleteInitExpression, DeleteTimestampExpression, DeleteWhereExpression, DeleteExtraWhereExpression, DeleteOnExistExpression,
+public class DeleteImpl implements DeleteInitExpression, DeleteTimestampExpression, DeleteWhereExpression, DeleteExtraWhereExpression,
     DeleteIfExpression, DeleteExtraIfExpression, DeleteExecuteExpression {
 
   private final CqlSession session;
@@ -71,12 +71,6 @@ public class DeleteImpl implements DeleteInitExpression, DeleteTimestampExpressi
   @Override
   public DeleteExtraIfExpression and_(final CriteriaExpression condition) {
     deleteQuery.setIf(condition);
-    return this;
-  }
-
-  @Override
-  public DeleteExecuteExpression ifExists() {
-    deleteQuery.enableIfExists();
     return this;
   }
 

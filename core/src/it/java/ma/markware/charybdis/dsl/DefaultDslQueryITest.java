@@ -289,6 +289,29 @@ class DefaultDslQueryITest extends AbstractIntegrationITest {
                                          record.get(TestEntity_Table.flag));
       assertThat(actual).isEqualTo(TestEntity_INST1.entity1);
     }
+
+    @Test
+    void insertInto_ifNotExists(CqlSession session) {
+      cleanDatabase(session);
+      // Given
+      dslQuery.insertInto(TestEntity_Table.test_entity, TestEntity_Table.id, TestEntity_Table.date, TestEntity_Table.udt, TestEntity_Table.list, TestEntity_Table.flag)
+              .values(TestEntity_INST1.id, TestEntity_INST1.date, TestEntity_INST1.udt1, TestEntity_INST1.list, false)
+              .execute();
+
+      dslQuery.insertInto(TestEntity_Table.test_entity, TestEntity_Table.id, TestEntity_Table.date, TestEntity_Table.udt, TestEntity_Table.list, TestEntity_Table.flag)
+              .values(TestEntity_INST1.id, TestEntity_INST1.date, TestEntity_INST1.udt1, TestEntity_INST1.list, true)
+              .ifNotExists()
+              .execute();
+
+      // When
+      Collection<Record> records = dslQuery.selectFrom(TestEntity_Table.test_entity)
+                              .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
+                              .fetch();
+
+      // Then
+      assertThat(records).hasSize(1);
+      assertThat(new ArrayList<>(records).get(0).get(TestEntity_Table.flag)).isFalse();
+    }
   }
 
   @Nested

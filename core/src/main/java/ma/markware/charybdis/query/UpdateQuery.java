@@ -37,7 +37,6 @@ public class UpdateQuery extends AbstractQuery {
   private List<ConditionClause> conditionClauses = new ArrayList<>();
   private Integer ttl;
   private Long timestamp;
-  private boolean ifExists;
 
   public String getKeyspace() {
     return keyspace;
@@ -121,10 +120,6 @@ public class UpdateQuery extends AbstractQuery {
     this.timestamp = timestamp;
   }
 
-  public void enableIfExists() {
-    this.ifExists = true;
-  }
-
   @Override
   public ResultSet execute(final CqlSession session) {
     UpdateStart updateStart = QueryBuilder.update(keyspace, table);
@@ -140,10 +135,6 @@ public class UpdateQuery extends AbstractQuery {
     UpdateWithAssignments updateWithAssignments = updateStart.set(QueryHelper.extractAssignments(assignmentClauses));
 
     Update update = updateWithAssignments.where(QueryHelper.extractRelations(whereClauses));
-
-    if (ifExists) {
-      update = update.ifExists();
-    }
 
     update = update.if_(QueryHelper.extractConditions(conditionClauses));
 

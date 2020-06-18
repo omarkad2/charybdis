@@ -18,7 +18,7 @@ import ma.markware.charybdis.model.field.nested.UdtNestedField;
 import ma.markware.charybdis.query.UpdateQuery;
 
 public class UpdateImpl implements UpdateInitExpression, UpdateTtlExpression, UpdateTimestampExpression, UpdateAssignmentExpression,
-    UpdateExtraAssignmentExpression, UpdateWhereExpression, UpdateExtraWhereExpression, UpdateOnExistExpression, UpdateIfExpression,
+    UpdateExtraAssignmentExpression, UpdateWhereExpression, UpdateExtraWhereExpression, UpdateIfExpression,
     UpdateExtraIfExpression, UpdateExecuteExpression {
 
   private final CqlSession session;
@@ -108,12 +108,6 @@ public class UpdateImpl implements UpdateInitExpression, UpdateTtlExpression, Up
   @Override
   public UpdateExtraWhereExpression and(final CriteriaExpression condition) {
     updateQuery.setWhere(condition);
-    return this;
-  }
-
-  @Override
-  public UpdateExecuteExpression ifExists() {
-    updateQuery.enableIfExists();
     return this;
   }
 

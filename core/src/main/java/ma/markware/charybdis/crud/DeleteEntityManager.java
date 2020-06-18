@@ -22,25 +22,18 @@ public class DeleteEntityManager<T> {
   private TableMetadata<T> tableMetadata;
   private T entity;
 
-  public DeleteEntityManager() {
+  DeleteEntityManager() {
     this.deleteQuery = new DeleteQuery();
   }
 
-  public DeleteEntityManager<T> withTableMetadata(TableMetadata<T> tableMetadata) {
+  DeleteEntityManager<T> withTableMetadata(TableMetadata<T> tableMetadata) {
     this.tableMetadata = tableMetadata;
     deleteQuery.setTable(tableMetadata);
     return this;
   }
 
-  public DeleteEntityManager<T> withEntity(T entity) {
+  DeleteEntityManager<T> withEntity(T entity) {
     this.entity = entity;
-    return this;
-  }
-
-  public DeleteEntityManager<T> withIfExists(boolean ifExists) {
-    if (ifExists) {
-      deleteQuery.enableIfExists();
-    }
     return this;
   }
 
@@ -54,7 +47,7 @@ public class DeleteEntityManager<T> {
     return this;
   }
 
-  public T save(CqlSession session) {
+  T save(CqlSession session) {
     Map<String, Object> columnValueMap = tableMetadata.serialize(entity);
     for (Entry<String, Object> columnEntry : columnValueMap.entrySet()) {
       String columnName = columnEntry.getKey();

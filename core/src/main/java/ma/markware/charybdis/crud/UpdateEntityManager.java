@@ -23,25 +23,18 @@ public class UpdateEntityManager<T> {
   private TableMetadata<T> tableMetadata;
   private T entity;
 
-  public UpdateEntityManager() {
+  UpdateEntityManager() {
     this.updateQuery = new UpdateQuery();
   }
 
-  public UpdateEntityManager<T> withTableMetadata(TableMetadata<T> tableMetadata) {
+  UpdateEntityManager<T> withTableMetadata(TableMetadata<T> tableMetadata) {
     this.tableMetadata = tableMetadata;
     updateQuery.setTable(tableMetadata);
     return this;
   }
 
-  public UpdateEntityManager<T> withEntity(T entity) {
+  UpdateEntityManager<T> withEntity(T entity) {
     this.entity = entity;
-    return this;
-  }
-
-  public UpdateEntityManager<T> withIfExists(boolean ifExists) {
-    if (ifExists) {
-      updateQuery.enableIfExists();
-    }
     return this;
   }
 
@@ -60,7 +53,7 @@ public class UpdateEntityManager<T> {
     return this;
   }
 
-  public T save(CqlSession session) {
+  T save(CqlSession session) {
     Instant now = Instant.now();
     tableMetadata.setLastUpdatedDate(entity, now);
 

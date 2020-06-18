@@ -26,7 +26,6 @@ public class DeleteQuery extends AbstractQuery {
   private List<WhereClause> whereClauses = new ArrayList<>();
   private List<ConditionClause> conditionClauses = new ArrayList<>();
   private Long timestamp;
-  private boolean ifExists;
 
   public String getKeyspace() {
     return keyspace;
@@ -71,10 +70,6 @@ public class DeleteQuery extends AbstractQuery {
     this.timestamp = timestamp;
   }
 
-  public void enableIfExists() {
-    this.ifExists = true;
-  }
-
   public void setWhere(CriteriaExpression criteriaExpression) {
     whereClauses.add(WhereClause.from(criteriaExpression));
   }
@@ -96,10 +91,6 @@ public class DeleteQuery extends AbstractQuery {
     }
 
     Delete delete = deleteSelection.where(QueryHelper.extractRelations(whereClauses));
-
-    if (ifExists) {
-      delete = delete.ifExists();
-    }
 
     delete = delete.if_(QueryHelper.extractConditions(conditionClauses));
 
