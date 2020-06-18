@@ -2,6 +2,7 @@ package ma.markware.charybdis.dsl.select;
 
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.cql.ResultSet;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -120,7 +121,8 @@ public class SelectImpl implements SelectInitExpression, SelectWhereExpression, 
     if (resultSet == null) {
       return null;
     }
-    return new PageResult<>(RecordUtils.resultSetToRecords(resultSet, selectedFields), resultSet.getExecutionInfo().getPagingState());
+    ByteBuffer nextPagingState = resultSet.getExecutionInfo().getPagingState();
+    List<Record> records = RecordUtils.resultSetToRecords(resultSet, selectedFields);
+    return new PageResult<>(records, nextPagingState);
   }
-
 }

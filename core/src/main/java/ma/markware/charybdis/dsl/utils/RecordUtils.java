@@ -23,8 +23,8 @@ public class RecordUtils {
 
   public static List<Record> resultSetToRecords(final ResultSet resultSet, final List<SelectableField> selectedFields) {
     List<Record> records = new ArrayList<>();
-    for (Row row : resultSet) {
-      records.add(rowToRecord(row, selectedFields));
+    while (resultSet.getAvailableWithoutFetching() > 0) {
+      records.add(rowToRecord(resultSet.one(), selectedFields));
     }
     return records;
   }

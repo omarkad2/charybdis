@@ -17,9 +17,12 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import ma.markware.charybdis.AbstractIntegrationITest;
+import ma.markware.charybdis.query.PageRequest;
+import ma.markware.charybdis.query.PageResult;
 import ma.markware.charybdis.test.entities.TestEntity;
 import ma.markware.charybdis.test.entities.TestEnum;
 import ma.markware.charybdis.test.entities.TestUdt;
@@ -86,8 +89,7 @@ class DefaultDslQueryITest extends AbstractIntegrationITest {
                               .fetchOne();
 
       // Then
-      TestEntity actual = new TestEntity(record.get(TestEntity_Table.id),
-                                         record.get(TestEntity_Table.date), record.get(TestEntity_Table.udt),
+      TestEntity actual = new TestEntity(record.get(TestEntity_Table.id), record.get(TestEntity_Table.date), record.get(TestEntity_Table.udt),
                                          record.get(TestEntity_Table.list), record.get(TestEntity_Table.se), record.get(TestEntity_Table.map),
                                          record.get(TestEntity_Table.nestedList), record.get(TestEntity_Table.nestedSet),
                                          record.get(TestEntity_Table.nestedMap), record.get(TestEntity_Table.enumValue),
@@ -108,36 +110,28 @@ class DefaultDslQueryITest extends AbstractIntegrationITest {
       UUID id3 = UUID.randomUUID();
 
       // Row1
-      insertRow(session, TestEntity_Table.KEYSPACE_NAME, TestEntity_Table.TABLE_NAME, ImmutableMap.of(
-        TestEntity_Table.id.getName(), QueryBuilder.literal(TestEntity_Table.id.serialize(id1)),
-        TestEntity_Table.date.getName(), QueryBuilder.literal(TestEntity_Table.date.serialize(TestEntity_INST1.date)),
-        TestEntity_Table.udt.getName(), QueryBuilder.literal(TestEntity_Table.udt.serialize(TestEntity_INST1.udt1)),
-        TestEntity_Table.list.getName(), QueryBuilder.literal(TestEntity_Table.list.serialize(TestEntity_INST1.list))
-      ));
+      insertRow(session, TestEntity_Table.KEYSPACE_NAME, TestEntity_Table.TABLE_NAME,
+                ImmutableMap.of(TestEntity_Table.id.getName(), QueryBuilder.literal(TestEntity_Table.id.serialize(id1)), TestEntity_Table.date.getName(), QueryBuilder.literal(TestEntity_Table.date.serialize(TestEntity_INST1.date)),
+                                TestEntity_Table.udt.getName(), QueryBuilder.literal(TestEntity_Table.udt.serialize(TestEntity_INST1.udt1)),
+                                TestEntity_Table.list.getName(), QueryBuilder.literal(TestEntity_Table.list.serialize(TestEntity_INST1.list))));
 
       // Row2
-      insertRow(session, TestEntity_Table.KEYSPACE_NAME, TestEntity_Table.TABLE_NAME, ImmutableMap.of(
-          TestEntity_Table.id.getName(), QueryBuilder.literal(TestEntity_Table.id.serialize(id1)),
-          TestEntity_Table.date.getName(), QueryBuilder.literal(TestEntity_Table.date.serialize(Instant.now())),
-          TestEntity_Table.udt.getName(), QueryBuilder.literal(TestEntity_Table.udt.serialize(TestEntity_INST1.udt1)),
-          TestEntity_Table.list.getName(), QueryBuilder.literal(TestEntity_Table.list.serialize(TestEntity_INST1.list))
-      ));
+      insertRow(session, TestEntity_Table.KEYSPACE_NAME, TestEntity_Table.TABLE_NAME,
+                ImmutableMap.of(TestEntity_Table.id.getName(), QueryBuilder.literal(TestEntity_Table.id.serialize(id1)), TestEntity_Table.date.getName(), QueryBuilder.literal(TestEntity_Table.date.serialize(Instant.now())),
+                                TestEntity_Table.udt.getName(), QueryBuilder.literal(TestEntity_Table.udt.serialize(TestEntity_INST1.udt1)),
+                                TestEntity_Table.list.getName(), QueryBuilder.literal(TestEntity_Table.list.serialize(TestEntity_INST1.list))));
 
       // Row3
-      insertRow(session, TestEntity_Table.KEYSPACE_NAME, TestEntity_Table.TABLE_NAME, ImmutableMap.of(
-          TestEntity_Table.id.getName(), QueryBuilder.literal(TestEntity_Table.id.serialize(id2)),
-          TestEntity_Table.date.getName(), QueryBuilder.literal(TestEntity_Table.date.serialize(Instant.now())),
-          TestEntity_Table.udt.getName(), QueryBuilder.literal(TestEntity_Table.udt.serialize(TestEntity_INST1.udt1)),
-          TestEntity_Table.list.getName(), QueryBuilder.literal(TestEntity_Table.list.serialize(TestEntity_INST1.list))
-      ));
+      insertRow(session, TestEntity_Table.KEYSPACE_NAME, TestEntity_Table.TABLE_NAME,
+                ImmutableMap.of(TestEntity_Table.id.getName(), QueryBuilder.literal(TestEntity_Table.id.serialize(id2)), TestEntity_Table.date.getName(), QueryBuilder.literal(TestEntity_Table.date.serialize(Instant.now())),
+                                TestEntity_Table.udt.getName(), QueryBuilder.literal(TestEntity_Table.udt.serialize(TestEntity_INST1.udt1)),
+                                TestEntity_Table.list.getName(), QueryBuilder.literal(TestEntity_Table.list.serialize(TestEntity_INST1.list))));
 
       // Row4
-      insertRow(session, TestEntity_Table.KEYSPACE_NAME, TestEntity_Table.TABLE_NAME, ImmutableMap.of(
-          TestEntity_Table.id.getName(), QueryBuilder.literal(TestEntity_Table.id.serialize(id3)),
-          TestEntity_Table.date.getName(), QueryBuilder.literal(TestEntity_Table.date.serialize(Instant.now())),
-          TestEntity_Table.udt.getName(), QueryBuilder.literal(TestEntity_Table.udt.serialize(TestEntity_INST1.udt1)),
-          TestEntity_Table.list.getName(), QueryBuilder.literal(TestEntity_Table.list.serialize(TestEntity_INST1.list))
-      ));
+      insertRow(session, TestEntity_Table.KEYSPACE_NAME, TestEntity_Table.TABLE_NAME,
+                ImmutableMap.of(TestEntity_Table.id.getName(), QueryBuilder.literal(TestEntity_Table.id.serialize(id3)), TestEntity_Table.date.getName(), QueryBuilder.literal(TestEntity_Table.date.serialize(Instant.now())),
+                                TestEntity_Table.udt.getName(), QueryBuilder.literal(TestEntity_Table.udt.serialize(TestEntity_INST1.udt1)),
+                                TestEntity_Table.list.getName(), QueryBuilder.literal(TestEntity_Table.list.serialize(TestEntity_INST1.list))));
 
       // When
       Collection<Record> records = dslQuery.selectDistinct(TestEntity_Table.id)
@@ -183,8 +177,7 @@ class DefaultDslQueryITest extends AbstractIntegrationITest {
       // Then
       assertThat(records).hasSize(1);
       Record record = new ArrayList<>(records).get(0);
-      TestEntity actual = new TestEntity(record.get(TestEntity_Table.id),
-                                         record.get(TestEntity_Table.date), record.get(TestEntity_Table.udt),
+      TestEntity actual = new TestEntity(record.get(TestEntity_Table.id), record.get(TestEntity_Table.date), record.get(TestEntity_Table.udt),
                                          record.get(TestEntity_Table.list), record.get(TestEntity_Table.se), record.get(TestEntity_Table.map),
                                          record.get(TestEntity_Table.nestedList), record.get(TestEntity_Table.nestedSet),
                                          record.get(TestEntity_Table.nestedMap), record.get(TestEntity_Table.enumValue),
@@ -194,6 +187,70 @@ class DefaultDslQueryITest extends AbstractIntegrationITest {
                                          record.get(TestEntity_Table.udtMap), record.get(TestEntity_Table.udtNestedList),
                                          record.get(TestEntity_Table.flag));
       assertThat(actual).isEqualTo(TestEntity_INST2.entity2);
+    }
+
+    @Test
+    void selectPaged(CqlSession session) {
+      // Row1
+      insertRow(session, TestEntity_Table.KEYSPACE_NAME, TestEntity_Table.TABLE_NAME, ImmutableMap.of(TestEntity_Table.id.getName(), QueryBuilder.literal(TestEntity_Table.id.serialize(UUID.randomUUID())),
+                                                                                                      TestEntity_Table.date.getName(), QueryBuilder.literal(TestEntity_Table.date.serialize(TestEntity_INST1.date)),
+                                                                                                      TestEntity_Table.udt.getName(), QueryBuilder.literal(TestEntity_Table.udt.serialize(TestEntity_INST1.udt1)),
+                                                                                                      TestEntity_Table.list.getName(), QueryBuilder.literal(TestEntity_Table.list.serialize(TestEntity_INST1.list))));
+
+      // Row2
+      insertRow(session, TestEntity_Table.KEYSPACE_NAME, TestEntity_Table.TABLE_NAME, ImmutableMap.of(TestEntity_Table.id.getName(), QueryBuilder.literal(TestEntity_Table.id.serialize(UUID.randomUUID())),
+                                                                                                      TestEntity_Table.date.getName(), QueryBuilder.literal(TestEntity_Table.date.serialize(TestEntity_INST1.date)),
+                                                                                                      TestEntity_Table.udt.getName(), QueryBuilder.literal(TestEntity_Table.udt.serialize(TestEntity_INST1.udt1)),
+                                                                                                      TestEntity_Table.list.getName(), QueryBuilder.literal(TestEntity_Table.list.serialize(TestEntity_INST1.list))));
+
+      // Row3
+      insertRow(session, TestEntity_Table.KEYSPACE_NAME, TestEntity_Table.TABLE_NAME, ImmutableMap.of(TestEntity_Table.id.getName(), QueryBuilder.literal(TestEntity_Table.id.serialize(UUID.randomUUID())),
+                                                                                                      TestEntity_Table.date.getName(), QueryBuilder.literal(TestEntity_Table.date.serialize(TestEntity_INST1.date)),
+                                                                                                      TestEntity_Table.udt.getName(), QueryBuilder.literal(TestEntity_Table.udt.serialize(TestEntity_INST1.udt1)),
+                                                                                                      TestEntity_Table.list.getName(), QueryBuilder.literal(TestEntity_Table.list.serialize(TestEntity_INST1.list))));
+
+      // Row4
+      insertRow(session, TestEntity_Table.KEYSPACE_NAME, TestEntity_Table.TABLE_NAME, ImmutableMap.of(TestEntity_Table.id.getName(), QueryBuilder.literal(TestEntity_Table.id.serialize(UUID.randomUUID())),
+                                                                                                      TestEntity_Table.date.getName(), QueryBuilder.literal(TestEntity_Table.date.serialize(TestEntity_INST1.date)),
+                                                                                                      TestEntity_Table.udt.getName(), QueryBuilder.literal(TestEntity_Table.udt.serialize(TestEntity_INST1.udt1)),
+                                                                                                      TestEntity_Table.list.getName(), QueryBuilder.literal(TestEntity_Table.list.serialize(TestEntity_INST1.list))));
+
+      // First page
+      PageResult pageResult1 = dslQuery.selectFrom(TestEntity_Table.test_entity)
+                                       .fetchPage(PageRequest.of(null, 2));
+      assertThat(pageResult1.getPagingState()).isNotNull();
+      assertThat(pageResult1.getResults()).hasSize(2);
+
+      // Second page
+      PageResult pageResult2 = dslQuery.selectFrom(TestEntity_Table.test_entity)
+                                       .fetchPage(PageRequest.of(pageResult1.getPagingState(), 2));
+      assertThat(pageResult2.getPagingState()).isNotNull();
+      assertThat(pageResult2.getResults()).hasSize(2);
+
+      // Third page
+      PageResult pageResult3 = dslQuery.selectFrom(TestEntity_Table.test_entity)
+                                       .fetchPage(PageRequest.of(pageResult2.getPagingState(), 2));
+      assertThat(pageResult3.getPagingState()).isNull();
+      assertThat(pageResult3.getResults()).isEmpty();
+    }
+
+    @Test
+    void selectOptional(CqlSession session) {
+      insertRow(session, TestEntity_Table.KEYSPACE_NAME, TestEntity_Table.TABLE_NAME, ImmutableMap.of(
+          TestEntity_Table.id.getName(), QueryBuilder.literal(TestEntity_Table.id.serialize(TestEntity_INST1.id)),
+          TestEntity_Table.date.getName(), QueryBuilder.literal(TestEntity_Table.date.serialize(TestEntity_INST1.date)),
+          TestEntity_Table.udt.getName(), QueryBuilder.literal(TestEntity_Table.udt.serialize(TestEntity_INST1.udt1)),
+          TestEntity_Table.list.getName(), QueryBuilder.literal(TestEntity_Table.list.serialize(TestEntity_INST1.list))));
+
+      Optional<Record> presentRecord = dslQuery.selectFrom(TestEntity_Table.test_entity)
+                                               .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
+                                               .fetchOptional();
+      assertThat(presentRecord).isPresent();
+
+      Optional<Record> absentRecord = dslQuery.selectFrom(TestEntity_Table.test_entity)
+                                              .where(TestEntity_Table.id.eq(UUID.randomUUID()))
+                                              .fetchOptional();
+      assertThat(absentRecord).isEmpty();
     }
   }
 
