@@ -10,7 +10,7 @@ import ma.markware.charybdis.query.InsertQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class CreateEntityManager<T> {
+class CreateEntityManager<T> {
 
   private static final Logger log = LoggerFactory.getLogger(CreateEntityManager.class);
 
@@ -18,44 +18,44 @@ public class CreateEntityManager<T> {
   private TableMetadata<T> tableMetadata;
   private T entity;
 
-  public CreateEntityManager() {
+  CreateEntityManager() {
     this.insertQuery = new InsertQuery();
   }
 
-  public CreateEntityManager<T> withTableMetadata(TableMetadata<T> tableMetadata) {
+  CreateEntityManager<T> withTableMetadata(TableMetadata<T> tableMetadata) {
     this.tableMetadata = tableMetadata;
     insertQuery.setTable(tableMetadata);
     return this;
   }
 
-  public CreateEntityManager<T> withEntity(T entity) {
+  CreateEntityManager<T> withEntity(T entity) {
     this.entity = entity;
     return this;
   }
 
-  public CreateEntityManager<T> withIfNotExists(boolean ifNotExists) {
+  CreateEntityManager<T> withIfNotExists(boolean ifNotExists) {
     if (ifNotExists) {
       insertQuery.enableIfNotExists();
     }
     return this;
   }
 
-  public CreateEntityManager<T> withTtl(int seconds) {
+  CreateEntityManager<T> withTtl(int seconds) {
     insertQuery.setTtl(seconds);
     return this;
   }
 
-  public CreateEntityManager<T> withTimestamp(Instant timestamp) {
+  CreateEntityManager<T> withTimestamp(Instant timestamp) {
     insertQuery.setTimestamp(timestamp);
     return this;
   }
 
-  public CreateEntityManager<T> withTimestamp(long timestamp) {
+  CreateEntityManager<T> withTimestamp(long timestamp) {
     insertQuery.setTimestamp(timestamp);
     return this;
   }
 
-  public T save(CqlSession session) {
+  T save(CqlSession session) {
     Instant now = Instant.now();
     tableMetadata.setGeneratedValues(entity);
     tableMetadata.setCreationDate(entity, now);

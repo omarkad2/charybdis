@@ -110,6 +110,28 @@ public class TestEntity extends TestSuperEntity {
     this.flag = flag;
   }
 
+  public TestEntity(final TestEntity testEntity) {
+    this.id = testEntity.id;
+    this.date = testEntity.date;
+    this.udt = testEntity.udt;
+    this.list = testEntity.list;
+    this.se = testEntity.se;
+    this.map = testEntity.map;
+    this.nestedList = testEntity.nestedList;
+    this.nestedSet = testEntity.nestedSet;
+    this.nestedMap = testEntity.nestedMap;
+    this.enumValue = testEntity.enumValue;
+    this.enumList = testEntity.enumList;
+    this.enumMap = testEntity.enumMap;
+    this.enumNestedList = testEntity.enumNestedList;
+    this.extraUdt = testEntity.extraUdt;
+    this.udtList = testEntity.udtList;
+    this.udtSet = testEntity.udtSet;
+    this.udtMap = testEntity.udtMap;
+    this.udtNestedList = testEntity.udtNestedList;
+    this.flag = testEntity.flag;
+  }
+
   public UUID getId() {
     return id;
   }

@@ -27,7 +27,7 @@ public class TestEntity_INST2 {
   public final static List<Set<TestEnum>> enumNestedList = null;
   public final static Map<Integer, TestEnum> enumMap = null;
   public final static List<TestEnum> enumList = null;
-  public final static TestNestedUdt nestedUdt1 = new TestNestedUdt("nestedName1", "nestedValue1", null);
+  private final static TestNestedUdt nestedUdt1 = new TestNestedUdt("nestedName1", "nestedValue1", null);
   public final static TestUdt udt = new TestUdt(2, "test2", null, null, null, nestedUdt1);
   public final static TestExtraUdt extraUdt = null;
   public final static List<TestUdt>  udtList = null;

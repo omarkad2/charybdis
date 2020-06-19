@@ -20,11 +20,7 @@ public interface EntityManager {
 
   <T> T create(TableMetadata<T> tableMetadata, T entity, Instant timestamp);
 
-  <T> T create(TableMetadata<T> tableMetadata, T entity, boolean ifNotExists, Instant timestamp);
-
   <T> T create(TableMetadata<T> tableMetadata, T entity, long timestamp);
-
-  <T> T create(TableMetadata<T> tableMetadata, T entity, boolean ifNotExists, long timestamp);
 
   <T> T update(TableMetadata<T> tableMetadata, T entity);
 

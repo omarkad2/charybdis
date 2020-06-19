@@ -62,20 +62,8 @@ public class DefaultEntityManager implements EntityManager {
   }
 
   @Override
-  public <T> T create(final TableMetadata<T> tableMetadata, final T entity, final boolean ifNotExists, final Instant timestamp) {
-    return new CreateEntityManager<T>().withTableMetadata(tableMetadata).withEntity(entity).withIfNotExists(ifNotExists).withTimestamp(timestamp)
-                                       .save(sessionFactory.getSession());
-  }
-
-  @Override
   public <T> T create(final TableMetadata<T> tableMetadata, final T entity, final long timestamp) {
     return new CreateEntityManager<T>().withTableMetadata(tableMetadata).withEntity(entity).withTimestamp(timestamp)
-                                       .save(sessionFactory.getSession());
-  }
-
-  @Override
-  public <T> T create(final TableMetadata<T> tableMetadata, final T entity, final boolean ifNotExists, final long timestamp) {
-    return new CreateEntityManager<T>().withTableMetadata(tableMetadata).withEntity(entity).withIfNotExists(ifNotExists).withTimestamp(timestamp)
                                        .save(sessionFactory.getSession());
   }
 
