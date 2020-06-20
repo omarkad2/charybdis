@@ -3,6 +3,7 @@ package ma.markware.charybdis.crud;
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.cql.ResultSet;
 import com.datastax.oss.driver.api.core.cql.Row;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import ma.markware.charybdis.model.criteria.CriteriaExpression;
@@ -17,20 +18,25 @@ public class ReadEntityManager<T> {
   private final SelectQuery selectQuery;
   private TableMetadata<T> tableMetadata;
 
-  public ReadEntityManager() {
+  ReadEntityManager() {
     this.selectQuery = new SelectQuery();
   }
 
-  public ReadEntityManager<T> withTableMetadata(TableMetadata<T> tableMetadata) {
+  ReadEntityManager<T> withTableMetadata(TableMetadata<T> tableMetadata) {
     this.tableMetadata = tableMetadata;
     selectQuery.setTableAndSelectors(tableMetadata);
     return this;
   }
 
-  public ReadEntityManager<T> withConditions(ExtendedCriteriaExpression conditions) {
+  ReadEntityManager<T> withConditions(ExtendedCriteriaExpression conditions) {
     for (CriteriaExpression condition : conditions.getCriterias()) {
       selectQuery.setWhereClause(condition);
     }
+    return this;
+  }
+
+  ReadEntityManager<T> withCondition(CriteriaExpression condition) {
+    selectQuery.setWhereClause(condition);
     return this;
   }
 
@@ -39,7 +45,7 @@ public class ReadEntityManager<T> {
     return this;
   }
 
-  public T fetchOne(CqlSession session) {
+  T fetchOne(CqlSession session) {
     final ResultSet resultSet = selectQuery.execute(session);
     if (resultSet == null) {
       return null;
@@ -48,7 +54,7 @@ public class ReadEntityManager<T> {
     return row == null ? null : tableMetadata.deserialize(row);
   }
 
-  public List<T> fetch(CqlSession session) {
+  List<T> fetch(CqlSession session) {
     final ResultSet resultSet = selectQuery.execute(session);
     if (resultSet == null) {
       return null;
@@ -56,24 +62,19 @@ public class ReadEntityManager<T> {
     return getEntities(resultSet);
   }
 
-  public PageResult<T> fetchPage(CqlSession session) {
+  PageResult<T> fetchPage(CqlSession session) {
     ResultSet resultSet = selectQuery.execute(session);
     if (resultSet == null) {
       return null;
     }
-    return new PageResult<>(getEntities(resultSet), resultSet.getExecutionInfo().getPagingState());
+    ByteBuffer pagingState = resultSet.getExecutionInfo().getPagingState();
+    return new PageResult<>(getEntities(resultSet), pagingState);
   }
 
   private List<T> getEntities(final ResultSet resultSet) {
     final List<T> entities = new ArrayList<>();
-    if (resultSet != null) {
-      int remaining = resultSet.getAvailableWithoutFetching();
-      for (final Row row : resultSet) {
-        entities.add(tableMetadata.deserialize(row));
-        if (--remaining == 0) {
-          break;
-        }
-      }
+    while (resultSet.getAvailableWithoutFetching() > 0) {
+      entities.add(tableMetadata.deserialize(resultSet.one()));
     }
     return entities;
   }

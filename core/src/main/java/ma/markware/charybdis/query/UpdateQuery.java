@@ -71,6 +71,10 @@ public class UpdateQuery extends AbstractQuery {
     table = tableMetadata.getTableName();
   }
 
+  public void setSerializedAssignment(ColumnMetadata columnMetadata, Object serializedValue) {
+    assignmentClauses.add(AssignmentClause.from(columnMetadata, serializedValue));
+  }
+
   public <D, S> void setAssignment(ColumnMetadata<D, S> columnMetadata, D value) {
     assignmentClauses.add(AssignmentClause.from(columnMetadata, columnMetadata.serialize(value)));
   }

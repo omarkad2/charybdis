@@ -4,6 +4,7 @@ import com.datastax.oss.driver.api.core.CqlSession;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import ma.markware.charybdis.model.criteria.CriteriaExpression;
 import ma.markware.charybdis.model.criteria.ExtendedCriteriaExpression;
 import ma.markware.charybdis.model.field.metadata.TableMetadata;
 import ma.markware.charybdis.query.PageRequest;
@@ -86,8 +87,25 @@ public class DefaultEntityManager implements EntityManager {
   }
 
   @Override
+  public <T> T findOne(final TableMetadata<T> tableMetadata, final CriteriaExpression condition) {
+    return new ReadEntityManager<T>().withTableMetadata(tableMetadata).withCondition(condition)
+                                     .fetchOne(sessionFactory.getSession());
+  }
+
+  @Override
   public <T> Optional<T> findOptional(final TableMetadata<T> tableMetadata, final ExtendedCriteriaExpression conditions) {
     return Optional.ofNullable(findOne(tableMetadata, conditions));
+  }
+
+  @Override
+  public <T> Optional<T> findOptional(final TableMetadata<T> tableMetadata, final CriteriaExpression condition) {
+    return Optional.ofNullable(findOne(tableMetadata, condition));
+  }
+
+  @Override
+  public <T> List<T> find(final TableMetadata<T> tableMetadata) {
+    return new ReadEntityManager<T>().withTableMetadata(tableMetadata)
+                                     .fetch(sessionFactory.getSession());
   }
 
   @Override
@@ -97,8 +115,29 @@ public class DefaultEntityManager implements EntityManager {
   }
 
   @Override
+  public <T> List<T> find(final TableMetadata<T> tableMetadata, final CriteriaExpression condition) {
+    return new ReadEntityManager<T>().withTableMetadata(tableMetadata).withCondition(condition)
+                                     .fetch(sessionFactory.getSession());
+  }
+
+  @Override
+  public <T> PageResult<T> find(final TableMetadata<T> tableMetadata, final PageRequest pageRequest) {
+    return new ReadEntityManager<T>().withTableMetadata(tableMetadata)
+                                     .withPaging(pageRequest)
+                                     .fetchPage(sessionFactory.getSession());
+  }
+
+  @Override
   public <T> PageResult<T> find(final TableMetadata<T> tableMetadata, final ExtendedCriteriaExpression conditions, final PageRequest pageRequest) {
     return new ReadEntityManager<T>().withTableMetadata(tableMetadata).withConditions(conditions)
+                                     .withPaging(pageRequest)
+                                     .fetchPage(sessionFactory.getSession());
+  }
+
+  @Override
+  public <T> PageResult<T> find(final TableMetadata<T> tableMetadata, final CriteriaExpression condition, final PageRequest pageRequest) {
+    return new ReadEntityManager<T>().withTableMetadata(tableMetadata).withCondition(condition)
+                                     .withPaging(pageRequest)
                                      .fetchPage(sessionFactory.getSession());
   }
 }

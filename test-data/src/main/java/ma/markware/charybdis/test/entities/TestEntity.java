@@ -78,7 +78,7 @@ public class TestEntity extends TestSuperEntity {
 
   @Column
   @Index
-  private boolean flag;
+  private Boolean flag;
 
   public TestEntity() {
   }
@@ -88,7 +88,7 @@ public class TestEntity extends TestSuperEntity {
       final Map<String, @Frozen Map<Integer, String>> nestedMap, final TestEnum enumValue, final List<TestEnum> enumList,
       final Map<Integer, TestEnum> enumMap, final List<@Frozen Set<TestEnum>> enumNestedList, final TestExtraUdt extraUdt,
       final List<@Frozen TestUdt> udtList, final Set<@Frozen TestUdt> udtSet, final Map<Integer, @Frozen TestUdt> udtMap,
-      final List<@Frozen List<TestUdt>> udtNestedList, final boolean flag) {
+      final List<@Frozen List<TestUdt>> udtNestedList, final Boolean flag) {
     this.id = id;
     this.date = date;
     this.udt = udt;
@@ -276,11 +276,11 @@ public class TestEntity extends TestSuperEntity {
     this.udtNestedList = udtNestedList;
   }
 
-  public boolean isFlag() {
+  public Boolean isFlag() {
     return flag;
   }
 
-  public void setFlag(final boolean flag) {
+  public void setFlag(final Boolean flag) {
     this.flag = flag;
   }
 

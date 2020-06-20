@@ -65,7 +65,7 @@ public class UpdateEntityManager<T> {
       if (value != null && tableMetadata.isPrimaryKey(columnName)) {
         updateQuery.setWhere(new CriteriaExpression(columnMetadata, CriteriaOperator.EQ, value));
       } else {
-        updateQuery.setAssignment(columnMetadata, value);
+        updateQuery.setSerializedAssignment(columnMetadata, value);
       }
     }
 
