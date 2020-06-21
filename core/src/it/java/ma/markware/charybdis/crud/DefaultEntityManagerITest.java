@@ -453,21 +453,14 @@ class DefaultEntityManagerITest extends AbstractIntegrationITest {
 
     @Test
     void delete() {
-      boolean isDeleted = entityManager.delete(TestEntity_Table.test_entity, TestEntity_INST1.entity1);
+      boolean isApplied = entityManager.delete(TestEntity_Table.test_entity, TestEntity_INST1.entity1);
 
       Record record = dslQuery.selectFrom(TestEntity_Table.test_entity)
                               .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
                               .fetchOne();
 
-      assertThat(isDeleted).isTrue();
+      assertThat(isApplied).isTrue();
       assertThat(record).isNull();
-    }
-
-    @Test
-    void delete_should_return_false_when_entity_not_exist() {
-      boolean isDeleted = entityManager.delete(TestEntity_Table.test_entity, TestEntity_INST2.entity2);
-
-      assertThat(isDeleted).isFalse();
     }
   }
 }

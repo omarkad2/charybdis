@@ -6,13 +6,10 @@ import com.datastax.oss.driver.api.core.cql.Row;
 import com.datastax.oss.driver.internal.querybuilder.relation.DefaultRelation;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Stream;
 import ma.markware.charybdis.model.field.metadata.ColumnMetadata;
 import ma.markware.charybdis.model.field.metadata.ListColumnMetadata;
 import ma.markware.charybdis.model.field.metadata.MapColumnMetadata;
-import ma.markware.charybdis.model.field.metadata.SetColumnMetadata;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -24,35 +21,6 @@ class WhereClauseTest {
   void testWhereClause(WhereClause whereClause, String operator, Object[] bindValues) {
     assertThat(((DefaultRelation) whereClause.getRelation()).getOperator()).isEqualTo(operator);
     assertThat(whereClause.getBindValues()).isEqualTo(bindValues);
-  }
-
-  @Test
-  void shouldThrowExceptionWhenUnsupportedOperation() {
-    SetColumnMetadata<Integer, Integer> setColumnMetadata = new SetColumnMetadata<Integer, Integer>() {
-      @Override
-      public Set<Integer> deserialize(final Row row) {
-        return row.getSet(getName(), Integer.class);
-      }
-
-      @Override
-      public Class getFieldClass() {
-        return Set.class;
-      }
-
-      @Override
-      public Set<Integer> serialize(final Set<Integer> field) {
-        return field;
-      }
-
-      @Override
-      public String getName() {
-        return "set";
-      }
-    };
-
-//    assertThatExceptionOfType(CharybdisUnsupportedOperation.class)
-//        .isThrownBy(() -> new CriteriaExpression(setColumnMetadata, new CriteriaOperator(), "value"))
-//        .withMessage("Operation '%s' is not supported in [WHERE] clause");
   }
 
   private static Stream<Arguments> getWhereClauseTestArguments() {
