@@ -75,7 +75,7 @@ public class DefaultEntityManager implements EntityManager {
   }
 
   @Override
-  public <T> T delete(final TableMetadata<T> tableMetadata, final T entity) {
+  public <T> boolean delete(final TableMetadata<T> tableMetadata, final T entity) {
     return new DeleteEntityManager<T>().withTableMetadata(tableMetadata).withEntity(entity)
                                        .save(sessionFactory.getSession());
   }

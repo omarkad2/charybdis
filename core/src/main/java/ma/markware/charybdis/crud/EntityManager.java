@@ -25,7 +25,7 @@ public interface EntityManager {
 
   <T> T update(TableMetadata<T> tableMetadata, T entity);
 
-  <T> T delete(TableMetadata<T> tableMetadata, T entity);
+  <T> boolean delete(TableMetadata<T> tableMetadata, T entity);
 
   <T> T findOne(TableMetadata<T> tableMetadata, ExtendedCriteriaExpression conditions);
 

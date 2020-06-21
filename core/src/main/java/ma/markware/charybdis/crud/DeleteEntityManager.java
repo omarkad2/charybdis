@@ -1,7 +1,5 @@
 package ma.markware.charybdis.crud;
 
-import static java.lang.String.format;
-
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.cql.ResultSet;
 import java.time.Instant;
@@ -47,7 +45,7 @@ public class DeleteEntityManager<T> {
     return this;
   }
 
-  T save(CqlSession session) {
+  boolean save(CqlSession session) {
     Map<String, Object> columnValueMap = tableMetadata.serialize(entity);
     for (Entry<String, Object> columnEntry : columnValueMap.entrySet()) {
       String columnName = columnEntry.getKey();
@@ -57,10 +55,6 @@ public class DeleteEntityManager<T> {
       }
     }
     ResultSet resultSet = deleteQuery.execute(session);
-    if (resultSet.wasApplied()) {
-      return null;
-    }
-    log.warn(format("Entity [%s] was not deleted", entity));
-    return entity;
+    return resultSet.wasApplied();
   }
 }
