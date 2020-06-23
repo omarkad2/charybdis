@@ -20,6 +20,12 @@ package ma.markware.charybdis.apt.metatype;
 
 import ma.markware.charybdis.apt.metatype.FieldTypeMetaType.FieldTypeKind;
 
+/**
+ * A generic field meta-type.
+ * Holds generic metadata that every Field has.
+ *
+ * @author Oussama Markad
+ */
 public class AbstractFieldMetaType {
 
   private String deserializationName;

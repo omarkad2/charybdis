@@ -20,6 +20,12 @@ package ma.markware.charybdis.apt.metatype;
 
 import java.util.List;
 
+/**
+ * A specific Class meta-type.
+ * Holds metadata found on classes annotated with {@link ma.markware.charybdis.model.annotation.Udt}.
+ *
+ * @author Oussama Markad
+ */
 public class UdtMetaType extends AbstractEntityMetaType {
 
   private String udtName;

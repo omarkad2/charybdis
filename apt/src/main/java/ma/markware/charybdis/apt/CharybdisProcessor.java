@@ -25,7 +25,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.Filer;
-import javax.annotation.processing.Messager;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.SourceVersion;
@@ -42,6 +41,17 @@ import ma.markware.charybdis.model.annotation.Keyspace;
 import ma.markware.charybdis.model.annotation.Table;
 import ma.markware.charybdis.model.annotation.Udt;
 
+/**
+ * Annotation processor main class.
+ * It processes classes annotated with:
+ * <ul>
+ *   <li>{@link Keyspace}</li>
+ *   <li>{@link Udt}</li>
+ *   <li>{@link Table}</li>
+ * </ul>
+ *
+ * @author Oussama Markad
+ */
 @AutoService(javax.annotation.processing.Processor.class)
 public class CharybdisProcessor extends AbstractProcessor {
 
@@ -50,17 +60,22 @@ public class CharybdisProcessor extends AbstractProcessor {
   private AptConfiguration aptConfiguration;
   private AptContext aptContext;
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public synchronized void init(final ProcessingEnvironment processingEnv) {
     super.init(processingEnv);
     final Filer filer = processingEnv.getFiler();
-    final Messager messager = processingEnv.getMessager();
     final Types types = processingEnv.getTypeUtils();
     final Elements elements = processingEnv.getElementUtils();
     aptContext = new AptContext();
     aptConfiguration = AptDefaultConfiguration.initConfig(aptContext, types, elements, filer);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Set<String> getSupportedAnnotationTypes() {
     Set<String> supportedAnnotationTypes = new HashSet<>();
@@ -70,11 +85,17 @@ public class CharybdisProcessor extends AbstractProcessor {
     return supportedAnnotationTypes;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public SourceVersion getSupportedSourceVersion() {
     return SourceVersion.latest();
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public boolean process(final Set<? extends TypeElement> annotations, final RoundEnvironment roundEnv) {
 

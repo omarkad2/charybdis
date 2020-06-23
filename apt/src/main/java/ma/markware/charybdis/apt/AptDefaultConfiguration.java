@@ -33,6 +33,11 @@ import ma.markware.charybdis.apt.serializer.TableSerializer;
 import ma.markware.charybdis.apt.serializer.UdtFieldSerializer;
 import ma.markware.charybdis.apt.serializer.UdtSerializer;
 
+/**
+ * The default implementation of {@link AptConfiguration}
+ *
+ * @author Oussama Markad
+ */
 public class AptDefaultConfiguration implements AptConfiguration {
 
   private final KeyspaceParser keyspaceParser;
@@ -53,6 +58,14 @@ public class AptDefaultConfiguration implements AptConfiguration {
     this.tableSerializer = tableSerializer;
   }
 
+  /**
+   * Creates instances of parsers and serializers used by annotation processor
+   * @param aptContext The annotation processor context
+   * @param types model API type utils
+   * @param elements model API element utlis
+   * @param filer allows serializers to create new java files
+   * @return Annotation processor global configuration
+   */
   public static AptConfiguration initConfig(AptContext aptContext, Types types, Elements elements, Filer filer) {
     FieldTypeParser fieldTypeParser = new FieldTypeParser(aptContext, types, elements);
     ColumnFieldParser columnFieldParser = new ColumnFieldParser(fieldTypeParser, types);
@@ -68,31 +81,49 @@ public class AptDefaultConfiguration implements AptConfiguration {
         new TableSerializer(columnFieldSerializer, filer));
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public KeyspaceParser getKeyspaceParser() {
     return keyspaceParser;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public UdtParser getUdtParser() {
     return udtParser;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public TableParser getTableParser() {
     return tableParser;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public KeyspaceSerializer getKeyspaceSerializer() {
     return keyspaceSerializer;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public UdtSerializer getUdtSerializer() {
     return udtSerializer;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public TableSerializer getTableSerializer() {
     return tableSerializer;

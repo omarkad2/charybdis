@@ -30,6 +30,12 @@ import ma.markware.charybdis.model.option.Replication;
 import ma.markware.charybdis.model.option.ReplicationStrategyClass;
 import org.apache.commons.lang3.StringUtils;
 
+/**
+ * A specific Class parser.
+ * Parses classes annotated with {@link ma.markware.charybdis.model.annotation.Keyspace}.
+ *
+ * @author Oussama Markad
+ */
 public class KeyspaceParser extends AbstractEntityParser<KeyspaceMetaType> {
 
   private final AptContext aptContext;
@@ -38,6 +44,9 @@ public class KeyspaceParser extends AbstractEntityParser<KeyspaceMetaType> {
     this.aptContext = aptContext;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public KeyspaceMetaType parse(final Element annotatedClass) {
     final Keyspace keyspace = annotatedClass.getAnnotation(Keyspace.class);
@@ -53,6 +62,9 @@ public class KeyspaceParser extends AbstractEntityParser<KeyspaceMetaType> {
     return keyspaceMetaType;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public void validateKeyspaceName(String className, String keyspaceName, AptContext aptContext) {
     if (StringUtils.isBlank(keyspaceName)) {
@@ -63,6 +75,9 @@ public class KeyspaceParser extends AbstractEntityParser<KeyspaceMetaType> {
     }
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public String resolveName(final Element annotatedClass) {
     final Keyspace keyspace = annotatedClass.getAnnotation(Keyspace.class);

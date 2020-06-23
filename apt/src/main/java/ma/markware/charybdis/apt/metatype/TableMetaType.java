@@ -20,6 +20,12 @@ package ma.markware.charybdis.apt.metatype;
 
 import java.util.List;
 
+/**
+ * A specific Class meta-type.
+ * Holds metadata found on classes annotated with {@link ma.markware.charybdis.model.annotation.Table}.
+ *
+ * @author Oussama Markad
+ */
 public class TableMetaType extends AbstractEntityMetaType {
 
   private String tableName;

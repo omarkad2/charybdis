@@ -30,8 +30,15 @@ import javax.annotation.processing.Filer;
 import javax.lang.model.element.Modifier;
 import ma.markware.charybdis.apt.exception.CharybdisSerializationException;
 
+/**
+ * Entity serializer.
+ * @param <ENTITY_META_TYPE> The input metadata type to serialize to java fields and methods.
+ */
 public interface EntitySerializer<ENTITY_META_TYPE> {
 
+  /**
+   * Builds static instance field of generated class.
+   */
   default FieldSpec buildStaticInstance(String packageName, String className, String entityName) {
     ClassName type = ClassName.get(packageName, className);
     return FieldSpec.builder(type, entityName)

@@ -18,6 +18,11 @@
  */
 package ma.markware.charybdis.apt.exception;
 
+/**
+ * Runtime exception that occurs when a class was not parsed correctly.
+ *
+ * @author Oussama Markad
+ */
 public class CharybdisParsingException extends RuntimeException {
 
   private static final long serialVersionUID = 1L;

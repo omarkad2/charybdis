@@ -42,12 +42,14 @@ import ma.markware.charybdis.apt.utils.ParserUtils;
 import ma.markware.charybdis.apt.utils.TypeUtils;
 import ma.markware.charybdis.model.annotation.Frozen;
 import org.apache.commons.lang.WordUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+/**
+ * A generic Field parser.
+ * Parses generic metadata that every Field has.
+ *
+ * @author Oussama Markad
+ */
 abstract class AbstractFieldParser<FIELD_META_TYPE extends AbstractFieldMetaType> implements FieldParser<FIELD_META_TYPE> {
-
-  private static final Logger log = LoggerFactory.getLogger(AbstractFieldParser.class);
 
   private final FieldTypeParser fieldTypeParser;
   private final Types types;
@@ -57,6 +59,9 @@ abstract class AbstractFieldParser<FIELD_META_TYPE extends AbstractFieldMetaType
     this.types = types;
   }
 
+  /**
+   * Parses generic attributes from Field
+   */
   AbstractFieldMetaType parseGenericField(Element annotatedField) {
     final AbstractFieldMetaType fieldMetaType = new AbstractFieldMetaType();
 

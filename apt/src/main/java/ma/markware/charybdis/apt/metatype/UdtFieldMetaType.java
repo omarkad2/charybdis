@@ -18,6 +18,12 @@
  */
 package ma.markware.charybdis.apt.metatype;
 
+/**
+ * A specific Field meta-type.
+ * Holds metadata found on fields annotated with {@link ma.markware.charybdis.model.annotation.UdtField}.
+ *
+ * @author Oussama Markad
+ */
 public class UdtFieldMetaType extends AbstractFieldMetaType {
 
   public UdtFieldMetaType(final AbstractFieldMetaType abstractFieldMetaType) {

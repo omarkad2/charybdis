@@ -42,6 +42,12 @@ import ma.markware.charybdis.model.field.metadata.SetColumnMetadata;
 import ma.markware.charybdis.model.field.metadata.UdtColumnMetadata;
 import ma.markware.charybdis.model.option.ClusteringOrder;
 
+/**
+ * A generic Field serializer.
+ * Serializes generic metadata into java methods and fields.
+ *
+ * @author Oussama Markad
+ */
 public class ColumnFieldSerializer extends AbstractFieldSerializer<ColumnFieldMetaType> {
 
   public ColumnFieldSerializer(final AptContext aptContext) {

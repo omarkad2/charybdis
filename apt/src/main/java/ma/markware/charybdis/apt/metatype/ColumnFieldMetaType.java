@@ -21,6 +21,12 @@ package ma.markware.charybdis.apt.metatype;
 import ma.markware.charybdis.model.option.ClusteringOrder;
 import ma.markware.charybdis.model.option.SequenceModel;
 
+/**
+ * A specific Field meta-type.
+ * Holds metadata found on fields annotated with {@link ma.markware.charybdis.model.annotation.Column}.
+ *
+ * @author Oussama Markad
+ */
 public class ColumnFieldMetaType extends AbstractFieldMetaType {
 
   private boolean isPartitionKey;

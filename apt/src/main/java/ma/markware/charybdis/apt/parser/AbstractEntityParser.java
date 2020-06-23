@@ -25,8 +25,17 @@ import javax.lang.model.type.TypeMirror;
 import ma.markware.charybdis.apt.AptContext;
 import ma.markware.charybdis.apt.metatype.AbstractEntityMetaType;
 
+/**
+ * A generic Class parser.
+ * Parses generic metadata that every Class has.
+ *
+ * @author Oussama Markad
+ */
 abstract class AbstractEntityParser<ENTITY_META_TYPE> implements EntityParser<ENTITY_META_TYPE> {
 
+  /**
+   * Parses generic attributes from Class
+   */
   AbstractEntityMetaType parseGenericEntity(final Element annotatedClass, final String annotationKeyspaceName, final AptContext aptContext) {
     final AbstractEntityMetaType entityMetaType = new AbstractEntityMetaType();
 
@@ -46,6 +55,9 @@ abstract class AbstractEntityParser<ENTITY_META_TYPE> implements EntityParser<EN
     return entityMetaType;
   }
 
+  /**
+   * Extracts package name from parsed class
+   */
   private String parsePackageName(Element annotatedClass) {
     Element enclosing = annotatedClass;
     while (enclosing.getKind() != ElementKind.PACKAGE) {

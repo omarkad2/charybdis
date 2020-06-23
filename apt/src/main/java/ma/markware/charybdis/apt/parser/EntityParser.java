@@ -29,12 +29,24 @@ import javax.lang.model.element.Modifier;
 import javax.lang.model.element.Name;
 import ma.markware.charybdis.apt.AptContext;
 import ma.markware.charybdis.apt.exception.CharybdisParsingException;
+import ma.markware.charybdis.model.annotation.Keyspace;
+import ma.markware.charybdis.model.annotation.Table;
+import ma.markware.charybdis.model.annotation.Udt;
 import org.apache.commons.lang3.StringUtils;
 
+/**
+ * Class parser
+ * @param <ENTITY_META_TYPE> the output of the parsing operation.
+ *
+ * @author Oussama Markad
+ */
 public interface EntityParser<ENTITY_META_TYPE> {
 
   Pattern pattern = Pattern.compile("[a-zA-Z$_][a-zA-Z0-9$_]*");
 
+  /**
+   * Checks if resolved Cassandra entity name is valid
+   */
   default void validateName(String name) {
     Matcher matcher = pattern.matcher(name);
     if (!matcher.matches()) {
@@ -42,6 +54,9 @@ public interface EntityParser<ENTITY_META_TYPE> {
     }
   }
 
+  /**
+   * Checks if Class has no-arg public constructor
+   */
   default void validateMandatoryConstructors(Element annotatedClass) {
     annotatedClass.getEnclosedElements()
                   .stream()
@@ -53,6 +68,9 @@ public interface EntityParser<ENTITY_META_TYPE> {
                   .orElseThrow(() -> new CharybdisParsingException(format("Public no-arg constructor is mandatory in class '%s'", annotatedClass.getSimpleName().toString())));
   }
 
+  /**
+   * Checks if keyspace name is present and is linked to a Class annotated with {@link ma.markware.charybdis.model.annotation.Keyspace}
+   */
   default void validateKeyspaceName(String className, String keyspaceName, AptContext aptContext) {
     if (StringUtils.isBlank(keyspaceName)) {
       throw new CharybdisParsingException(format("Entity '%s' must be linked to a keyspace", className));
@@ -62,6 +80,10 @@ public interface EntityParser<ENTITY_META_TYPE> {
     }
   }
 
+  /**
+   * Resolves Cassandra entity name from annotation attribute and Class name.
+   * See {@link Keyspace#name()}, {@link Udt#name()} and {@link Table#name()}
+   */
   default String resolveName(final String annotationName, final Name className) {
     String tableName = annotationName;
     if (org.apache.commons.lang.StringUtils.isBlank(tableName)) {
@@ -70,8 +92,14 @@ public interface EntityParser<ENTITY_META_TYPE> {
     return tableName.toLowerCase();
   }
 
+  /**
+   * Resolves Cassandra entity name from parsed class.
+   */
   String resolveName(Element annotatedClass);
 
+  /**
+   * Parses annotated class and returns metadata.
+   */
   ENTITY_META_TYPE parse(Element annotatedClass);
 
 }

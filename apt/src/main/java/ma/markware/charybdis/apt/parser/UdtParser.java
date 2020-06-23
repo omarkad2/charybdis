@@ -33,6 +33,12 @@ import ma.markware.charybdis.apt.metatype.UdtMetaType;
 import ma.markware.charybdis.apt.utils.ParserUtils;
 import ma.markware.charybdis.model.annotation.Udt;
 
+/**
+ * A specific Class parser.
+ * Parses classes annotated with {@link ma.markware.charybdis.model.annotation.Udt}.
+ *
+ * @author Oussama Markad
+ */
 public class UdtParser extends AbstractEntityParser<UdtMetaType> {
 
   private final FieldParser<UdtFieldMetaType> udtFieldParser;
@@ -45,6 +51,9 @@ public class UdtParser extends AbstractEntityParser<UdtMetaType> {
     this.types = types;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public UdtMetaType parse(final Element annotatedClass) {
     validateMandatoryConstructors(annotatedClass);
@@ -70,6 +79,9 @@ public class UdtParser extends AbstractEntityParser<UdtMetaType> {
     return udtMetaType;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public String resolveName(final Element annotatedClass) {
     final Udt table = annotatedClass.getAnnotation(Udt.class);

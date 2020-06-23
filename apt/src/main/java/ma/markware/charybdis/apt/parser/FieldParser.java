@@ -20,7 +20,16 @@ package ma.markware.charybdis.apt.parser;
 
 import javax.lang.model.element.Element;
 
+/**
+ * Field parser
+ * @param <FIELD_META_TYPE> the output of the parsing operation
+ *
+ * @author Oussama Markad
+ */
 public interface FieldParser<FIELD_META_TYPE> {
 
-  FIELD_META_TYPE parse(Element annotatedClass, String entityName);
+  /**
+   * Parses annotated field and returns metadata.
+   */
+  FIELD_META_TYPE parse(Element annotatedField, String entityName);
 }

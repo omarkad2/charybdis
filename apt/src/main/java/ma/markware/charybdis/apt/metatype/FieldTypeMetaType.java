@@ -29,6 +29,12 @@ import ma.markware.charybdis.apt.parser.TypePosition;
 import ma.markware.charybdis.apt.utils.ClassUtils;
 import ma.markware.charybdis.apt.utils.TypeUtils;
 
+/**
+ * Field's type metadata.
+ * Holds metadata found on every field's type.
+ *
+ * @author Oussama Markad
+ */
 public class FieldTypeMetaType {
 
   private TypeDetail deserializationTypeDetail;
@@ -40,6 +46,9 @@ public class FieldTypeMetaType {
   private List<FieldTypeMetaType> subTypes = new LinkedList<>();
   private TypePosition typePosition;
 
+  /**
+   * Creates metadata holder using {@link TypeDetail} and the type's position {@link TypePosition}
+   */
   public FieldTypeMetaType(final TypeDetail deserializationTypeDetail, final int index, final int depth) {
     this.deserializationTypeDetail = deserializationTypeDetail;
     this.typePosition = new TypePosition(index, depth);
@@ -160,10 +169,45 @@ public class FieldTypeMetaType {
         + fieldTypeKind + ", frozen=" + frozen + ", custom=" + custom + ", subTypes=" + subTypes + '}';
   }
 
+  /**
+   * An enum that specifies the kind of a {@link FieldTypeMetaType}.
+   */
   public enum FieldTypeKind {
-    NORMAL, ENUM, LIST, SET, MAP, UDT,
+
+    /**
+     * Primitive type, or any other java predefined type that is not generic
+     */
+    NORMAL,
+
+    /**
+     * Class of type {@link Enum}
+     */
+    ENUM,
+
+    /**
+     * Class of type {@link List}
+     */
+    LIST,
+
+    /**
+     * Class of type {@link java.util.Set}
+     */
+    SET,
+
+    /**
+     * Class of type {@link java.util.Map}
+     */
+    MAP,
+
+    /**
+     * Class annotated with {@link ma.markware.charybdis.model.annotation.Udt}
+     */
+    UDT,
   }
 
+  /**
+   * Holds detail of a given field type
+   */
   public static class TypeDetail {
 
     private TypeName typeName;

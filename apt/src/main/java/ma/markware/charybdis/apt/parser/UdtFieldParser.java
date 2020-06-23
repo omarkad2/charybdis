@@ -24,17 +24,26 @@ import ma.markware.charybdis.apt.metatype.AbstractFieldMetaType;
 import ma.markware.charybdis.apt.metatype.UdtFieldMetaType;
 import ma.markware.charybdis.model.annotation.UdtField;
 
+/**
+ * A specific Field parser.
+ * Parses fields annotated with {@link ma.markware.charybdis.model.annotation.UdtField}.
+ *
+ * @author Oussama Markad
+ */
 public class UdtFieldParser extends AbstractFieldParser<UdtFieldMetaType> {
 
   public UdtFieldParser(final FieldTypeParser fieldTypeParser, final Types types) {
     super(fieldTypeParser, types);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public UdtFieldMetaType parse(final Element field, final String udtName) {
-    final UdtField udtField = field.getAnnotation(UdtField.class);
+  public UdtFieldMetaType parse(final Element annotatedField, final String udtName) {
+    final UdtField udtField = annotatedField.getAnnotation(UdtField.class);
     if (udtField != null) {
-      AbstractFieldMetaType abstractFieldMetaType = parseGenericField(field);
+      AbstractFieldMetaType abstractFieldMetaType = parseGenericField(annotatedField);
       UdtFieldMetaType udtFieldMetaType = new UdtFieldMetaType(abstractFieldMetaType);
 
       String udtFieldName = udtField.name();

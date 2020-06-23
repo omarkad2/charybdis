@@ -38,6 +38,12 @@ import ma.markware.charybdis.model.annotation.PartitionKey;
 import ma.markware.charybdis.model.option.SequenceModel;
 import org.apache.commons.lang.StringUtils;
 
+/**
+ * A specific Field parser.
+ * Parses fields annotated with {@link ma.markware.charybdis.model.annotation.Column}.
+ *
+ * @author Oussama Markad
+ */
 public class ColumnFieldParser extends AbstractFieldParser<ColumnFieldMetaType> {
 
   public ColumnFieldParser(final FieldTypeParser fieldTypeParser, final Types types) {
@@ -45,10 +51,10 @@ public class ColumnFieldParser extends AbstractFieldParser<ColumnFieldMetaType> 
   }
 
   @Override
-  public ColumnFieldMetaType parse(final Element field, final String tableName) {
-    final Column column = field.getAnnotation(Column.class);
+  public ColumnFieldMetaType parse(final Element annotatedField, final String tableName) {
+    final Column column = annotatedField.getAnnotation(Column.class);
     if (column != null) {
-      AbstractFieldMetaType abstractFieldMetaType = parseGenericField(field);
+      AbstractFieldMetaType abstractFieldMetaType = parseGenericField(annotatedField);
       final ColumnFieldMetaType columnMetaType = new ColumnFieldMetaType(abstractFieldMetaType);
 
       String columnName = column.name();
@@ -57,13 +63,13 @@ public class ColumnFieldParser extends AbstractFieldParser<ColumnFieldMetaType> 
       }
       columnMetaType.setSerializationName(columnName.toLowerCase());
 
-      final PartitionKey partitionKey = field.getAnnotation(PartitionKey.class);
+      final PartitionKey partitionKey = annotatedField.getAnnotation(PartitionKey.class);
       if (partitionKey != null) {
         columnMetaType.setPartitionKeyIndex(partitionKey.index());
         columnMetaType.setPartitionKey(true);
       }
 
-      final ClusteringKey clusteringKey = field.getAnnotation(ClusteringKey.class);
+      final ClusteringKey clusteringKey = annotatedField.getAnnotation(ClusteringKey.class);
       if (clusteringKey != null) {
         if (partitionKey != null) {
           throw new CharybdisParsingException("Column can either be a partition key or a clustering key not both");
@@ -73,13 +79,13 @@ public class ColumnFieldParser extends AbstractFieldParser<ColumnFieldMetaType> 
         columnMetaType.setClusteringOrder(clusteringKey.order());
       }
 
-      final Index index = field.getAnnotation(Index.class);
+      final Index index = annotatedField.getAnnotation(Index.class);
       if (index != null && partitionKey == null) {
         columnMetaType.setIndexed(true);
         columnMetaType.setIndexName(format("%s_%s_idx", tableName.toLowerCase(), columnMetaType.getSerializationName().toLowerCase()));
       }
 
-      final GeneratedValue generatedValue = field.getAnnotation(GeneratedValue.class);
+      final GeneratedValue generatedValue = annotatedField.getAnnotation(GeneratedValue.class);
       if (generatedValue != null) {
         try {
           final SequenceModel sequenceModel = SequenceModel.findSequenceModel(Class.forName(columnMetaType.getFieldType()
@@ -101,8 +107,8 @@ public class ColumnFieldParser extends AbstractFieldParser<ColumnFieldMetaType> 
       }
 
       // TODO: ...Check if date type supported
-      columnMetaType.setCreationDate(field.getAnnotation(CreationDate.class) != null);
-      columnMetaType.setLastUpdatedDate(field.getAnnotation(LastUpdatedDate.class) != null);
+      columnMetaType.setCreationDate(annotatedField.getAnnotation(CreationDate.class) != null);
+      columnMetaType.setLastUpdatedDate(annotatedField.getAnnotation(LastUpdatedDate.class) != null);
       return columnMetaType;
     }
     return null;

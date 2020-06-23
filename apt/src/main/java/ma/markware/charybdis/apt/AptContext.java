@@ -31,6 +31,12 @@ import ma.markware.charybdis.apt.metatype.TableMetaType;
 import ma.markware.charybdis.apt.metatype.UdtMetaType;
 import ma.markware.charybdis.model.annotation.Udt;
 
+/**
+ * The context of charybdis' annotation processor.
+ * It stores parsing and serialization context throughout the execution of annotation processor.
+ *
+ * @author Oussama Markad
+ */
 public class AptContext {
 
   Set<String> keyspaceNames;
@@ -39,6 +45,15 @@ public class AptContext {
   List<UdtMetaType> udtMetaTypes;
   List<TableMetaType> tableMetaTypes;
 
+  /**
+   * Used to initialize charybdis' annotation processor.
+   * This method initialize:
+   * <ul>
+   * <li>Keyspace names with empty set</li>
+   * <li>Stores names and class names of different user-defined types (Udt)</li>
+   * </ul>
+   *
+   */
   public void init(final RoundEnvironment roundEnv, final AptConfiguration configuration) {
     keyspaceNames = new HashSet<>();
     udtContexts = new HashMap<>();
@@ -55,26 +70,50 @@ public class AptContext {
     }
   }
 
+  /**
+   * Stores keyspace name in charybdis' annotation processor context.
+   */
   public void addKeyspaceName(final String keyspaceName) {
     keyspaceNames.add(keyspaceName);
   }
 
+  /**
+   * Checks if keyspace name exists in our annotation processor context.
+   */
   public boolean isKeyspaceExist(final String keyspaceName) {
     return keyspaceNames.contains(keyspaceName);
   }
 
+  /**
+   * Checks if a class is declared as a user-defined type (annotated with {@link Udt}).
+   */
   public boolean isUdt(final String className) {
     return udtContexts.containsKey(className);
   }
 
+  /**
+   * Gets {@link UdtContext} that contains classes declared as a user-defined types (annotated with {@link Udt}).
+   */
   public UdtContext getUdtContext(final String udtClassName) {
     return udtContexts.get(udtClassName);
   }
 
+  /**
+   * Handles context of classes declared as user-defined types (annotated with {@link Udt})
+   *
+   * It is a registry with:
+   * <ul>
+   *   <li>The original annotated class name</li>
+   *   <li>The udt name see {@link Udt#name()}</li>
+   * </ul>
+   */
   public class UdtContext {
     private final String udtMetadataClassName;
     private final String udtName;
 
+    /**
+     * Creates a new Udt context
+     */
     UdtContext(final String udtMetadataClassName, final String udtName) {
       this.udtMetadataClassName = udtMetadataClassName;
       this.udtName = udtName;

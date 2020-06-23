@@ -22,6 +22,13 @@ import com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntry;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * Holds position of a given field's type.
+ *
+ * Given Field with type: <code>List<List<Map<Integer, Target>>></code>
+ * the position of type <code>Target</code> is [index: 2, depth: 1]
+ * @author Oussama Markad
+ */
 public class TypePosition {
 
   private final int index;
@@ -32,6 +39,9 @@ public class TypePosition {
     this.depth = depth;
   }
 
+  /**
+   * Creates instance from {@link List<TypePathEntry>}.
+   */
   public static TypePosition from(List<TypePathEntry> location) {
     if (location.size() == 0) {
       return new TypePosition(0, 0);

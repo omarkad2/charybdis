@@ -24,8 +24,6 @@ import com.datastax.oss.driver.api.core.data.UdtValue;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
-import com.sun.tools.javac.code.Symbol;
-import com.sun.tools.javac.code.SymbolMetadata;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumSet;
@@ -33,7 +31,6 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
-import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.TypeElement;
@@ -49,12 +46,13 @@ import ma.markware.charybdis.apt.metatype.FieldTypeMetaType.FieldTypeKind;
 import ma.markware.charybdis.apt.metatype.FieldTypeMetaType.TypeDetail;
 import ma.markware.charybdis.apt.utils.TypeUtils;
 import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+/**
+ * Field type parser
+ *
+ * @author Oussama Markad
+ */
 public class FieldTypeParser {
-
-  private static final Logger log = LoggerFactory.getLogger(FieldTypeParser.class);
 
   private static final Set<Class> LIST_SUPPORTED_TYPES = Collections.singleton(List.class);
   private static final Set<Class> SET_SUPPORTED_TYPES = Collections.singleton(Set.class);
@@ -75,6 +73,9 @@ public class FieldTypeParser {
     this.frozenAnnotationPositions = frozenAnnotationPositions;
   }
 
+  /**
+   * Parses field type using {@link TypeMirror}
+   */
   FieldTypeMetaType parseFieldType(TypeMirror typeMirror) {
     return parseFieldType(typeMirror, false, false, 0, 0);
   }
@@ -195,15 +196,5 @@ public class FieldTypeParser {
     Element sourceTypeElement = sourceType.asElement();
     return sourceTypeElement.equals(targetTypeElement) ||
         types.directSupertypes(sourceType).stream().anyMatch(inter -> targetTypeElement.equals(sourceTypeElement));
-  }
-
-  List<? extends AnnotationMirror> typeUseAnnotations(TypeMirror el) {
-    if (el instanceof Symbol) {
-      SymbolMetadata meta = ((Symbol) el).getMetadata();
-      if (meta != null) {
-        return meta.getTypeAttributes();
-      }
-    }
-    return Collections.emptyList();
   }
 }

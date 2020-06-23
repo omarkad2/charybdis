@@ -20,6 +20,12 @@ package ma.markware.charybdis.apt.metatype;
 
 import com.squareup.javapoet.TypeName;
 
+/**
+ * A generic Class meta-type.
+ * Holds generic metadata that every Class has.
+ *
+ * @author Oussama Markad
+ */
 public class AbstractEntityMetaType {
 
   private String packageName;

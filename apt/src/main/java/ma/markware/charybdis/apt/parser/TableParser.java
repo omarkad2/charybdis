@@ -36,6 +36,12 @@ import ma.markware.charybdis.apt.utils.ParserUtils;
 import ma.markware.charybdis.model.annotation.Table;
 import org.apache.commons.collections.CollectionUtils;
 
+/**
+ * A specific Class parser.
+ * Parses classes annotated with {@link ma.markware.charybdis.model.annotation.Table}.
+ *
+ * @author Oussama Markad
+ */
 public class TableParser extends AbstractEntityParser<TableMetaType> {
 
   private final FieldParser<ColumnFieldMetaType> columnFieldParser;
@@ -48,6 +54,9 @@ public class TableParser extends AbstractEntityParser<TableMetaType> {
     this.types = types;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public TableMetaType parse(final Element annotatedClass) {
     validateMandatoryConstructors(annotatedClass);
@@ -85,6 +94,9 @@ public class TableParser extends AbstractEntityParser<TableMetaType> {
     return tableMetaType;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public String resolveName(final Element annotatedClass) {
     final Table table = annotatedClass.getAnnotation(Table.class);

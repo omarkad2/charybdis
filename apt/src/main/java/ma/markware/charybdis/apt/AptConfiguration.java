@@ -24,17 +24,57 @@ import ma.markware.charybdis.apt.metatype.UdtMetaType;
 import ma.markware.charybdis.apt.parser.EntityParser;
 import ma.markware.charybdis.apt.serializer.EntitySerializer;
 
+/**
+ * The configuration of charybdis' annotation processor.
+ * It defines methods to get different parser and serializer
+ * used to generate metadata classes that will be used by the ORM
+ *
+ * @author Oussama Markad
+ */
 public interface AptConfiguration {
 
+  /**
+   * Extracts parser of classes annotated with {@link ma.markware.charybdis.model.annotation.Keyspace}
+   *
+   * @return File parser of @Keyspace annotated classes
+   */
   EntityParser<KeyspaceMetaType> getKeyspaceParser();
 
+  /**
+   * Extracts parser of classes annotated with {@link ma.markware.charybdis.model.annotation.Udt}
+   *
+   * @return File parser of @Udt annotated classes
+   */
   EntityParser<UdtMetaType> getUdtParser();
 
+  /**
+   * Extracts parser of classes annotated with {@link ma.markware.charybdis.model.annotation.Table}
+   *
+   * @return File parser of @Table annotated classes
+   */
   EntityParser<TableMetaType> getTableParser();
 
+  /**
+   * Extracts serializer used to write {@link ma.markware.charybdis.model.field.metadata.KeyspaceMetadata} custom implementation
+   *
+   * @return {@link KeyspaceMetaType} serializer to generate {@link ma.markware.charybdis.model.field.metadata.KeyspaceMetadata}
+   * implementations
+   */
   EntitySerializer<KeyspaceMetaType> getKeyspaceSerializer();
 
+  /**
+   * Extracts serializer used to write {@link ma.markware.charybdis.model.field.metadata.UdtMetadata} custom implementation
+   *
+   * @return {@link UdtMetaType} serializer to generate {@link ma.markware.charybdis.model.field.metadata.UdtMetadata}
+   * custom implementations
+   */
   EntitySerializer<UdtMetaType> getUdtSerializer();
 
+  /**
+   * Extracts serializer used to write {@link ma.markware.charybdis.model.field.metadata.TableMetadata} custom implementation
+   *
+   * @return {@link TableMetaType} serializer to generate {@link ma.markware.charybdis.model.field.metadata.TableMetadata}
+   * implementations
+   */
   EntitySerializer<TableMetaType> getTableSerializer();
 }

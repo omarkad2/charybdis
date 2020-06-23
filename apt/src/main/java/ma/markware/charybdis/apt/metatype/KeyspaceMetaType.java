@@ -20,6 +20,12 @@ package ma.markware.charybdis.apt.metatype;
 
 import ma.markware.charybdis.model.option.Replication;
 
+/**
+ * A specific Class meta-type.
+ * Holds metadata found on classes annotated with {@link ma.markware.charybdis.model.annotation.Keyspace}.
+ *
+ * @author Oussama Markad
+ */
 public class KeyspaceMetaType extends AbstractEntityMetaType {
 
   private Replication replication;

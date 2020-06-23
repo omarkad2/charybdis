@@ -43,6 +43,12 @@ import ma.markware.charybdis.apt.metatype.FieldTypeMetaType;
 import ma.markware.charybdis.apt.utils.NameUtils;
 import ma.markware.charybdis.model.utils.StringUtils;
 
+/**
+ * A specific Field serializer.
+ * Serializes column metadata {@link ma.markware.charybdis.apt.metatype.ColumnFieldMetaType} into java methods and fields.
+ *
+ * @author Oussama Markad
+ */
 abstract class AbstractFieldSerializer<FIELD_META_TYPE extends AbstractFieldMetaType> implements FieldSerializer<FIELD_META_TYPE> {
 
   private final AptContext aptContext;
@@ -55,6 +61,9 @@ abstract class AbstractFieldSerializer<FIELD_META_TYPE extends AbstractFieldMeta
     return aptContext;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public FieldSpec serializeFieldGenericType(final FIELD_META_TYPE fieldMetaType) {
     FieldTypeMetaType fieldType = fieldMetaType.getFieldType();
