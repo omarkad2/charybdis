@@ -25,8 +25,8 @@ import java.util.Objects;
 /**
  * Holds position of a given field's type.
  *
- * Given Field with type: <code>List<List<Map<Integer, Target>>></code>
- * the position of type <code>Target</code> is [index: 2, depth: 1]
+ * Given Field with type: {@code List<List<Map<Integer, Target>>>}
+ * the position of type {@code Target} is [index: 2, depth: 1]
  * @author Oussama Markad
  */
 public class TypePosition {

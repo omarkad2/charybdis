@@ -33,7 +33,15 @@ import ma.markware.charybdis.query.UpdateQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class UpdateEntityManager<T> {
+/**
+ * Responsible of entity update in DB <b>(Internal use only)</b>.
+ * This service is used exclusively by CRUD API.
+ *
+ * @param <T> entity to read.
+ *
+ * @author Oussama Markad
+ */
+class UpdateEntityManager<T> {
 
   private static final Logger log = LoggerFactory.getLogger(UpdateEntityManager.class);
 
@@ -45,32 +53,52 @@ public class UpdateEntityManager<T> {
     this.updateQuery = new UpdateQuery();
   }
 
-  UpdateEntityManager<T> withTableMetadata(TableMetadata<T> tableMetadata) {
-    this.tableMetadata = tableMetadata;
-    updateQuery.setTable(tableMetadata);
+  /**
+   * Specify table in update query.
+   */
+  UpdateEntityManager<T> withTableMetadata(TableMetadata<T> table) {
+    this.tableMetadata = table;
+    updateQuery.setTable(table);
     return this;
   }
 
+  /**
+   * Specify entity in insert query.
+   */
   UpdateEntityManager<T> withEntity(T entity) {
     this.entity = entity;
     return this;
   }
 
-  public UpdateEntityManager<T> withTtl(int seconds) {
+  /**
+   * Add ttl in seconds to update query.
+   */
+  UpdateEntityManager<T> withTtl(int seconds) {
     updateQuery.setTtl(seconds);
     return this;
   }
 
-  public UpdateEntityManager<T> withTimestamp(Instant timestamp) {
+  /**
+   * Add writetime to update query.
+   */
+  UpdateEntityManager<T> withTimestamp(Instant timestamp) {
     updateQuery.setTimestamp(timestamp);
     return this;
   }
 
-  public UpdateEntityManager<T> withTimestamp(long timestamp) {
+  /**
+   * Add writetime in millis to update query.
+   */
+  UpdateEntityManager<T> withTimestamp(long timestamp) {
     updateQuery.setTimestamp(timestamp);
     return this;
   }
 
+  /**
+   * Execute udpate query.
+   *
+   * @return updated entity.
+   */
   T save(CqlSession session) {
     Instant now = Instant.now();
     tableMetadata.setLastUpdatedDate(entity, now);

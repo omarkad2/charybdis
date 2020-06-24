@@ -28,6 +28,14 @@ import ma.markware.charybdis.query.InsertQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Responsible of entity creation in DB <b>(Internal use only)</b>.
+ * This service is used exclusively by CRUD API.
+ *
+ * @param <T> entity to persist
+ *
+ * @author Oussama Markad
+ */
 class CreateEntityManager<T> {
 
   private static final Logger log = LoggerFactory.getLogger(CreateEntityManager.class);
@@ -40,17 +48,26 @@ class CreateEntityManager<T> {
     this.insertQuery = new InsertQuery();
   }
 
-  CreateEntityManager<T> withTableMetadata(TableMetadata<T> tableMetadata) {
-    this.tableMetadata = tableMetadata;
-    insertQuery.setTable(tableMetadata);
+  /**
+   * Specify table in insert query.
+   */
+  CreateEntityManager<T> withTableMetadata(TableMetadata<T> table) {
+    this.tableMetadata = table;
+    insertQuery.setTable(table);
     return this;
   }
 
+  /**
+   * Specify entity in insert query.
+   */
   CreateEntityManager<T> withEntity(T entity) {
     this.entity = entity;
     return this;
   }
 
+  /**
+   * Specify if insert query should overwrite any existing entity.
+   */
   CreateEntityManager<T> withIfNotExists(boolean ifNotExists) {
     if (ifNotExists) {
       insertQuery.enableIfNotExists();
@@ -58,21 +75,35 @@ class CreateEntityManager<T> {
     return this;
   }
 
+  /**
+   * Add ttl to insert query.
+   */
   CreateEntityManager<T> withTtl(int seconds) {
     insertQuery.setTtl(seconds);
     return this;
   }
 
+  /**
+   * Add writetime to insert query.
+   */
   CreateEntityManager<T> withTimestamp(Instant timestamp) {
     insertQuery.setTimestamp(timestamp);
     return this;
   }
 
+  /**
+   * Add writetime in millis to insert query.
+   */
   CreateEntityManager<T> withTimestamp(long timestamp) {
     insertQuery.setTimestamp(timestamp);
     return this;
   }
 
+  /**
+   * Execute insert query.
+   *
+   * @return inserted entity.
+   */
   T save(CqlSession session) {
     Instant now = Instant.now();
     tableMetadata.setGeneratedValues(entity);

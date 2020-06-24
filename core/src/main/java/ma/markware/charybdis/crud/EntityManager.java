@@ -27,41 +27,205 @@ import ma.markware.charybdis.model.field.metadata.TableMetadata;
 import ma.markware.charybdis.query.PageRequest;
 import ma.markware.charybdis.query.PageResult;
 
+/**
+ * A service that allows handling entities in DB, through CRUD operations.
+ *
+ * @author Oussama Markad
+ */
 public interface EntityManager {
 
-  <T> T create(TableMetadata<T> tableMetadata, T entity);
+  /**
+   * Create entity in DB.
+   *
+   * @param table table in which we want to create the entity.
+   * @param entity entity to persist.
+   * @param <T> type of entity.
+   * @return persisted entity.
+   */
+  <T> T create(TableMetadata<T> table, T entity);
 
-  <T> T create(TableMetadata<T> tableMetadata, T entity, boolean ifNotExists);
+  /**
+   * Create entity in DB if it doesn't exist (no overwriting).
+   * If another entity is already present in DB with a primary key PK, enabling 'ifNotExists'
+   * will ensure that the creation of any entity with the same PK will be ignored.
+   *
+   * @param table table in which we want to create the entity.
+   * @param entity entity to persist.
+   * @param ifNotExists enable to avoid overwriting.
+   * @param <T> type of entity.
+   * @return persisted entity.
+   */
+  <T> T create(TableMetadata<T> table, T entity, boolean ifNotExists);
 
-  <T> T create(TableMetadata<T> tableMetadata, T entity, int seconds);
+  /**
+   * Create entity in DB with TTL in seconds.
+   *
+   * @param table table in which we want to create the entity.
+   * @param entity entity to persist.
+   * @param seconds ttl in seconds.
+   * @param <T> type of entity.
+   * @return persisted entity.
+   */
+  <T> T create(TableMetadata<T> table, T entity, int seconds);
 
-  <T> T create(TableMetadata<T> tableMetadata, T entity, boolean ifNotExists, int seconds);
+  /**
+   * Create entity in DB if it doesn't exist (no overwriting) with TTL in seconds.
+   * If another entity is already present in DB with a primary key PK, enabling 'ifNotExists'
+   * will ensure that the creation of any entity with the same PK will be ignored.
+   *
+   * @param table table in which we want to create the entity.
+   * @param entity entity to persist.
+   * @param ifNotExists enable to avoid overwriting.
+   * @param seconds ttl in seconds.
+   * @param <T> type of entity.
+   * @return persisted entity.
+   */
+  <T> T create(TableMetadata<T> table, T entity, boolean ifNotExists, int seconds);
 
-  <T> T create(TableMetadata<T> tableMetadata, T entity, Instant timestamp);
+  /**
+   * Create entity in DB with custom write time.
+   *
+   * @param table table in which we want to create the entity.
+   * @param entity entity to persist.
+   * @param timestamp custom write time.
+   * @param <T> type of entity.
+   * @return persisted entity.
+   */
+  <T> T create(TableMetadata<T> table, T entity, Instant timestamp);
 
-  <T> T create(TableMetadata<T> tableMetadata, T entity, long timestamp);
+  /**
+   * Create entity in DB with custom write time in millis.
+   *
+   * @param table table in which we want to create the entity.
+   * @param entity entity to persist.
+   * @param timestamp custom write time in millis.
+   * @param <T> type of entity.
+   * @return persisted entity.
+   */
+  <T> T create(TableMetadata<T> table, T entity, long timestamp);
 
-  <T> T update(TableMetadata<T> tableMetadata, T entity);
+  /**
+   * Update entity in DB.
+   * returns null if entity not found in DB.
+   *
+   * @param table table in which we want to update the entity.
+   * @param entity entity to update.
+   * @param <T> type of entity.
+   * @return updated entity.
+   */
+  <T> T update(TableMetadata<T> table, T entity);
 
-  <T> boolean delete(TableMetadata<T> tableMetadata, T entity);
+  /**
+   * Delete entity in DB.
+   *
+   * @param table table in which we want to delete the entity.
+   * @param entity entity to delete.
+   * @param <T> type of entity.
+   * @return true if entity deleted.
+   */
+  <T> boolean delete(TableMetadata<T> table, T entity);
 
-  <T> T findOne(TableMetadata<T> tableMetadata, ExtendedCriteriaExpression conditions);
+  /**
+   * Fetch one entity from DB fulfilling given conditions.
+   *
+   * @param table table in which we want to fetch the entity.
+   * @param conditions conditions to be fulfilled by entity.
+   * @param <T> type of entity.
+   * @return the entity if found otherwise {@code null}.
+   */
+  <T> T findOne(TableMetadata<T> table, ExtendedCriteriaExpression conditions);
 
-  <T> T findOne(TableMetadata<T> tableMetadata, CriteriaExpression condition);
+  /**
+   * Fetch one entity from DB fulfilling a given condition.
+   *
+   * @param table table in which we want to fetch the entity.
+   * @param condition condition to be fulfilled by entity.
+   * @param <T> type of entity.
+   * @return the entity if found otherwise {@code null}.
+   */
+  <T> T findOne(TableMetadata<T> table, CriteriaExpression condition);
 
-  <T> Optional<T> findOptional(TableMetadata<T> tableMetadata, ExtendedCriteriaExpression conditions);
+  /**
+   * Fetch one entity wrapped in {@code Optional} from DB fulfilling given conditions.
+   *
+   * @param table table in which we want to fetch the entity.
+   * @param conditions conditions to be fulfilled by entity.
+   * @param <T> type of entity.
+   * @return the entity wrapped in {@code Optional} if found otherwise {@code Optional.empty()}.
+   */
+  <T> Optional<T> findOptional(TableMetadata<T> table, ExtendedCriteriaExpression conditions);
 
-  <T> Optional<T> findOptional(TableMetadata<T> tableMetadata, CriteriaExpression condition);
+  /**
+   * Fetch one entity wrapped in {@code Optional} from DB fulfilling a given condition.
+   *
+   * @param table table in which we want to fetch the entity.
+   * @param condition condition to be fulfilled by entity.
+   * @param <T> type of entity.
+   * @return the entity wrapped in {@code Optional} if found otherwise {@code Optional.empty()}.
+   */
+  <T> Optional<T> findOptional(TableMetadata<T> table, CriteriaExpression condition);
 
-  <T> List<T> find(TableMetadata<T> tableMetadata);
+  /**
+   * Fetch entities from DB.
+   *
+   * @param table table in which we want to fetch the entities.
+   * @param <T> type of entities.
+   * @return entities from DB.
+   */
+  <T> List<T> find(TableMetadata<T> table);
 
-  <T> List<T> find(TableMetadata<T> tableMetadata, ExtendedCriteriaExpression conditions);
+  /**
+   * Fetch entities from DB fulfilling given conditions.
+   *
+   * @param table table in which we want to fetch the entities.
+   * @param conditions conditions to be fulfilled by entities.
+   * @param <T> type of entities.
+   * @return entities from DB.
+   */
+  <T> List<T> find(TableMetadata<T> table, ExtendedCriteriaExpression conditions);
 
-  <T> List<T> find(TableMetadata<T> tableMetadata, CriteriaExpression condition);
+  /**
+   * Fetch entities from DB fulfilling a given condition.
+   *
+   * @param table table in which we want to fetch the entities.
+   * @param condition condition to be fulfilled by entities.
+   * @param <T> type of entities.
+   * @return entities from DB.
+   */
+  <T> List<T> find(TableMetadata<T> table, CriteriaExpression condition);
 
-  <T> PageResult<T> find(TableMetadata<T> tableMetadata, PageRequest pageRequest);
+  /**
+   * Fetch a page of entities from DB.
+   * When fetching the last page, {@link PageResult#getPagingState()} will be {@code null}.
+   *
+   * @param table table in which we want to fetch the entities.
+   * @param pageRequest requested page see {@link PageRequest}.
+   * @param <T> type of entities.
+   * @return page result of entities from DB and updated paging state {@link PageResult}.
+   */
+  <T> PageResult<T> find(TableMetadata<T> table, PageRequest pageRequest);
 
-  <T> PageResult<T> find(TableMetadata<T> tableMetadata, ExtendedCriteriaExpression conditions, PageRequest pageRequest);
+  /**
+   * Fetch a page of entities from DB fulfilling given conditions.
+   * When fetching the last page, {@link PageResult#getPagingState()} will be {@code null}.
+   *
+   * @param table table in which we want to fetch the entities.
+   * @param conditions conditions to be fulfilled by entities.
+   * @param pageRequest requested page see {@link PageRequest}.
+   * @param <T> type of entities.
+   * @return page result of entities from DB and updated paging state {@link PageResult}.
+   */
+  <T> PageResult<T> find(TableMetadata<T> table, ExtendedCriteriaExpression conditions, PageRequest pageRequest);
 
-  <T> PageResult<T> find(TableMetadata<T> tableMetadata, CriteriaExpression condition, PageRequest pageRequest);
+  /**
+   * Fetch a page of entities from DB fulfilling a given condition.
+   * When fetching the last page, {@link PageResult#getPagingState()} will be {@code null}.
+   *
+   * @param table table in which we want to fetch the entities.
+   * @param condition condition to be fulfilled by entities.
+   * @param pageRequest requested page see {@link PageRequest}.
+   * @param <T> type of entities.
+   * @return page result of entities from DB and updated paging state {@link PageResult}.
+   */
+  <T> PageResult<T> find(TableMetadata<T> table, CriteriaExpression condition, PageRequest pageRequest);
 }

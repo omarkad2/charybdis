@@ -31,7 +31,15 @@ import ma.markware.charybdis.query.PageRequest;
 import ma.markware.charybdis.query.PageResult;
 import ma.markware.charybdis.query.SelectQuery;
 
-public class ReadEntityManager<T> {
+/**
+ * Responsible of entity reading in DB <b>(Internal use only)</b>.
+ * This service is used exclusively by CRUD API.
+ *
+ * @param <T> entity to read.
+ *
+ * @author Oussama Markad
+ */
+class ReadEntityManager<T> {
 
   private final SelectQuery selectQuery;
   private TableMetadata<T> tableMetadata;
@@ -40,12 +48,18 @@ public class ReadEntityManager<T> {
     this.selectQuery = new SelectQuery();
   }
 
-  ReadEntityManager<T> withTableMetadata(TableMetadata<T> tableMetadata) {
-    this.tableMetadata = tableMetadata;
-    selectQuery.setTableAndSelectors(tableMetadata);
+  /**
+   * Specify table in select query.
+   */
+  ReadEntityManager<T> withTableMetadata(TableMetadata<T> table) {
+    this.tableMetadata = table;
+    selectQuery.setTableAndSelectors(table);
     return this;
   }
 
+  /**
+   * Specify conditions in select query.
+   */
   ReadEntityManager<T> withConditions(ExtendedCriteriaExpression conditions) {
     for (CriteriaExpression condition : conditions.getCriterias()) {
       selectQuery.setWhereClause(condition);
@@ -53,16 +67,27 @@ public class ReadEntityManager<T> {
     return this;
   }
 
+  /**
+   * Specify condition in select query.
+   */
   ReadEntityManager<T> withCondition(CriteriaExpression condition) {
     selectQuery.setWhereClause(condition);
     return this;
   }
 
-  public ReadEntityManager<T> withPaging(PageRequest pageRequest) {
+  /**
+   * Add paging capability to select query.
+   */
+  ReadEntityManager<T> withPaging(PageRequest pageRequest) {
     selectQuery.setPageRequest(pageRequest);
     return this;
   }
 
+  /**
+   * Execute select query.
+   *
+   * @return one element
+   */
   T fetchOne(CqlSession session) {
     final ResultSet resultSet = selectQuery.execute(session);
     if (resultSet == null) {
@@ -72,6 +97,11 @@ public class ReadEntityManager<T> {
     return row == null ? null : tableMetadata.deserialize(row);
   }
 
+  /**
+   * Execute select query.
+   *
+   * @return list of entities
+   */
   List<T> fetch(CqlSession session) {
     final ResultSet resultSet = selectQuery.execute(session);
     if (resultSet == null) {
@@ -80,6 +110,11 @@ public class ReadEntityManager<T> {
     return getEntities(resultSet);
   }
 
+  /**
+   * Execute select query.
+   *
+   * @return page of entities
+   */
   PageResult<T> fetchPage(CqlSession session) {
     ResultSet resultSet = selectQuery.execute(session);
     if (resultSet == null) {

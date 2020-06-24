@@ -31,130 +31,210 @@ import ma.markware.charybdis.session.DefaultSessionFactory;
 import ma.markware.charybdis.session.SessionFactory;
 import ma.markware.charybdis.session.StandaloneSessionFactory;
 
+/**
+ * Entity manager {@link EntityManager} default implementation.
+ * implements DB crud operations.
+ *
+ * @author Oussama Markad
+ */
 public class DefaultEntityManager implements EntityManager {
 
   private final SessionFactory sessionFactory;
 
+  /**
+   * Initialize the entity manager using a session factory.
+   *
+   * @param sessionFactory Instance of the class responsible of creating cql sessions.
+   */
   public DefaultEntityManager(SessionFactory sessionFactory) {
     this.sessionFactory = sessionFactory;
   }
 
+  /**
+   * Initialize the entity manager using datastax default driver configuration.
+   * For details: <a href="https://docs.datastax.com/en/developer/java-driver/4.5/manual/core/configuration/reference/">
+   *   https://docs.datastax.com/en/developer/java-driver/4.5/manual/core/configuration/reference/</a>
+   */
   public DefaultEntityManager() {
     this(new DefaultSessionFactory());
   }
 
+  /**
+   * Initialize the entity manager with custom configuration file loaded from classpath.
+   *
+   * @param customConfiguration driver configuration file name in classpath.
+   */
   public DefaultEntityManager(final String customConfiguration) {
     this(new DefaultSessionFactory(customConfiguration));
   }
 
+  /**
+   * Initialize the entity manager with an existing session.
+   *
+   * @param session open cql session.
+   */
   public DefaultEntityManager(CqlSession session) {
     this(new StandaloneSessionFactory(session));
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public <T> T create(final TableMetadata<T> tableMetadata, final T entity) {
-    return new CreateEntityManager<T>().withTableMetadata(tableMetadata).withEntity(entity).save(sessionFactory.getSession());
+  public <T> T create(final TableMetadata<T> table, final T entity) {
+    return new CreateEntityManager<T>().withTableMetadata(table).withEntity(entity).save(sessionFactory.getSession());
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public <T> T create(final TableMetadata<T> tableMetadata, final T entity, final boolean ifNotExists) {
-    return new CreateEntityManager<T>().withTableMetadata(tableMetadata).withEntity(entity).withIfNotExists(ifNotExists)
+  public <T> T create(final TableMetadata<T> table, final T entity, final boolean ifNotExists) {
+    return new CreateEntityManager<T>().withTableMetadata(table).withEntity(entity).withIfNotExists(ifNotExists)
                                        .save(sessionFactory.getSession());
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public <T> T create(final TableMetadata<T> tableMetadata, final T entity, final int seconds) {
-    return new CreateEntityManager<T>().withTableMetadata(tableMetadata).withEntity(entity).withTtl(seconds)
+  public <T> T create(final TableMetadata<T> table, final T entity, final int seconds) {
+    return new CreateEntityManager<T>().withTableMetadata(table).withEntity(entity).withTtl(seconds)
                                        .save(sessionFactory.getSession());
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public <T> T create(final TableMetadata<T> tableMetadata, final T entity, final boolean ifNotExists, final int seconds) {
-    return new CreateEntityManager<T>().withTableMetadata(tableMetadata).withEntity(entity).withIfNotExists(ifNotExists).withTtl(seconds)
+  public <T> T create(final TableMetadata<T> table, final T entity, final boolean ifNotExists, final int seconds) {
+    return new CreateEntityManager<T>().withTableMetadata(table).withEntity(entity).withIfNotExists(ifNotExists).withTtl(seconds)
                                        .save(sessionFactory.getSession());
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public <T> T create(final TableMetadata<T> tableMetadata, final T entity, final Instant timestamp) {
-    return new CreateEntityManager<T>().withTableMetadata(tableMetadata).withEntity(entity).withTimestamp(timestamp)
+  public <T> T create(final TableMetadata<T> table, final T entity, final Instant timestamp) {
+    return new CreateEntityManager<T>().withTableMetadata(table).withEntity(entity).withTimestamp(timestamp)
                                        .save(sessionFactory.getSession());
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public <T> T create(final TableMetadata<T> tableMetadata, final T entity, final long timestamp) {
-    return new CreateEntityManager<T>().withTableMetadata(tableMetadata).withEntity(entity).withTimestamp(timestamp)
+  public <T> T create(final TableMetadata<T> table, final T entity, final long timestamp) {
+    return new CreateEntityManager<T>().withTableMetadata(table).withEntity(entity).withTimestamp(timestamp)
                                        .save(sessionFactory.getSession());
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public <T> T update(final TableMetadata<T> tableMetadata, final T entity) {
-    return new UpdateEntityManager<T>().withTableMetadata(tableMetadata).withEntity(entity)
+  public <T> T update(final TableMetadata<T> table, final T entity) {
+    return new UpdateEntityManager<T>().withTableMetadata(table).withEntity(entity)
                                        .save(sessionFactory.getSession());
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public <T> boolean delete(final TableMetadata<T> tableMetadata, final T entity) {
-    return new DeleteEntityManager<T>().withTableMetadata(tableMetadata).withEntity(entity)
+  public <T> boolean delete(final TableMetadata<T> table, final T entity) {
+    return new DeleteEntityManager<T>().withTableMetadata(table).withEntity(entity)
                                        .save(sessionFactory.getSession());
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public <T> T findOne(final TableMetadata<T> tableMetadata, final ExtendedCriteriaExpression conditions) {
-    return new ReadEntityManager<T>().withTableMetadata(tableMetadata).withConditions(conditions)
+  public <T> T findOne(final TableMetadata<T> table, final ExtendedCriteriaExpression conditions) {
+    return new ReadEntityManager<T>().withTableMetadata(table).withConditions(conditions)
                                      .fetchOne(sessionFactory.getSession());
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public <T> T findOne(final TableMetadata<T> tableMetadata, final CriteriaExpression condition) {
-    return new ReadEntityManager<T>().withTableMetadata(tableMetadata).withCondition(condition)
+  public <T> T findOne(final TableMetadata<T> table, final CriteriaExpression condition) {
+    return new ReadEntityManager<T>().withTableMetadata(table).withCondition(condition)
                                      .fetchOne(sessionFactory.getSession());
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public <T> Optional<T> findOptional(final TableMetadata<T> tableMetadata, final ExtendedCriteriaExpression conditions) {
-    return Optional.ofNullable(findOne(tableMetadata, conditions));
+  public <T> Optional<T> findOptional(final TableMetadata<T> table, final ExtendedCriteriaExpression conditions) {
+    return Optional.ofNullable(findOne(table, conditions));
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public <T> Optional<T> findOptional(final TableMetadata<T> tableMetadata, final CriteriaExpression condition) {
-    return Optional.ofNullable(findOne(tableMetadata, condition));
+  public <T> Optional<T> findOptional(final TableMetadata<T> table, final CriteriaExpression condition) {
+    return Optional.ofNullable(findOne(table, condition));
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public <T> List<T> find(final TableMetadata<T> tableMetadata) {
-    return new ReadEntityManager<T>().withTableMetadata(tableMetadata)
+  public <T> List<T> find(final TableMetadata<T> table) {
+    return new ReadEntityManager<T>().withTableMetadata(table)
                                      .fetch(sessionFactory.getSession());
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public <T> List<T> find(final TableMetadata<T> tableMetadata, final ExtendedCriteriaExpression conditions) {
-    return new ReadEntityManager<T>().withTableMetadata(tableMetadata).withConditions(conditions)
+  public <T> List<T> find(final TableMetadata<T> table, final ExtendedCriteriaExpression conditions) {
+    return new ReadEntityManager<T>().withTableMetadata(table).withConditions(conditions)
                                      .fetch(sessionFactory.getSession());
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public <T> List<T> find(final TableMetadata<T> tableMetadata, final CriteriaExpression condition) {
-    return new ReadEntityManager<T>().withTableMetadata(tableMetadata).withCondition(condition)
+  public <T> List<T> find(final TableMetadata<T> table, final CriteriaExpression condition) {
+    return new ReadEntityManager<T>().withTableMetadata(table).withCondition(condition)
                                      .fetch(sessionFactory.getSession());
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public <T> PageResult<T> find(final TableMetadata<T> tableMetadata, final PageRequest pageRequest) {
-    return new ReadEntityManager<T>().withTableMetadata(tableMetadata)
+  public <T> PageResult<T> find(final TableMetadata<T> table, final PageRequest pageRequest) {
+    return new ReadEntityManager<T>().withTableMetadata(table)
                                      .withPaging(pageRequest)
                                      .fetchPage(sessionFactory.getSession());
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public <T> PageResult<T> find(final TableMetadata<T> tableMetadata, final ExtendedCriteriaExpression conditions, final PageRequest pageRequest) {
-    return new ReadEntityManager<T>().withTableMetadata(tableMetadata).withConditions(conditions)
+  public <T> PageResult<T> find(final TableMetadata<T> table, final ExtendedCriteriaExpression conditions, final PageRequest pageRequest) {
+    return new ReadEntityManager<T>().withTableMetadata(table).withConditions(conditions)
                                      .withPaging(pageRequest)
                                      .fetchPage(sessionFactory.getSession());
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public <T> PageResult<T> find(final TableMetadata<T> tableMetadata, final CriteriaExpression condition, final PageRequest pageRequest) {
-    return new ReadEntityManager<T>().withTableMetadata(tableMetadata).withCondition(condition)
+  public <T> PageResult<T> find(final TableMetadata<T> table, final CriteriaExpression condition, final PageRequest pageRequest) {
+    return new ReadEntityManager<T>().withTableMetadata(table).withCondition(condition)
                                      .withPaging(pageRequest)
                                      .fetchPage(sessionFactory.getSession());
   }

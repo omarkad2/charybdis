@@ -30,6 +30,14 @@ import ma.markware.charybdis.query.DeleteQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Responsible of entity creation in DB <b>(Internal use only)</b>.
+ * This service is used exclusively by CRUD API.
+ *
+ * @param <T> entity to delete.
+ *
+ * @author Oussama Markad
+ */
 public class DeleteEntityManager<T> {
 
   private static final Logger log = LoggerFactory.getLogger(DeleteEntityManager.class);
@@ -42,27 +50,44 @@ public class DeleteEntityManager<T> {
     this.deleteQuery = new DeleteQuery();
   }
 
-  DeleteEntityManager<T> withTableMetadata(TableMetadata<T> tableMetadata) {
-    this.tableMetadata = tableMetadata;
-    deleteQuery.setTable(tableMetadata);
+  /**
+   * Specify table in delete query.
+   */
+  DeleteEntityManager<T> withTableMetadata(TableMetadata<T> table) {
+    this.tableMetadata = table;
+    deleteQuery.setTable(table);
     return this;
   }
 
+  /**
+   * Specify entity in delete query.
+   */
   DeleteEntityManager<T> withEntity(T entity) {
     this.entity = entity;
     return this;
   }
 
+  /**
+   * Add writetime to delete query.
+   */
   public DeleteEntityManager<T> withTimestamp(Instant timestamp) {
     deleteQuery.setTimestamp(timestamp);
     return this;
   }
 
+  /**
+   * Add writetime in millis to delete query.
+   */
   public DeleteEntityManager<T> withTimestamp(long timestamp) {
     deleteQuery.setTimestamp(timestamp);
     return this;
   }
 
+  /**
+   * Execute delete query.
+   *
+   * @return if delete was applied
+   */
   boolean save(CqlSession session) {
     Map<String, Object> columnValueMap = tableMetadata.serialize(entity);
     for (Entry<String, Object> columnEntry : columnValueMap.entrySet()) {
