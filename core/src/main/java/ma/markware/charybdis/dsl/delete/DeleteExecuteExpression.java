@@ -18,6 +18,11 @@
  */
 package ma.markware.charybdis.dsl.delete;
 
+/**
+ * Expression of DSL API when selecting generic
+ *
+ * @author Oussama Markad
+ */
 public interface DeleteExecuteExpression {
 
   boolean execute();

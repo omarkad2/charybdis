@@ -23,9 +23,37 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * Annotation to indicate that a field is a column
+ *
+ * Examples:
+ *
+ * // Define Column 'field'
+ * <pre>{@code
+ * public class Entity {
+ *
+ *  @literal @Column
+ *  private String field;
+ * }</pre>
+ *
+ * // Define column 'custom_name'
+ * <pre>{@code
+ * public class Entity {
+ *
+ *  @literal @Column(name = "custom_name")
+ *  private String field;
+ * }</pre>
+ *
+ * @author Oussama Markad
+ */
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.CLASS)
 public @interface Column {
 
+  /**
+   * Set column name.
+   *
+   * @return column name defined in annotation.
+   */
   String name() default "";
 }
