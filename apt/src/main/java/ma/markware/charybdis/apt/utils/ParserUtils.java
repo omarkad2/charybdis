@@ -23,15 +23,25 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.Types;
-
+/**
+ * Parser Utils methods
+ *
+ * @author Oussama Markad
+ */
 public class ParserUtils {
 
+  /**
+   * Extracts fields from annotated class.
+   */
   public static Stream<? extends Element> extractFields(Element annotatedClass, Types types) {
     return Stream.concat(annotatedClass.getEnclosedElements().stream()
                                        .filter(elt-> elt.getKind() == ElementKind.FIELD),
                          extractSuperFields(annotatedClass, types));
   }
 
+  /**
+   * Extracts methods (including inherited ones) from annotated class.
+   */
   public static Stream<? extends Element> extractMethods(Element annotatedClass, Types types) {
     return Stream.concat(annotatedClass.getEnclosedElements().stream()
                                        .filter(elt-> elt.getKind() == ElementKind.METHOD),

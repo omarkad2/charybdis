@@ -18,8 +18,16 @@
  */
 package ma.markware.charybdis.apt.utils;
 
+/**
+ * Naming Utils methods
+ *
+ * @author Oussama Markad
+ */
 public class NameUtils {
 
+  /**
+   * Resolves generic type field's name.
+   */
   public static String resolveGenericTypeName(String fieldType) {
     return fieldType + "GenericType";
   }

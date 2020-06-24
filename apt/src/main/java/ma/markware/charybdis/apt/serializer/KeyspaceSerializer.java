@@ -25,6 +25,12 @@ import javax.lang.model.element.Modifier;
 import ma.markware.charybdis.apt.metatype.KeyspaceMetaType;
 import ma.markware.charybdis.model.field.metadata.KeyspaceMetadata;
 
+/**
+ * A specific Class serializer.
+ * Serializes Keyspace metadata {@link ma.markware.charybdis.apt.metatype.KeyspaceMetaType} into java methods and fields.
+ *
+ * @author Oussama Markad
+ */
 public class KeyspaceSerializer implements EntitySerializer<KeyspaceMetaType> {
 
   private final Filer filer;
@@ -33,11 +39,14 @@ public class KeyspaceSerializer implements EntitySerializer<KeyspaceMetaType> {
     this.filer = filer;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public void serialize(final KeyspaceMetaType keyspaceMetaType) {
     String className = keyspaceMetaType.getDeserializationName();
     String packageName = keyspaceMetaType.getPackageName();
-    String generatedClassName = getClassName(className);
+    String generatedClassName = resolveClassName(className);
     String keyspaceName = keyspaceMetaType.getKeyspaceName();
     TypeSpec keyspaceMetadataSerialization = TypeSpec.classBuilder(generatedClassName)
                                              .addModifiers(Modifier.PUBLIC)
@@ -53,8 +62,11 @@ public class KeyspaceSerializer implements EntitySerializer<KeyspaceMetaType> {
     writeSerialization(packageName, className, keyspaceMetadataSerialization, filer);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public String getClassName(final String metaTypeClassName) {
+  public String resolveClassName(final String metaTypeClassName) {
     return metaTypeClassName + SerializationConstants.KEYSPACE_SERIALIZATION_SUFFIX;
   }
 }

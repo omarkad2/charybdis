@@ -33,6 +33,8 @@ import ma.markware.charybdis.apt.exception.CharybdisSerializationException;
 /**
  * Entity serializer.
  * @param <ENTITY_META_TYPE> The input metadata type to serialize to java fields and methods.
+ *
+ * @author Oussama Markad
  */
 public interface EntitySerializer<ENTITY_META_TYPE> {
 
@@ -47,6 +49,9 @@ public interface EntitySerializer<ENTITY_META_TYPE> {
                     .build();
   }
 
+  /**
+   * Builds static attribute that holds Cassandra entity name.
+   */
   default FieldSpec buildEntityNameField(String attributeName, String value) {
     return FieldSpec.builder(String.class, attributeName)
                     .addModifiers(Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)
@@ -54,12 +59,18 @@ public interface EntitySerializer<ENTITY_META_TYPE> {
                     .build();
   }
 
+  /**
+   * Builds no-arg private constructor of generated class.
+   */
   default MethodSpec buildPrivateConstructor() {
     return MethodSpec.constructorBuilder()
                      .addModifiers(Modifier.PRIVATE)
                      .build();
   }
 
+  /**
+   * Builds getter method that returns Cassandra entity name.
+   */
   default MethodSpec buildGetEntityNameMethod(String methodName, String attributeName) {
     return MethodSpec.methodBuilder(methodName)
                      .addModifiers(Modifier.PUBLIC)
@@ -68,6 +79,9 @@ public interface EntitySerializer<ENTITY_META_TYPE> {
                      .build();
   }
 
+  /**
+   * Writes methods and fields in a java file.
+   */
   default void writeSerialization(String packageName, String className, TypeSpec typeSpec, Filer filer) {
     try {
       JavaFile.builder(packageName, typeSpec)
@@ -78,7 +92,13 @@ public interface EntitySerializer<ENTITY_META_TYPE> {
     }
   }
 
+  /**
+   * Serializes class or field charybdis' metadata into a new java file written to filesystem.
+   */
   void serialize(final ENTITY_META_TYPE metaType);
 
-  String getClassName(String metaTypeClassName);
+  /**
+   * Resolves class name of generated java file.
+   */
+  String resolveClassName(String metaTypeClassName);
 }

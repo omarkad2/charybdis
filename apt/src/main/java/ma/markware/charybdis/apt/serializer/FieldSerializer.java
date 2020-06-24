@@ -20,9 +20,22 @@ package ma.markware.charybdis.apt.serializer;
 
 import com.squareup.javapoet.FieldSpec;
 
+/**
+ * Field serializer.
+ * @param <FIELD_META_TYPE> The input charybdis' metadata type to serialize to java fields.
+ *
+ * @author Oussama Markad
+ */
 public interface FieldSerializer<FIELD_META_TYPE> {
 
+  /**
+   * Specific serialization of field metadata.
+   * It creates a field that can later be written to a java file.
+   */
   FieldSpec serializeField(FIELD_META_TYPE fieldMetaType);
 
+  /**
+   * Generic serialization of field metadata.
+   */
   FieldSpec serializeFieldGenericType(FIELD_META_TYPE fieldMetaType);
 }

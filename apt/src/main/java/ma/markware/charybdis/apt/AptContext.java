@@ -64,8 +64,8 @@ public class AptContext {
 
     for (final Element element : roundEnv.getElementsAnnotatedWith(Udt.class)) {
       String udtName = configuration.getUdtParser().resolveName(element);
-      String udtClassName = configuration.getUdtSerializer().getClassName(element.getSimpleName()
-                                                                                 .toString());
+      String udtClassName = configuration.getUdtSerializer().resolveClassName(element.getSimpleName()
+                                                                                     .toString());
       udtContexts.put(element.asType().toString(), new UdtContext(udtClassName, udtName));
     }
   }

@@ -46,6 +46,12 @@ import ma.markware.charybdis.apt.utils.CollectionUtils;
 import ma.markware.charybdis.apt.utils.NameUtils;
 import ma.markware.charybdis.model.field.metadata.UdtMetadata;
 
+/**
+ * A specific Class serializer.
+ * Serializes Udt metadata {@link ma.markware.charybdis.apt.metatype.UdtMetaType} into java methods and fields.
+ *
+ * @author Oussama Markad
+ */
 public class UdtSerializer implements EntitySerializer<UdtMetaType> {
 
   private static final String SKIP_LINE = "\n";
@@ -60,12 +66,15 @@ public class UdtSerializer implements EntitySerializer<UdtMetaType> {
     this.filer = filer;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public void serialize(final UdtMetaType udtMetaType) {
 
     String className = udtMetaType.getDeserializationName();
     String packageName = udtMetaType.getPackageName();
-    String generatedClassName = getClassName(className);
+    String generatedClassName = resolveClassName(className);
     String keyspaceName = udtMetaType.getKeyspaceName();
     String udtName = udtMetaType.getUdtName();
     TypeSpec udtMetadataSerialization = TypeSpec.classBuilder(generatedClassName)
@@ -205,7 +214,7 @@ public class UdtSerializer implements EntitySerializer<UdtMetaType> {
   }
 
   @Override
-  public String getClassName(final String metaTypeClassName) {
+  public String resolveClassName(final String metaTypeClassName) {
     return metaTypeClassName + SerializationConstants.UDT_SERIALIZATION_SUFFIX;
   }
 }

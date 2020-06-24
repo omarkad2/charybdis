@@ -41,6 +41,12 @@ import ma.markware.charybdis.model.field.metadata.ColumnMetadata;
 import ma.markware.charybdis.model.field.metadata.TableMetadata;
 import ma.markware.charybdis.model.option.SequenceModel;
 
+/**
+ * A specific Class serializer.
+ * Serializes Table metadata {@link ma.markware.charybdis.apt.metatype.TableMetaType} into java methods and fields.
+ *
+ * @author Oussama Markad
+ */
 public class TableSerializer implements EntitySerializer<TableMetaType> {
 
   private final FieldSerializer<ColumnFieldMetaType> columnFieldSerializer;
@@ -51,11 +57,14 @@ public class TableSerializer implements EntitySerializer<TableMetaType> {
     this.filer = filer;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public void serialize(final TableMetaType tableMetaType) {
     String className = tableMetaType.getDeserializationName();
     String packageName = tableMetaType.getPackageName();
-    String generatedClassName = getClassName(className);
+    String generatedClassName = resolveClassName(className);
     String keyspaceName = tableMetaType.getKeyspaceName();
     String tableName = tableMetaType.getTableName();
 
@@ -93,8 +102,11 @@ public class TableSerializer implements EntitySerializer<TableMetaType> {
     writeSerialization(packageName, className, tableMetadataSerialization, filer);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public String getClassName(final String metaTypeClassName) {
+  public String resolveClassName(final String metaTypeClassName) {
     return metaTypeClassName + SerializationConstants.TABLE_SERIALIZATION_SUFFIX;
   }
 

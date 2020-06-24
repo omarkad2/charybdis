@@ -21,8 +21,16 @@ package ma.markware.charybdis.apt.utils;
 import com.squareup.javapoet.TypeName;
 import javax.lang.model.type.TypeMirror;
 
+/**
+ * Class Utils methods
+ *
+ * @author Oussama Markad
+ */
 public final class ClassUtils {
 
+  /**
+   * Transforms primitive type to wrapper
+   */
   public static TypeName primitiveToWrapper(TypeName typeName) {
     if (!typeName.isPrimitive()) {
       return typeName;
