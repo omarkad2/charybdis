@@ -22,16 +22,31 @@ import java.util.HashMap;
 import java.util.Map;
 import ma.markware.charybdis.model.field.SelectableField;
 
+/**
+ * Default implementation of {@link Record} that stores
+ * database result records in a {@link HashMap}
+ *
+ * @author Oussama Markad
+ */
 public class DefaultRecord implements Record {
 
   private Map<String, Object> fieldValueMap = new HashMap<>();
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   @SuppressWarnings("unchecked")
   public <D> D get(final SelectableField<D> field) {
     return (D) fieldValueMap.get(field.getName());
   }
 
+  /**
+   * Store value of a row field in a Map.
+   *
+   * @param field row field.
+   * @param value field value in DB.
+   */
   public void put(final SelectableField field, final Object value) {
     fieldValueMap.put(field.getName(), value);
   }

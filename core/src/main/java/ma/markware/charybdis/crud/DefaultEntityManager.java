@@ -42,12 +42,12 @@ public class DefaultEntityManager implements EntityManager {
   private final SessionFactory sessionFactory;
 
   /**
-   * Initialize the entity manager using a session factory.
+   * Initialize the entity manager using a custom session factory.
    *
-   * @param sessionFactory Instance of the class responsible of creating cql sessions.
+   * @param customSessionFactory Instance of {@link SessionFactory} responsible of creating cql sessions.
    */
-  public DefaultEntityManager(SessionFactory sessionFactory) {
-    this.sessionFactory = sessionFactory;
+  public DefaultEntityManager(SessionFactory customSessionFactory) {
+    this.sessionFactory = customSessionFactory;
   }
 
   /**

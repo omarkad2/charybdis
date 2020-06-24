@@ -28,7 +28,7 @@ import ma.markware.charybdis.query.PageRequest;
 import ma.markware.charybdis.query.PageResult;
 
 /**
- * A service that allows handling entities in DB, through CRUD operations.
+ * API that allows handling entities in DB through CRUD operations.
  *
  * @author Oussama Markad
  */

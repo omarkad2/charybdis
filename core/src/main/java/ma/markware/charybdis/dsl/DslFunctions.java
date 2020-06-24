@@ -23,13 +23,34 @@ import ma.markware.charybdis.model.field.function.TtlFunctionField;
 import ma.markware.charybdis.model.field.function.WriteTimeFunctionField;
 import ma.markware.charybdis.model.field.metadata.ColumnMetadata;
 
+/**
+ * Defines Cassandra native function, that can be
+ * used in Dsl query expressions.
+ *
+ * <a href="https://docs.datastax.com/en/cql-oss/3.x/cql/cql_reference/cql_function_r.html">
+ *  https://docs.datastax.com/en/cql-oss/3.x/cql/cql_reference/cql_function_r.html</a>
+ *
+ * @author Oussama Markad
+ */
 public class DslFunctions {
 
-  public static SelectableField<Long> writetime(ColumnMetadata<?, ?> columnMetadata) {
-    return new WriteTimeFunctionField(columnMetadata);
+  /**
+   * Retrieve the time a write occured.
+   *
+   * @param column writetime cql function argument.
+   * @return field that retrieves write time of a given column.
+   */
+  public static SelectableField<Long> writetime(ColumnMetadata<?, ?> column) {
+    return new WriteTimeFunctionField(column);
   }
 
-  public static SelectableField<Integer> ttl(ColumnMetadata<?, ?> columnMetadata) {
-    return new TtlFunctionField(columnMetadata);
+  /**
+   * Retrieve the time to live of column.
+   *
+   * @param column ttl cql function argument.
+   * @return field that retrieves ttl of a given column.
+   */
+  public static SelectableField<Integer> ttl(ColumnMetadata<?, ?> column) {
+    return new TtlFunctionField(column);
   }
 }

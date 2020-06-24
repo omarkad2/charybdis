@@ -19,7 +19,6 @@
 package ma.markware.charybdis.dsl;
 
 import com.datastax.oss.driver.api.core.CqlSession;
-import com.datastax.oss.driver.api.core.config.DriverExecutionProfile;
 import ma.markware.charybdis.dsl.delete.DeleteImpl;
 import ma.markware.charybdis.dsl.delete.DeleteInitExpression;
 import ma.markware.charybdis.dsl.insert.InsertImpl;
@@ -39,22 +38,48 @@ import ma.markware.charybdis.session.DefaultSessionFactory;
 import ma.markware.charybdis.session.SessionFactory;
 import ma.markware.charybdis.session.StandaloneSessionFactory;
 
+/**
+ * DSL manager {@link DslQuery} default implementation.
+ * implements DB dsl operations.
+ *
+ * @author Oussama Markad
+ */
 public class DefaultDslQuery implements DslQuery {
 
   private final SessionFactory sessionFactory;
 
+  /**
+   * Initialize the DSL manager using a custom session factory.
+   *
+   * @param customSessionFactory Instance of {@link SessionFactory} responsible of creating cql sessions.
+   */
   public DefaultDslQuery(final SessionFactory customSessionFactory) {
     this.sessionFactory = customSessionFactory;
   }
 
+  /**
+   * Initialize the DSL manager using datastax default driver configuration.
+   * For details: <a href="https://docs.datastax.com/en/developer/java-driver/4.5/manual/core/configuration/reference/">
+   *   https://docs.datastax.com/en/developer/java-driver/4.5/manual/core/configuration/reference/</a>
+   */
   public DefaultDslQuery() {
     this(new DefaultSessionFactory());
   }
 
+  /**
+   * Initialize the DSL manager with custom configuration file loaded from classpath.
+   *
+   * @param customConfiguration driver configuration file name in classpath.
+   */
   public DefaultDslQuery(final String customConfiguration) {
     this(new DefaultSessionFactory(customConfiguration));
   }
 
+  /**
+   * Initialize the DSL manager with an existing session.
+   *
+   * @param session open cql session.
+   */
   public DefaultDslQuery(CqlSession session) {
     this(new StandaloneSessionFactory(session));
   }
@@ -64,48 +89,59 @@ public class DefaultDslQuery implements DslQuery {
     return new SelectImpl(sessionFactory.getSession()).select(fields);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public SelectInitExpression selectDistinct(final PartitionKeyColumnMetadata... fields) {
     return new SelectImpl(sessionFactory.getSession()).selectDistinct(fields);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public SelectWhereExpression selectFrom(final TableMetadata table) {
     return new SelectImpl(sessionFactory.getSession()).selectFrom(table);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public InsertInitExpression insertInto(final TableMetadata table) {
     return new InsertImpl(sessionFactory.getSession()).insertInto(table);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public InsertInitWithColumnsExpression insertInto(TableMetadata table, ColumnMetadata... columns) {
     return new InsertImpl(sessionFactory.getSession()).insertInto(table, columns);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public UpdateInitExpression update(TableMetadata table) {
     return new UpdateImpl(sessionFactory.getSession()).update(table);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public DeleteInitExpression delete() {
     return new DeleteImpl(sessionFactory.getSession()).delete();
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public DeleteInitExpression delete(final DeletableField... fields) {
     return new DeleteImpl(sessionFactory.getSession()).delete(fields);
-  }
-
-  @Override
-  public DslQuery using(final DriverExecutionProfile executionProfile) {
-    return null;
-  }
-
-  @Override
-  public DslQuery using(final String executionProfile) {
-    return null;
   }
 }

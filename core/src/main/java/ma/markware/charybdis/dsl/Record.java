@@ -20,7 +20,20 @@ package ma.markware.charybdis.dsl;
 
 import ma.markware.charybdis.model.field.SelectableField;
 
+/**
+ * A database result record.
+ * It can be seen as generic column / value mapping
+ *
+ * @author Oussama Markad
+ */
 public interface Record {
 
+  /**
+   * Extract value associated to a specific field
+   *
+   * @param field row field.
+   * @param <D> field deserialized type (type after charybdis deserialization)
+   * @return Column or Udt value
+   */
   <D> D get(SelectableField<D> field);
 }
