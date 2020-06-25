@@ -23,9 +23,39 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * Annotation to indicate that a field is a partition key column
+ *
+ * Examples:
+ *
+ * // partition key column <i>'field'</i> at index 0
+ * <pre>{@code
+ * public class Entity {
+ *
+ *  @literal @Column
+ *  @literal @PartitionKey
+ *  private String field;
+ * }}</pre>
+ *
+ * // partition key column <i>'field'</i> at index 2
+ * <pre>{@code
+ * public class Entity {
+ *
+ *  @literal @Column
+ *  @literal @PartitionKey(index = 2)
+ *  private String field;
+ * }}</pre>
+ *
+ * @author Oussama Markad
+ */
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.CLASS)
 public @interface PartitionKey {
 
+  /**
+   * Set partition key column index.
+   *
+   * @return partition key index defined in annotation.
+   */
   int index() default 0;
 }

@@ -23,9 +23,40 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * Annotation to indicate that a field is part of a udt
+ * (user-defined type).
+ *
+ * Examples:
+ *
+ * // Define udt field <i>'field'</i>
+ * <pre>{@code
+ * @literal @Udt
+ * public class Entity {
+ *
+ *  @literal @UdtField
+ *  private String field;
+ * }}</pre>
+ *
+ * // Define udt field <i>'custom_name'</i>
+ * <pre>{@code
+ * @literal @Udt
+ * public class Entity {
+ *
+ *  @literal @UdtField(name = "custom_name")
+ *  private String field;
+ * }}</pre>
+ *
+ * @author Oussama Markad
+ */
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.CLASS)
 public @interface UdtField {
 
+  /**
+   * Set udt field name.
+   *
+   * @return udt field name defined in annotation.
+   */
   String name() default "";
 }

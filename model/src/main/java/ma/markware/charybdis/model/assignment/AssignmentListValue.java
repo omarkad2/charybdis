@@ -21,6 +21,11 @@ package ma.markware.charybdis.model.assignment;
 import java.util.List;
 import ma.markware.charybdis.model.field.metadata.ListColumnMetadata;
 
+/**
+ *
+ * @param <D>
+ * @param <S>
+ */
 public class AssignmentListValue<D, S> {
 
   private final ListColumnMetadata<D, S> listColumn;

@@ -23,6 +23,23 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * Annotation to indicate that a field holds entity's creation
+ * date.
+ *
+ * Example:
+ *
+ * // Define Column <i>'creationDate'</i>
+ * <pre>{@code
+ * public class Entity {
+ *
+ *  @literal @Column
+ *  @literal @CreationDate
+ *  private Instant creationDate;
+ * }}</pre>
+ *
+ * @author Oussama Markad
+ */
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.CLASS)
 public @interface CreationDate {

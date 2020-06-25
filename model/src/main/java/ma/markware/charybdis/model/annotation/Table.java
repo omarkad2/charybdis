@@ -23,15 +23,35 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * Annotation to indicate that a class is a Cassandra table representation.
+ *
+ * Example:
+ *
+ * // Define table <i>'test_table'</i> in keyspace <i>'test_keyspace'</i>.
+ * <pre>{@code
+ * @literal @Table(keyspace="test_keyspace", name = "test_table")
+ * public class TableDefinition {
+ *  ...<Column definitions>...
+ * }}</pre>
+ *
+ * @author Oussama Markad
+ */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.CLASS)
 public @interface Table {
 
+  /**
+   * Set keyspace name in which the table exists.
+   *
+   * @return keyspace name defined in annotation.
+   */
   String keyspace();
 
+  /**
+   * Set table name.
+   *
+   * @return table name defined in annotation.
+   */
   String name();
-
-  String writeConsistency() default "";
-
-  String readConsistency() default "";
 }

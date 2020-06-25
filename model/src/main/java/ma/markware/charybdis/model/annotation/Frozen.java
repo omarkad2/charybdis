@@ -25,7 +25,32 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * This annotation can only be used on collection types and user-defined types otherwise it is ignored
+ * This annotation indicates that a type is frozen when mapped to Cassandra.
+ *
+ * It can only be used on collection types and user-defined types otherwise it is ignored.
+ *
+ * Examples:
+ *
+ * In order to represent column <i>'collection'</i> with data type {@code list<frozen<set<text>>>},
+ * we use the annotation as follows:
+ * <pre>{@code
+ * public class Entity {
+ *
+ *  @literal @Column
+ *  private List<@Frozen Set<String>> collection;
+ * }}</pre>
+ *
+ * Given <i>'address'</i> a user-defined type in Cassandra and <i>Address</i> its associated Charybdis class,
+ * when we want to represent a frozen user-defined type column <i>'my_address'</i> with data type {@code frozen<address>},
+ * we use the annotation as follows:
+ * <pre>{@code
+ * public class Entity {
+ *
+ *  @literal @Column(name = "my_address")
+ *  private @Frozen Address address;
+ * }}</pre>
+ *
+ * @author Oussama Markad
  */
 @Documented
 @Target({ElementType.TYPE_USE})

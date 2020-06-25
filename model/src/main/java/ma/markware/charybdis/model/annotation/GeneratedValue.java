@@ -23,6 +23,21 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * This annotation indicates that a column will have its value generated automatically.
+ * Exclusively used by CRUD API.
+ *
+ * Example:
+ * <pre>{@code
+ * public class Entity {
+ *
+ *  @literal @GeneratedValue
+ *  @literal @Column
+ *  private UUID id;
+ * }}</pre>
+ *
+ * @author Oussama Markad
+ */
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.CLASS)
 public @interface GeneratedValue {

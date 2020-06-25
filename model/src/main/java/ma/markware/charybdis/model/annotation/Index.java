@@ -23,9 +23,28 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * This annotation indicates that a column is a secondary index.
+ *
+ * Example:
+ * <pre>{@code
+ * public class Entity {
+ *
+ *  @literal @Index
+ *  @literal @Column
+ *  private String indexed;
+ * }}</pre>
+ *
+ * @author Oussama Markad
+ */
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.CLASS)
 public @interface Index {
 
+  /**
+   * Set index name.
+   *
+   * @return index name defined in annotation.
+   */
   String name() default "";
 }

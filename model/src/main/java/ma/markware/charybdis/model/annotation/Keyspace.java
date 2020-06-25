@@ -24,14 +24,49 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import ma.markware.charybdis.model.option.ReplicationStrategyClass;
 
+/**
+ * Annotation to indicate that a class is a Cassandra keyspace representation.
+ *
+ * Examples:
+ *
+ * // Define Keyspace <i>'test_keyspace'</i>.
+ * <pre>{@code
+ * @literal @Keyspace(name = "test_keyspace")
+ * public class KeyspaceDefinition {
+ *
+ * }}</pre>
+ *
+ * // Define keyspace <i>'test_keyspace'</i> with replication factor equals to 2.
+ * <pre>{@code
+ * @literal @Keyspace(name = "test_keyspace", replicationFactor = 2)
+ * public class KeyspaceDefinition {
+ *
+ * }}</pre>
+ *
+ * @author Oussama Markad
+ */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.CLASS)
 public @interface Keyspace {
 
-
+  /**
+   * Set keyspace name.
+   *
+   * @return keyspace name defined in annotation.
+   */
   String name() default "";
 
+  /**
+   * Set replication strategy.
+   *
+   * @return replication strategy defined in annotation.
+   */
   ReplicationStrategyClass replicaPlacementStrategy() default ReplicationStrategyClass.SIMPLE_STRATEGY;
 
+  /**
+   * Set replication factor.
+   *
+   * @return replication factor name defined in annotation.
+   */
   int replicationFactor() default 1;
 }

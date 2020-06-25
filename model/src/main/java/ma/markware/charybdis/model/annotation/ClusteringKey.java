@@ -29,23 +29,23 @@ import ma.markware.charybdis.model.option.ClusteringOrder;
  *
  * Examples:
  *
- * // clustering key column 'field' at index 0 and with ascending order
+ * // clustering key column <i>'field'</i> at index 0 and with ascending order
  * <pre>{@code
  * public class Entity {
  *
  *  @literal @Column
  *  @literal @ClusteringKey
  *  private String field;
- * }</pre>
+ * }}</pre>
  *
- * // clustering key column 'field' at index 2 and with descending order
+ * // clustering key column <i>'field'</i> at index 2 and with descending order
  * <pre>{@code
  * public class Entity {
  *
  *  @literal @Column
  *  @literal @ClusteringKey(index = 2, order = ClusteringOrder.DESC)
  *  private String field;
- * }</pre>
+ * }}</pre>
  *
  * @author Oussama Markad
  */
