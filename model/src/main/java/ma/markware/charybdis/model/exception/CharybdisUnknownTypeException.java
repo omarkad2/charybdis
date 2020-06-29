@@ -18,6 +18,11 @@
  */
 package ma.markware.charybdis.model.exception;
 
+/**
+ * Runtime exception that occurs when we try to map an unknown class to a Cassandra data type.
+ *
+ * @author Oussama Markad
+ */
 public class CharybdisUnknownTypeException extends RuntimeException {
 
   public CharybdisUnknownTypeException(final String message) {

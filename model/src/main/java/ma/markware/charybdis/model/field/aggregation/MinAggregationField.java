@@ -23,6 +23,13 @@ import com.datastax.oss.driver.api.querybuilder.select.Selector;
 import ma.markware.charybdis.model.field.SelectableField;
 import ma.markware.charybdis.model.utils.StringUtils;
 
+/**
+ * Selectable field, to seek min aggregated value.
+ *
+ * @param <T> min value type.
+ *
+ * @author Oussama Markad
+ */
 public class MinAggregationField<T> implements SelectableField<T> {
 
   private final SelectableField<T> aggregatedField;
@@ -31,21 +38,33 @@ public class MinAggregationField<T> implements SelectableField<T> {
     this.aggregatedField = aggregatedField;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public T deserialize(final Row row) {
     return row.get(resolveAlias(), getFieldClass());
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Class<T> getFieldClass() {
     return aggregatedField.getFieldClass();
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public String getName() {
     return "min_" + aggregatedField.getName();
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Selector toSelector(boolean useAlias) {
     Selector minSelector = Selector.function("min", aggregatedField.toSelector(false));

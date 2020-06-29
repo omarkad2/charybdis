@@ -22,6 +22,16 @@ import java.util.Map;
 import java.util.Set;
 import ma.markware.charybdis.model.field.metadata.MapColumnMetadata;
 
+/**
+ * Representation of an assignment on a map.
+ *
+ * @param <D_KEY> deserialized map key's type
+ * @param <D_VALUE> deserialized map value's type
+ * @param <S_KEY> serialized map key's type
+ * @param <S_VALUE> serialized map value's type
+ *
+ * @author Oussama Markad
+ */
 public class AssignmentMapValue<D_KEY, D_VALUE, S_KEY, S_VALUE> {
 
   private final MapColumnMetadata<D_KEY, D_VALUE, S_KEY, S_VALUE> mapColumn;

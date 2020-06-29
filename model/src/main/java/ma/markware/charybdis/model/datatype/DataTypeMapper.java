@@ -29,6 +29,11 @@ import java.util.Map;
 import java.util.UUID;
 import ma.markware.charybdis.model.exception.CharybdisUnknownTypeException;
 
+/**
+ * Mapper to link java type to Cassandra's data types.
+ *
+ * @author Oussama Markad
+ */
 public class DataTypeMapper {
 
   private static Map<Class, DataType> dataTypeMap = new HashMap<>();
@@ -53,6 +58,9 @@ public class DataTypeMapper {
     dataTypeMap.put(LocalDate.class, DataTypes.DATE);
   }
 
+  /**
+   * Get Cassandra data type from java class.
+   */
   public static DataType getDataType(final Class clazz) {
     if (dataTypeMap.containsKey(clazz)) {
       return dataTypeMap.get(clazz);

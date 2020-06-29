@@ -18,6 +18,11 @@
  */
 package ma.markware.charybdis.model.field.entry;
 
+/**
+ * List entry expression.
+ *
+ * @author Oussama Markad
+ */
 public class ListEntry implements EntryExpression<Integer> {
 
   private int index;
@@ -26,11 +31,17 @@ public class ListEntry implements EntryExpression<Integer> {
     this.index = index;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Integer getKey() {
     return index;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public String getName() {
     return String.valueOf(index);

@@ -25,36 +25,68 @@ import ma.markware.charybdis.model.criteria.CriteriaExpression;
 import ma.markware.charybdis.model.criteria.CriteriaOperator;
 import ma.markware.charybdis.model.field.SerializableField;
 
+/**
+ * Field representing a Cassandra condition.
+ *
+ * @param <D> field's type after deserialization.
+ * @param <S> field's type after serialization.
+ *
+ * @author Oussama Markad
+ */
 public interface CriteriaField<D, S> extends SerializableField<D, S> {
 
+  /**
+   * Transform field to datastax Relation.
+   */
   default Relation toRelation(String operator, Term term) {
     return Relation.column(getName()).build(operator, term);
   }
 
+  /**
+   * Transform field to datastax Condition.
+   */
   default Condition toCondition(String operator, Term term) {
     return Condition.column(getName()).build(operator, term);
   }
 
+  /**
+   * Compare field value with another value for equality.
+   */
   default CriteriaExpression eq(D value) {
     return new CriteriaExpression(this, CriteriaOperator.EQ, serialize(value));
   }
 
+  /**
+   * Compare field value with another value for inequality.
+   */
   default CriteriaExpression neq(D value) {
     return new CriteriaExpression(this, CriteriaOperator.NOT_EQ, serialize(value));
   }
 
+  /**
+   * Compare field value with another value for order (greater than).
+   */
   default CriteriaExpression gt(D value) {
     return new CriteriaExpression(this, CriteriaOperator.GT, serialize(value));
   }
 
+  /**
+   * Compare field value with another value for order (greater than or equal).
+   */
   default CriteriaExpression gte(D value) {
     return new CriteriaExpression(this, CriteriaOperator.GTE, serialize(value));
   }
 
+  /**
+   * Compare field value with another value for order (lesser than).
+   */
   default CriteriaExpression lt(D value) {
     return new CriteriaExpression(this, CriteriaOperator.LT, serialize(value));
   }
 
+  /**
+   * Compare field value with another value for order (lesser than or equal).
+   */
   default CriteriaExpression lte(D value) {
     return new CriteriaExpression(this, CriteriaOperator.LTE, serialize(value));
   }

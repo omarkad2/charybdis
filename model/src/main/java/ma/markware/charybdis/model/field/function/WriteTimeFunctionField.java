@@ -24,6 +24,11 @@ import ma.markware.charybdis.model.field.SelectableField;
 import ma.markware.charybdis.model.field.metadata.ColumnMetadata;
 import ma.markware.charybdis.model.utils.StringUtils;
 
+/**
+ * Selectable field, to seek write time value.
+ *
+ * @author Oussama Markad
+ */
 public class WriteTimeFunctionField implements SelectableField<Long> {
 
   private final ColumnMetadata columnMetadata;

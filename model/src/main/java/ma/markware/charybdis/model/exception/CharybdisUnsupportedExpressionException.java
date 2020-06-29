@@ -18,6 +18,12 @@
  */
 package ma.markware.charybdis.model.exception;
 
+/**
+ * Runtime exception that occurs when we try obtain Cassandra expression over a inappropriate
+ * java type.
+ *
+ * @author Oussama Markad
+ */
 public class CharybdisUnsupportedExpressionException extends RuntimeException {
 
   public CharybdisUnsupportedExpressionException(final String message) {

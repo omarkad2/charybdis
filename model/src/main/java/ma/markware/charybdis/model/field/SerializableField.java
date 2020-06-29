@@ -18,7 +18,18 @@
  */
 package ma.markware.charybdis.model.field;
 
+/**
+ * Field that can be serialized (persisted).
+ *
+ * @param <D> field's type after deserialization.
+ * @param <S> field's type after serialization.
+ *
+ * @author Oussama Markad
+ */
 public interface SerializableField<D, S> extends Field  {
 
+  /**
+   * Transform field's java value to Cassandra-ready value for write operation.
+   */
   S serialize(D value);
 }

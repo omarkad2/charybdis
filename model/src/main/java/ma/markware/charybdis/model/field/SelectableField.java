@@ -21,15 +21,34 @@ package ma.markware.charybdis.model.field;
 import com.datastax.oss.driver.api.core.cql.Row;
 import com.datastax.oss.driver.api.querybuilder.select.Selector;
 
+/**
+ * Field that can be selected.
+ *
+ * @param <D> field type after deserialization.
+ *
+ * @author Oussama Markad
+ */
 public interface SelectableField<D> extends Field {
 
+  /**
+   * Transform field to datastax selector, allowing the use of aliases.
+   */
   default Selector toSelector() {
     return toSelector(true);
   }
 
+  /**
+   * Transform field to datastax selector.
+   */
   Selector toSelector(boolean useAlias);
 
+  /**
+   * Deserialize field from result row.
+   */
   D deserialize(Row row);
 
+  /**
+   * @return field's class after deserialization.
+   */
   Class<D> getFieldClass();
 }

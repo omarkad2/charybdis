@@ -18,6 +18,12 @@
  */
 package ma.markware.charybdis.model.exception;
 
+/**
+ * Runtime exception that occurs when we apply certain conditions on
+ * an inappropriate data type.
+ *
+ * @author Oussama Markad
+ */
 public class CharybdisUnsupportedCriteriaExpressionException extends RuntimeException {
 
   public CharybdisUnsupportedCriteriaExpressionException(final String message) {

@@ -20,7 +20,15 @@ package ma.markware.charybdis.model.field;
 
 import com.datastax.oss.driver.api.querybuilder.select.Selector;
 
+/**
+ * Field that can be deleted.
+ *
+ * @author Oussama Markad
+ */
 public interface DeletableField extends Field {
 
+  /**
+   * Transform field to datastax selector.
+   */
   Selector toDeletableSelector();
 }

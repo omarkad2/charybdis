@@ -18,6 +18,11 @@
  */
 package ma.markware.charybdis.model.assignment;
 
+/**
+ * Operations applied on collection types.
+ *
+ * @author Oussama Markad
+ */
 public enum AssignmentOperation {
 
   APPEND, PREPEND, REMOVE

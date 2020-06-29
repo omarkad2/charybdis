@@ -22,9 +22,12 @@ import java.util.List;
 import ma.markware.charybdis.model.field.metadata.ListColumnMetadata;
 
 /**
+ * Representation of an assignment on a collection of type list.
  *
- * @param <D>
- * @param <S>
+ * @param <D> deserialized list item's type
+ * @param <S> serialized list item's type
+ *
+ * @author Oussama Markad
  */
 public class AssignmentListValue<D, S> {
 

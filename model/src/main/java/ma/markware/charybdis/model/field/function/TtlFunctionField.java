@@ -24,6 +24,11 @@ import ma.markware.charybdis.model.field.SelectableField;
 import ma.markware.charybdis.model.field.metadata.ColumnMetadata;
 import ma.markware.charybdis.model.utils.StringUtils;
 
+/**
+ * Selectable field, to seek ttl in seconds value.
+ *
+ * @author Oussama Markad
+ */
 public class TtlFunctionField implements SelectableField<Integer> {
 
   private final ColumnMetadata columnMetadata;

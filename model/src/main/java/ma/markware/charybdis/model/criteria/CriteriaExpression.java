@@ -20,6 +20,11 @@ package ma.markware.charybdis.model.criteria;
 
 import ma.markware.charybdis.model.field.criteria.CriteriaField;
 
+/**
+ * Representation of a condition expression in Cassandra.
+ *
+ * @author Oussama Markad
+ */
 public class CriteriaExpression {
 
   private CriteriaField field;

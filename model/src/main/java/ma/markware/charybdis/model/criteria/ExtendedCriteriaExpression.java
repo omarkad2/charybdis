@@ -22,6 +22,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Representation of a set of conditions in Cassandra.
+ *
+ * @author Oussama Markad
+ */
 public class ExtendedCriteriaExpression {
 
   private List<CriteriaExpression> criterias;

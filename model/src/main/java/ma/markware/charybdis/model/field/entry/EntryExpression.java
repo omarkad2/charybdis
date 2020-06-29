@@ -18,9 +18,24 @@
  */
 package ma.markware.charybdis.model.field.entry;
 
+/**
+ * Field entry expression.
+ * Used to get around nested fields in types like: <em>list</em>, <em>map</em>
+ * and <em>udt</em>.
+ *
+ * @param <T> entry type.
+ *
+ * @author Oussama Markad
+ */
 public interface EntryExpression<T> {
 
+  /**
+   * @return path or key leading to nested field.
+   */
   T getKey();
 
+  /**
+   * @return expression name.
+   */
   String getName();
 }

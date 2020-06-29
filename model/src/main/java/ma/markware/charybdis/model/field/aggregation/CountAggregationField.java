@@ -23,6 +23,11 @@ import com.datastax.oss.driver.api.querybuilder.select.Selector;
 import ma.markware.charybdis.model.field.SelectableField;
 import ma.markware.charybdis.model.utils.StringUtils;
 
+/**
+ * Selectable field, to seek count aggregated value.
+ *
+ * @author Oussama Markad
+ */
 public class CountAggregationField implements SelectableField<Long> {
 
   private SelectableField aggregatedField;
@@ -34,21 +39,33 @@ public class CountAggregationField implements SelectableField<Long> {
     this.aggregatedField = aggregatedField;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Long deserialize(final Row row) {
     return row.get(resolveAlias(), getFieldClass());
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Class<Long> getFieldClass() {
     return long.class;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public String getName() {
     return aggregatedField != null ? "count_" + aggregatedField.getName() : "count_*";
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Selector toSelector(boolean useAlias) {
     Selector countSelector = aggregatedField != null ? Selector.function("count", aggregatedField.toSelector(false)) :

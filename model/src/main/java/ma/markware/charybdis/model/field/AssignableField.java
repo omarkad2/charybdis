@@ -18,5 +18,13 @@
  */
 package ma.markware.charybdis.model.field;
 
+/**
+ * Field to which we can assign values
+ *
+ * @param <D> field's type after deserialization.
+ * @param <S> field's type after serialization.
+ *
+ * @author Oussama Markad
+ */
 public interface AssignableField<D, S> extends SerializableField<D, S> {
 }

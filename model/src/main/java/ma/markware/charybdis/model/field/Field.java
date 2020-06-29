@@ -18,7 +18,16 @@
  */
 package ma.markware.charybdis.model.field;
 
+/**
+ * Representation of a field.
+ * It may either be a column or a udt (user-defined type) field
+ *
+ * @author Oussama Markad
+ */
 public interface Field {
 
+  /**
+   * @return field name.
+   */
   String getName();
 }

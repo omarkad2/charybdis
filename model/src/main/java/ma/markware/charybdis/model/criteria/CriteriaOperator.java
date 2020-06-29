@@ -18,6 +18,11 @@
  */
 package ma.markware.charybdis.model.criteria;
 
+/**
+ * Condition operators
+ *
+ * @author Oussama Markad
+ */
 public enum CriteriaOperator {
 
   EQ, GT, GTE, LT, LTE, IN, CONTAINS, CONTAINS_KEY, IS_NOT_NULL, NOT_EQ, LIKE

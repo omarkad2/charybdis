@@ -21,6 +21,14 @@ package ma.markware.charybdis.model.assignment;
 import java.util.Set;
 import ma.markware.charybdis.model.field.metadata.SetColumnMetadata;
 
+/**
+ * Representation of an assignment on a collection of type set.
+ *
+ * @param <D> deserialized set item's type
+ * @param <S> serialized set item's type
+ *
+ * @author Oussama Markad
+ */
 public class AssignmentSetValue<D, S> {
 
   private final SetColumnMetadata<D, S> setColumn;

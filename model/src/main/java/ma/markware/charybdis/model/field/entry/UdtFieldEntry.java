@@ -24,12 +24,20 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import ma.markware.charybdis.model.field.metadata.UdtFieldMetadata;
 
-public class UdtFieldEntry<T, V> implements EntryExpression<UdtFieldMetadata<T, V>> {
+/**
+ * Udt entry expression.
+ *
+ * @param <D> Nested field type after serialization.
+ * @param <S> Nested field type after deserialization.
+ *
+ * @author Oussama Markad
+ */
+public class UdtFieldEntry<D, S> implements EntryExpression<UdtFieldMetadata<D, S>> {
 
   private LinkedList<UdtFieldMetadata> intermediateUdtFields = new LinkedList<>();
-  private UdtFieldMetadata<T, V> principalUdtField;
+  private UdtFieldMetadata<D, S> principalUdtField;
 
-  public UdtFieldEntry(final UdtFieldMetadata<T, V> udtField) {
+  public UdtFieldEntry(final UdtFieldMetadata<D, S> udtField) {
     this.principalUdtField = udtField;
   }
 
@@ -39,11 +47,14 @@ public class UdtFieldEntry<T, V> implements EntryExpression<UdtFieldMetadata<T, 
     return allEntries;
   }
 
-  public UdtFieldEntry<T, V> add(UdtFieldMetadata udtFieldMetadata) {
+  public UdtFieldEntry<D, S> add(UdtFieldMetadata udtFieldMetadata) {
     intermediateUdtFields.addFirst(udtFieldMetadata);
     return this;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public String getName() {
     return Stream.concat(intermediateUdtFields.stream(), Stream.of(principalUdtField))
@@ -51,8 +62,11 @@ public class UdtFieldEntry<T, V> implements EntryExpression<UdtFieldMetadata<T, 
                  .collect(Collectors.joining("."));
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public UdtFieldMetadata<T, V> getKey() {
+  public UdtFieldMetadata<D, S> getKey() {
     return principalUdtField;
   }
 

@@ -18,6 +18,13 @@
  */
 package ma.markware.charybdis.model.field.entry;
 
+/**
+ * Map entry expression.
+ *
+ * @param <T> Map key type.
+ *
+ * @author Oussama Markad
+ */
 public class MapEntry<T> implements EntryExpression<T> {
 
   private final T key;
@@ -26,11 +33,17 @@ public class MapEntry<T> implements EntryExpression<T> {
     this.key = key;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public T getKey() {
     return key;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public String getName() {
     return key.toString();
