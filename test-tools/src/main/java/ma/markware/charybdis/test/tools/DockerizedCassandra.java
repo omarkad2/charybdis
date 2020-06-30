@@ -36,6 +36,11 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * A Cassandra docker container.
+ *
+ * @author Oussama Markad
+ */
 public class DockerizedCassandra implements AutoCloseable {
 
   private static final Logger logger = LoggerFactory.getLogger(DockerizedCassandra.class);
@@ -66,6 +71,9 @@ public class DockerizedCassandra implements AutoCloseable {
     return port;
   }
 
+  /**
+   * Start docker image.
+   */
   void start() {
     ExposedPort tcp = ExposedPort.tcp(CQL_PORT);
 
@@ -104,6 +112,9 @@ public class DockerizedCassandra implements AutoCloseable {
     logger.info("Connection established with success");
   }
 
+  /**
+   * Stop docker image.
+   */
   @Override
   public synchronized void close() {
     if (session != null && !session.isClosed()) {

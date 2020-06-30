@@ -21,6 +21,11 @@ package ma.markware.charybdis.model.option;
 import java.util.Map;
 import java.util.Objects;
 
+/**
+ * Replication details.
+ *
+ * @author Oussama Markad
+ */
 public class Replication {
 
   public static Replication DEFAULT_REPLICATION = new Replication(ReplicationStrategyClass.SIMPLE_STRATEGY, 1);

@@ -21,7 +21,7 @@ package ma.markware.charybdis.model.criteria;
 import ma.markware.charybdis.model.field.criteria.CriteriaField;
 
 /**
- * Representation of a condition expression in Cql.
+ * Representation of a WHERE or a IF clause in Cql.
  *
  * @author Oussama Markad
  */

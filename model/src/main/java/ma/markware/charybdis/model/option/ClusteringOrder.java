@@ -18,6 +18,11 @@
  */
 package ma.markware.charybdis.model.option;
 
+/**
+ * Clustering order types.
+ *
+ * @author Oussama Markad
+ */
 public enum ClusteringOrder {
   ASC, DESC
 }

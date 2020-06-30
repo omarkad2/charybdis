@@ -18,10 +18,25 @@
  */
 package ma.markware.charybdis.model.option;
 
+/**
+ * Replication strategy class types.
+ *
+ * @author Oussama Markad
+ */
 public enum ReplicationStrategyClass {
 
+  /**
+   * Use only for a single datacenter and one rack.
+   * <em>SimpleStrategy</em> places the first replica on a node determined by the partitioner.
+   * Additional replicas are placed on the next nodes clockwise in the ring without
+   * considering topology (rack or datacenter location).
+   */
   SIMPLE_STRATEGY("SimpleStrategy"),
 
+  /**
+   * Use <em>NetworkTopologyStrategy</em> when you have (or plan to have) your cluster deployed
+   * across multiple datacenters. This strategy specifies how many replicas you want in each datacenter.
+   */
   NETWORK_TOPOLOGY_STRATEGY("NetworkTopologyStrategy");
 
   private String value;

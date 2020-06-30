@@ -29,6 +29,15 @@ import org.junit.jupiter.api.extension.ParameterResolutionException;
 import org.junit.jupiter.api.extension.ParameterResolver;
 import org.junit.platform.commons.support.ModifierSupport;
 
+/**
+ * Junit5 extension that:
+ * <ul>
+ *   <li>Before Tests: Start a cassandra docker container</li>
+ *   <li>After Tests: Stop the started cassandra docker container</li>
+ * </ul>
+ *
+ * @author Oussama Markad
+ */
 public class DatabaseSetupExtension implements BeforeAllCallback, AfterAllCallback, ParameterResolver {
 
   private DockerizedCassandra dockerizedCassandra;
@@ -40,6 +49,9 @@ public class DatabaseSetupExtension implements BeforeAllCallback, AfterAllCallba
     SUPPORTED_PARAMETERS.add(int.class);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public void beforeAll(final ExtensionContext extensionContext) throws Exception {
     if (extensionContext.getTestClass().isPresent()) {
@@ -55,6 +67,9 @@ public class DatabaseSetupExtension implements BeforeAllCallback, AfterAllCallba
     System.setProperty("datastax-java-driver.basic.load-balancing-policy.local-datacenter", "datacenter1");
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public void afterAll(final ExtensionContext extensionContext) {
     if (extensionContext.getTestClass().isPresent()) {
@@ -69,12 +84,18 @@ public class DatabaseSetupExtension implements BeforeAllCallback, AfterAllCallba
     System.clearProperty("datastax-java-driver.basic.load-balancing-policy.local-datacenter");
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public boolean supportsParameter(final ParameterContext parameterContext, final ExtensionContext extensionContext)
       throws ParameterResolutionException {
     return SUPPORTED_PARAMETERS.contains(parameterContext.getParameter().getType());
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Object resolveParameter(final ParameterContext parameterContext, final ExtensionContext extensionContext)
       throws ParameterResolutionException {

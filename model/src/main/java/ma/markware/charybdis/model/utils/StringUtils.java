@@ -18,8 +18,16 @@
  */
 package ma.markware.charybdis.model.utils;
 
+/**
+ * String utils methods.
+ *
+ * @author Oussama Markad
+ */
 public class StringUtils {
 
+  /**
+   * @return input string enclosed in double quotes.
+   */
   public static String quoteString(String str) {
     return str == null ? null : "\"" + str + "\"";
   }

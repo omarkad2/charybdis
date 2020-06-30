@@ -28,6 +28,14 @@ import ma.markware.charybdis.model.field.metadata.ColumnMetadata;
 import ma.markware.charybdis.model.field.metadata.UdtColumnMetadata;
 import ma.markware.charybdis.model.field.metadata.UdtFieldMetadata;
 
+/**
+ * Nested field in Udt column.
+ *
+ * @param <D> udt deserialization type.
+ * @param <S> udt serialization type.
+ *
+ * @author Oussama Markad
+ */
 public class UdtNestedField<D, S> implements NestedField, SelectableField<D>, DeletableField, AssignableField<D, S> {
 
   private UdtColumnMetadata sourceColumn;
@@ -43,36 +51,57 @@ public class UdtNestedField<D, S> implements NestedField, SelectableField<D>, De
     this.udtFields = udtFieldEntry;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public String getName() {
     return sourceColumn.getName() + "." + udtFields.getName();
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public S serialize(D value) {
     return getEntry().serialize(value);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public D deserialize(Row row) {
     return getEntry().deserialize(row, getName());
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public ColumnMetadata getSourceColumn() {
     return sourceColumn;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public UdtFieldMetadata<D, S> getEntry() {
     return udtFields.getKey();
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Class<D> getFieldClass() {
     return getEntry().getFieldClass();
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Selector toSelector(boolean useAlias) {
     String columnName = getSourceColumn().getName();
@@ -83,6 +112,9 @@ public class UdtNestedField<D, S> implements NestedField, SelectableField<D>, De
     return selector;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Selector toDeletableSelector() {
     return toSelector();

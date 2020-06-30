@@ -21,6 +21,11 @@ package ma.markware.charybdis.test.tools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Backbone service to retry an operation for a certain amount of time.
+ *
+ * @author Oussama Markad
+ */
 class BackoffService {
 
   private static final Logger logger = LoggerFactory.getLogger(BackoffService.class);

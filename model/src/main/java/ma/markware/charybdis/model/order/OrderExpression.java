@@ -20,6 +20,11 @@ package ma.markware.charybdis.model.order;
 
 import com.datastax.oss.driver.api.core.metadata.schema.ClusteringOrder;
 
+/**
+ * Representation of an ORDER BY clause in Cql.
+ *
+ * @author Oussama Markad
+ */
 public class OrderExpression {
 
   private String columnName;

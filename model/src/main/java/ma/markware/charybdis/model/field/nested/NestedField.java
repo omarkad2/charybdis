@@ -21,9 +21,22 @@ package ma.markware.charybdis.model.field.nested;
 import ma.markware.charybdis.model.field.Field;
 import ma.markware.charybdis.model.field.metadata.ColumnMetadata;
 
+/**
+ * Nested field in column.
+ *
+ * @param <KEY> entry key type.
+ *
+ * @author Ousssama Markad
+ */
 public interface NestedField<KEY> extends Field {
 
+  /**
+   * @return parent column metadata.
+   */
   ColumnMetadata getSourceColumn();
 
+  /**
+   * @return entry point from parent column.
+   */
   KEY getEntry();
 }

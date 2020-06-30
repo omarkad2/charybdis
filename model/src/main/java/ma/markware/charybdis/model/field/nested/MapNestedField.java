@@ -31,6 +31,16 @@ import ma.markware.charybdis.model.field.entry.MapEntry;
 import ma.markware.charybdis.model.field.metadata.ColumnMetadata;
 import ma.markware.charybdis.model.field.metadata.MapColumnMetadata;
 
+/**
+ * Nested field in Map column.
+ *
+ * @param <D_KEY> map's key deserialization type.
+ * @param <D_VALUE> map's value deserialization type.
+ * @param <S_KEY> map's key serialization type.
+ * @param <S_VALUE> map's value serialization type.
+ *
+ * @author Oussama Markad
+ */
 public class MapNestedField<D_KEY, D_VALUE, S_KEY, S_VALUE> implements NestedField<D_KEY>, CriteriaField<D_VALUE, S_VALUE>, DeletableField,
     AssignableField<D_VALUE, S_VALUE> {
 
@@ -42,36 +52,57 @@ public class MapNestedField<D_KEY, D_VALUE, S_KEY, S_VALUE> implements NestedFie
     this.mapEntry = new MapEntry<>(mapEntry);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public String getName() {
     return sourceColumn.getName() + "['" + mapEntry.getName() + "']";
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public S_VALUE serialize(final D_VALUE field) {
     return sourceColumn.serializeValue(field);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public ColumnMetadata getSourceColumn() {
     return sourceColumn;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public D_KEY getEntry() {
     return mapEntry.getKey();
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Relation toRelation(String operator, Term term) {
     return Relation.mapValue(sourceColumn.getName(), QueryBuilder.literal(mapEntry.getKey())).build(operator, term);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Condition toCondition(final String operator, final Term term) {
     throw new CharybdisUnsupportedExpressionException("Cannot express condition on a map entry in [IF] statement");
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Selector toDeletableSelector() {
     return Selector.element(sourceColumn.getName(), QueryBuilder.literal(getEntry()));

@@ -26,6 +26,14 @@ import ma.markware.charybdis.model.field.entry.ListEntry;
 import ma.markware.charybdis.model.field.metadata.ColumnMetadata;
 import ma.markware.charybdis.model.field.metadata.ListColumnMetadata;
 
+/**
+ * Nested field in List column.
+ *
+ * @param <D> list's item deserialization type.
+ * @param <S> list's item serialization type.
+ *
+ * @author Oussama Markad
+ */
 public class ListNestedField<D, S> implements NestedField<Integer>, DeletableField, AssignableField<D, S> {
 
   private ListColumnMetadata<D, S> sourceColumn;
@@ -36,26 +44,41 @@ public class ListNestedField<D, S> implements NestedField<Integer>, DeletableFie
     this.listEntry = new ListEntry(listEntry);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public String getName() {
     return sourceColumn.getName() + "[" + listEntry.getKey() + "]";
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public ColumnMetadata getSourceColumn() {
     return sourceColumn;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Integer getEntry() {
     return listEntry.getKey();
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Selector toDeletableSelector() {
     return Selector.element(sourceColumn.getName(), QueryBuilder.literal(getEntry()));
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public S serialize(final D value) {
     return sourceColumn.serializeItem(value);

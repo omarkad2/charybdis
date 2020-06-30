@@ -22,8 +22,19 @@ import java.util.Arrays;
 import java.util.Objects;
 import java.util.function.Supplier;
 
+/**
+ * Sequence model types.
+ * Defines for each type, a java class and a method to auto-generate
+ * values/instances of the latter class.
+ *
+ * @author Oussama Markad
+ */
 public enum SequenceModel {
 
+  /**
+   * java.util.UUID sequence model.
+   * Used to generate values for Cql fields of type <i>uuid</i>.
+   */
   UUID(java.util.UUID.class, java.util.UUID::randomUUID);
 
   private Class<?> supportedClass;
@@ -35,6 +46,9 @@ public enum SequenceModel {
     this.generationMethod = generationMethod;
   }
 
+  /**
+   * @return Sequence model from a given class.
+   */
   public static SequenceModel findSequenceModel(final Class clazz) {
     return Arrays.stream(SequenceModel.values())
                  .filter(s -> Objects.equals(s.getSupportedClass(), clazz))
