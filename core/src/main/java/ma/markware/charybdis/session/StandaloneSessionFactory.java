@@ -20,8 +20,9 @@ package ma.markware.charybdis.session;
 
 import com.datastax.oss.driver.api.core.CqlSession;
 
-/**
- * Used for tests
+/*
+ * Session factory implementation. (Internal use only)
+ * Commodity for tests.
  */
 public class StandaloneSessionFactory implements SessionFactory {
 

@@ -21,7 +21,15 @@ package ma.markware.charybdis.query;
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.cql.ResultSet;
 
+/**
+ * Cql Query
+ *
+ * @author Oussama Markad
+ */
 public interface Query {
 
+  /**
+   * Execute query and return results.
+   */
   ResultSet execute(final CqlSession session);
 }

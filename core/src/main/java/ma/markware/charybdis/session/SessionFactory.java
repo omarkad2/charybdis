@@ -20,9 +20,20 @@ package ma.markware.charybdis.session;
 
 import com.datastax.oss.driver.api.core.CqlSession;
 
+/**
+ * Factory of Cql session.
+ *
+ * @author Oussama Markad
+ */
 public interface SessionFactory {
 
+  /**
+   * @return an open cql session.
+   */
   CqlSession getSession();
 
+  /**
+   * Shutdown opened sessions.
+   */
   void shutdown();
 }

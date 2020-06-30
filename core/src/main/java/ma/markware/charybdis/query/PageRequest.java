@@ -20,26 +20,51 @@ package ma.markware.charybdis.query;
 
 import java.nio.ByteBuffer;
 
+/**
+ * A pagination expression.
+ * It modelizes the seek page request.
+ *
+ * Example:
+ * <pre>
+ *   {@code
+ *   // Fetch the first 100 elements from TABLE.
+ *   PageResult firstPage = dslQuery.selectFrom(TABLE)
+ *                                  .fetchPage(PageRequest.of(null, 100));
+ *   // Fetch second page of 100 elements from TABLE.
+ *   PageResult secondPage = dslQuery.selectFrom(TestEntity_Table.test_entity)
+ *                                   .fetchPage(PageRequest.of(firstPage.getPagingState(), 100));
+ *   }
+ * </pre>
+ *
+ * @author Oussama Markad
+ */
 public class PageRequest {
 
   private ByteBuffer pagingState;
 
   private int fetchSize;
 
-  PageRequest(final ByteBuffer pagingState, final int fetchSize) {
+  private PageRequest(final ByteBuffer pagingState, final int fetchSize) {
     this.pagingState = pagingState;
     this.fetchSize = fetchSize;
   }
 
+  /**
+   * Create a page request.
+   *
+   * @param pagingState paging state.
+   * @param fetchSize limit of elements to fetch.
+   * @return pageRequest from given parameters.
+   */
   public static PageRequest of(final ByteBuffer pagingState, final int fetchSize) {
     return new PageRequest(pagingState, fetchSize);
   }
 
-  public ByteBuffer getPagingState() {
+  ByteBuffer getPagingState() {
     return pagingState;
   }
 
-  public int getFetchSize() {
+  int getFetchSize() {
     return fetchSize;
   }
 }

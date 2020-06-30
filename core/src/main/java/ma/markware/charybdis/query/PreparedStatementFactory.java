@@ -26,7 +26,13 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class PreparedStatementFactory {
+/**
+ * Prepared statement factory
+ * Create and Cache statements to improve performance.
+ *
+ * @author Oussama Markad.
+ */
+class PreparedStatementFactory {
 
   private static final Logger log = LoggerFactory.getLogger(PreparedStatementFactory.class);
 
@@ -36,7 +42,7 @@ public class PreparedStatementFactory {
     return sessionName + "_" + query;
   }
 
-  public static PreparedStatement createPreparedStatement(final CqlSession session, final String query) {
+  static PreparedStatement createPreparedStatement(final CqlSession session, final String query) {
     Map<String, PreparedStatement> sessionPreparedStatementCache = PREPARED_STATEMENT_CACHE.get(session);
     if (sessionPreparedStatementCache == null) {
       sessionPreparedStatementCache = new ConcurrentHashMap<>();

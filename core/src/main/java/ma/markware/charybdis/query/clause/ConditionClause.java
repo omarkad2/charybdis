@@ -28,6 +28,11 @@ import ma.markware.charybdis.exception.CharybdisUnsupportedOperation;
 import ma.markware.charybdis.model.criteria.CriteriaExpression;
 import ma.markware.charybdis.model.field.criteria.CriteriaField;
 
+/**
+ * Condition clause (or IF clause) modelization.
+ *
+ * @author Oussama Markad
+ */
 public class ConditionClause {
 
   private Condition condition;
@@ -38,6 +43,9 @@ public class ConditionClause {
     this.bindValues = bindValues;
   }
 
+  /**
+   * Create a condition clause from {@link CriteriaExpression}.
+   */
   public static ConditionClause from(CriteriaExpression criteria) {
     CriteriaField field = criteria.getField();
     Object[] values = criteria.getSerializedValues();

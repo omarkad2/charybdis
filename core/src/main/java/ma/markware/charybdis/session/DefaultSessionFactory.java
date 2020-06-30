@@ -22,6 +22,12 @@ import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.config.DriverConfigLoader;
 import com.datastax.oss.driver.internal.core.config.typesafe.DefaultDriverConfigLoader;
 
+/**
+ * Default implementation of {@link SessionFactory}.
+ * Spawns a unique session and reuses it until it is closed.
+ *
+ * @author Oussama Markad
+ */
 public class DefaultSessionFactory implements SessionFactory {
 
   private final DriverConfigLoader driverConfigLoader;
@@ -35,17 +41,23 @@ public class DefaultSessionFactory implements SessionFactory {
     driverConfigLoader = DriverConfigLoader.fromClasspath(customConfiguration);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public CqlSession getSession() {
-    if (currentSession == null) {
+    if (currentSession == null || currentSession.isClosed()) {
       currentSession = CqlSession.builder().withConfigLoader(driverConfigLoader).build();
     }
     return currentSession;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public void shutdown() {
-    if (currentSession != null) {
+    if (currentSession != null && !currentSession.isClosed()) {
       currentSession.close();
     }
   }

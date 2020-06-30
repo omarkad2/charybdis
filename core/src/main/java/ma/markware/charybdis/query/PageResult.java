@@ -21,6 +21,13 @@ package ma.markware.charybdis.query;
 import java.nio.ByteBuffer;
 import java.util.List;
 
+/**
+ * Result of a pagination request see {@link PageRequest}.
+ *
+ * @param <T> row results java type.
+ *
+ * @author Oussama Markad
+ */
 public class PageResult<T> {
 
   private List<T> results;
@@ -32,10 +39,16 @@ public class PageResult<T> {
     this.pagingState = pagingState;
   }
 
+  /**
+   * @return paging state.
+   */
   public ByteBuffer getPagingState() {
       return pagingState;
     }
 
+  /**
+   * @return row results.
+   */
   public List<T> getResults() {
       return results;
     }

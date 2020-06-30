@@ -28,6 +28,11 @@ import ma.markware.charybdis.exception.CharybdisUnsupportedOperation;
 import ma.markware.charybdis.model.criteria.CriteriaExpression;
 import ma.markware.charybdis.model.field.criteria.CriteriaField;
 
+/**
+ * Where clause modelization.
+ *
+ * @author Oussama Markad
+ */
 public class WhereClause {
 
   private Relation relation;
@@ -38,6 +43,9 @@ public class WhereClause {
     this.bindValues = bindValues;
   }
 
+  /**
+   * Create a where clause from {@link CriteriaExpression}.
+   */
   public static WhereClause from(CriteriaExpression criteria) {
     CriteriaField field = criteria.getField();
     Object[] serializedValues = criteria.getSerializedValues();

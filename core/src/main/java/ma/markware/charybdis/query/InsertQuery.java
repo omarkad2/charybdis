@@ -37,6 +37,11 @@ import ma.markware.charybdis.model.field.metadata.TableMetadata;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
+/**
+ * Insert query.
+ *
+ * @author Oussama Markad
+ */
 public class InsertQuery extends AbstractQuery {
 
   private String keyspace;
@@ -115,6 +120,9 @@ public class InsertQuery extends AbstractQuery {
     this.timestamp = timestamp;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public ResultSet execute(final CqlSession session) {
     InsertInto insertInto = QueryBuilder.insertInto(keyspace, table);

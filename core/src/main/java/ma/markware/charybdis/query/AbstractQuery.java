@@ -26,6 +26,11 @@ import java.nio.ByteBuffer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * A generic {@link Query} implementation.
+ *
+ * @author Oussama Markad
+ */
 abstract class AbstractQuery implements Query {
 
   private static final Logger log = LoggerFactory.getLogger(AbstractQuery.class);

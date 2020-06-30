@@ -36,6 +36,11 @@ import ma.markware.charybdis.model.field.metadata.TableMetadata;
 import ma.markware.charybdis.query.clause.ConditionClause;
 import ma.markware.charybdis.query.clause.WhereClause;
 
+/**
+ * Delete query.
+ *
+ * @author Oussama Markad
+ */
 public class DeleteQuery extends AbstractQuery {
 
   private String keyspace;
@@ -96,6 +101,9 @@ public class DeleteQuery extends AbstractQuery {
     conditionClauses.add(ConditionClause.from(criteriaExpression));
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public ResultSet execute(final CqlSession session) {
     DeleteSelection deleteSelection = QueryBuilder.deleteFrom(keyspace, table);
