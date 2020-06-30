@@ -21,7 +21,7 @@ package ma.markware.charybdis.model.criteria;
 import ma.markware.charybdis.model.field.criteria.CriteriaField;
 
 /**
- * Representation of a condition expression in Cassandra.
+ * Representation of a condition expression in Cql.
  *
  * @author Oussama Markad
  */

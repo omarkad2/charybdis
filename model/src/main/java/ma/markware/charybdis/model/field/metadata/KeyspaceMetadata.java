@@ -18,7 +18,15 @@
  */
 package ma.markware.charybdis.model.field.metadata;
 
+/**
+ * Keyspace metadata.
+ *
+ * @author Oussama Markad
+ */
 public interface KeyspaceMetadata {
 
+  /**
+   * @return keyspace name.
+   */
   String getKeyspaceName();
 }

@@ -27,6 +27,8 @@ import ma.markware.charybdis.model.field.metadata.UdtFieldMetadata;
 /**
  * Udt entry expression.
  *
+ * It is the representation of a path leading to a nested Udt field.
+ *
  * @param <D> Nested field type after serialization.
  * @param <S> Nested field type after deserialization.
  *

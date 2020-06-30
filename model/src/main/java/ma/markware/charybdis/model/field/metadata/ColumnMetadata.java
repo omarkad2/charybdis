@@ -30,39 +30,71 @@ import ma.markware.charybdis.model.field.SerializableField;
 import ma.markware.charybdis.model.field.criteria.CriteriaField;
 import ma.markware.charybdis.model.order.OrderExpression;
 
+/**
+ * Column metadata.
+ *
+ * @param <D> Column deserialization type.
+ * @param <S> Column serialization type.
+ *
+ * @author Oussama Markad
+ */
 public interface ColumnMetadata<D, S> extends Field, SelectableField<D>, CriteriaField<D, S>, DeletableField, SerializableField<D, S> {
 
+  /**
+   * @return column secondary index name.
+   */
   default String getIndexName() {
     return null;
   }
 
+  /**
+   * Transform column metadata to datastax {@link Selector}.
+   */
   @Override
   default Selector toSelector(boolean useAlias) {
     return Selector.column(getName());
   }
 
+  /**
+   * Transform column metadata to datastax {@link Selector} for deletion.
+   */
   @Override
   default Selector toDeletableSelector() {
     return Selector.column(getName());
   }
 
+  /**
+   * Compare column value with a set of values for equality.
+   */
   @SuppressWarnings("unchecked")
   default CriteriaExpression in(D... values) {
     return new CriteriaExpression(this, CriteriaOperator.IN, Stream.of(values).map(this::serialize).toArray());
   }
 
+  /**
+   * Pattern-check column value against a another value.
+   */
   default CriteriaExpression like(D value) {
     return new CriteriaExpression(this, CriteriaOperator.LIKE, serialize(value));
   }
 
+  /**
+   * Check column value different than null.
+   */
   default CriteriaExpression isNotNull() {
     return new CriteriaExpression(this, CriteriaOperator.IS_NOT_NULL, null);
   }
 
+  /**
+   * Create ascending order expression.
+   */
   default OrderExpression asc() {
     return new OrderExpression(getName(), ClusteringOrder.ASC);
   }
 
+  /**
+   * Create descending order expression.
+   */
   default OrderExpression desc() {
     return new OrderExpression(getName(), ClusteringOrder.DESC);
   }

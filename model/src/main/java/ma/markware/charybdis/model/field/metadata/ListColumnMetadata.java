@@ -26,41 +26,76 @@ import ma.markware.charybdis.model.criteria.CriteriaExpression;
 import ma.markware.charybdis.model.criteria.CriteriaOperator;
 import ma.markware.charybdis.model.field.nested.ListNestedField;
 
+/**
+ * Column of type {@link List} metadata.
+ *
+ * @param <D> list's item deserialization type.
+ * @param <S> list's item serialization type.
+ *
+ * @author Oussama Markad
+ */
 public interface ListColumnMetadata<D, S> extends CollectionColumnMetadata<List<D>, List<S>> {
 
+  /**
+   * Serialize list item to cql-compatible type.
+   */
   S serializeItem(D item);
 
-  default CriteriaExpression contains(D value) {
-    return new CriteriaExpression(this, CriteriaOperator.CONTAINS, value);
+  /**
+   * Check column list value contains an item.
+   */
+  default CriteriaExpression contains(D item) {
+    return new CriteriaExpression(this, CriteriaOperator.CONTAINS, item);
   }
 
+  /**
+   * Access list item field with index.
+   */
   default ListNestedField<D, S> entry(int index) {
     return new ListNestedField<>(this, index);
   }
 
+  /**
+   * Append values to column.
+   */
   @SuppressWarnings("unchecked")
   default AssignmentListValue<D, S> append(D... values) {
     return append(Arrays.asList(values));
   }
 
+  /**
+   * Append values to column.
+   */
   default AssignmentListValue<D, S> append(List<D> values) {
     return new AssignmentListValue<D, S>(this, AssignmentOperation.APPEND, serialize(values));
   }
 
+  /**
+   * Append values to column.
+   */
   @SuppressWarnings("unchecked")
   default AssignmentListValue<D, S> prepend(D... values) {
     return prepend(Arrays.asList(values));
   }
 
+  /**
+   * Prepend values to column.
+   */
   default AssignmentListValue<D, S> prepend(List<D> values) {
     return new AssignmentListValue<>(this, AssignmentOperation.PREPEND, serialize(values));
   }
 
+  /**
+   * Remove values from column.
+   */
   @SuppressWarnings("unchecked")
   default AssignmentListValue<D, S> remove(D... values) {
     return remove(Arrays.asList(values));
   }
 
+  /**
+   * Remove values from column.
+   */
   default AssignmentListValue<D, S> remove(List<D> values) {
     return new AssignmentListValue<>(this, AssignmentOperation.REMOVE, serialize(values));
   }

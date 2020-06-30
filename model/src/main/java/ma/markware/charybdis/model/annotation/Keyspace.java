@@ -25,7 +25,7 @@ import java.lang.annotation.Target;
 import ma.markware.charybdis.model.option.ReplicationStrategyClass;
 
 /**
- * Annotation to indicate that a class is a Cassandra keyspace representation.
+ * Annotation to indicate that a class is a Cql keyspace representation.
  *
  * Examples:
  *

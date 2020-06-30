@@ -21,28 +21,51 @@ package ma.markware.charybdis.model.field.metadata;
 import ma.markware.charybdis.model.criteria.CriteriaExpression;
 import ma.markware.charybdis.model.exception.CharybdisUnsupportedCriteriaExpressionException;
 
+/**
+ * Collection type column's metadata.
+ *
+ * @param <D> Column deserialization type.
+ * @param <S> Column serialization type.
+ *
+ * @author Oussama Markad
+ */
 public interface CollectionColumnMetadata<D, S> extends ColumnMetadata<D, S> {
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   default CriteriaExpression gt(D value) {
     throw new CharybdisUnsupportedCriteriaExpressionException("Unsupported criteria 'greater than' on Collection types");
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   default CriteriaExpression gte(D value) {
     throw new CharybdisUnsupportedCriteriaExpressionException("Unsupported criteria 'greater than or equal' on Collection types");
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   default CriteriaExpression lt(D value) {
     throw new CharybdisUnsupportedCriteriaExpressionException("Unsupported criteria 'lesser than' on Collection types");
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   default CriteriaExpression lte(D value) {
     throw new CharybdisUnsupportedCriteriaExpressionException("Unsupported criteria 'lesser than or equal' on Collection types");
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   default CriteriaExpression like(D value) {
     throw new CharybdisUnsupportedCriteriaExpressionException("Unsupported criteria 'like' on Collection types");

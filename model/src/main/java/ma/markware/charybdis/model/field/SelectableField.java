@@ -31,14 +31,14 @@ import com.datastax.oss.driver.api.querybuilder.select.Selector;
 public interface SelectableField<D> extends Field {
 
   /**
-   * Transform field to datastax selector, allowing the use of aliases.
+   * Transform field to datastax {@link Selector}, allowing the use of aliases.
    */
   default Selector toSelector() {
     return toSelector(true);
   }
 
   /**
-   * Transform field to datastax selector.
+   * Transform field to datastax {@link Selector}.
    */
   Selector toSelector(boolean useAlias);
 
@@ -48,7 +48,7 @@ public interface SelectableField<D> extends Field {
   D deserialize(Row row);
 
   /**
-   * @return field's class after deserialization.
+   * @return field's deserialization class.
    */
   Class<D> getFieldClass();
 }

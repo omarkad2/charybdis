@@ -23,7 +23,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Representation of a set of conditions in Cassandra.
+ * Representation of a set of conditions in Cql.
  *
  * @author Oussama Markad
  */

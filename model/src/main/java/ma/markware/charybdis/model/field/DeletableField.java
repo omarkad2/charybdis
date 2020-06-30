@@ -28,7 +28,7 @@ import com.datastax.oss.driver.api.querybuilder.select.Selector;
 public interface DeletableField extends Field {
 
   /**
-   * Transform field to datastax selector.
+   * Transform field to datastax {@link Selector}.
    */
   Selector toDeletableSelector();
 }

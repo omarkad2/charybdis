@@ -25,23 +25,52 @@ import ma.markware.charybdis.model.field.Field;
 import ma.markware.charybdis.model.field.SerializableField;
 import ma.markware.charybdis.model.field.entry.UdtFieldEntry;
 
+/**
+ * Udt field metadata.
+ *
+ * @param <D> udt field deserialization type.
+ * @param <S> udt field serialization type.
+ *
+ * @author Oussama Markad
+ */
 public interface UdtFieldMetadata<D, S> extends Field, SerializableField<D, S> {
 
+  /**
+   * Deserialize udt field from {@link UdtValue}.
+   */
   D deserialize(UdtValue udtValue);
 
+  /**
+   * Deserialize udt field from Cql row.
+   */
   D deserialize(Row row, String path);
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   S serialize(D field);
 
+  /**
+   * @return field's deserialization class.
+   */
   Class<D> getFieldClass();
 
+  /**
+   * @return Udt field CQL type
+   */
   DataType getDataType();
 
+  /**
+   * Chain nested udt field's path with {@link UdtFieldEntry}.
+   */
   default <U, K> UdtFieldEntry<U, K> entry(UdtFieldEntry<U, K> udtFieldEntry) {
     return udtFieldEntry.add(this);
   }
 
+  /**
+   * Chain nested udt field's path with {@link UdtFieldMetadata}.
+   */
   default <U, K> UdtFieldEntry<U, K> entry(UdtFieldMetadata<U, K> udtFieldMetadata) {
     UdtFieldEntry<U, K> udtFieldEntry = new UdtFieldEntry<>(udtFieldMetadata);
     udtFieldEntry.add(this);

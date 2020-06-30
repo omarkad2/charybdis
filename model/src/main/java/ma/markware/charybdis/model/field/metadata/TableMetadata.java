@@ -22,35 +22,87 @@ import com.datastax.oss.driver.api.core.cql.Row;
 import java.time.Instant;
 import java.util.Map;
 
+/**
+ * Table metadata.
+ *
+ * @param <ENTITY> java class representation of a Cql table.
+ *
+ * @author Oussama Markad
+ */
 public interface TableMetadata<ENTITY> {
 
+  /**
+   * @return table keyspace name.
+   */
   String getKeyspaceName();
 
+  /**
+   * @return table name.
+   */
   String getTableName();
 
+  /**
+   * @return metadata of a given column.
+   */
   ColumnMetadata getColumnMetadata(String columnName);
 
+  /**
+   * @return column metadata by column name mapping.
+   */
   Map<String, ColumnMetadata> getColumnsMetadata();
 
+  /**
+   * @return partition key column metadata by column name mapping.
+   */
   Map<String, ColumnMetadata> getPartitionKeyColumns();
 
+  /**
+   * @return clustering key column metadata by column name mapping.
+   */
   Map<String, ColumnMetadata> getClusteringKeyColumns();
 
+  /**
+   * @return primary key column metadata by column name mapping.
+   */
   Map<String, ColumnMetadata> getPrimaryKeys();
 
+  /**
+   * @return is a given column a primary key.
+   */
   boolean isPrimaryKey(String columnName);
 
+  /**
+   * @return primary key size.
+   */
   int getPrimaryKeySize();
 
+  /**
+   * @return number of columns.
+   */
   int getColumnsSize();
 
+  /**
+   * Set auto-generated values in given entity.
+   */
   void setGeneratedValues(ENTITY entity);
 
+  /**
+   * Set creation date to given entity.
+   */
   void setCreationDate(ENTITY entity, Instant creationDate);
 
+  /**
+   * Set last updated date to given entity.
+   */
   void setLastUpdatedDate(ENTITY entity, Instant lastUpdatedDate);
 
+  /**
+   * @return serialized entity as a column-value map.
+   */
   Map<String, Object> serialize(ENTITY entity);
 
+  /**
+   * @return deserialized java entity from Cql row.
+   */
   ENTITY deserialize(Row row);
 }

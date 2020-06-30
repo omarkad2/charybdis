@@ -21,12 +21,27 @@ package ma.markware.charybdis.model.field.metadata;
 import ma.markware.charybdis.model.field.entry.UdtFieldEntry;
 import ma.markware.charybdis.model.field.nested.UdtNestedField;
 
+/**
+ * User-defined type column metadata.
+ *
+ * @param <D> column deserialization type.
+ * @param <S> column serialization type.
+ *
+ * @author Oussama Markad
+ */
 public interface UdtColumnMetadata<D, S> extends ColumnMetadata<D, S> {
 
+  /**
+   * Access nested udt item field with {@link UdtFieldMetadata}.
+   */
   default <U, K> UdtNestedField<U, K> entry(UdtFieldMetadata<U, K> udtFieldMetadata) {
     return new UdtNestedField<>(this, udtFieldMetadata);
   }
 
+  /**
+   * Access nested udt item field with {@link UdtFieldEntry}.
+   * Used when {@link UdtColumnMetadata} contains a nested udt field.
+   */
   default <U, K> UdtNestedField<U, K> entry(UdtFieldEntry<U, K> udtFieldEntry) {
     return new UdtNestedField<>(this, udtFieldEntry);
   }

@@ -18,7 +18,18 @@
  */
 package ma.markware.charybdis.model.field.metadata;
 
+/**
+ * Partition key column metadata.
+ *
+ * @param <D> column deserialization type.
+ * @param <S> column serialization type.
+ *
+ * @author Oussama Markad
+ */
 public interface PartitionKeyColumnMetadata<D, S> extends ColumnMetadata<D, S> {
 
+  /**
+   * @return column partition key index.
+   */
   int getPartitionKeyIndex();
 }

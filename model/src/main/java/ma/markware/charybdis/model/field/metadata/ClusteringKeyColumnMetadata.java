@@ -20,9 +20,23 @@ package ma.markware.charybdis.model.field.metadata;
 
 import ma.markware.charybdis.model.option.ClusteringOrder;
 
+/**
+ * Clustering key column metadata.
+ *
+ * @param <D> Column deserialization type.
+ * @param <S> Column serialization type.
+ *
+ * @author Oussama Markad
+ */
 public interface ClusteringKeyColumnMetadata<D, S> extends ColumnMetadata<D, S> {
 
+  /**
+   * @return column clustering key index
+   */
   int getClusteringKeyIndex();
 
+  /**
+   * @return column clustering order
+   */
   ClusteringOrder getClusteringOrder();
 }

@@ -26,35 +26,64 @@ import ma.markware.charybdis.model.assignment.AssignmentSetValue;
 import ma.markware.charybdis.model.criteria.CriteriaExpression;
 import ma.markware.charybdis.model.criteria.CriteriaOperator;
 
+/**
+ * Column of type {@link Set} metadata.
+ *
+ * @param <D> set's item deserialization type.
+ * @param <S> set's item serialization type.
+ *
+ * @author Oussama Markad
+ */
 public interface SetColumnMetadata<D, S> extends CollectionColumnMetadata<Set<D>, Set<S>> {
 
+  /**
+   * Check column set value contains an item.
+   */
   default CriteriaExpression contains(D value) {
     return new CriteriaExpression(this, CriteriaOperator.CONTAINS, value);
   }
 
+  /**
+   * Append values to column.
+   */
   @SuppressWarnings("unchecked")
   default AssignmentSetValue<D, S> append(D... values) {
     return append(Arrays.stream(values).collect(Collectors.toSet()));
   }
 
+  /**
+   * Append values to column.
+   */
   default AssignmentSetValue<D, S> append(Set<D> values) {
     return new AssignmentSetValue<>(this, AssignmentOperation.APPEND, serialize(values));
   }
 
+  /**
+   * Prepend values to column.
+   */
   @SuppressWarnings("unchecked")
   default AssignmentSetValue<D, S> prepend(D... values) {
     return prepend(Arrays.stream(values).collect(Collectors.toSet()));
   }
 
+  /**
+   * Prepend values to column.
+   */
   default AssignmentSetValue<D, S> prepend(Set<D> values) {
     return new AssignmentSetValue<>(this, AssignmentOperation.PREPEND, serialize(values));
   }
 
+  /**
+   * Remove values from column.
+   */
   @SuppressWarnings("unchecked")
   default AssignmentSetValue<D, S> remove(D... values) {
     return remove(Arrays.stream(values).collect(Collectors.toSet()));
   }
 
+  /**
+   * Remove values from column.
+   */
   default AssignmentSetValue<D, S> remove(Set<D> values) {
     return new AssignmentSetValue<>(this, AssignmentOperation.REMOVE, serialize(values));
   }

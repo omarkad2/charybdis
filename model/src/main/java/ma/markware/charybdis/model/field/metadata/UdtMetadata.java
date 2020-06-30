@@ -20,13 +20,32 @@ package ma.markware.charybdis.model.field.metadata;
 
 import com.datastax.oss.driver.api.core.data.UdtValue;
 
+/**
+ * Udt metadata.
+ *
+ * @param <UDT> java class representation of a Cql UDT.
+ *
+ * @author Oussama Markad
+ */
 public interface UdtMetadata<UDT> {
 
+  /**
+   * @return udt keyspace name.
+   */
   String getKeyspaceName();
 
+  /**
+   * @return udt name.
+   */
   String getUdtName();
 
+  /**
+   * @return serialized udt to {@link UdtValue}.
+   */
   UdtValue serialize(UDT entity);
 
+  /**
+   * @return deserialized java entity from Cql UDT.
+   */
   UDT deserialize(UdtValue udtValue);
 }

@@ -45,7 +45,7 @@ public interface EntityParser<ENTITY_META_TYPE> {
   Pattern pattern = Pattern.compile("[a-zA-Z$_][a-zA-Z0-9$_]*");
 
   /**
-   * Checks if resolved Cassandra entity name is valid
+   * Checks if resolved Cql entity name is valid
    */
   default void validateName(String name) {
     Matcher matcher = pattern.matcher(name);
@@ -81,7 +81,7 @@ public interface EntityParser<ENTITY_META_TYPE> {
   }
 
   /**
-   * Resolves Cassandra entity name from annotation attribute and Class name.
+   * Resolves Cql entity name from annotation attribute and Class name.
    * See {@link Keyspace#name()}, {@link Udt#name()} and {@link Table#name()}
    */
   default String resolveName(final String annotationName, final Name className) {
@@ -93,7 +93,7 @@ public interface EntityParser<ENTITY_META_TYPE> {
   }
 
   /**
-   * Resolves Cassandra entity name from parsed class.
+   * Resolves Cql entity name from parsed class.
    */
   String resolveName(Element annotatedClass);
 

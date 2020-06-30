@@ -29,7 +29,7 @@ package ma.markware.charybdis.model.field;
 public interface SerializableField<D, S> extends Field  {
 
   /**
-   * Transform field's java value to Cassandra-ready value for write operation.
+   * Transform field's java value to cql-compatible value for write operation.
    */
   S serialize(D value);
 }

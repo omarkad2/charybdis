@@ -24,7 +24,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Annotation to indicate that a class is a Cassandra table representation.
+ * Annotation to indicate that a class is a Cql table representation.
  *
  * Example:
  *

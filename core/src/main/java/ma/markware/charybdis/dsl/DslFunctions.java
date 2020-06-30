@@ -24,7 +24,7 @@ import ma.markware.charybdis.model.field.function.WriteTimeFunctionField;
 import ma.markware.charybdis.model.field.metadata.ColumnMetadata;
 
 /**
- * Defines Cassandra native function, that can be
+ * Defines Cql native function, that can be
  * used in Dsl query expressions.
  *
  * <a href="https://docs.datastax.com/en/cql-oss/3.x/cql/cql_reference/cql_function_r.html">

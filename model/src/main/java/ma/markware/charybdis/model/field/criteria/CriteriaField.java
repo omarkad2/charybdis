@@ -36,14 +36,14 @@ import ma.markware.charybdis.model.field.SerializableField;
 public interface CriteriaField<D, S> extends SerializableField<D, S> {
 
   /**
-   * Transform field to datastax Relation.
+   * Transform field to datastax {@link Relation}.
    */
   default Relation toRelation(String operator, Term term) {
     return Relation.column(getName()).build(operator, term);
   }
 
   /**
-   * Transform field to datastax Condition.
+   * Transform field to datastax {@link Condition}.
    */
   default Condition toCondition(String operator, Term term) {
     return Condition.column(getName()).build(operator, term);
