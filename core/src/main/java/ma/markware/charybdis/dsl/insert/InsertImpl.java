@@ -74,8 +74,8 @@ public class InsertImpl implements InsertInitExpression, InsertInitWithColumnsEx
    * {@inheritDoc}
    */
   @Override
-  public <D, S> InsertSetExpression set(final ColumnMetadata<D, S> columnMetadata, final D value) {
-    insertQuery.setSet(columnMetadata, value);
+  public <D, S> InsertSetExpression set(final ColumnMetadata<D, S> column, final D value) {
+    insertQuery.setSet(column, value);
     return this;
   }
 

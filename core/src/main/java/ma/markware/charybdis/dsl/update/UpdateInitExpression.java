@@ -18,6 +18,14 @@
  */
 package ma.markware.charybdis.dsl.update;
 
+/**
+ * Update DSL query expression.
+ *
+ * <p>
+ * It is not recommended to reference any object with type {@link UpdateInitExpression}.
+ *
+ * @author Oussama Markad
+ */
 public interface UpdateInitExpression extends UpdateTtlExpression, UpdateTimestampExpression {
 
 }

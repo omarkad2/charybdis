@@ -18,7 +18,23 @@
  */
 package ma.markware.charybdis.dsl.select;
 
+/**
+ * Select DSL query expression.
+ *
+ * <p>
+ * It is not recommended to reference any object with type {@link SelectFilteringExpression}.
+ *
+ * @author Oussama Markad
+ */
 public interface SelectFilteringExpression extends SelectFetchExpression {
 
+  /**
+   * Allow filtering in select DSL query.
+   * <p>
+   * Caution:
+   * <p>
+   * Avoid using {@code ALLOW FILTERING} in production!
+   * @return updated select DSL query expression.
+   */
   SelectFetchExpression allowFiltering();
 }

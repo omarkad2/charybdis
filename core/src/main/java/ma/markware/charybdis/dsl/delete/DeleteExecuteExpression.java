@@ -19,11 +19,19 @@
 package ma.markware.charybdis.dsl.delete;
 
 /**
- * Expression of DSL API when selecting generic
+ * Delete DSL query expression.
+ *
+ * <p>
+ * It is not recommended to reference any object with type {@link DeleteExecuteExpression}.
  *
  * @author Oussama Markad
  */
 public interface DeleteExecuteExpression {
 
+  /**
+   * Execute Delete DSL query.
+   *
+   * @return {@code true} if query is executed, {@code false} otherwise.
+   */
   boolean execute();
 }

@@ -20,7 +20,21 @@ package ma.markware.charybdis.dsl.delete;
 
 import ma.markware.charybdis.model.criteria.CriteriaExpression;
 
+/**
+ * Delete DSL query expression.
+ *
+ * <p>
+ * It is not recommended to reference any object with type {@link DeleteIfExpression}.
+ *
+ * @author Oussama Markad
+ */
 public interface DeleteIfExpression extends DeleteExecuteExpression {
 
+  /**
+   * Create {@code IF} clause in delete DSL query.
+   *
+   * @param condition initial condition.
+   * @return updated delete DSL query expression.
+   */
   DeleteExtraIfExpression if_(CriteriaExpression condition);
 }

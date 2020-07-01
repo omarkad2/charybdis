@@ -18,7 +18,20 @@
  */
 package ma.markware.charybdis.dsl.insert;
 
+/**
+ * Insert DSL query expression.
+ *
+ * <p>
+ * It is not recommended to reference any object with type {@link InsertExecuteExpression}.
+ *
+ * @author Oussama Markad
+ */
 public interface InsertExecuteExpression {
 
+  /**
+   * Execute Insert DSL query.
+   *
+   * @return {@code true} if query is executed, {@code false} otherwise.
+   */
   boolean execute();
 }

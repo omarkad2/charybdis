@@ -18,7 +18,21 @@
  */
 package ma.markware.charybdis.dsl.select;
 
+/**
+ * Select DSL query expression.
+ *
+ * <p>
+ * It is not recommended to reference any object with type {@link SelectLimitExpression}.
+ *
+ * @author Oussama Markad
+ */
 public interface SelectLimitExpression extends SelectFilteringExpression {
 
+  /**
+   * Set limit to delete DSL query.
+   *
+   * @param nbOfRows number of rows to fetch.
+   * @return updated select DSL query expression.
+   */
   SelectFetchExpression limit(int nbOfRows);
 }

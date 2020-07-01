@@ -18,7 +18,21 @@
  */
 package ma.markware.charybdis.dsl.insert;
 
+/**
+ * Insert DSL query expression.
+ *
+ * <p>
+ * It is not recommended to reference any object with type {@link InsertTtlExpression}.
+ *
+ * @author Oussama Markad
+ */
 public interface InsertTtlExpression extends InsertExecuteExpression {
 
+  /**
+   * Set {@code TTL} in insert DSL query.
+   *
+   * @param seconds ttl in seconds.
+   * @return updated insert DSL query expression.
+   */
   InsertExecuteExpression usingTtl(int seconds);
 }

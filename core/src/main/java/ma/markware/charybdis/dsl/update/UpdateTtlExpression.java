@@ -18,7 +18,21 @@
  */
 package ma.markware.charybdis.dsl.update;
 
+/**
+ * Update DSL query expression.
+ *
+ * <p>
+ * It is not recommended to reference any object with type {@link UpdateTtlExpression}.
+ *
+ * @author Oussama Markad
+ */
 public interface UpdateTtlExpression extends UpdateAssignmentExpression {
 
+  /**
+   * Set {@code TTL} in insert DSL query.
+   *
+   * @param seconds ttl in seconds.
+   * @return updated insert DSL query expression.
+   */
   UpdateAssignmentExpression usingTtl(int seconds);
 }

@@ -20,7 +20,21 @@ package ma.markware.charybdis.dsl.select;
 
 import ma.markware.charybdis.model.field.metadata.TableMetadata;
 
+/**
+ * Select DSL query expression.
+ *
+ * <p>
+ * It is not recommended to reference any object with type {@link SelectInitExpression}.
+ *
+ * @author Oussama Markad
+ */
 public interface SelectInitExpression {
 
+  /**
+   * Set table to select DSL query.
+   *
+   * @param table table to select from.
+   * @return updated select DSL query expression.
+   */
   SelectWhereExpression from(TableMetadata table);
 }

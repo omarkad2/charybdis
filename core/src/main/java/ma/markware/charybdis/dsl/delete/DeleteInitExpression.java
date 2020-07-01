@@ -20,7 +20,21 @@ package ma.markware.charybdis.dsl.delete;
 
 import ma.markware.charybdis.model.field.metadata.TableMetadata;
 
+/**
+ * Delete DSL query expression.
+ *
+ * <p>
+ * It is not recommended to reference any object with type {@link DeleteInitExpression}.
+ *
+ * @author Oussama Markad
+ */
 public interface DeleteInitExpression {
 
+  /**
+   * Set table to delete DSL query.
+   *
+   * @param table table to delete from.
+   * @return updated delete DSL query expression.
+   */
   DeleteTimestampExpression from(TableMetadata table);
 }

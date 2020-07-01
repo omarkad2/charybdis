@@ -20,9 +20,29 @@ package ma.markware.charybdis.dsl.update;
 
 import java.time.Instant;
 
+/**
+ * Update DSL query expression.
+ *
+ * <p>
+ * It is not recommended to reference any object with type {@link UpdateTimestampExpression}.
+ *
+ * @author Oussama Markad
+ */
 public interface UpdateTimestampExpression extends UpdateAssignmentExpression {
 
+  /**
+   * Set write time in update DSL query.
+   *
+   * @param timestamp writetime as {@link Instant}.
+   * @return updated update DSL query expression.
+   */
   UpdateAssignmentExpression usingTimestamp(Instant timestamp);
 
+  /**
+   * Set write time in update DSL query.
+   *
+   * @param timestamp writetime as millis.
+   * @return updated update DSL query expression.
+   */
   UpdateAssignmentExpression usingTimestamp(long timestamp);
 }

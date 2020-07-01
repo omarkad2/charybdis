@@ -20,7 +20,21 @@ package ma.markware.charybdis.dsl.select;
 
 import ma.markware.charybdis.model.criteria.CriteriaExpression;
 
+/**
+ * Select DSL query expression.
+ *
+ * <p>
+ * It is not recommended to reference any object with type {@link SelectWhereExpression}.
+ *
+ * @author Oussama Markad
+ */
 public interface SelectWhereExpression extends SelectOrderExpression {
 
+  /**
+   * Create {@code WHERE} clause in select DSL query.
+   *
+   * @param condition initial condition.
+   * @return updated select DSL query expression.
+   */
   SelectExtraWhereExpression where(CriteriaExpression condition);
 }

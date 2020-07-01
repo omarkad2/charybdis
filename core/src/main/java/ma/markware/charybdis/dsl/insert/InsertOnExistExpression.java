@@ -18,7 +18,20 @@
  */
 package ma.markware.charybdis.dsl.insert;
 
+/**
+ * Insert DSL query expression.
+ *
+ * <p>
+ * It is not recommended to reference any object with type {@link InsertOnExistExpression}.
+ *
+ * @author Oussama Markad
+ */
 public interface InsertOnExistExpression extends InsertTtlExpression, InsertTimestampExpression {
 
+  /**
+   * Insert only if no other entity exists with the same primary key.
+   *
+   * @return updated insert DSL query expression.
+   */
   <T extends InsertTtlExpression & InsertTimestampExpression> T ifNotExists();
 }

@@ -107,8 +107,8 @@ public class SelectImpl implements SelectInitExpression, SelectWhereExpression, 
    * {@inheritDoc}
    */
   @Override
-  public SelectExtraWhereExpression and(final CriteriaExpression criteriaExpression) {
-    selectQuery.setWhereClause(criteriaExpression);
+  public SelectExtraWhereExpression and(final CriteriaExpression condition) {
+    selectQuery.setWhereClause(condition);
     return this;
   }
 
@@ -116,8 +116,8 @@ public class SelectImpl implements SelectInitExpression, SelectWhereExpression, 
    * {@inheritDoc}
    */
   @Override
-  public SelectLimitExpression orderBy(final OrderExpression orderExpression) {
-    selectQuery.setOrdering(orderExpression);
+  public SelectLimitExpression orderBy(final OrderExpression order) {
+    selectQuery.setOrdering(order);
     return this;
   }
 

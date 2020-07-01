@@ -20,7 +20,22 @@ package ma.markware.charybdis.dsl.insert;
 
 import ma.markware.charybdis.model.field.metadata.ColumnMetadata;
 
+/**
+ * Insert DSL query expression.
+ *
+ * <p>
+ * It is not recommended to reference any object with type {@link InsertInitExpression}.
+ *
+ * @author Oussama Markad
+ */
 public interface InsertInitExpression {
 
-  <D, S> InsertSetExpression set(ColumnMetadata<D, S> columnMetadata, D value);
+  /**
+   * Assign value to column in insert DSL query.
+   *
+   * @param column assigned field.
+   * @param value assigned value.
+   * @return updated insert DSL query expression.
+   */
+  <D, S> InsertSetExpression set(ColumnMetadata<D, S> column, D value);
 }

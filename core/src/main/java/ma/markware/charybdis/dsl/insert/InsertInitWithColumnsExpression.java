@@ -18,7 +18,21 @@
  */
 package ma.markware.charybdis.dsl.insert;
 
+/**
+ * Insert DSL query expression.
+ *
+ * <p>
+ * It is not recommended to reference any object with type {@link InsertInitWithColumnsExpression}.
+ *
+ * @author Oussama Markad
+ */
 public interface InsertInitWithColumnsExpression {
 
+  /**
+   * Assign values in insert DSL query.
+   *
+   * @param values assigned values.
+   * @return updated insert DSL query expression.
+   */
   InsertValuesExpression values(Object... values);
 }

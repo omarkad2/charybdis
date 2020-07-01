@@ -22,7 +22,7 @@ import java.nio.ByteBuffer;
 
 /**
  * A pagination expression.
- * It modelizes the seek page request.
+ * It modelizes the seek page request with a {@code LIMIT} and {@code OFFSET}.
  *
  * Example:
  * <pre>
@@ -52,7 +52,7 @@ public class PageRequest {
   /**
    * Create a page request.
    *
-   * @param pagingState paging state.
+   * @param pagingState offset.
    * @param fetchSize limit of elements to fetch.
    * @return pageRequest from given parameters.
    */

@@ -20,7 +20,21 @@ package ma.markware.charybdis.dsl.select;
 
 import ma.markware.charybdis.model.order.OrderExpression;
 
+/**
+ * Select DSL query expression.
+ *
+ * <p>
+ * It is not recommended to reference any object with type {@link SelectOrderExpression}.
+ *
+ * @author Oussama Markad
+ */
 public interface SelectOrderExpression extends SelectLimitExpression {
 
-  SelectLimitExpression orderBy(OrderExpression orderExpression);
+  /**
+   * Set {@code ORDER BY} clause in select DSL query.
+   *
+   * @param order result records order.
+   * @return updated select DSL query expression.
+   */
+  SelectLimitExpression orderBy(OrderExpression order);
 }

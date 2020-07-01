@@ -24,13 +24,46 @@ import ma.markware.charybdis.dsl.Record;
 import ma.markware.charybdis.query.PageRequest;
 import ma.markware.charybdis.query.PageResult;
 
+/**
+ * Select DSL query expression.
+ *
+ * <p>
+ * It is not recommended to reference any object with type {@link SelectFetchExpression}.
+ *
+ * @author Oussama Markad
+ */
 public interface SelectFetchExpression {
 
+  /**
+   * Execute Select DSL query.
+   * Fetch only one element.
+   *
+   * @return {@link Record} if selected item exists in DB, otherwise {@code null}.
+   */
   Record fetchOne();
 
+  /**
+   * Execute Select DSL query.
+   * Fetch one element wrapped in {@link Optional}.
+   *
+   * @return Optional {@link Record}.
+   */
   Optional<Record> fetchOptional();
 
+  /**
+   * Execute Select DSL query.
+   * Fetch all elements.
+   *
+   * @return Collection of {@link Record}.
+   */
   Collection<Record> fetch();
 
+  /**
+   * Execute Select DSL query.
+   * Fetch a page of elements.
+   *
+   * @param pageRequest requested page (limit and offset)
+   * @return Page of {@link Record}.
+   */
   PageResult<Record> fetchPage(PageRequest pageRequest);
 }

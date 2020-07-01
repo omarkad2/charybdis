@@ -20,7 +20,21 @@ package ma.markware.charybdis.dsl.update;
 
 import ma.markware.charybdis.model.criteria.CriteriaExpression;
 
+/**
+ * Update DSL query expression.
+ *
+ * <p>
+ * It is not recommended to reference any object with type {@link UpdateExtraWhereExpression}.
+ *
+ * @author Oussama Markad
+ */
 public interface UpdateExtraWhereExpression extends UpdateIfExpression, UpdateExecuteExpression {
 
+  /**
+   * Add condition to {@code WHERE} clause in update DSL query.
+   *
+   * @param condition additional condition
+   * @return updated update DSL query expression.
+   */
   UpdateExtraWhereExpression and(CriteriaExpression condition);
 }

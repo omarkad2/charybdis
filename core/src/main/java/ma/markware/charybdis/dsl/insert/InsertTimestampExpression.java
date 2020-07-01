@@ -20,9 +20,29 @@ package ma.markware.charybdis.dsl.insert;
 
 import java.time.Instant;
 
+/**
+ * Insert DSL query expression.
+ *
+ * <p>
+ * It is not recommended to reference any object with type {@link InsertTimestampExpression}.
+ *
+ * @author Oussama Markad
+ */
 public interface InsertTimestampExpression extends InsertExecuteExpression {
 
+  /**
+   * Set write time in insert DSL query.
+   *
+   * @param timestamp writetime as {@link Instant}.
+   * @return updated insert DSL query expression.
+   */
   InsertExecuteExpression usingTimestamp(Instant timestamp);
 
+  /**
+   * Set write time in insert DSL query.
+   *
+   * @param timestamp writetime as millis.
+   * @return updated insert DSL query expression.
+   */
   InsertExecuteExpression usingTimestamp(long timestamp);
 }

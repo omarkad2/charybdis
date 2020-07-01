@@ -20,9 +20,29 @@ package ma.markware.charybdis.dsl.delete;
 
 import java.time.Instant;
 
+/**
+ * Delete DSL query expression.
+ *
+ * <p>
+ * It is not recommended to reference any object with type {@link DeleteTimestampExpression}.
+ *
+ * @author Oussama Markad
+ */
 public interface DeleteTimestampExpression extends DeleteWhereExpression  {
 
+  /**
+   * Set write time in delete DSL query.
+   *
+   * @param timestamp writetime as {@link Instant}.
+   * @return updated delete DSL query expression.
+   */
   DeleteWhereExpression usingTimestamp(Instant timestamp);
 
+  /**
+   * Set write time in the delete DSL query.
+   *
+   * @param timestamp writetime as millis.
+   * @return updated delete DSL query expression.
+   */
   DeleteWhereExpression usingTimestamp(long timestamp);
 }
