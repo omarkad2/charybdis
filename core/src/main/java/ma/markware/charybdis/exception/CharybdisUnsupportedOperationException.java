@@ -18,9 +18,15 @@
  */
 package ma.markware.charybdis.exception;
 
-public class CharybdisUnsupportedOperation extends RuntimeException {
+/**
+ * Runtime exception that occurs when we apply certain conditions on
+ * an inappropriate data type.
+ *
+ * @author Oussama Markad
+ */
+public class CharybdisUnsupportedOperationException extends RuntimeException {
 
-  public CharybdisUnsupportedOperation(final String s) {
+  public CharybdisUnsupportedOperationException(final String s) {
     super(s);
   }
 }

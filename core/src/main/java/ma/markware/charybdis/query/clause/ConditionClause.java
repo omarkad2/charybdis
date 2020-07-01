@@ -24,7 +24,7 @@ import static java.util.Arrays.fill;
 import com.datastax.oss.driver.api.querybuilder.BindMarker;
 import com.datastax.oss.driver.api.querybuilder.QueryBuilder;
 import com.datastax.oss.driver.api.querybuilder.condition.Condition;
-import ma.markware.charybdis.exception.CharybdisUnsupportedOperation;
+import ma.markware.charybdis.exception.CharybdisUnsupportedOperationException;
 import ma.markware.charybdis.model.criteria.CriteriaExpression;
 import ma.markware.charybdis.model.field.criteria.CriteriaField;
 
@@ -71,7 +71,7 @@ public class ConditionClause {
           return new ConditionClause(field.toCondition(" IN ", QueryBuilder.raw("")), null);
         }
       default:
-        throw new CharybdisUnsupportedOperation(format("Operation '%s' is not supported in [IF] clause", criteria.getCriteriaOperator()));
+        throw new CharybdisUnsupportedOperationException(format("Operation '%s' is not supported in [IF] clause", criteria.getCriteriaOperator()));
     }
   }
 

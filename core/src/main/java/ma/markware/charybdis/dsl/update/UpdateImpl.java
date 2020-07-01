@@ -35,6 +35,11 @@ import ma.markware.charybdis.model.field.nested.MapNestedField;
 import ma.markware.charybdis.model.field.nested.UdtNestedField;
 import ma.markware.charybdis.query.UpdateQuery;
 
+/**
+ * Update query builder.
+ *
+ * @author Oussama Markad
+ */
 public class UpdateImpl implements UpdateInitExpression, UpdateTtlExpression, UpdateTimestampExpression, UpdateAssignmentExpression,
     UpdateExtraAssignmentExpression, UpdateWhereExpression, UpdateExtraWhereExpression, UpdateIfExpression,
     UpdateExtraIfExpression, UpdateExecuteExpression {
@@ -51,47 +56,71 @@ public class UpdateImpl implements UpdateInitExpression, UpdateTtlExpression, Up
     return updateQuery;
   }
 
-  public UpdateInitExpression update(TableMetadata tableMetadata) {
-    updateQuery.setTable(tableMetadata);
+  /**
+   * Set table to update.
+   */
+  public UpdateInitExpression update(TableMetadata table) {
+    updateQuery.setTable(table);
     return this;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public UpdateAssignmentExpression usingTimestamp(final long timestamp) {
     updateQuery.setTimestamp(timestamp);
     return this;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public UpdateAssignmentExpression usingTimestamp(final Instant timestamp) {
     updateQuery.setTimestamp(timestamp);
     return this;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public UpdateAssignmentExpression usingTtl(final int seconds) {
     updateQuery.setTtl(seconds);
     return this;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public <D, S> UpdateExtraAssignmentExpression set(ColumnMetadata<D, S> columnMetadata, D value) {
     updateQuery.setAssignment(columnMetadata, value);
     return this;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public <D, S> UpdateExtraAssignmentExpression set(final ListColumnMetadata<D, S> column, final AssignmentListValue<D, S> value) {
     updateQuery.setAssignment(column, value);
     return this;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public <D, S> UpdateExtraAssignmentExpression set(final SetColumnMetadata<D, S> column, final AssignmentSetValue<D, S> value) {
     updateQuery.setAssignment(column, value);
     return this;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public <D_KEY, D_VALUE, S_KEY, S_VALUE> UpdateExtraAssignmentExpression set(final MapColumnMetadata<D_KEY, D_VALUE, S_KEY, S_VALUE> column,
       final AssignmentMapValue<D_KEY, D_VALUE, S_KEY, S_VALUE> value) {
@@ -99,48 +128,72 @@ public class UpdateImpl implements UpdateInitExpression, UpdateTtlExpression, Up
     return this;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public <D_KEY, D_VALUE, S_KEY, S_VALUE> UpdateExtraAssignmentExpression set(final MapNestedField<D_KEY, D_VALUE, S_KEY, S_VALUE> field, final D_VALUE value) {
     updateQuery.setAssignment(field, value);
     return this;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public <D, S> UpdateExtraAssignmentExpression set(final ListNestedField<D, S> field, final D value) {
     updateQuery.setAssignment(field, value);
     return this;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public <D, S> UpdateExtraAssignmentExpression set(final UdtNestedField<D, S> field, final D value) {
     updateQuery.setAssignment(field, value);
     return this;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public UpdateExtraWhereExpression where(final CriteriaExpression condition) {
     updateQuery.setWhere(condition);
     return this;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public UpdateExtraWhereExpression and(final CriteriaExpression condition) {
     updateQuery.setWhere(condition);
     return this;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public UpdateExtraIfExpression if_(final CriteriaExpression condition) {
     updateQuery.setIf(condition);
     return this;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public UpdateExtraIfExpression and_(final CriteriaExpression condition) {
     updateQuery.setIf(condition);
     return this;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public boolean execute() {
     ResultSet resultSet = updateQuery.execute(session);

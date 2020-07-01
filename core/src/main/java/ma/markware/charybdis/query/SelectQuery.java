@@ -40,6 +40,11 @@ import ma.markware.charybdis.model.field.metadata.TableMetadata;
 import ma.markware.charybdis.model.order.OrderExpression;
 import ma.markware.charybdis.query.clause.WhereClause;
 
+/**
+ * Select query.
+ *
+ * @author Oussama Markad
+ */
 public class SelectQuery extends AbstractQuery {
 
   public static final List<Selector> SELECT_ALL = Collections.singletonList(AllSelector.INSTANCE);
@@ -133,6 +138,9 @@ public class SelectQuery extends AbstractQuery {
     this.pageRequest = pageRequest;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public ResultSet execute(final CqlSession session) {
     Select select;

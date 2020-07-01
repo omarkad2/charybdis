@@ -46,6 +46,11 @@ import ma.markware.charybdis.query.clause.AssignmentClause;
 import ma.markware.charybdis.query.clause.ConditionClause;
 import ma.markware.charybdis.query.clause.WhereClause;
 
+/**
+ * Update query.
+ *
+ * @author Oussama Markad
+ */
 public class UpdateQuery extends AbstractQuery {
 
   private String keyspace;
@@ -142,6 +147,9 @@ public class UpdateQuery extends AbstractQuery {
     this.timestamp = timestamp;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public ResultSet execute(final CqlSession session) {
     UpdateStart updateStart = QueryBuilder.update(keyspace, table);

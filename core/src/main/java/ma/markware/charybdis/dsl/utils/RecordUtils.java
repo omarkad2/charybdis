@@ -26,8 +26,16 @@ import ma.markware.charybdis.dsl.DefaultRecord;
 import ma.markware.charybdis.dsl.Record;
 import ma.markware.charybdis.model.field.SelectableField;
 
+/**
+ * Record utils methods.
+ *
+ * @author Oussama Markad
+ */
 public class RecordUtils {
 
+  /**
+   * Transform Cql row to a database result record.
+   */
   public static Record rowToRecord(final Row row, final List<SelectableField> selectedFields) {
     if (row == null) {
       return null;
@@ -39,6 +47,9 @@ public class RecordUtils {
     return record;
   }
 
+  /**
+   * Transform Cql result set to a list of database result records.
+   */
   public static List<Record> resultSetToRecords(final ResultSet resultSet, final List<SelectableField> selectedFields) {
     List<Record> records = new ArrayList<>();
     while (resultSet.getAvailableWithoutFetching() > 0) {

@@ -27,7 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Prepared statement factory
+ * Prepared statement factory.
  * Create and Cache statements to improve performance.
  *
  * @author Oussama Markad.
@@ -42,6 +42,9 @@ class PreparedStatementFactory {
     return sessionName + "_" + query;
   }
 
+  /**
+   * Create prepared statement.
+   */
   static PreparedStatement createPreparedStatement(final CqlSession session, final String query) {
     Map<String, PreparedStatement> sessionPreparedStatementCache = PREPARED_STATEMENT_CACHE.get(session);
     if (sessionPreparedStatementCache == null) {

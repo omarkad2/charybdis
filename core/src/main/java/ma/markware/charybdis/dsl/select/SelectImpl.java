@@ -37,6 +37,11 @@ import ma.markware.charybdis.query.PageRequest;
 import ma.markware.charybdis.query.PageResult;
 import ma.markware.charybdis.query.SelectQuery;
 
+/**
+ * Select query builder.
+ *
+ * @author Oussama Markad
+ */
 public class SelectImpl implements SelectInitExpression, SelectWhereExpression, SelectExtraWhereExpression, SelectLimitExpression, SelectOrderExpression,
     SelectFilteringExpression, SelectFetchExpression {
 
@@ -53,76 +58,111 @@ public class SelectImpl implements SelectInitExpression, SelectWhereExpression, 
     return selectQuery;
   }
 
+  /**
+   * Set fields to select.
+   */
   public SelectInitExpression select(final SelectableField... fields) {
     this.selectedFields = Arrays.asList(fields);
     selectQuery.setSelectors(fields);
     return this;
   }
 
+  /**
+   * Set fields to select.
+   */
   public SelectInitExpression selectDistinct(final PartitionKeyColumnMetadata... fields) {
     this.selectedFields = Arrays.asList(fields);
     selectQuery.setSelectDistinct(fields);
     return this;
   }
 
+  /**
+   * Set table to select.
+   */
   public SelectWhereExpression selectFrom(final TableMetadata<?> tableMetadata) {
     this.selectedFields = new ArrayList<>(tableMetadata.getColumnsMetadata().values());
     selectQuery.setTableAndSelectors(tableMetadata);
     return this;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public SelectWhereExpression from(final TableMetadata tableMetadata) {
     selectQuery.setTable(tableMetadata);
     return this;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public SelectExtraWhereExpression where(final CriteriaExpression criteriaExpression) {
     selectQuery.setWhereClause(criteriaExpression);
     return this;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public SelectExtraWhereExpression and(final CriteriaExpression criteriaExpression) {
     selectQuery.setWhereClause(criteriaExpression);
     return this;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public SelectLimitExpression orderBy(final OrderExpression orderExpression) {
     selectQuery.setOrdering(orderExpression);
     return this;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public SelectFetchExpression limit(final int limit) {
     selectQuery.setLimit(limit);
     return this;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public SelectFetchExpression allowFiltering() {
     selectQuery.enableFiltering();
     return this;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Record fetchOne() {
     selectQuery.setLimit(1);
     ResultSet resultSet = selectQuery.execute(session);
     if (resultSet == null) {
-      // TODO: throw exception may be
       return null;
     }
     return RecordUtils.rowToRecord(resultSet.one(), selectedFields);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Optional<Record> fetchOptional() {
     return Optional.ofNullable(fetchOne());
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public List<Record> fetch() {
     ResultSet resultSet = selectQuery.execute(session);
@@ -132,6 +172,9 @@ public class SelectImpl implements SelectInitExpression, SelectWhereExpression, 
     return RecordUtils.resultSetToRecords(resultSet, selectedFields);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public PageResult<Record> fetchPage(final PageRequest pageRequest) {
     selectQuery.setPageRequest(pageRequest);

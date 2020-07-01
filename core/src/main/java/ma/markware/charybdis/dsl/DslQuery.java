@@ -31,14 +31,20 @@ import ma.markware.charybdis.model.field.metadata.PartitionKeyColumnMetadata;
 import ma.markware.charybdis.model.field.metadata.TableMetadata;
 
 /**
- * API that allows handling entities in DB through DSL operations.
+ * API to handle entities in DB through DSL operations.
  *
  * @author Oussama Markad
  */
 public interface DslQuery {
 
   /**
-   * Initiate select dsl query with fields to select.
+   * Create a new DSL select query with fields to select.
+   * <p>
+   * Example: <code><pre>
+   * dslQuery.select(field1, field2)
+   *         .from(table)
+   *         .fetch();
+   * </pre></code>
    *
    * @param fields fields to select.
    * @return initialized select expression.
@@ -46,7 +52,13 @@ public interface DslQuery {
   SelectInitExpression select(SelectableField... fields);
 
   /**
-   * Initiate select distinct dsl query with partition key fields.
+   * Create a new DSL select distinct query with partition key fields.
+   * <p>
+   * Example: <code><pre>
+   * dslQuery.selectDistinct(field1)
+   *         .from(table)
+   *         .fetch();
+   * </pre></code>
    *
    * @param fields partition key fields to select.
    * @return initialized select expression.
@@ -54,7 +66,13 @@ public interface DslQuery {
   SelectInitExpression selectDistinct(PartitionKeyColumnMetadata... fields);
 
   /**
-   * Initiate select all dsl query with table.
+   * Create a new DSL select expression.
+   * <p>
+   * Example: <code><pre>
+   * dslQuery.selectFrom(table)
+   *         .where(field2.eq("test"))
+   *         .fetchOne();
+   * </pre></code>
    *
    * @param table table of select query.
    * @return initialized select expression.
@@ -62,7 +80,14 @@ public interface DslQuery {
   SelectWhereExpression selectFrom(TableMetadata table);
 
   /**
-   * Initiate insert dsl query with table.
+   * Create a new DSL insert expression.
+   * <p>
+   * Example: <code><pre>
+   * dslQuery.insertInto(table)
+   *         .set(field1, 100)
+   *         .set(field2, "test")
+   *         .execute();
+   * </pre></code>
    *
    * @param table table of insert query.
    * @return initialized insert expression.
@@ -70,7 +95,13 @@ public interface DslQuery {
   InsertInitExpression insertInto(TableMetadata table);
 
   /**
-   * Initiate insert dsl query with table and columns to insert.
+   * Create a new DSL insert expression.
+   * <p>
+   * Example: <code><pre>
+   * dslQuery.insertInto(table, field1, field2)
+   *         .values(100, "test")
+   *         .execute();
+   * </pre></code>
    *
    * @param table table of insert query.
    * @param columns columns to insert.
@@ -79,22 +110,45 @@ public interface DslQuery {
   InsertInitWithColumnsExpression insertInto(TableMetadata table, ColumnMetadata... columns);
 
   /**
-   * Initiate update dsl query with table.
+   * Create a new DSL update expression.
+   * <p>
+   * Example: <code><pre>
+   * dslQuery.update(table)
+   *         .set(field1, value1)
+   *         .set(field2, value2)
+   *         .where(field1.eq(10))
+   *         .execute();
+   * </pre></code>
    *
    * @param table table of update query.
-   * @return initialized updated expression.
+   * @return initialized update expression.
    */
   UpdateInitExpression update(TableMetadata table);
 
   /**
-   * Initiate delete row dsl query.
+   * Create a new DSL delete expression.
+   * <p>
+   * Example: <code><pre>
+   * dslQuery.delete()
+   *         .from(table)
+   *         .where(field1.eq(0))
+   *         .and(field2.gt("abc"))
+   *         .execute();
+   * </pre></code>
    *
    * @return initialized delete expression.
    */
   DeleteInitExpression delete();
 
   /**
-   * Initiate delete dsl query with fields to delete.
+   * Create a new DSL delete expression with fields to delete.
+   * <p>
+   * Example: <code><pre>
+   * dslQuery.delete(field2)
+   *         .from(table)
+   *         .where(field1.lt(1_000))
+   *         .execute();
+   * </pre></code>
    *
    * @return initialized delete expression.
    */

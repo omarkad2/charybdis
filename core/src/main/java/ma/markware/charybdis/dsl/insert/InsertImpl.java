@@ -25,6 +25,11 @@ import ma.markware.charybdis.model.field.metadata.ColumnMetadata;
 import ma.markware.charybdis.model.field.metadata.TableMetadata;
 import ma.markware.charybdis.query.InsertQuery;
 
+/**
+ * Insert query builder.
+ *
+ * @author Oussama Markad
+ */
 public class InsertImpl implements InsertInitExpression, InsertInitWithColumnsExpression, InsertValuesExpression, InsertSetExpression,
     InsertOnExistExpression, InsertTtlExpression, InsertTimestampExpression, InsertExecuteExpression {
 
@@ -40,53 +45,79 @@ public class InsertImpl implements InsertInitExpression, InsertInitWithColumnsEx
     return insertQuery;
   }
 
+  /**
+   * Set table to insert.
+   */
   public InsertInitExpression insertInto(TableMetadata tableMetadata) {
     insertQuery.setTable(tableMetadata);
     return this;
   }
 
+  /**
+   * Set table and columns to insert.
+   */
   public InsertInitWithColumnsExpression insertInto(TableMetadata table, ColumnMetadata... columns) {
     insertQuery.setTableAndColumns(table, columns);
     return this;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public InsertValuesExpression values(final Object... values) {
     insertQuery.setValues(values);
     return this;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public <D, S> InsertSetExpression set(final ColumnMetadata<D, S> columnMetadata, final D value) {
     insertQuery.setSet(columnMetadata, value);
     return this;
   }
 
-  // TODO to delete
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public <T extends InsertTtlExpression & InsertTimestampExpression> T ifNotExists() {
     insertQuery.enableIfNotExists();
     return (T) this;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public InsertExecuteExpression usingTtl(final int ttl) {
     insertQuery.setTtl(ttl);
     return this;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public InsertExecuteExpression usingTimestamp(final Instant timestamp) {
     insertQuery.setTimestamp(timestamp);
     return this;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public InsertExecuteExpression usingTimestamp(final long timestamp) {
     insertQuery.setTimestamp(timestamp);
     return this;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public boolean execute() {
     ResultSet resultSet = insertQuery.execute(session);

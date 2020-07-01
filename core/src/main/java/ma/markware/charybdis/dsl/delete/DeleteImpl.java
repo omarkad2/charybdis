@@ -26,6 +26,11 @@ import ma.markware.charybdis.model.field.DeletableField;
 import ma.markware.charybdis.model.field.metadata.TableMetadata;
 import ma.markware.charybdis.query.DeleteQuery;
 
+/**
+ * Delete query builder.
+ *
+ * @author Oussama Markad
+ */
 public class DeleteImpl implements DeleteInitExpression, DeleteTimestampExpression, DeleteWhereExpression, DeleteExtraWhereExpression,
     DeleteIfExpression, DeleteExtraIfExpression, DeleteExecuteExpression {
 
@@ -37,61 +42,91 @@ public class DeleteImpl implements DeleteInitExpression, DeleteTimestampExpressi
     this.deleteQuery = new DeleteQuery();
   }
 
-  public DeleteQuery getDeleteQuery() {
+  DeleteQuery getDeleteQuery() {
     return deleteQuery;
   }
 
+  /**
+   * No-op method. (commodity)
+   */
   public DeleteInitExpression delete() {
     return this;
   }
 
+  /**
+   * Set fields to delete in query.
+   */
   public DeleteInitExpression delete(DeletableField... fields) {
     deleteQuery.setSelectors(fields);
     return this;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public DeleteTimestampExpression from(final TableMetadata table) {
     deleteQuery.setTable(table);
     return this;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public DeleteWhereExpression usingTimestamp(final Instant timestamp) {
     deleteQuery.setTimestamp(timestamp);
     return this;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public DeleteWhereExpression usingTimestamp(final long timestamp) {
     deleteQuery.setTimestamp(timestamp);
     return this;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public DeleteExtraWhereExpression where(final CriteriaExpression criteria) {
     deleteQuery.setWhere(criteria);
     return this;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public DeleteExtraWhereExpression and(final CriteriaExpression criteria) {
     deleteQuery.setWhere(criteria);
     return this;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public DeleteExtraIfExpression if_(final CriteriaExpression condition) {
     deleteQuery.setIf(condition);
     return this;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public DeleteExtraIfExpression and_(final CriteriaExpression condition) {
     deleteQuery.setIf(condition);
     return this;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public boolean execute() {
     ResultSet resultSet = deleteQuery.execute(session);

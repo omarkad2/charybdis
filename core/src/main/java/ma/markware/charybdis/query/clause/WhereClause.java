@@ -24,7 +24,7 @@ import static java.util.Arrays.fill;
 import com.datastax.oss.driver.api.querybuilder.BindMarker;
 import com.datastax.oss.driver.api.querybuilder.QueryBuilder;
 import com.datastax.oss.driver.api.querybuilder.relation.Relation;
-import ma.markware.charybdis.exception.CharybdisUnsupportedOperation;
+import ma.markware.charybdis.exception.CharybdisUnsupportedOperationException;
 import ma.markware.charybdis.model.criteria.CriteriaExpression;
 import ma.markware.charybdis.model.field.criteria.CriteriaField;
 
@@ -79,7 +79,7 @@ public class WhereClause {
       case IS_NOT_NULL:
         return new WhereClause(field.toRelation(" IS NOT NULL ", null), null);
       default:
-        throw new CharybdisUnsupportedOperation(format("Operation '%s' is not supported in [WHERE] clause", criteria.getCriteriaOperator()));
+        throw new CharybdisUnsupportedOperationException(format("Operation '%s' is not supported in [WHERE] clause", criteria.getCriteriaOperator()));
     }
   }
 

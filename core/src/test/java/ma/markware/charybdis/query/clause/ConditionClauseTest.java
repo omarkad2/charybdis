@@ -25,7 +25,7 @@ import com.datastax.oss.driver.api.core.cql.Row;
 import com.datastax.oss.driver.internal.querybuilder.condition.DefaultCondition;
 import java.util.Set;
 import java.util.stream.Stream;
-import ma.markware.charybdis.exception.CharybdisUnsupportedOperation;
+import ma.markware.charybdis.exception.CharybdisUnsupportedOperationException;
 import ma.markware.charybdis.model.criteria.CriteriaExpression;
 import ma.markware.charybdis.model.criteria.CriteriaOperator;
 import ma.markware.charybdis.model.field.metadata.ColumnMetadata;
@@ -68,7 +68,7 @@ class ConditionClauseTest {
       }
     };
 
-    assertThatExceptionOfType(CharybdisUnsupportedOperation.class)
+    assertThatExceptionOfType(CharybdisUnsupportedOperationException.class)
         .isThrownBy(() -> ConditionClause.from(new CriteriaExpression(setColumnMetadata, CriteriaOperator.CONTAINS, 10)))
         .withMessage("Operation 'CONTAINS' is not supported in [IF] clause");
   }

@@ -22,7 +22,7 @@ import static java.lang.String.format;
 
 import com.datastax.oss.driver.api.querybuilder.QueryBuilder;
 import com.datastax.oss.driver.api.querybuilder.update.Assignment;
-import ma.markware.charybdis.exception.CharybdisUnsupportedOperation;
+import ma.markware.charybdis.exception.CharybdisUnsupportedOperationException;
 import ma.markware.charybdis.model.assignment.AssignmentListValue;
 import ma.markware.charybdis.model.assignment.AssignmentMapValue;
 import ma.markware.charybdis.model.assignment.AssignmentOperation;
@@ -79,7 +79,7 @@ public class AssignmentClause {
       case REMOVE:
         return new AssignmentClause(Assignment.remove(listColumnMetadata.getName(), QueryBuilder.bindMarker()), new Object[]{ value });
       default:
-        throw new CharybdisUnsupportedOperation(format("Operation '%s' is not supported in [ASSIGNMENT] clause for data type 'list'", listValue.getOperation()));
+        throw new CharybdisUnsupportedOperationException(format("Operation '%s' is not supported in [ASSIGNMENT] clause for data type 'list'", listValue.getOperation()));
     }
   }
 
@@ -97,7 +97,7 @@ public class AssignmentClause {
       case REMOVE:
         return new AssignmentClause(Assignment.remove(setColumnMetadata.getName(), QueryBuilder.bindMarker()), new Object[]{ value });
       default:
-        throw new CharybdisUnsupportedOperation(format("Operation '%s' is not supported in [ASSIGNMENT] clause for data type 'set'", setValue.getOperation()));
+        throw new CharybdisUnsupportedOperationException(format("Operation '%s' is not supported in [ASSIGNMENT] clause for data type 'set'", setValue.getOperation()));
     }
   }
 
@@ -113,7 +113,7 @@ public class AssignmentClause {
       case REMOVE:
         return new AssignmentClause(Assignment.remove(mapColumnMetadata.getName(), QueryBuilder.bindMarker()), new Object[]{ mapValue.getRemoveSerializedValues() });
       default:
-        throw new CharybdisUnsupportedOperation(format("Operation '%s' is not supported in [ASSIGNMENT] clause for data type 'map'", mapValue.getOperation()));
+        throw new CharybdisUnsupportedOperationException(format("Operation '%s' is not supported in [ASSIGNMENT] clause for data type 'map'", mapValue.getOperation()));
     }
   }
 

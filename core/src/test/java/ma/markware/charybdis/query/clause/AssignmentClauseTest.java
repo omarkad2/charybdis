@@ -31,7 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
-import ma.markware.charybdis.exception.CharybdisUnsupportedOperation;
+import ma.markware.charybdis.exception.CharybdisUnsupportedOperationException;
 import ma.markware.charybdis.model.assignment.AssignmentMapValue;
 import ma.markware.charybdis.model.assignment.AssignmentOperation;
 import ma.markware.charybdis.model.field.metadata.ColumnMetadata;
@@ -165,7 +165,7 @@ class AssignmentClauseTest {
 
   @Test
   void shouldThrowExceptionWhenUnsupportedOperation() {
-    assertThatExceptionOfType(CharybdisUnsupportedOperation.class)
+    assertThatExceptionOfType(CharybdisUnsupportedOperationException.class)
         .isThrownBy(() -> AssignmentClause.from(mapColumnMetadata, new AssignmentMapValue<>(mapColumnMetadata, AssignmentOperation.PREPEND, new HashMap<>())))
         .withMessage("Operation 'PREPEND' is not supported in [ASSIGNMENT] clause for data type 'map'");
   }

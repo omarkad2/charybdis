@@ -28,28 +28,51 @@ import ma.markware.charybdis.query.clause.AssignmentClause;
 import ma.markware.charybdis.query.clause.ConditionClause;
 import ma.markware.charybdis.query.clause.WhereClause;
 
+/**
+ * Query helper methods.
+ *
+ * @author Oussama Markad
+ */
 final class QueryHelper {
 
+  /**
+   * Extract dastastax {@link Assignment} from {@link AssignmentClause}
+   */
   static List<Assignment> extractAssignments(List<AssignmentClause> assignmentClauses) {
     return assignmentClauses.stream().map(AssignmentClause::getAssignment).collect(Collectors.toList());
   }
 
+  /**
+   * Extract dastastax {@link Relation} from {@link WhereClause}
+   */
   static List<Relation> extractRelations(List<WhereClause> whereClauses) {
     return whereClauses.stream().map(WhereClause::getRelation).collect(Collectors.toList());
   }
 
+  /**
+   * Extract dastastax {@link Condition} from {@link ConditionClause}
+   */
   static List<Condition> extractConditions(List<ConditionClause> conditionClauses) {
     return conditionClauses.stream().map(ConditionClause::getCondition).collect(Collectors.toList());
   }
 
+  /**
+   * Extract assignment clauses' bound values.
+   */
   static Stream<Object> extractAssignmentBindValues(List<AssignmentClause> assignmentClauses) {
     return assignmentClauses.stream().map(AssignmentClause::getBindValues).flatMap(Stream::of);
   }
 
+  /**
+   * Extract where clauses' bound values.
+   */
   static Stream<Object> extractWhereBindValues(List<WhereClause> whereClauses) {
     return whereClauses.stream().map(WhereClause::getBindValues).flatMap(Stream::of);
   }
 
+  /**
+   * Extract condition clauses' bound values.
+   */
   static Stream<Object> extractConditionBindValues(List<ConditionClause> conditionClauses) {
     return conditionClauses.stream().map(ConditionClause::getBindValues).flatMap(Stream::of);
   }
