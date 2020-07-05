@@ -19,18 +19,20 @@ In this regard, Charybdis, unlike ORM libraries working at runtime, offers the f
 runtime, since most work is done at compile-time. 
 - **Model validation**: Get error reports at build-time when models are incomplete 
 or incorrect.
+- **Seamless model-transformation**: Complex java data structures can be transformed seamlessly to 
+Cassandra data types.
 
 ## Installation
 ### Maven
 Add the following dependency to your **pom.xml**
 
-```xml
-<dependency>
-    <groupId>com.github.charybdis</groupId>
-    <artifactId>charybdis-core</artifactId>
-    <version>${charybdis.version}</version>
-</dependency>
-```
+<!--```xml-->
+<!--<dependency>-->
+<!--    <groupId>com.github.charybdis</groupId>-->
+<!--    <artifactId>charybdis-core</artifactId>-->
+<!--    <version>${charybdis.version}</version>-->
+<!--</dependency>-->
+<!--```-->
 
 <!--### Gradle-->
 <!--Add the following dependency to your **build.gradle**-->
@@ -139,77 +141,71 @@ After compile, this generates class `User_Udt` with the needed metadata.
 
 ### Querying
 In order to query our Cassandra database, we can either use a **Dsl API** or **Crud API**. 
-Both can be instantiated by providing an implementation of (link)SessionFactory if 
-none provided we fallback on (link)DefaultSessionFactory.
+Both can be instantiated by providing an implementation of [SessionFactory](https://github.com/omarkad2/charybdis/blob/master/core/src/main/java/ma/markware/charybdis/session/SessionFactory.java) if 
+none provided we fallback on [DefaultSessionFactory](https://github.com/omarkad2/charybdis/blob/master/core/src/main/java/ma/markware/charybdis/session/DefaultSessionFactory.java).
 #### Dsl API
 
-Instantiate the API:
-```java
-DslQuery dsl = new DefaultDslQuery();
-```
+- Instantiate the API:
+    ```java
+    DslQuery dsl = new DefaultDslQuery();
+    ```
 
-Insert:
-```java
-List<Adress> addresses = List.of(...);
-boolean applied = dsl.insertInto(User_Table.user, User_Table.id, User_Table.joiningDate, User_Table.addresses)
-                   .values(UUID.randomUUID(), Instant.now(), addresses)
-                   .ifNotExists()
-                   .execute();
+- Insert:
+    ```java
+    List<Adress> addresses = List.of(...);
+    boolean applied = dsl.insertInto(User_Table.user, User_Table.id, User_Table.joiningDate, User_Table.addresses)
+                       .values(UUID.randomUUID(), Instant.now(), addresses)
+                       .ifNotExists()
+                       .execute();
+    ```
 
-```
+- Update:
+    ```java
+    boolean applied = dsl.update(User_Table.user)
+                       .set(User_Table.addresses.entry(0), new Address(...)) // Updates address at index 0.
+                       .set(User_Table.role, RoleEnum.ADMIN)
+                       .set(User_Table.accessLogs, User_Table.accessLogs.append(Map.of(Instant.now(), "Ubuntu"))) // Adds entry to column 'access_logs'
+                       .execute();
+    ```
 
-Update:
-```java
-boolean applied = dsl.update(User_Table.user)
-                   .set(User_Table.addresses.entry(0), new Address(...)) // Updates address at index 0.
-                   .set(User_Table.role, RoleEnum.ADMIN)
-                   .set(User_Table.accessLogs, User_Table.accessLogs.append(Map.of(Instant.now(), "Ubuntu"))) // Adds entry to column 'access_logs'
-                   .execute();
-
-```
-
-Select: 
-```java
-User user = dsl.selectFrom(User_Table.user)
-                   .where(User_Table.joiningDate.lt(Instant.parse("2020-01-01T00:00:00Z")))
-                   .allowFiltering()
-                   .fetchOne();
-
-```
-Delete:
-```java
-boolean applied = dsl.delete()
-                   .from(User_Table.user)
-                   .where(User_Table.id.eq(UUID.fromString("c9b593c0-f5cb-4e88-bd55-88dee10a4e97")))
-                   .execute();
-
-```
+- Select: 
+    ```java
+    User user = dsl.selectFrom(User_Table.user)
+                       .where(User_Table.joiningDate.lt(Instant.parse("2020-01-01T00:00:00Z")))
+                       .allowFiltering()
+                       .fetchOne();
+    ```
+- Delete:
+    ```java
+    boolean applied = dsl.delete()
+                       .from(User_Table.user)
+                       .where(User_Table.id.eq(UUID.fromString("c9b593c0-f5cb-4e88-bd55-88dee10a4e97")))
+                       .execute();
+    ```
 #### Crud API
-Instantiate the API:
-```java
-EntityManager entityManager = new DefaultEntityManager();
-```
+- Instantiate the API:
+    ```java
+    EntityManager entityManager = new DefaultEntityManager();
+    ```
 
-Insert:
-```java
-User persistedUser = entityManager.create(User_Table.user, new User(...));
-```
+- Insert:
+    ```java
+    User persistedUser = entityManager.create(User_Table.user, new User(...));
+    ```
 
-Update:
-```java
-persistedUser.setJoiningDate(Instant.now());
-persistedUser = entityManager.update(User_Table.user, persistedUser);
+- Update:
+    ```java
+    persistedUser.setJoiningDate(Instant.now());
+    persistedUser = entityManager.update(User_Table.user, persistedUser);
+    ```
 
-```
-
-Select: 
-```java
-Optional<User> adminUser = entityManager.findOptional(User_Table.user, User_Table.id.eq(userId)
-                                                                    .and(User_Table.joiningDate.lt(Instant.now()))
-                                                                    .and(User_Table.role.eq(RoleEnum.ADMIN)))
-
-```
-Delete:
-```java
-boolean deleted = entityManager.delete(User_Table.user, persistedUser);
-```
+- Select: 
+    ```java
+    Optional<User> adminUser = entityManager.findOptional(User_Table.user, User_Table.id.eq(userId)
+                                                                        .and(User_Table.joiningDate.lt(Instant.now()))
+                                                                        .and(User_Table.role.eq(RoleEnum.ADMIN)))
+    ```
+- Delete:
+    ```java
+    boolean deleted = entityManager.delete(User_Table.user, persistedUser);
+    ```

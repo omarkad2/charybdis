@@ -58,6 +58,10 @@ public class Replication {
     this.replicationFactor = replicationFactor;
   }
 
+  public Map<String, Integer> getDatacenterReplicaMap() {
+    return datacenterReplicaMap;
+  }
+
   public void setDatacenterReplicaMap(final Map<String, Integer> datacenterReplicaMap) {
     this.datacenterReplicaMap = datacenterReplicaMap;
   }

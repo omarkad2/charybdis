@@ -28,6 +28,7 @@ import ma.markware.charybdis.apt.parser.TableParser;
 import ma.markware.charybdis.apt.parser.UdtFieldParser;
 import ma.markware.charybdis.apt.parser.UdtParser;
 import ma.markware.charybdis.apt.serializer.ColumnFieldSerializer;
+import ma.markware.charybdis.apt.serializer.DdlScriptSerializer;
 import ma.markware.charybdis.apt.serializer.KeyspaceSerializer;
 import ma.markware.charybdis.apt.serializer.TableSerializer;
 import ma.markware.charybdis.apt.serializer.UdtFieldSerializer;
@@ -46,16 +47,18 @@ public class AptDefaultConfiguration implements AptConfiguration {
   private final KeyspaceSerializer keyspaceSerializer;
   private final UdtSerializer udtSerializer;
   private final TableSerializer tableSerializer;
+  private final DdlScriptSerializer ddlScriptSerializer;
 
   private AptDefaultConfiguration(final KeyspaceParser keyspaceParser, final UdtParser udtParser,
       final TableParser tableParser, final KeyspaceSerializer keyspaceSerializer, final UdtSerializer udtSerializer,
-      final TableSerializer tableSerializer) {
+      final TableSerializer tableSerializer, final DdlScriptSerializer ddlScriptSerializer) {
     this.keyspaceParser = keyspaceParser;
     this.udtParser = udtParser;
     this.tableParser = tableParser;
     this.keyspaceSerializer = keyspaceSerializer;
     this.udtSerializer = udtSerializer;
     this.tableSerializer = tableSerializer;
+    this.ddlScriptSerializer = ddlScriptSerializer;
   }
 
   /**
@@ -78,7 +81,8 @@ public class AptDefaultConfiguration implements AptConfiguration {
         new TableParser(columnFieldParser, aptContext, types),
         new KeyspaceSerializer(filer),
         new UdtSerializer(udtFieldSerializer, aptContext, filer),
-        new TableSerializer(columnFieldSerializer, filer));
+        new TableSerializer(columnFieldSerializer, filer),
+        new DdlScriptSerializer(aptContext, filer));
   }
 
   /**
@@ -127,5 +131,13 @@ public class AptDefaultConfiguration implements AptConfiguration {
   @Override
   public TableSerializer getTableSerializer() {
     return tableSerializer;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public DdlScriptSerializer getDdlScriptSerializer() {
+    return ddlScriptSerializer;
   }
 }

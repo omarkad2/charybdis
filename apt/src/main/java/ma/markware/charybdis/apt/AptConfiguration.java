@@ -22,6 +22,7 @@ import ma.markware.charybdis.apt.metatype.KeyspaceMetaType;
 import ma.markware.charybdis.apt.metatype.TableMetaType;
 import ma.markware.charybdis.apt.metatype.UdtMetaType;
 import ma.markware.charybdis.apt.parser.EntityParser;
+import ma.markware.charybdis.apt.serializer.DdlScriptSerializer;
 import ma.markware.charybdis.apt.serializer.EntitySerializer;
 
 /**
@@ -77,4 +78,11 @@ public interface AptConfiguration {
    * implementations
    */
   EntitySerializer<TableMetaType> getTableSerializer();
+
+  /**
+   * Extracts serializer used to write ddl cql scripts
+   *
+   * @return Ddl script serializer to generate create and drop script cql files.
+   */
+  DdlScriptSerializer getDdlScriptSerializer();
 }

@@ -166,6 +166,7 @@ public class UpdateQuery extends AbstractQuery {
 
     Update update = updateWithAssignments.where(QueryHelper.extractRelations(whereClauses));
 
+    update = update.ifExists();
     update = update.if_(QueryHelper.extractConditions(conditionClauses));
 
     SimpleStatement simpleStatement = update.build();

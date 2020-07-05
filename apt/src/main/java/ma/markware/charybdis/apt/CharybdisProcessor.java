@@ -36,6 +36,7 @@ import ma.markware.charybdis.apt.metatype.KeyspaceMetaType;
 import ma.markware.charybdis.apt.metatype.TableMetaType;
 import ma.markware.charybdis.apt.metatype.UdtMetaType;
 import ma.markware.charybdis.apt.parser.EntityParser;
+import ma.markware.charybdis.apt.serializer.DdlScriptSerializer;
 import ma.markware.charybdis.apt.serializer.EntitySerializer;
 import ma.markware.charybdis.model.annotation.Keyspace;
 import ma.markware.charybdis.model.annotation.Table;
@@ -147,6 +148,8 @@ public class CharybdisProcessor extends AbstractProcessor {
     serializeUdtMetadata(aptContext.udtMetaTypes, aptConfiguration.getUdtSerializer());
 
     serializeTableMetadata(aptContext.tableMetaTypes, aptConfiguration.getTableSerializer());
+
+    serializeDdlScriptFiles(aptContext.keyspaceMetaTypes, aptContext.udtMetaTypes, aptContext.tableMetaTypes, aptConfiguration.getDdlScriptSerializer());
   }
 
   private void serializeKeyspaceMetadata(final List<KeyspaceMetaType> keyspaceMetaTypes, final EntitySerializer<KeyspaceMetaType> keyspaceSerializer) {
@@ -159,5 +162,10 @@ public class CharybdisProcessor extends AbstractProcessor {
 
   private void serializeTableMetadata(final List<TableMetaType> tableMetaTypes, final EntitySerializer<TableMetaType> tableSerializer) {
     tableMetaTypes.forEach(tableSerializer::serialize);
+  }
+
+  private void serializeDdlScriptFiles(final List<KeyspaceMetaType> keyspaceMetaTypes, final List<UdtMetaType> udtMetaTypes,
+      final List<TableMetaType> tableMetaTypes, final DdlScriptSerializer ddlScriptSerializer) {
+    ddlScriptSerializer.serialize(keyspaceMetaTypes, udtMetaTypes, tableMetaTypes);
   }
 }

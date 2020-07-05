@@ -25,7 +25,6 @@ import com.datastax.oss.driver.api.querybuilder.QueryBuilder;
 import com.datastax.oss.driver.api.querybuilder.term.Term;
 import com.google.common.collect.ImmutableMap;
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -417,8 +416,6 @@ class DefaultEntityManagerITest extends AbstractIntegrationITest {
     @Test
     void update() {
       TestEntity newEntity = new TestEntity(TestEntity_INST1.entity1);
-      Instant newDate = Instant.parse("2020-06-20T00:00:00Z");
-      newEntity.setDate(newDate);
       newEntity.setFlag(false);
       entityManager.update(TestEntity_Table.test_entity, newEntity);
 
@@ -428,7 +425,6 @@ class DefaultEntityManagerITest extends AbstractIntegrationITest {
 
       assertThat(record).isNotNull();
       // updated columns
-      assertThat(record.get(TestEntity_Table.date).truncatedTo(ChronoUnit.MILLIS)).isEqualTo(newDate.truncatedTo(ChronoUnit.MILLIS));
       assertThat(record.get(TestEntity_Table.flag)).isEqualTo(false);
       // non-updated columns
       assertThat(record.get(TestEntity_Table.id)).isEqualTo(TestEntity_INST1.id);

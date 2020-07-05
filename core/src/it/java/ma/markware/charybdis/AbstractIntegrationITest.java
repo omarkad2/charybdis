@@ -23,8 +23,15 @@ import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.cql.SimpleStatement;
 import com.datastax.oss.driver.api.querybuilder.QueryBuilder;
 import com.datastax.oss.driver.api.querybuilder.term.Term;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.Map;
 import ma.markware.charybdis.test.tools.DatabaseSetupExtension;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
@@ -36,45 +43,14 @@ public class AbstractIntegrationITest {
   private static final Logger logger = LoggerFactory.getLogger(AbstractIntegrationITest.class);
 
   @BeforeAll
-  static void initDb(CqlSession session) {
+  static void initDb(CqlSession session) throws IOException {
     logger.info("Start creating Keyspaces/Udts/Tables");
-    session.execute("CREATE KEYSPACE IF NOT EXISTS test_keyspace WITH REPLICATION = { 'class' : 'SimpleStrategy', 'replication_factor' : 1 };");
-    session.execute("CREATE TYPE IF NOT EXISTS test_keyspace.test_extra_udt ("
-                        + "intvalue int, "
-                        + "doublevalue double);");
-    session.execute("CREATE TYPE IF NOT EXISTS test_keyspace.test_nested_udt ("
-                        + "name text, "
-                        + "value text, "
-                        + "numbers list<int>);");
-    session.execute("CREATE TYPE IF NOT EXISTS test_keyspace.test_udt ("
-                        + "udtnested frozen<test_keyspace.test_nested_udt>, "
-                        + "number int, "
-                        + "value text, "
-                        + "udtnestedlist list<frozen<test_keyspace.test_nested_udt>>, "
-                        + "udtnestednestedset set<frozen<list<test_keyspace.test_nested_udt>>>, "
-                        + "udtnestedmap map<text, frozen<list<test_keyspace.test_nested_udt>>>);");
-    session.execute("CREATE TABLE IF NOT EXISTS test_keyspace.test_entity ("
-                        + "id uuid, "
-                        + "date timestamp, "
-                        + "udt frozen<test_keyspace.test_udt>, "
-                        + "list frozen<list<text>>, "
-                        + "se set<int>, "
-                        + "map map<text,text>, "
-                        + "nestedlist frozen<list<list<int>>>, "
-                        + "nestedset set<frozen<list<int>>>, "
-                        + "nestedmap map<text,frozen<map<int,text>>>, "
-                        + "enumvalue text, enumlist list<text>, "
-                        + "enummap map<int,text>, "
-                        + "enumnestedlist list<frozen<set<text>>>, "
-                        + "extraudt test_keyspace.test_extra_udt, "
-                        + "udtlist list<frozen<test_keyspace.test_udt>>, "
-                        + "udtset set<frozen<test_keyspace.test_udt>>, "
-                        + "udtmap map<int,frozen<test_keyspace.test_udt>>, "
-                        + "udtnestedlist list<frozen<list<test_keyspace.test_udt>>>, "
-                        + "flag boolean, "
-                        + "creation_date timestamp, "
-                        + "last_updated_date timestamp, "
-                        + "PRIMARY KEY ((id), date, udt, list));");
+    InputStream resourceAsStream = AbstractIntegrationITest.class.getClassLoader().getResourceAsStream("ddl_create_int.cql");
+    assert resourceAsStream != null;
+    StringWriter writer = new StringWriter();
+    IOUtils.copy(resourceAsStream, writer, StandardCharsets.UTF_8);
+    String[] statements = StringUtils.split(writer.toString(), ";\n");
+    Arrays.stream(statements).filter(StringUtils::isNotBlank).map(statement -> StringUtils.normalizeSpace(statement) + ";\n").forEach(session::execute);
     logger.info("End creating Keyspaces/Udts/Tables");
   }
 
