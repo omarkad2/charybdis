@@ -41,6 +41,7 @@ import ma.markware.charybdis.apt.metatype.KeyspaceMetaType;
 import ma.markware.charybdis.apt.metatype.TableMetaType;
 import ma.markware.charybdis.apt.metatype.UdtFieldMetaType;
 import ma.markware.charybdis.apt.metatype.UdtMetaType;
+import ma.markware.charybdis.apt.utils.CollectionUtils;
 import ma.markware.charybdis.model.datatype.DataTypeMapper;
 import ma.markware.charybdis.model.option.Replication;
 import ma.markware.charybdis.model.option.ReplicationStrategyClass;
@@ -73,7 +74,7 @@ public class DdlScriptSerializer {
         try (BufferedWriter br = new BufferedWriter(ddlCreateFile.openWriter())) {
           br.write(keyspaceMetaTypes.stream().map(this::createKeyspaceCqlStatement).collect(Collectors.joining("\n")));
           br.newLine();
-          br.write(sortedUdtMetaTypes.stream().map(this::createUdtCqlStatement).collect(Collectors.joining("\n")));
+          br.write(CollectionUtils.reverseStream(sortedUdtMetaTypes.stream()).map(this::createUdtCqlStatement).collect(Collectors.joining("\n")));
           br.newLine();
           br.write(tableMetaTypes.stream().map(this::createTableCqlStatement).collect(Collectors.joining("\n")));
           br.newLine();

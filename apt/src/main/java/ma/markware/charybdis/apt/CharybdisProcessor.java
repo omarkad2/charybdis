@@ -38,6 +38,7 @@ import ma.markware.charybdis.apt.metatype.UdtMetaType;
 import ma.markware.charybdis.apt.parser.EntityParser;
 import ma.markware.charybdis.apt.serializer.DdlScriptSerializer;
 import ma.markware.charybdis.apt.serializer.EntitySerializer;
+import ma.markware.charybdis.apt.utils.TypeUtils;
 import ma.markware.charybdis.model.annotation.Keyspace;
 import ma.markware.charybdis.model.annotation.Table;
 import ma.markware.charybdis.model.annotation.Udt;
@@ -166,6 +167,6 @@ public class CharybdisProcessor extends AbstractProcessor {
 
   private void serializeDdlScriptFiles(final List<KeyspaceMetaType> keyspaceMetaTypes, final List<UdtMetaType> udtMetaTypes,
       final List<TableMetaType> tableMetaTypes, final DdlScriptSerializer ddlScriptSerializer) {
-    ddlScriptSerializer.serialize(keyspaceMetaTypes, udtMetaTypes, tableMetaTypes);
+    ddlScriptSerializer.serialize(keyspaceMetaTypes, TypeUtils.sortUdtMetaTypes(udtMetaTypes), tableMetaTypes);
   }
 }

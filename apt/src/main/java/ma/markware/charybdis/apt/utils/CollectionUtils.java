@@ -19,7 +19,9 @@
 package ma.markware.charybdis.apt.utils;
 
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Stream;
 
 /**
  * Collection Utils methods
@@ -29,12 +31,21 @@ import java.util.List;
 public class CollectionUtils {
 
   /**
-   * Merges two collections and varargs elements
+   * Merge two collections and varargs elements.
    */
   @SafeVarargs
   public static <T> List<T> addAll(List<T> list1, List<T> list2, T... args) {
     list1.addAll(list2);
     list1.addAll(Arrays.asList(args));
     return list1;
+  }
+
+  /**
+   * Reverse stream sequential order.
+   */
+  public static <T> Stream<T> reverseStream(Stream<T> stream) {
+    LinkedList<T> stack = new LinkedList<>();
+    stream.forEach(stack::push);
+    return stack.stream();
   }
 }

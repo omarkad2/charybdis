@@ -94,8 +94,8 @@ class DdlScriptSerializerTest {
 
     keyspaceMetaTypes = Collections.singletonList(configuration.getKeyspaceParser()
                  .parse(elements.getTypeElement(TestKeyspaceDefinition.class.getCanonicalName())));
-    udtMetaTypes = Arrays.asList(configuration.getUdtParser().parse(testNestedUdtElement), configuration.getUdtParser().parse(testExtraUdtElement),
-                                 configuration.getUdtParser().parse(testUdtElement));
+    udtMetaTypes = Arrays.asList(configuration.getUdtParser().parse(testUdtElement), configuration.getUdtParser().parse(testNestedUdtElement),
+                                 configuration.getUdtParser().parse(testExtraUdtElement));
     tableMetaTypes = Collections.singletonList(configuration.getTableParser()
                  .parse(elements.getTypeElement(TestEntity.class.getCanonicalName())));
   }

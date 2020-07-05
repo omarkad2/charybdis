@@ -1,6 +1,6 @@
 CREATE KEYSPACE IF NOT EXISTS test_keyspace WITH REPLICATION={'class' : 'SimpleStrategy', 'replication_factor' : 1};
-CREATE TYPE IF NOT EXISTS test_keyspace.test_nested_udt(name text,value text,numbers list<int>);
 CREATE TYPE IF NOT EXISTS test_keyspace.test_extra_udt(intvalue int,doublevalue double);
+CREATE TYPE IF NOT EXISTS test_keyspace.test_nested_udt(name text,value text,numbers list<int>);
 CREATE TYPE IF NOT EXISTS test_keyspace.test_udt(udtnested frozen<test_nested_udt>,number int,value text,udtnestedlist list<frozen<test_nested_udt>>,udtnestednestedset set<frozen<list<test_nested_udt>>>,udtnestedmap map<text,frozen<list<test_nested_udt>>>);
 CREATE TABLE IF NOT EXISTS test_keyspace.test_entity(id uuid,date timestamp,udt frozen<test_udt>,list frozen<list<text>>,se set<int>,map map<text,text>,nestedlist frozen<list<list<int>>>,nestedset set<frozen<list<int>>>,nestedmap map<text,frozen<map<int,text>>>,enumvalue text,enumlist list<text>,enummap map<int,text>,enumnestedlist list<frozen<set<text>>>,extraudt test_extra_udt,udtlist list<frozen<test_udt>>,udtset set<frozen<test_udt>>,udtmap map<int,frozen<test_udt>>,udtnestedlist list<frozen<list<test_udt>>>,flag boolean,creation_date timestamp,last_updated_date timestamp,PRIMARY KEY(id, date,udt,list))WITH CLUSTERING ORDER BY(date DESC,udt ASC,list ASC);
 CREATE INDEX IF NOT EXISTS test_entity_flag_idx ON test_keyspace.test_entity(flag);

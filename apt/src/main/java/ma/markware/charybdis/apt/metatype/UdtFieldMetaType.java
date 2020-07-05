@@ -26,7 +26,18 @@ package ma.markware.charybdis.apt.metatype;
  */
 public class UdtFieldMetaType extends AbstractFieldMetaType {
 
+  // not null when udtFieldType is of kind UDT
+  private UdtMetaType udtMetaType;
+
   public UdtFieldMetaType(final AbstractFieldMetaType abstractFieldMetaType) {
     super(abstractFieldMetaType);
+  }
+
+  public UdtMetaType getUdtMetaType() {
+    return udtMetaType;
+  }
+
+  public void setUdtMetaType(final UdtMetaType udtMetaType) {
+    this.udtMetaType = udtMetaType;
   }
 }
