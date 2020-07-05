@@ -32,6 +32,13 @@ import com.github.charybdis.apt.CompilationExtension;
 import com.github.charybdis.apt.metatype.KeyspaceMetaType;
 import com.github.charybdis.apt.metatype.TableMetaType;
 import com.github.charybdis.apt.metatype.UdtMetaType;
+import com.github.charybdis.apt.utils.TypeUtils;
+import com.github.charybdis.model.annotation.Udt;
+import com.github.charybdis.test.entities.TestEntity;
+import com.github.charybdis.test.entities.TestExtraUdt;
+import com.github.charybdis.test.entities.TestKeyspaceDefinition;
+import com.github.charybdis.test.entities.TestNestedUdt;
+import com.github.charybdis.test.entities.TestUdt;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -50,12 +57,6 @@ import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
-import com.github.charybdis.model.annotation.Udt;
-import com.github.charybdis.test.entities.TestEntity;
-import com.github.charybdis.test.entities.TestExtraUdt;
-import com.github.charybdis.test.entities.TestKeyspaceDefinition;
-import com.github.charybdis.test.entities.TestNestedUdt;
-import com.github.charybdis.test.entities.TestUdt;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -101,7 +102,7 @@ class DdlScriptSerializerTest {
   }
 
   @Test
-  void serializeKeyspaceTest() throws IOException {
+  void serialize() throws IOException {
     // Given
     StringWriter ddlCreateCqlWriter = new StringWriter();
     StringWriter ddlDropCqlWriter = new StringWriter();
@@ -109,7 +110,7 @@ class DdlScriptSerializerTest {
     when(filer.createResource(any(), any(), eq("ddl_drop.cql"))).thenReturn(SerializerTestHelper.createJavaFileObject(ddlDropCqlWriter));
 
     // When
-    configuration.getDdlScriptSerializer().serialize(keyspaceMetaTypes, udtMetaTypes, tableMetaTypes);
+    configuration.getDdlScriptSerializer().serialize(keyspaceMetaTypes, TypeUtils.sortUdtMetaTypes(udtMetaTypes), tableMetaTypes);
 
     // Then
     InputStream ddlCreateInputStream = getClass().getClassLoader().getResourceAsStream("ddl_create_int.cql");

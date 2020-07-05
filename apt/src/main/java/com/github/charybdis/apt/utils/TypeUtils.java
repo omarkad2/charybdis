@@ -23,6 +23,7 @@ import com.github.charybdis.apt.metatype.UdtMetaType;
 import com.squareup.javapoet.TypeName;
 import java.lang.reflect.Type;
 import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -57,11 +58,10 @@ public class TypeUtils {
     return endIdx > -1 ? canonicalName.substring(0, endIdx) : canonicalName;
   }
 
-  public static List<UdtMetaType> sortUdtMetaTypes(List<UdtMetaType> udtMetaTypes) {
+  public static LinkedList<UdtMetaType> sortUdtMetaTypes(List<UdtMetaType> udtMetaTypes) {
     return udtMetaTypes.stream()
-                       .sorted(
-                           Comparator.comparingInt(udtMetaType -> computeUdtMetaTypeOrder(udtMetaType, udtMetaTypes)))
-                       .collect(Collectors.toList());
+                       .sorted(Comparator.comparingInt(udtMetaType -> computeUdtMetaTypeOrder(udtMetaType, udtMetaTypes)))
+                       .collect(Collectors.toCollection(LinkedList::new));
   }
 
   /**

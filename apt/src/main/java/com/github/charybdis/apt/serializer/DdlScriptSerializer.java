@@ -31,6 +31,9 @@ import com.github.charybdis.apt.metatype.TableMetaType;
 import com.github.charybdis.apt.metatype.UdtFieldMetaType;
 import com.github.charybdis.apt.metatype.UdtMetaType;
 import com.github.charybdis.apt.utils.CollectionUtils;
+import com.github.charybdis.model.datatype.DataTypeMapper;
+import com.github.charybdis.model.option.Replication;
+import com.github.charybdis.model.option.ReplicationStrategyClass;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.Reader;
@@ -42,9 +45,6 @@ import java.util.stream.Collectors;
 import javax.annotation.processing.Filer;
 import javax.tools.FileObject;
 import javax.tools.StandardLocation;
-import com.github.charybdis.model.datatype.DataTypeMapper;
-import com.github.charybdis.model.option.Replication;
-import com.github.charybdis.model.option.ReplicationStrategyClass;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,7 +73,7 @@ public class DdlScriptSerializer {
       try (BufferedWriter br = new BufferedWriter(ddlCreateFile.openWriter())) {
         br.write(keyspaceMetaTypes.stream().map(this::createKeyspaceCqlStatement).collect(Collectors.joining("\n")));
         br.newLine();
-        br.write(CollectionUtils.reverseStream(sortedUdtMetaTypes.stream()).map(this::createUdtCqlStatement).collect(Collectors.joining("\n")));
+        br.write(sortedUdtMetaTypes.stream().map(this::createUdtCqlStatement).collect(Collectors.joining("\n")));
         br.newLine();
         br.write(tableMetaTypes.stream().map(this::createTableCqlStatement).collect(Collectors.joining("\n")));
         br.newLine();
@@ -86,7 +86,7 @@ public class DdlScriptSerializer {
       try (BufferedWriter br = new BufferedWriter(ddlDropFile.openWriter())) {
         br.write(keyspaceMetaTypes.stream().map(this::dropKeyspaceCqlStatement).collect(Collectors.joining("\n")));
         br.newLine();
-        br.write(sortedUdtMetaTypes.stream().map(this::dropUdtCqlStatement).collect(Collectors.joining("\n")));
+        br.write(CollectionUtils.reverseStream(sortedUdtMetaTypes.stream()).map(this::dropUdtCqlStatement).collect(Collectors.joining("\n")));
         br.newLine();
         br.write(tableMetaTypes.stream().map(this::dropTableCqlStatement).collect(Collectors.joining("\n")));
         br.newLine();
