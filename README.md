@@ -230,3 +230,8 @@ none provided we fallback on [DefaultSessionFactory](https://github.com/omarkad2
     ```java
     boolean deleted = entityManager.delete(User_Table.user, persistedUser);
     ```
+
+## Licensing
+Charybdis is licensed under the Apache License, Version 2.0 (the "License"); 
+you may not use this project except in compliance with the License. 
+You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0.
