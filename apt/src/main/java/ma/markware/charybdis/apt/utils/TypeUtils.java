@@ -69,7 +69,7 @@ public class TypeUtils {
    */
   private static UdtMetaType getUdtMetaTypeFromUdtFieldMetaType(UdtFieldMetaType udtFieldMetaType, List<UdtMetaType> udtMetaTypes) {
     return udtMetaTypes.stream()
-                       .filter(udtMetaType -> Objects.equals(udtMetaType.getTypeName().toString(), udtFieldMetaType.getFieldType().getSerializationTypeCanonicalName()))
+                       .filter(udtMetaType -> Objects.equals(udtMetaType.getTypeName().toString(), udtFieldMetaType.getFieldType().getDeserializationTypeCanonicalName()))
                        .findAny()
                        .get();
   }

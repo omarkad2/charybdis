@@ -167,6 +167,8 @@ public class CharybdisProcessor extends AbstractProcessor {
 
   private void serializeDdlScriptFiles(final List<KeyspaceMetaType> keyspaceMetaTypes, final List<UdtMetaType> udtMetaTypes,
       final List<TableMetaType> tableMetaTypes, final DdlScriptSerializer ddlScriptSerializer) {
-    ddlScriptSerializer.serialize(keyspaceMetaTypes, TypeUtils.sortUdtMetaTypes(udtMetaTypes), tableMetaTypes);
+    if (!keyspaceMetaTypes.isEmpty() || !udtMetaTypes.isEmpty() || !tableMetaTypes.isEmpty()) {
+      ddlScriptSerializer.serialize(keyspaceMetaTypes, TypeUtils.sortUdtMetaTypes(udtMetaTypes), tableMetaTypes);
+    }
   }
 }

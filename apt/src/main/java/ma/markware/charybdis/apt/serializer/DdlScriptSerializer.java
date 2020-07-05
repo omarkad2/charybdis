@@ -67,36 +67,34 @@ public class DdlScriptSerializer {
   }
 
   public void serialize(List<KeyspaceMetaType> keyspaceMetaTypes, List<UdtMetaType> sortedUdtMetaTypes, List<TableMetaType> tableMetaTypes) {
-    if (!keyspaceMetaTypes.isEmpty() || !sortedUdtMetaTypes.isEmpty() || !tableMetaTypes.isEmpty()) {
-      try {
-        // DDL creation script
-        FileObject ddlCreateFile = filer.createResource(StandardLocation.CLASS_OUTPUT, "", "ddl_create.cql");
-        try (BufferedWriter br = new BufferedWriter(ddlCreateFile.openWriter())) {
-          br.write(keyspaceMetaTypes.stream().map(this::createKeyspaceCqlStatement).collect(Collectors.joining("\n")));
-          br.newLine();
-          br.write(CollectionUtils.reverseStream(sortedUdtMetaTypes.stream()).map(this::createUdtCqlStatement).collect(Collectors.joining("\n")));
-          br.newLine();
-          br.write(tableMetaTypes.stream().map(this::createTableCqlStatement).collect(Collectors.joining("\n")));
-          br.newLine();
-          br.write(tableMetaTypes.stream().map(this::createIndexCqlStatement).collect(Collectors.joining("\n")));
-          br.newLine();
-        }
-
-        // DDL drop script
-        FileObject ddlDropFile = filer.createResource(StandardLocation.CLASS_OUTPUT, "", "ddl_drop.cql");
-        try (BufferedWriter br = new BufferedWriter(ddlDropFile.openWriter())) {
-          br.write(keyspaceMetaTypes.stream().map(this::dropKeyspaceCqlStatement).collect(Collectors.joining("\n")));
-          br.newLine();
-          br.write(sortedUdtMetaTypes.stream().map(this::dropUdtCqlStatement).collect(Collectors.joining("\n")));
-          br.newLine();
-          br.write(tableMetaTypes.stream().map(this::dropTableCqlStatement).collect(Collectors.joining("\n")));
-          br.newLine();
-          br.write(tableMetaTypes.stream().map(this::dropIndexCqlStatement).collect(Collectors.joining("\n")));
-          br.newLine();
-        }
-      } catch (IOException e) {
-        throw new CharybdisSerializationException("Serialization of 'ddl_*.cql' files failed", e);
+    try {
+      // DDL creation script
+      FileObject ddlCreateFile = filer.createResource(StandardLocation.CLASS_OUTPUT, "", "ddl_create.cql");
+      try (BufferedWriter br = new BufferedWriter(ddlCreateFile.openWriter())) {
+        br.write(keyspaceMetaTypes.stream().map(this::createKeyspaceCqlStatement).collect(Collectors.joining("\n")));
+        br.newLine();
+        br.write(CollectionUtils.reverseStream(sortedUdtMetaTypes.stream()).map(this::createUdtCqlStatement).collect(Collectors.joining("\n")));
+        br.newLine();
+        br.write(tableMetaTypes.stream().map(this::createTableCqlStatement).collect(Collectors.joining("\n")));
+        br.newLine();
+        br.write(tableMetaTypes.stream().map(this::createIndexCqlStatement).collect(Collectors.joining("\n")));
+        br.newLine();
       }
+
+      // DDL drop script
+      FileObject ddlDropFile = filer.createResource(StandardLocation.CLASS_OUTPUT, "", "ddl_drop.cql");
+      try (BufferedWriter br = new BufferedWriter(ddlDropFile.openWriter())) {
+        br.write(keyspaceMetaTypes.stream().map(this::dropKeyspaceCqlStatement).collect(Collectors.joining("\n")));
+        br.newLine();
+        br.write(sortedUdtMetaTypes.stream().map(this::dropUdtCqlStatement).collect(Collectors.joining("\n")));
+        br.newLine();
+        br.write(tableMetaTypes.stream().map(this::dropTableCqlStatement).collect(Collectors.joining("\n")));
+        br.newLine();
+        br.write(tableMetaTypes.stream().map(this::dropIndexCqlStatement).collect(Collectors.joining("\n")));
+        br.newLine();
+      }
+    } catch (IOException e) {
+      throw new CharybdisSerializationException("Serialization of 'ddl_*.cql' files failed", e);
     }
   }
 
