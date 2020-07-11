@@ -28,7 +28,7 @@ Add the following dependency to your **pom.xml**
 
 <!--```xml-->
 <!--<dependency>-->
-<!--    <groupId>com.github.charybdis</groupId>-->
+<!--    <groupId>ma.markware.charybdis</groupId>-->
 <!--    <artifactId>charybdis-core</artifactId>-->
 <!--    <version>${charybdis.version}</version>-->
 <!--</dependency>-->
@@ -162,8 +162,8 @@ The following Cql files are generated for the modelling above:
 
 ### Querying
 In order to query our Cassandra database, we can either use a **Dsl API** or **Crud API**. 
-Both can be instantiated by providing an implementation of [SessionFactory](https://github.com/omarkad2/charybdis/blob/master/core/src/main/java/com/github/charybdis/session/SessionFactory.java) if 
-none provided we fallback on [DefaultSessionFactory](https://github.com/omarkad2/charybdis/blob/master/core/src/main/java/com/github/charybdis/session/DefaultSessionFactory.java).
+Both can be instantiated by providing an implementation of [SessionFactory](https://github.com/omarkad2/charybdis/blob/master/core/src/main/java/ma/markware/charybdis/session/SessionFactory.java) if 
+none provided we fallback on [DefaultSessionFactory](https://github.com/omarkad2/charybdis/blob/master/core/src/main/java/ma/markware/charybdis/session/DefaultSessionFactory.java).
 #### Dsl API
 
 - Instantiate the API:

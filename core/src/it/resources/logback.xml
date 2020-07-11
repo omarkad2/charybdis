@@ -8,7 +8,7 @@
     </encoder>
   </appender>
 
-  <logger name="com.github.charybdis" level="INFO" additivity="false">
+  <logger name="ma.markware.charybdis" level="INFO" additivity="false">
     <appender-ref ref="STDOUT" />
   </logger>
 

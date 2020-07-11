@@ -5,7 +5,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>com.github.charybdis</groupId>
+    <groupId>ma.markware.charybdis</groupId>
     <artifactId>charybdis-parent</artifactId>
     <version>1.0.0-SNAPSHOT</version>
   </parent>
@@ -15,7 +15,7 @@
   <dependencies>
     <!-- Internal modules -->
     <dependency>
-      <groupId>com.github.charybdis</groupId>
+      <groupId>ma.markware.charybdis</groupId>
       <artifactId>charybdis-model</artifactId>
     </dependency>
 
@@ -35,7 +35,7 @@
 
     <!-- Test -->
     <dependency>
-      <groupId>com.github.charybdis</groupId>
+      <groupId>ma.markware.charybdis</groupId>
       <artifactId>charybdis-test-data</artifactId>
       <scope>test</scope>
     </dependency>
