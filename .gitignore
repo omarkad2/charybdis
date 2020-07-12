@@ -38,4 +38,7 @@ hs_err_pid*
 log/
 target/
 
+# Release
 release.properties
+*.releaseBackup
+
