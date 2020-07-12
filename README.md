@@ -2,6 +2,7 @@
 
 [![Build Status](https://travis-ci.org/omarkad2/charybdis.svg?branch=master)](https://travis-ci.org/omarkad2/charybdis)
 [![codecov](https://codecov.io/gh/omarkad2/charybdis/branch/master/graph/badge.svg)](https://codecov.io/gh/omarkad2/charybdis)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/ma.markware.charybdis/charybdis-core/badge.svg)](https://maven-badges.herokuapp.com/maven-central/ma.markware.charybdis/charybdis-core)
 [![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/omarkad2/charybdis/issues)
 [![License](https://img.shields.io/github/license/fridujo/spring-automocker.svg)](https://opensource.org/licenses/Apache-2.0)
 
@@ -26,13 +27,13 @@ Cassandra data types.
 ### Maven
 Add the following dependency to your **pom.xml**
 
-<!--```xml-->
-<!--<dependency>-->
-<!--    <groupId>ma.markware.charybdis</groupId>-->
-<!--    <artifactId>charybdis-core</artifactId>-->
-<!--    <version>${charybdis.version}</version>-->
-<!--</dependency>-->
-<!--```-->
+```xml
+<dependency>
+    <groupId>ma.markware.charybdis</groupId>
+    <artifactId>charybdis-core</artifactId>
+    <version>1.0.2</version>
+</dependency>
+```
 
 <!--### Gradle-->
 <!--Add the following dependency to your **build.gradle**-->
