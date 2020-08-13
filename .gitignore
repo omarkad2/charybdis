@@ -41,4 +41,4 @@ target/
 # Release
 release.properties
 *.releaseBackup
-
+.java-version

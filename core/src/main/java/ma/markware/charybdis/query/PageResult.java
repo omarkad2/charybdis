@@ -19,6 +19,7 @@
 package ma.markware.charybdis.query;
 
 import java.nio.ByteBuffer;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -30,6 +31,7 @@ import java.util.List;
  */
 public class PageResult<T> {
 
+  public static final PageResult EMPTY_PAGE = new PageResult<>(Collections.emptyList(), null);
   private List<T> results;
 
   private ByteBuffer pagingState;

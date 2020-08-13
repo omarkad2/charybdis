@@ -23,6 +23,7 @@ import com.datastax.oss.driver.api.core.cql.ResultSet;
 import com.datastax.oss.driver.api.core.cql.Row;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import ma.markware.charybdis.model.criteria.CriteriaExpression;
 import ma.markware.charybdis.model.criteria.ExtendedCriteriaExpression;
@@ -105,7 +106,7 @@ class ReadEntityManager<T> {
   List<T> fetch(CqlSession session) {
     final ResultSet resultSet = selectQuery.execute(session);
     if (resultSet == null) {
-      return null;
+      return Collections.emptyList();
     }
     return getEntities(resultSet);
   }
@@ -118,7 +119,7 @@ class ReadEntityManager<T> {
   PageResult<T> fetchPage(CqlSession session) {
     ResultSet resultSet = selectQuery.execute(session);
     if (resultSet == null) {
-      return null;
+      return PageResult.EMPTY_PAGE;
     }
     ByteBuffer pagingState = resultSet.getExecutionInfo().getPagingState();
     return new PageResult<>(getEntities(resultSet), pagingState);

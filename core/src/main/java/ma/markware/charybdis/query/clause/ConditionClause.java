@@ -68,7 +68,7 @@ public class ConditionClause {
           fill(bindMarkers, QueryBuilder.bindMarker());
           return new ConditionClause(field.toCondition(" IN ", QueryBuilder.tuple(bindMarkers)), values);
         } else {
-          return new ConditionClause(field.toCondition(" IN ", QueryBuilder.raw("")), null);
+          return new ConditionClause(field.toCondition(" IN ", QueryBuilder.raw("()")), new Object[]{});
         }
       default:
         throw new CharybdisUnsupportedOperationException(format("Operation '%s' is not supported in [IF] clause", criteria.getCriteriaOperator()));
