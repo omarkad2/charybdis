@@ -22,6 +22,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.datastax.oss.driver.api.core.cql.Row;
 import com.datastax.oss.driver.internal.querybuilder.relation.DefaultRelation;
+
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -130,10 +132,11 @@ class WhereClauseTest {
         Arguments.of(WhereClause.from(simpleColumnMetadata.gte("test")), ">=", new Object[] { "test" }),
         Arguments.of(WhereClause.from(simpleColumnMetadata.lt("test")), "<", new Object[] { "test" }),
         Arguments.of(WhereClause.from(simpleColumnMetadata.lte("test")), "<=", new Object[] { "test" }),
-        Arguments.of(WhereClause.from(simpleColumnMetadata.isNotNull()), " IS NOT NULL ", null),
+        Arguments.of(WhereClause.from(simpleColumnMetadata.isNotNull()), " IS NOT NULL ", new Object[] {}),
         Arguments.of(WhereClause.from(simpleColumnMetadata.like("te")), " LIKE ", new Object[] { "te" }),
         Arguments.of(WhereClause.from(simpleColumnMetadata.in("test1", "test2")), " IN ", new Object[] { "test1", "test2" }),
-        Arguments.of(WhereClause.from(simpleColumnMetadata.in()), " IN ", null),
+        Arguments.of(WhereClause.from(simpleColumnMetadata.in()), " IN ", new Object[] {}),
+        Arguments.of(WhereClause.from(simpleColumnMetadata.in(Collections.emptyList())), " IN ", new Object[] {}),
         Arguments.of(WhereClause.from(listColumnMetadata.contains(100)), " CONTAINS ", new Object[] { 100 }),
         Arguments.of(WhereClause.from(mapColumnMetadata.contains("test")), " CONTAINS ", new Object[] { "test" }),
         Arguments.of(WhereClause.from(mapColumnMetadata.containsKey(10)), " CONTAINS KEY ", new Object[] { 10 })

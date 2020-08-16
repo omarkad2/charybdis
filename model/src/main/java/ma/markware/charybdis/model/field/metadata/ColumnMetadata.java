@@ -20,6 +20,8 @@ package ma.markware.charybdis.model.field.metadata;
 
 import com.datastax.oss.driver.api.core.metadata.schema.ClusteringOrder;
 import com.datastax.oss.driver.api.querybuilder.select.Selector;
+
+import java.util.Collection;
 import java.util.stream.Stream;
 import ma.markware.charybdis.model.criteria.CriteriaExpression;
 import ma.markware.charybdis.model.criteria.CriteriaOperator;
@@ -29,6 +31,7 @@ import ma.markware.charybdis.model.field.SelectableField;
 import ma.markware.charybdis.model.field.SerializableField;
 import ma.markware.charybdis.model.field.criteria.CriteriaField;
 import ma.markware.charybdis.model.order.OrderExpression;
+import org.apache.commons.collections.CollectionUtils;
 
 /**
  * Column metadata.
@@ -69,6 +72,16 @@ public interface ColumnMetadata<D, S> extends Field, SelectableField<D>, Criteri
   @SuppressWarnings("unchecked")
   default CriteriaExpression in(D... values) {
     return new CriteriaExpression(this, CriteriaOperator.IN, Stream.of(values).map(this::serialize).toArray());
+  }
+
+  /**
+   * Compare column value with a set of values for equality.
+   */
+  default CriteriaExpression in(Collection<D> values) {
+    if (CollectionUtils.isEmpty(values)) {
+      return new CriteriaExpression(this, CriteriaOperator.IN, new Object[]{});
+    }
+    return new CriteriaExpression(this, CriteriaOperator.IN, values.stream().map(this::serialize).toArray());
   }
 
   /**

@@ -104,7 +104,7 @@ class ConditionClauseTest {
         Arguments.of(ConditionClause.from(simpleColumnMetadata.lt("test")), "<", new Object[] { "test" }),
         Arguments.of(ConditionClause.from(simpleColumnMetadata.lte("test")), "<=", new Object[] { "test" }),
         Arguments.of(ConditionClause.from(simpleColumnMetadata.in("test1", "test2")), " IN ", new Object[] { "test1", "test2" }),
-        Arguments.of(ConditionClause.from(simpleColumnMetadata.in()), " IN ", null)
+        Arguments.of(ConditionClause.from(simpleColumnMetadata.in()), " IN ", new Object[] {})
     );
   }
 }

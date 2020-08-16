@@ -68,7 +68,7 @@ public class WhereClause {
           fill(bindMarkers, QueryBuilder.bindMarker());
           return new WhereClause(field.toRelation(" IN ", QueryBuilder.tuple(bindMarkers)), serializedValues);
         } else {
-          return new WhereClause(field.toRelation(" IN ", QueryBuilder.raw("")), null);
+          return new WhereClause(field.toRelation(" IN ", QueryBuilder.raw("()")), new Object[]{});
         }
       case CONTAINS:
         return new WhereClause(field.toRelation(" CONTAINS ", QueryBuilder.bindMarker()), serializedValues);
@@ -77,7 +77,7 @@ public class WhereClause {
       case LIKE:
         return new WhereClause(field.toRelation(" LIKE ", QueryBuilder.bindMarker()), serializedValues);
       case IS_NOT_NULL:
-        return new WhereClause(field.toRelation(" IS NOT NULL ", null), null);
+        return new WhereClause(field.toRelation(" IS NOT NULL ", null), new Object[]{});
       default:
         throw new CharybdisUnsupportedOperationException(format("Operation '%s' is not supported in [WHERE] clause", criteria.getCriteriaOperator()));
     }
