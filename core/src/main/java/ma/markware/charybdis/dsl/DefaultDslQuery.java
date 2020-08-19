@@ -19,6 +19,9 @@
 package ma.markware.charybdis.dsl;
 
 import com.datastax.oss.driver.api.core.CqlSession;
+import com.datastax.oss.driver.api.core.config.DriverExecutionProfile;
+import com.google.common.annotations.VisibleForTesting;
+import ma.markware.charybdis.ExecutionContext;
 import ma.markware.charybdis.dsl.delete.DeleteImpl;
 import ma.markware.charybdis.dsl.delete.DeleteInitExpression;
 import ma.markware.charybdis.dsl.insert.InsertImpl;
@@ -34,6 +37,7 @@ import ma.markware.charybdis.model.field.SelectableField;
 import ma.markware.charybdis.model.field.metadata.ColumnMetadata;
 import ma.markware.charybdis.model.field.metadata.PartitionKeyColumnMetadata;
 import ma.markware.charybdis.model.field.metadata.TableMetadata;
+import ma.markware.charybdis.model.option.ConsistencyLevel;
 import ma.markware.charybdis.session.DefaultSessionFactory;
 import ma.markware.charybdis.session.SessionFactory;
 import ma.markware.charybdis.session.StandaloneSessionFactory;
@@ -47,6 +51,12 @@ import ma.markware.charybdis.session.StandaloneSessionFactory;
 public class DefaultDslQuery implements DslQuery {
 
   private final SessionFactory sessionFactory;
+  private ExecutionContext executionContext;
+
+  private DefaultDslQuery(SessionFactory sessionFactory, ExecutionContext executionContext) {
+    this.sessionFactory = sessionFactory;
+    this.executionContext = executionContext;
+  }
 
   /**
    * Initialize the DSL manager using a custom session factory.
@@ -54,7 +64,7 @@ public class DefaultDslQuery implements DslQuery {
    * @param customSessionFactory Instance of {@link SessionFactory} responsible of creating cql sessions.
    */
   public DefaultDslQuery(final SessionFactory customSessionFactory) {
-    this.sessionFactory = customSessionFactory;
+    this(customSessionFactory, new ExecutionContext());
   }
 
   /**
@@ -84,9 +94,50 @@ public class DefaultDslQuery implements DslQuery {
     this(new StandaloneSessionFactory(session));
   }
 
+  /**
+   * @return current execution context.
+   */
+  @VisibleForTesting
+  public ExecutionContext getExecutionContext() {
+    return executionContext;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public DefaultDslQuery withExecutionProfile(DriverExecutionProfile executionProfile) {
+    ExecutionContext executionContext = new ExecutionContext(this.executionContext);
+    executionContext.setDriverExecutionProfile(executionProfile);
+    return new DefaultDslQuery(sessionFactory, executionContext);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public DefaultDslQuery withExecutionProfile(String executionProfile) {
+    ExecutionContext executionContext = new ExecutionContext(this.executionContext);
+    executionContext.setExecutionProfileName(executionProfile);
+    return new DefaultDslQuery(sessionFactory, executionContext);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public DefaultDslQuery withConsistency(ConsistencyLevel consistencyLevel) {
+    ExecutionContext executionContext = new ExecutionContext(this.executionContext);
+    executionContext.setConsistencyLevel(consistencyLevel);
+    return new DefaultDslQuery(sessionFactory, executionContext);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public SelectInitExpression select(final SelectableField... fields) {
-    return new SelectImpl(sessionFactory.getSession()).select(fields);
+    return new SelectImpl(sessionFactory.getSession(), executionContext).select(fields);
   }
 
   /**
@@ -94,7 +145,7 @@ public class DefaultDslQuery implements DslQuery {
    */
   @Override
   public SelectInitExpression selectDistinct(final PartitionKeyColumnMetadata... fields) {
-    return new SelectImpl(sessionFactory.getSession()).selectDistinct(fields);
+    return new SelectImpl(sessionFactory.getSession(), executionContext).selectDistinct(fields);
   }
 
   /**
@@ -102,7 +153,7 @@ public class DefaultDslQuery implements DslQuery {
    */
   @Override
   public SelectWhereExpression selectFrom(final TableMetadata table) {
-    return new SelectImpl(sessionFactory.getSession()).selectFrom(table);
+    return new SelectImpl(sessionFactory.getSession(), executionContext).selectFrom(table);
   }
 
   /**
@@ -110,7 +161,7 @@ public class DefaultDslQuery implements DslQuery {
    */
   @Override
   public InsertInitExpression insertInto(final TableMetadata table) {
-    return new InsertImpl(sessionFactory.getSession()).insertInto(table);
+    return new InsertImpl(sessionFactory.getSession(), executionContext).insertInto(table);
   }
 
   /**
@@ -118,7 +169,7 @@ public class DefaultDslQuery implements DslQuery {
    */
   @Override
   public InsertInitWithColumnsExpression insertInto(TableMetadata table, ColumnMetadata... columns) {
-    return new InsertImpl(sessionFactory.getSession()).insertInto(table, columns);
+    return new InsertImpl(sessionFactory.getSession(), executionContext).insertInto(table, columns);
   }
 
   /**
@@ -126,7 +177,7 @@ public class DefaultDslQuery implements DslQuery {
    */
   @Override
   public UpdateInitExpression update(TableMetadata table) {
-    return new UpdateImpl(sessionFactory.getSession()).update(table);
+    return new UpdateImpl(sessionFactory.getSession(), executionContext).update(table);
   }
 
   /**
@@ -134,7 +185,7 @@ public class DefaultDslQuery implements DslQuery {
    */
   @Override
   public DeleteInitExpression delete() {
-    return new DeleteImpl(sessionFactory.getSession()).delete();
+    return new DeleteImpl(sessionFactory.getSession(), executionContext).delete();
   }
 
   /**
@@ -142,6 +193,6 @@ public class DefaultDslQuery implements DslQuery {
    */
   @Override
   public DeleteInitExpression delete(final DeletableField... fields) {
-    return new DeleteImpl(sessionFactory.getSession()).delete(fields);
+    return new DeleteImpl(sessionFactory.getSession(), executionContext).delete(fields);
   }
 }

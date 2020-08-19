@@ -29,6 +29,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import ma.markware.charybdis.ExecutionContext;
+import ma.markware.charybdis.model.option.ConsistencyLevel;
 import ma.markware.charybdis.query.InsertQuery;
 import ma.markware.charybdis.test.entities.TestEnum;
 import ma.markware.charybdis.test.entities.TestNestedUdt;
@@ -48,11 +50,13 @@ class InsertImplTest {
   private CqlSession session;
 
   private InsertImpl insertImpl;
+  private ExecutionContext executionContext;
   private TestUdt udt1, udt2;
 
   @BeforeEach
   void setup() {
-    insertImpl = new InsertImpl(session);
+    executionContext = new ExecutionContext();
+    insertImpl = new InsertImpl(session, executionContext);
 
     TestNestedUdt nestedUdt1 = new TestNestedUdt("nestedName1", "nestedValue1", Arrays.asList(12, 13));
     TestNestedUdt nestedUdt2 = new TestNestedUdt("nestedName2", "nestedValue2", Arrays.asList(14, 15, 16));
@@ -74,6 +78,12 @@ class InsertImplTest {
     InsertQuery insertQuery = insertImpl.getInsertQuery();
     assertThat(insertQuery.getKeyspace()).isEqualTo(TestEntity_Table.KEYSPACE_NAME);
     assertThat(insertQuery.getTable()).isEqualTo(TestEntity_Table.TABLE_NAME);
+  }
+
+  @Test
+  void insert_should_set_fallback_consistency() {
+    insertImpl.insertInto(TestEntity_Table.test_entity);
+    assertThat(executionContext.getDefaultConsistencyLevel()).isEqualTo(ConsistencyLevel.QUORUM);
   }
 
   @Test

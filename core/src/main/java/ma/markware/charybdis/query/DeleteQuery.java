@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Stream;
+import ma.markware.charybdis.ExecutionContext;
 import ma.markware.charybdis.model.criteria.CriteriaExpression;
 import ma.markware.charybdis.model.field.DeletableField;
 import ma.markware.charybdis.model.field.metadata.TableMetadata;
@@ -49,6 +50,10 @@ public class DeleteQuery extends AbstractQuery {
   private List<WhereClause> whereClauses = new ArrayList<>();
   private List<ConditionClause> conditionClauses = new ArrayList<>();
   private Long timestamp;
+
+  public DeleteQuery(ExecutionContext executionContext) {
+    super(executionContext);
+  }
 
   public String getKeyspace() {
     return keyspace;
@@ -75,8 +80,9 @@ public class DeleteQuery extends AbstractQuery {
   }
 
   public void setTable(TableMetadata tableMetadata) {
-    this.keyspace = tableMetadata.getKeyspaceName();
-    this.table = tableMetadata.getTableName();
+    keyspace = tableMetadata.getKeyspaceName();
+    table = tableMetadata.getTableName();
+    executionContext.setDefaultConsistencyLevel(tableMetadata.getDefaultWriteConsistency());
   }
 
   public void setSelectors(DeletableField... fields) {

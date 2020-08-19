@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Stream;
+import ma.markware.charybdis.ExecutionContext;
 import ma.markware.charybdis.model.assignment.AssignmentListValue;
 import ma.markware.charybdis.model.assignment.AssignmentMapValue;
 import ma.markware.charybdis.model.assignment.AssignmentSetValue;
@@ -60,6 +61,10 @@ public class UpdateQuery extends AbstractQuery {
   private List<ConditionClause> conditionClauses = new ArrayList<>();
   private Integer ttl;
   private Long timestamp;
+
+  public UpdateQuery(ExecutionContext executionContext) {
+    super(executionContext);
+  }
 
   public String getKeyspace() {
     return keyspace;
@@ -92,6 +97,7 @@ public class UpdateQuery extends AbstractQuery {
   public void setTable(TableMetadata tableMetadata) {
     keyspace = tableMetadata.getKeyspaceName();
     table = tableMetadata.getTableName();
+    executionContext.setDefaultConsistencyLevel(tableMetadata.getDefaultReadConsistency());
   }
 
   public void setSerializedAssignment(ColumnMetadata columnMetadata, Object serializedValue) {

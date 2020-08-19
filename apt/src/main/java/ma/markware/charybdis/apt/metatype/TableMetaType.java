@@ -18,6 +18,8 @@
  */
 package ma.markware.charybdis.apt.metatype;
 
+import ma.markware.charybdis.model.option.ConsistencyLevel;
+
 import java.util.List;
 
 /**
@@ -29,6 +31,9 @@ import java.util.List;
 public class TableMetaType extends AbstractEntityMetaType {
 
   private String tableName;
+  private ConsistencyLevel defaultWriteConsistency;
+  private ConsistencyLevel defaultReadConsistency;
+
   private List<ColumnFieldMetaType> columns;
   private List<ColumnFieldMetaType> partitionKeyColumns;
   private List<ColumnFieldMetaType> clusteringKeyColumns;
@@ -43,6 +48,22 @@ public class TableMetaType extends AbstractEntityMetaType {
 
   public void setTableName(final String tableName) {
     this.tableName = tableName;
+  }
+
+  public ConsistencyLevel getDefaultWriteConsistency() {
+    return defaultWriteConsistency;
+  }
+
+  public void setDefaultWriteConsistency(ConsistencyLevel defaultWriteConsistency) {
+    this.defaultWriteConsistency = defaultWriteConsistency;
+  }
+
+  public ConsistencyLevel getDefaultReadConsistency() {
+    return defaultReadConsistency;
+  }
+
+  public void setDefaultReadConsistency(ConsistencyLevel defaultReadConsistency) {
+    this.defaultReadConsistency = defaultReadConsistency;
   }
 
   public List<ColumnFieldMetaType> getColumns() {

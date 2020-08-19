@@ -18,6 +18,8 @@
  */
 package ma.markware.charybdis.model.annotation;
 
+import ma.markware.charybdis.model.option.ConsistencyLevel;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -54,4 +56,14 @@ public @interface Table {
    * @return table name defined in annotation.
    */
   String name();
+
+  /**
+   * Default write consistency (overridable at query level)
+   */
+  ConsistencyLevel writeConsistency() default ConsistencyLevel.NOT_SPECIFIED;
+
+  /**
+   * Default read consistency (overridable at query level)
+   */
+  ConsistencyLevel readConsistency() default ConsistencyLevel.NOT_SPECIFIED;
 }

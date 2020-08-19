@@ -14,8 +14,9 @@ import ma.markware.charybdis.model.annotation.Index;
 import ma.markware.charybdis.model.annotation.PartitionKey;
 import ma.markware.charybdis.model.annotation.Table;
 import ma.markware.charybdis.model.option.ClusteringOrder;
+import ma.markware.charybdis.model.option.ConsistencyLevel;
 
-@Table(keyspace = "test_keyspace", name = "test_entity")
+@Table(keyspace = "test_keyspace", name = "test_entity", readConsistency = ConsistencyLevel.QUORUM, writeConsistency = ConsistencyLevel.QUORUM)
 public class TestEntity extends TestSuperEntity {
 
   @Column

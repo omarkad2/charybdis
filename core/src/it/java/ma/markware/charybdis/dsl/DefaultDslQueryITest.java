@@ -39,6 +39,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import ma.markware.charybdis.AbstractIntegrationITest;
+import ma.markware.charybdis.model.field.SelectableField;
 import ma.markware.charybdis.query.PageRequest;
 import ma.markware.charybdis.query.PageResult;
 import ma.markware.charybdis.test.entities.TestEntity;
@@ -129,25 +130,29 @@ class DefaultDslQueryITest extends AbstractIntegrationITest {
 
       // Row1
       insertRow(session, TestEntity_Table.KEYSPACE_NAME, TestEntity_Table.TABLE_NAME,
-                ImmutableMap.of(TestEntity_Table.id.getName(), QueryBuilder.literal(TestEntity_Table.id.serialize(id1)), TestEntity_Table.date.getName(), QueryBuilder.literal(TestEntity_Table.date.serialize(TestEntity_INST1.date)),
+                ImmutableMap.of(TestEntity_Table.id.getName(), QueryBuilder.literal(TestEntity_Table.id.serialize(id1)), TestEntity_Table.date.getName(),
+                                QueryBuilder.literal(TestEntity_Table.date.serialize(TestEntity_INST1.date)),
                                 TestEntity_Table.udt.getName(), QueryBuilder.literal(TestEntity_Table.udt.serialize(TestEntity_INST1.udt1)),
                                 TestEntity_Table.list.getName(), QueryBuilder.literal(TestEntity_Table.list.serialize(TestEntity_INST1.list))));
 
       // Row2
       insertRow(session, TestEntity_Table.KEYSPACE_NAME, TestEntity_Table.TABLE_NAME,
-                ImmutableMap.of(TestEntity_Table.id.getName(), QueryBuilder.literal(TestEntity_Table.id.serialize(id1)), TestEntity_Table.date.getName(), QueryBuilder.literal(TestEntity_Table.date.serialize(Instant.now())),
+                ImmutableMap.of(TestEntity_Table.id.getName(), QueryBuilder.literal(TestEntity_Table.id.serialize(id1)), TestEntity_Table.date.getName(),
+                                QueryBuilder.literal(TestEntity_Table.date.serialize(Instant.now())),
                                 TestEntity_Table.udt.getName(), QueryBuilder.literal(TestEntity_Table.udt.serialize(TestEntity_INST1.udt1)),
                                 TestEntity_Table.list.getName(), QueryBuilder.literal(TestEntity_Table.list.serialize(TestEntity_INST1.list))));
 
       // Row3
       insertRow(session, TestEntity_Table.KEYSPACE_NAME, TestEntity_Table.TABLE_NAME,
-                ImmutableMap.of(TestEntity_Table.id.getName(), QueryBuilder.literal(TestEntity_Table.id.serialize(id2)), TestEntity_Table.date.getName(), QueryBuilder.literal(TestEntity_Table.date.serialize(Instant.now())),
+                ImmutableMap.of(TestEntity_Table.id.getName(), QueryBuilder.literal(TestEntity_Table.id.serialize(id2)), TestEntity_Table.date.getName(),
+                                QueryBuilder.literal(TestEntity_Table.date.serialize(Instant.now())),
                                 TestEntity_Table.udt.getName(), QueryBuilder.literal(TestEntity_Table.udt.serialize(TestEntity_INST1.udt1)),
                                 TestEntity_Table.list.getName(), QueryBuilder.literal(TestEntity_Table.list.serialize(TestEntity_INST1.list))));
 
       // Row4
       insertRow(session, TestEntity_Table.KEYSPACE_NAME, TestEntity_Table.TABLE_NAME,
-                ImmutableMap.of(TestEntity_Table.id.getName(), QueryBuilder.literal(TestEntity_Table.id.serialize(id3)), TestEntity_Table.date.getName(), QueryBuilder.literal(TestEntity_Table.date.serialize(Instant.now())),
+                ImmutableMap.of(TestEntity_Table.id.getName(), QueryBuilder.literal(TestEntity_Table.id.serialize(id3)), TestEntity_Table.date.getName(),
+                                QueryBuilder.literal(TestEntity_Table.date.serialize(Instant.now())),
                                 TestEntity_Table.udt.getName(), QueryBuilder.literal(TestEntity_Table.udt.serialize(TestEntity_INST1.udt1)),
                                 TestEntity_Table.list.getName(), QueryBuilder.literal(TestEntity_Table.list.serialize(TestEntity_INST1.list))));
 
@@ -531,6 +536,58 @@ class DefaultDslQueryITest extends AbstractIntegrationITest {
       assertThat(record.get(TestEntity_Table.udtNestedList)).isNull();
       assertThat(record.get(TestEntity_Table.flag)).isEqualTo(TestEntity_INST1.flag);
     }
+
+    @Test
+    void update_with_timestamp_in_micros() {
+
+      // When
+      long micros = Instant.now().plus(1, ChronoUnit.DAYS).toEpochMilli() * 1000;
+      boolean applied = dslQuery.update(TestEntity_Table.test_entity)
+                                .usingTimestamp(micros)
+                                .set(TestEntity_Table.flag, true)
+                                .where(TestEntity_Table.id.eq(TestEntity_INST2.id))
+                                .and(TestEntity_Table.date.eq(TestEntity_INST2.date))
+                                .and(TestEntity_Table.udt.eq(TestEntity_INST2.udt))
+                                .and(TestEntity_Table.list.eq(TestEntity_INST2.list))
+                                .execute();
+
+      SelectableField<Long> writetime = DslFunctions.writetime(TestEntity_Table.flag);
+      Record record = dslQuery.select(writetime)
+                              .from(TestEntity_Table.test_entity)
+                              .where(TestEntity_Table.id.eq(TestEntity_INST2.id))
+                              .fetchOne();
+
+      // Then
+      assertThat(applied).isTrue();
+      assertThat(record).isNotNull();
+      assertThat(record.get(writetime)).isEqualTo(micros);
+    }
+
+    @Test
+    void update_with_ttl() {
+
+      // When
+      int ttlInSeconds = 86400;
+      boolean applied = dslQuery.update(TestEntity_Table.test_entity)
+                                .usingTtl(ttlInSeconds)
+                                .set(TestEntity_Table.flag, false)
+                                .where(TestEntity_Table.id.eq(TestEntity_INST2.id))
+                                .and(TestEntity_Table.date.eq(TestEntity_INST2.date))
+                                .and(TestEntity_Table.udt.eq(TestEntity_INST2.udt))
+                                .and(TestEntity_Table.list.eq(TestEntity_INST2.list))
+                                .execute();
+
+      SelectableField<Integer> ttl = DslFunctions.ttl(TestEntity_Table.flag);
+      Record record = dslQuery.select(ttl)
+                              .from(TestEntity_Table.test_entity)
+                              .where(TestEntity_Table.id.eq(TestEntity_INST2.id))
+                              .fetchOne();
+
+      // Then
+      assertThat(applied).isTrue();
+      assertThat(record).isNotNull();
+      assertThat(record.get(ttl)).isEqualTo(ttlInSeconds);
+    }
   }
 
   @Nested
@@ -707,6 +764,33 @@ class DefaultDslQueryITest extends AbstractIntegrationITest {
       newUdtNestedList.remove(0);
       assertThat(record.get(TestEntity_Table.udtNestedList)).isEqualTo(newUdtNestedList);
       assertThat(record.get(TestEntity_Table.flag)).isEqualTo(TestEntity_INST1.flag);
+    }
+
+    @Test
+    void delete_with_timestamp_should_delete_values_written_before_timestamp() {
+
+      // When
+      long micros = Instant.now().plus(1, ChronoUnit.DAYS).toEpochMilli() * 1000;
+      boolean applied = dslQuery.delete(TestEntity_Table.flag)
+                                .from(TestEntity_Table.test_entity)
+                                .usingTimestamp(micros)
+                                .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
+                                .and(TestEntity_Table.date.eq(TestEntity_INST1.date))
+                                .and(TestEntity_Table.udt.eq(TestEntity_INST1.udt1))
+                                .and(TestEntity_Table.list.eq(TestEntity_INST1.list))
+                                .execute();
+
+      Record record = dslQuery.select(TestEntity_Table.flag)
+                              .from(TestEntity_Table.test_entity)
+                              .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
+                              .and(TestEntity_Table.date.eq(TestEntity_INST1.date))
+                              .and(TestEntity_Table.udt.eq(TestEntity_INST1.udt1))
+                              .and(TestEntity_Table.list.eq(TestEntity_INST1.list))
+                              .fetchOne();
+
+      // Then
+      assertThat(applied).isTrue();
+      assertThat(record.get(TestEntity_Table.flag)).isNull();
     }
   }
 }

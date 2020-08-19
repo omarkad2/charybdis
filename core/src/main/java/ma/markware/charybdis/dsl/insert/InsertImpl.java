@@ -21,6 +21,7 @@ package ma.markware.charybdis.dsl.insert;
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.cql.ResultSet;
 import java.time.Instant;
+import ma.markware.charybdis.ExecutionContext;
 import ma.markware.charybdis.model.field.metadata.ColumnMetadata;
 import ma.markware.charybdis.model.field.metadata.TableMetadata;
 import ma.markware.charybdis.query.InsertQuery;
@@ -36,9 +37,9 @@ public class InsertImpl implements InsertInitExpression, InsertInitWithColumnsEx
   private final CqlSession session;
   private final InsertQuery insertQuery;
 
-  public InsertImpl(final CqlSession session) {
+  public InsertImpl(final CqlSession session, final ExecutionContext executionContext) {
     this.session = session;
-    this.insertQuery = new InsertQuery();
+    this.insertQuery = new InsertQuery(executionContext);
   }
 
   InsertQuery getInsertQuery() {

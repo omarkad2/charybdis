@@ -33,6 +33,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
+import ma.markware.charybdis.ExecutionContext;
+import ma.markware.charybdis.model.option.ConsistencyLevel;
 import ma.markware.charybdis.query.DeleteQuery;
 import ma.markware.charybdis.query.clause.ConditionClause;
 import ma.markware.charybdis.query.clause.WhereClause;
@@ -53,11 +55,13 @@ class DeleteImplTest {
   private CqlSession session;
 
   private DeleteImpl deleteImpl;
+  private ExecutionContext executionContext;
   private TestUdt udt1, udt2;
 
   @BeforeEach
   void setup() {
-    deleteImpl = new DeleteImpl(session);
+    executionContext = new ExecutionContext();
+    deleteImpl = new DeleteImpl(session, executionContext);
 
     TestNestedUdt nestedUdt1 = new TestNestedUdt("nestedName1", "nestedValue1", Arrays.asList(12, 13));
     TestNestedUdt nestedUdt2 = new TestNestedUdt("nestedName2", "nestedValue2", Arrays.asList(14, 15, 16));
@@ -81,6 +85,12 @@ class DeleteImplTest {
                                           .containsExactlyInAnyOrder(
                                               CqlIdentifier.fromCql(TestEntity_Table.list.getName()),
                                               CqlIdentifier.fromCql(TestEntity_Table.map.getName()));
+  }
+
+  @Test
+  void delete_should_set_fallback_consistency() {
+    deleteImpl.delete().from(TestEntity_Table.test_entity);
+    assertThat(executionContext.getDefaultConsistencyLevel()).isEqualTo(ConsistencyLevel.QUORUM);
   }
 
   @Test

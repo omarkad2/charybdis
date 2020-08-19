@@ -18,12 +18,14 @@
  */
 package ma.markware.charybdis.crud;
 
+import com.datastax.oss.driver.api.core.config.DriverExecutionProfile;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import ma.markware.charybdis.model.criteria.CriteriaExpression;
 import ma.markware.charybdis.model.criteria.ExtendedCriteriaExpression;
 import ma.markware.charybdis.model.field.metadata.TableMetadata;
+import ma.markware.charybdis.model.option.ConsistencyLevel;
 import ma.markware.charybdis.query.PageRequest;
 import ma.markware.charybdis.query.PageResult;
 
@@ -33,6 +35,30 @@ import ma.markware.charybdis.query.PageResult;
  * @author Oussama Markad
  */
 public interface EntityManager {
+
+  /**
+   * Set consistency level that will be applied to queries by our entity manager.
+   *
+   * @param consistencyLevel consistency level.
+   * @return a new entity manager instance with a specific consistency level.
+   */
+  EntityManager withConsistency(ConsistencyLevel consistencyLevel);
+
+  /**
+   * Set execution profile that will be applied to queries by our entity manager.
+   *
+   * @param executionProfile driver execution profile.
+   * @return a new entity manager instance with a specific execution profile.
+   */
+  EntityManager withExecutionProfile(DriverExecutionProfile executionProfile);
+
+  /**
+   * Set execution profile that will be applied to queries by our entity manager.
+   *
+   * @param executionProfile execution profile name.
+   * @return a new entity manager instance with a specific execution profile.
+   */
+  EntityManager withExecutionProfile(String executionProfile);
 
   /**
    * Create entity in DB.

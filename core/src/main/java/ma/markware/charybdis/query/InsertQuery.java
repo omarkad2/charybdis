@@ -32,6 +32,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import ma.markware.charybdis.ExecutionContext;
 import ma.markware.charybdis.model.field.metadata.ColumnMetadata;
 import ma.markware.charybdis.model.field.metadata.TableMetadata;
 import org.apache.commons.lang3.StringUtils;
@@ -50,6 +51,10 @@ public class InsertQuery extends AbstractQuery {
   private Integer ttl;
   private Long timestamp;
   private boolean ifNotExists;
+
+  public InsertQuery(ExecutionContext executionContext) {
+    super(executionContext);
+  }
 
   public String getKeyspace() {
     return keyspace;
@@ -76,9 +81,10 @@ public class InsertQuery extends AbstractQuery {
   }
 
   public void setTable(TableMetadata tableMetadata) {
-    this.keyspace = tableMetadata.getKeyspaceName();
-    this.table = tableMetadata.getTableName();
+    keyspace = tableMetadata.getKeyspaceName();
+    table = tableMetadata.getTableName();
     columnNameValueMapping.setTableMetadata(tableMetadata);
+    executionContext.setDefaultConsistencyLevel(tableMetadata.getDefaultWriteConsistency());
   }
 
   public void setTableAndColumns(TableMetadata tableMetadata, ColumnMetadata... columns) {

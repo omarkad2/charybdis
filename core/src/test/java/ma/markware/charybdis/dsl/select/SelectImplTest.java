@@ -33,6 +33,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
+import ma.markware.charybdis.ExecutionContext;
+import ma.markware.charybdis.model.option.ConsistencyLevel;
 import ma.markware.charybdis.query.SelectQuery;
 import ma.markware.charybdis.query.clause.WhereClause;
 import ma.markware.charybdis.test.entities.TestEnum;
@@ -52,11 +54,13 @@ class SelectImplTest {
   private CqlSession session;
 
   private SelectImpl selectImpl;
+  private ExecutionContext executionContext;
   private TestUdt udt1, udt2;
 
   @BeforeEach
   void setup() {
-    selectImpl = new SelectImpl(session);
+    executionContext = new ExecutionContext();
+    selectImpl = new SelectImpl(session, executionContext);
 
     TestNestedUdt nestedUdt1 = new TestNestedUdt("nestedName1", "nestedValue1", Arrays.asList(12, 13));
     TestNestedUdt nestedUdt2 = new TestNestedUdt("nestedName2", "nestedValue2", Arrays.asList(14, 15, 16));
@@ -80,6 +84,12 @@ class SelectImplTest {
                                           .containsExactlyInAnyOrder(
         CqlIdentifier.fromCql(TestEntity_Table.id.getName()),
         CqlIdentifier.fromCql(TestEntity_Table.udt.getName()));
+  }
+
+  @Test
+  void select_should_set_fallback_consistency() {
+    selectImpl.selectFrom(TestEntity_Table.test_entity);
+    assertThat(executionContext.getDefaultConsistencyLevel()).isEqualTo(ConsistencyLevel.QUORUM);
   }
 
   @Test

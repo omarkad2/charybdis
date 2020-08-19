@@ -20,6 +20,7 @@ import ma.markware.charybdis.model.field.metadata.SetColumnMetadata;
 import ma.markware.charybdis.model.field.metadata.TableMetadata;
 import ma.markware.charybdis.model.field.metadata.UdtColumnMetadata;
 import ma.markware.charybdis.model.option.ClusteringOrder;
+import ma.markware.charybdis.model.option.ConsistencyLevel;
 import ma.markware.charybdis.test.entities.TestEntity;
 import ma.markware.charybdis.test.entities.TestEnum;
 import ma.markware.charybdis.test.entities.TestExtraUdt;
@@ -828,6 +829,16 @@ public class TestEntity_Table implements TableMetadata<TestEntity> {
   @Override
   public String getTableName() {
     return TABLE_NAME;
+  }
+
+  @Override
+  public ConsistencyLevel getDefaultReadConsistency() {
+    return ConsistencyLevel.QUORUM;
+  }
+
+  @Override
+  public ConsistencyLevel getDefaultWriteConsistency() {
+    return ConsistencyLevel.QUORUM;
   }
 
   @Override

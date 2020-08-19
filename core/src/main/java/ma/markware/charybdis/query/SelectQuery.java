@@ -33,6 +33,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import ma.markware.charybdis.ExecutionContext;
 import ma.markware.charybdis.model.criteria.CriteriaExpression;
 import ma.markware.charybdis.model.field.SelectableField;
 import ma.markware.charybdis.model.field.metadata.PartitionKeyColumnMetadata;
@@ -58,6 +59,10 @@ public class SelectQuery extends AbstractQuery {
   private Integer limit;
   private boolean allowFiltering;
   private PageRequest pageRequest;
+
+  public SelectQuery(ExecutionContext executionContext) {
+    super(executionContext);
+  }
 
   public String getKeyspace() {
     return keyspace;
@@ -96,8 +101,9 @@ public class SelectQuery extends AbstractQuery {
   }
 
   public void setTable(TableMetadata tableMetadata) {
-    this.keyspace = tableMetadata.getKeyspaceName();
-    this.table = tableMetadata.getTableName();
+    keyspace = tableMetadata.getKeyspaceName();
+    table = tableMetadata.getTableName();
+    executionContext.setDefaultConsistencyLevel(tableMetadata.getDefaultReadConsistency());
   }
 
   public void setTableAndSelectors(TableMetadata tableMetadata) {

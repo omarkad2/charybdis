@@ -19,6 +19,8 @@
 package ma.markware.charybdis.model.field.metadata;
 
 import com.datastax.oss.driver.api.core.cql.Row;
+import ma.markware.charybdis.model.option.ConsistencyLevel;
+
 import java.time.Instant;
 import java.util.Map;
 
@@ -40,6 +42,16 @@ public interface TableMetadata<ENTITY> {
    * @return table name.
    */
   String getTableName();
+
+  /**
+   * @return Table default write consistency
+   */
+  ConsistencyLevel getDefaultWriteConsistency();
+
+  /**
+   * @return Table default read consistency
+   */
+  ConsistencyLevel getDefaultReadConsistency();
 
   /**
    * @return metadata of a given column.

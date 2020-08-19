@@ -23,6 +23,8 @@ import com.datastax.oss.driver.api.core.cql.PreparedStatement;
 import com.datastax.oss.driver.api.core.cql.ResultSet;
 import com.datastax.oss.driver.api.core.cql.SimpleStatement;
 import java.nio.ByteBuffer;
+import ma.markware.charybdis.ExecutionContext;
+import ma.markware.charybdis.model.option.ConsistencyLevel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,15 +33,26 @@ import org.slf4j.LoggerFactory;
  *
  * @author Oussama Markad
  */
-abstract class AbstractQuery implements Query {
+public abstract class AbstractQuery implements Query {
 
   private static final Logger log = LoggerFactory.getLogger(AbstractQuery.class);
 
-  ResultSet executeStatement(final CqlSession session, final SimpleStatement statement, final Object[] bindValueArray) {
+  final ExecutionContext executionContext;
+
+  AbstractQuery(ExecutionContext executionContext) {
+    this.executionContext = executionContext;
+  }
+
+  public ExecutionContext getExecutionContext() {
+    return executionContext;
+  }
+
+  ResultSet executeStatement(final CqlSession session, SimpleStatement statement, final Object[] bindValueArray) {
+    statement = resolveExecutionContext(statement);
     return executeStatement(session, statement, 0, null, bindValueArray);
   }
 
-  ResultSet executeStatement(final CqlSession session, final SimpleStatement statement, final int fetchSize, final ByteBuffer pagingState,
+  public ResultSet executeStatement(final CqlSession session, final SimpleStatement statement, final int fetchSize, final ByteBuffer pagingState,
       final Object[] bindValueArray) {
     ResultSet resultSet = null;
     log.info("Statement query: {}", statement.getQuery());
@@ -52,4 +65,20 @@ abstract class AbstractQuery implements Query {
     return resultSet;
   }
 
+  private SimpleStatement resolveExecutionContext(SimpleStatement statement) {
+    if (getExecutionContext().getConsistencyLevel() != null && getExecutionContext().getConsistencyLevel() != ConsistencyLevel.NOT_SPECIFIED) {
+      statement = statement.setConsistencyLevel(getExecutionContext().getConsistencyLevel().getDatastaxConsistencyLevel());
+    } else if (getExecutionContext().getDefaultConsistencyLevel() != null) {
+      statement = statement.setConsistencyLevel(getExecutionContext().getDefaultConsistencyLevel().getDatastaxConsistencyLevel());
+    }
+
+    if (getExecutionContext().getDriverExecutionProfile() != null) {
+      statement = statement.setExecutionProfile(getExecutionContext().getDriverExecutionProfile());
+    }
+
+    if (getExecutionContext().getExecutionProfileName() != null) {
+      statement = statement.setExecutionProfileName(getExecutionContext().getExecutionProfileName());
+    }
+    return statement;
+  }
 }

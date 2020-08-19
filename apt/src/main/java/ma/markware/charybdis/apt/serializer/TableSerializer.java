@@ -19,27 +19,21 @@
 package ma.markware.charybdis.apt.serializer;
 
 import com.datastax.oss.driver.api.core.cql.Row;
-import com.squareup.javapoet.ClassName;
-import com.squareup.javapoet.CodeBlock;
-import com.squareup.javapoet.MethodSpec;
-import com.squareup.javapoet.ParameterizedTypeName;
-import com.squareup.javapoet.TypeSpec;
-import java.time.Instant;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.stream.Collectors;
-import javax.annotation.processing.Filer;
-import javax.lang.model.element.Modifier;
+import com.squareup.javapoet.*;
 import ma.markware.charybdis.apt.metatype.ColumnFieldMetaType;
 import ma.markware.charybdis.apt.metatype.TableMetaType;
 import ma.markware.charybdis.apt.utils.ClassUtils;
 import ma.markware.charybdis.apt.utils.CollectionUtils;
 import ma.markware.charybdis.model.field.metadata.ColumnMetadata;
 import ma.markware.charybdis.model.field.metadata.TableMetadata;
+import ma.markware.charybdis.model.option.ConsistencyLevel;
 import ma.markware.charybdis.model.option.SequenceModel;
+
+import javax.annotation.processing.Filer;
+import javax.lang.model.element.Modifier;
+import java.time.Instant;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * A specific Class serializer.
@@ -84,6 +78,8 @@ public class TableSerializer implements EntitySerializer<TableMetaType> {
                                                       buildPrivateConstructor(),
                                                       buildGetEntityNameMethod(SerializationConstants.GET_KEYSPACE_NAME_METHOD, SerializationConstants.KEYSPACE_NAME_ATTRIBUTE),
                                                       buildGetEntityNameMethod(SerializationConstants.GET_TABLE_NAME_METHOD, SerializationConstants.TABLE_NAME_ATTRIBUTE),
+                                                      buildGetDefaultReadConsistencyMethod(tableMetaType.getDefaultReadConsistency()),
+                                                      buildGetDefaultWriteConsistencyMethod(tableMetaType.getDefaultWriteConsistency()),
                                                       buildColumnsGetterMethod(SerializationConstants.GET_COLUMNS_METADATA_METHOD, tableMetaType.getColumns()),
                                                       buildColumnsGetterMethod(SerializationConstants.GET_PARTITION_KEY_COLUMNS_METHOD, tableMetaType.getPartitionKeyColumns()),
                                                       buildColumnsGetterMethod(SerializationConstants.GET_CLUSTERING_KEY_COLUMNS_METHOD, tableMetaType.getClusteringKeyColumns()),
@@ -100,6 +96,22 @@ public class TableSerializer implements EntitySerializer<TableMetaType> {
                                                   .build();
 
     writeSerialization(packageName, className, tableMetadataSerialization, filer);
+  }
+
+  private MethodSpec buildGetDefaultReadConsistencyMethod(ConsistencyLevel defaultReadConsistency) {
+    return MethodSpec.methodBuilder(SerializationConstants.GET_DEFAULT_READ_CONSISTENCY_METHOD)
+            .addModifiers(Modifier.PUBLIC)
+            .returns(ConsistencyLevel.class)
+            .addStatement("return $T.$L", ConsistencyLevel.class, defaultReadConsistency)
+            .build();
+  }
+
+  private MethodSpec buildGetDefaultWriteConsistencyMethod(ConsistencyLevel defaultWriteConsistency) {
+    return MethodSpec.methodBuilder(SerializationConstants.GET_DEFAULT_WRITE_CONSISTENCY_METHOD)
+            .addModifiers(Modifier.PUBLIC)
+            .returns(ConsistencyLevel.class)
+            .addStatement("return $T.$L", ConsistencyLevel.class, defaultWriteConsistency)
+            .build();
   }
 
   /**
