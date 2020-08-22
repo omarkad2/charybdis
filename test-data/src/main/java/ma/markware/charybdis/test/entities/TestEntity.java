@@ -15,8 +15,10 @@ import ma.markware.charybdis.model.annotation.PartitionKey;
 import ma.markware.charybdis.model.annotation.Table;
 import ma.markware.charybdis.model.option.ClusteringOrder;
 import ma.markware.charybdis.model.option.ConsistencyLevel;
+import ma.markware.charybdis.model.option.SerialConsistencyLevel;
 
-@Table(keyspace = "test_keyspace", name = "test_entity", readConsistency = ConsistencyLevel.QUORUM, writeConsistency = ConsistencyLevel.QUORUM)
+@Table(keyspace = "test_keyspace", name = "test_entity", readConsistency = ConsistencyLevel.QUORUM,
+    writeConsistency = ConsistencyLevel.QUORUM, serialConsistency = SerialConsistencyLevel.LOCAL_SERIAL)
 public class TestEntity extends TestSuperEntity {
 
   @Column

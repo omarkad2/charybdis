@@ -18,9 +18,9 @@
  */
 package ma.markware.charybdis.apt.metatype;
 
-import ma.markware.charybdis.model.option.ConsistencyLevel;
-
 import java.util.List;
+import ma.markware.charybdis.model.option.ConsistencyLevel;
+import ma.markware.charybdis.model.option.SerialConsistencyLevel;
 
 /**
  * A specific Class meta-type.
@@ -33,6 +33,7 @@ public class TableMetaType extends AbstractEntityMetaType {
   private String tableName;
   private ConsistencyLevel defaultWriteConsistency;
   private ConsistencyLevel defaultReadConsistency;
+  private SerialConsistencyLevel defaultSerialConsistency;
 
   private List<ColumnFieldMetaType> columns;
   private List<ColumnFieldMetaType> partitionKeyColumns;
@@ -64,6 +65,14 @@ public class TableMetaType extends AbstractEntityMetaType {
 
   public void setDefaultReadConsistency(ConsistencyLevel defaultReadConsistency) {
     this.defaultReadConsistency = defaultReadConsistency;
+  }
+
+  public SerialConsistencyLevel getDefaultSerialConsistency() {
+    return defaultSerialConsistency;
+  }
+
+  public void setDefaultSerialConsistency(final SerialConsistencyLevel defaultSerialConsistency) {
+    this.defaultSerialConsistency = defaultSerialConsistency;
   }
 
   public List<ColumnFieldMetaType> getColumns() {

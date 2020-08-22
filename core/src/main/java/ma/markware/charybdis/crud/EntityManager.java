@@ -26,6 +26,7 @@ import ma.markware.charybdis.model.criteria.CriteriaExpression;
 import ma.markware.charybdis.model.criteria.ExtendedCriteriaExpression;
 import ma.markware.charybdis.model.field.metadata.TableMetadata;
 import ma.markware.charybdis.model.option.ConsistencyLevel;
+import ma.markware.charybdis.model.option.SerialConsistencyLevel;
 import ma.markware.charybdis.query.PageRequest;
 import ma.markware.charybdis.query.PageResult;
 
@@ -43,6 +44,14 @@ public interface EntityManager {
    * @return a new entity manager instance with a specific consistency level.
    */
   EntityManager withConsistency(ConsistencyLevel consistencyLevel);
+
+  /**
+   * Set serial consistency level that will be applied to LWT queries by our entity manager.
+   *
+   * @param serialConsistencyLevel serial consistency level.
+   * @return a new entity manager instance with a specific consistency level.
+   */
+  EntityManager withSerialConsistency(SerialConsistencyLevel serialConsistencyLevel);
 
   /**
    * Set execution profile that will be applied to queries by our entity manager.

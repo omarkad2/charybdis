@@ -26,7 +26,7 @@ import org.junit.jupiter.api.Test;
 class ConsistencyLevelTest {
 
   @Test
-  void test_driver_correspondance() {
+  void test_driver_consistency_conformity() {
     assertThat(ConsistencyLevel.NOT_SPECIFIED.getDatastaxConsistencyLevel()).isNull();
     assertThat(ConsistencyLevel.ANY.getDatastaxConsistencyLevel()).isEqualTo(com.datastax.oss.driver.api.core.ConsistencyLevel.ANY);
     assertThat(ConsistencyLevel.ONE.getDatastaxConsistencyLevel()).isEqualTo(com.datastax.oss.driver.api.core.ConsistencyLevel.ONE);
@@ -37,7 +37,5 @@ class ConsistencyLevelTest {
     assertThat(ConsistencyLevel.LOCAL_ONE.getDatastaxConsistencyLevel()).isEqualTo(com.datastax.oss.driver.api.core.ConsistencyLevel.LOCAL_ONE);
     assertThat(ConsistencyLevel.LOCAL_QUORUM.getDatastaxConsistencyLevel()).isEqualTo(com.datastax.oss.driver.api.core.ConsistencyLevel.LOCAL_QUORUM);
     assertThat(ConsistencyLevel.EACH_QUORUM.getDatastaxConsistencyLevel()).isEqualTo(com.datastax.oss.driver.api.core.ConsistencyLevel.EACH_QUORUM);
-    assertThat(ConsistencyLevel.SERIAL.getDatastaxConsistencyLevel()).isEqualTo(com.datastax.oss.driver.api.core.ConsistencyLevel.SERIAL);
-    assertThat(ConsistencyLevel.LOCAL_SERIAL.getDatastaxConsistencyLevel()).isEqualTo(com.datastax.oss.driver.api.core.ConsistencyLevel.LOCAL_SERIAL);
   }
 }

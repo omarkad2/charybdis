@@ -23,6 +23,7 @@ import com.datastax.oss.driver.api.core.config.DriverExecutionProfile;
 import com.google.common.annotations.VisibleForTesting;
 import java.util.Objects;
 import ma.markware.charybdis.model.option.ConsistencyLevel;
+import ma.markware.charybdis.model.option.SerialConsistencyLevel;
 
 /**
  * A POJO that handles specific options for query executions
@@ -33,6 +34,8 @@ public class ExecutionContext {
 
   private ConsistencyLevel consistencyLevel;
   private ConsistencyLevel defaultConsistencyLevel;
+  private SerialConsistencyLevel serialConsistencyLevel;
+  private SerialConsistencyLevel defaultSerialConsistencyLevel;
   private DriverExecutionProfile driverExecutionProfile;
   private String executionProfileName;
 
@@ -44,13 +47,18 @@ public class ExecutionContext {
     driverExecutionProfile = source.driverExecutionProfile;
     executionProfileName = source.executionProfileName;
     defaultConsistencyLevel = source.defaultConsistencyLevel;
+    serialConsistencyLevel = source.serialConsistencyLevel;
+    defaultSerialConsistencyLevel = source.defaultSerialConsistencyLevel;
   }
 
   @VisibleForTesting
   public ExecutionContext(final ConsistencyLevel consistencyLevel, final ConsistencyLevel defaultConsistencyLevel,
+      final SerialConsistencyLevel serialConsistencyLevel, final SerialConsistencyLevel defaultSerialConsistencyLevel,
       final DriverExecutionProfile driverExecutionProfile, final String executionProfileName) {
     this.consistencyLevel = consistencyLevel;
     this.defaultConsistencyLevel = defaultConsistencyLevel;
+    this.serialConsistencyLevel = serialConsistencyLevel;
+    this.defaultSerialConsistencyLevel = defaultSerialConsistencyLevel;
     this.driverExecutionProfile = driverExecutionProfile;
     this.executionProfileName = executionProfileName;
   }
@@ -69,6 +77,22 @@ public class ExecutionContext {
 
   public void setDefaultConsistencyLevel(ConsistencyLevel defaultConsistencyLevel) {
     this.defaultConsistencyLevel = defaultConsistencyLevel;
+  }
+
+  public SerialConsistencyLevel getSerialConsistencyLevel() {
+    return serialConsistencyLevel;
+  }
+
+  public void setSerialConsistencyLevel(final SerialConsistencyLevel serialConsistencyLevel) {
+    this.serialConsistencyLevel = serialConsistencyLevel;
+  }
+
+  public SerialConsistencyLevel getDefaultSerialConsistencyLevel() {
+    return defaultSerialConsistencyLevel;
+  }
+
+  public void setDefaultSerialConsistencyLevel(final SerialConsistencyLevel defaultSerialConsistencyLevel) {
+    this.defaultSerialConsistencyLevel = defaultSerialConsistencyLevel;
   }
 
   public DriverExecutionProfile getDriverExecutionProfile() {
@@ -96,18 +120,14 @@ public class ExecutionContext {
       return false;
     }
     final ExecutionContext that = (ExecutionContext) o;
-    return consistencyLevel == that.consistencyLevel && defaultConsistencyLevel == that.defaultConsistencyLevel && Objects.equals(
-        driverExecutionProfile, that.driverExecutionProfile) && Objects.equals(executionProfileName, that.executionProfileName);
+    return consistencyLevel == that.consistencyLevel && defaultConsistencyLevel == that.defaultConsistencyLevel
+        && serialConsistencyLevel == that.serialConsistencyLevel && defaultSerialConsistencyLevel == that.defaultSerialConsistencyLevel
+        && Objects.equals(driverExecutionProfile, that.driverExecutionProfile) && Objects.equals(executionProfileName, that.executionProfileName);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(consistencyLevel, defaultConsistencyLevel, driverExecutionProfile, executionProfileName);
-  }
-
-  @Override
-  public String toString() {
-    return "ExecutionContext{" + "consistencyLevel=" + consistencyLevel + ", defaultConsistencyLevel=" + defaultConsistencyLevel
-        + ", driverExecutionProfile=" + driverExecutionProfile + ", executionProfileName='" + executionProfileName + '\'' + '}';
+    return Objects.hash(consistencyLevel, defaultConsistencyLevel, serialConsistencyLevel, defaultSerialConsistencyLevel, driverExecutionProfile,
+                        executionProfileName);
   }
 }

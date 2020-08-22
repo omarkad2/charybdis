@@ -244,6 +244,7 @@ public class Table {
 ```
    
 We can also have a fine-grained control over consistency, by having a particular level for certain queries.
+This can be done at runtime:
 - In Crud API:
     ```java
     entityManager.withConsistency(ConsistencyLevel.EACH_QUORUM).create(User_Table.user, new User(...));
@@ -256,6 +257,11 @@ We can also have a fine-grained control over consistency, by having a particular
             .ifNotExists()
             .execute();
     ```
+    
+### Lightweight Transaction
+Charybdis also handles lightweight transactions in order to prevent race conditions in
+cases where client need to read, then write data when strong consistency is not enough.
+
 ## Licensing
 Charybdis is licensed under the Apache License, Version 2.0 (the "License"); 
 you may not use this project except in compliance with the License. 

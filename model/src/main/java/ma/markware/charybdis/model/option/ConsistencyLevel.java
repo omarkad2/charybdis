@@ -12,8 +12,6 @@ public enum ConsistencyLevel {
   LOCAL_ONE(com.datastax.oss.driver.api.core.ConsistencyLevel.LOCAL_ONE),
   LOCAL_QUORUM(com.datastax.oss.driver.api.core.ConsistencyLevel.LOCAL_QUORUM),
   EACH_QUORUM(com.datastax.oss.driver.api.core.ConsistencyLevel.EACH_QUORUM),
-  SERIAL(com.datastax.oss.driver.api.core.ConsistencyLevel.SERIAL),
-  LOCAL_SERIAL(com.datastax.oss.driver.api.core.ConsistencyLevel.LOCAL_SERIAL),
   ;
 
   private com.datastax.oss.driver.api.core.ConsistencyLevel datastaxConsistencyLevel;

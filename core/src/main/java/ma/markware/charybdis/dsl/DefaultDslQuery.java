@@ -38,6 +38,7 @@ import ma.markware.charybdis.model.field.metadata.ColumnMetadata;
 import ma.markware.charybdis.model.field.metadata.PartitionKeyColumnMetadata;
 import ma.markware.charybdis.model.field.metadata.TableMetadata;
 import ma.markware.charybdis.model.option.ConsistencyLevel;
+import ma.markware.charybdis.model.option.SerialConsistencyLevel;
 import ma.markware.charybdis.session.DefaultSessionFactory;
 import ma.markware.charybdis.session.SessionFactory;
 import ma.markware.charybdis.session.StandaloneSessionFactory;
@@ -106,6 +107,26 @@ public class DefaultDslQuery implements DslQuery {
    * {@inheritDoc}
    */
   @Override
+  public DefaultDslQuery withConsistency(ConsistencyLevel consistencyLevel) {
+    ExecutionContext executionContext = new ExecutionContext(this.executionContext);
+    executionContext.setConsistencyLevel(consistencyLevel);
+    return new DefaultDslQuery(sessionFactory, executionContext);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public DefaultDslQuery withSerialConsistency(SerialConsistencyLevel serialConsistencyLevel) {
+    ExecutionContext executionContext = new ExecutionContext(this.executionContext);
+    executionContext.setSerialConsistencyLevel(serialConsistencyLevel);
+    return new DefaultDslQuery(sessionFactory, executionContext);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
   public DefaultDslQuery withExecutionProfile(DriverExecutionProfile executionProfile) {
     ExecutionContext executionContext = new ExecutionContext(this.executionContext);
     executionContext.setDriverExecutionProfile(executionProfile);
@@ -119,16 +140,6 @@ public class DefaultDslQuery implements DslQuery {
   public DefaultDslQuery withExecutionProfile(String executionProfile) {
     ExecutionContext executionContext = new ExecutionContext(this.executionContext);
     executionContext.setExecutionProfileName(executionProfile);
-    return new DefaultDslQuery(sessionFactory, executionContext);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public DefaultDslQuery withConsistency(ConsistencyLevel consistencyLevel) {
-    ExecutionContext executionContext = new ExecutionContext(this.executionContext);
-    executionContext.setConsistencyLevel(consistencyLevel);
     return new DefaultDslQuery(sessionFactory, executionContext);
   }
 

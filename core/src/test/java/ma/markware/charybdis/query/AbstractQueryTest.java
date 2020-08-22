@@ -38,6 +38,7 @@ import com.datastax.oss.driver.api.querybuilder.QueryBuilder;
 import com.datastax.oss.driver.api.querybuilder.relation.Relation;
 import ma.markware.charybdis.ExecutionContext;
 import ma.markware.charybdis.model.option.ConsistencyLevel;
+import ma.markware.charybdis.model.option.SerialConsistencyLevel;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -79,6 +80,8 @@ class AbstractQueryTest {
         null,
         ConsistencyLevel.QUORUM,
         null,
+        null,
+        null,
         null));
 
     // When
@@ -87,6 +90,7 @@ class AbstractQueryTest {
     // Then
     verify(abstractQuery).executeStatement(eq(session), statementAc.capture(), eq(0), eq(null), eq(new Object[] {}));
     assertThat(statementAc.getValue().getConsistencyLevel()).isEqualTo(com.datastax.oss.driver.api.core.ConsistencyLevel.QUORUM);
+    assertThat(statementAc.getValue().getSerialConsistencyLevel()).isNull();
     assertThat(statementAc.getValue().getExecutionProfile()).isNull();
     assertThat(statementAc.getValue().getExecutionProfileName()).isNull();
   }
@@ -99,6 +103,8 @@ class AbstractQueryTest {
         ConsistencyLevel.NOT_SPECIFIED,
         ConsistencyLevel.QUORUM,
         null,
+        null,
+        null,
         null));
 
     // When
@@ -107,6 +113,7 @@ class AbstractQueryTest {
     // Then
     verify(abstractQuery).executeStatement(eq(session), statementAc.capture(), eq(0), eq(null), eq(new Object[] {}));
     assertThat(statementAc.getValue().getConsistencyLevel()).isEqualTo(com.datastax.oss.driver.api.core.ConsistencyLevel.QUORUM);
+    assertThat(statementAc.getValue().getSerialConsistencyLevel()).isNull();
     assertThat(statementAc.getValue().getExecutionProfile()).isNull();
     assertThat(statementAc.getValue().getExecutionProfileName()).isNull();
   }
@@ -119,6 +126,8 @@ class AbstractQueryTest {
         ConsistencyLevel.EACH_QUORUM,
         ConsistencyLevel.QUORUM,
         null,
+        null,
+        null,
         null));
 
     // When
@@ -127,6 +136,76 @@ class AbstractQueryTest {
     // Then
     verify(abstractQuery).executeStatement(eq(session), statementAc.capture(), eq(0), eq(null), eq(new Object[] {}));
     assertThat(statementAc.getValue().getConsistencyLevel()).isEqualTo(com.datastax.oss.driver.api.core.ConsistencyLevel.EACH_QUORUM);
+    assertThat(statementAc.getValue().getSerialConsistencyLevel()).isNull();
+    assertThat(statementAc.getValue().getExecutionProfile()).isNull();
+    assertThat(statementAc.getValue().getExecutionProfileName()).isNull();
+  }
+
+  @Test
+  void executeStatement_should_apply_default_serial_consistency_when_no_serial_consistency_on_query() {
+    // Given
+    ArgumentCaptor<SimpleStatement> statementAc = ArgumentCaptor.forClass(SimpleStatement.class);
+    when(abstractQuery.getExecutionContext()).thenReturn(new ExecutionContext(
+        null,
+        null,
+        null,
+        SerialConsistencyLevel.LOCAL_SERIAL,
+        null,
+        null));
+
+    // When
+    abstractQuery.executeStatement(session, simpleStatement, new Object[] {});
+
+    // Then
+    verify(abstractQuery).executeStatement(eq(session), statementAc.capture(), eq(0), eq(null), eq(new Object[] {}));
+    assertThat(statementAc.getValue().getConsistencyLevel()).isNull();
+    assertThat(statementAc.getValue().getSerialConsistencyLevel()).isEqualTo(com.datastax.oss.driver.api.core.ConsistencyLevel.LOCAL_SERIAL);
+    assertThat(statementAc.getValue().getExecutionProfile()).isNull();
+    assertThat(statementAc.getValue().getExecutionProfileName()).isNull();
+  }
+
+  @Test
+  void executeStatement_should_apply_default_serial_consistency_when_not_specified_on_query() {
+    // Given
+    ArgumentCaptor<SimpleStatement> statementAc = ArgumentCaptor.forClass(SimpleStatement.class);
+    when(abstractQuery.getExecutionContext()).thenReturn(new ExecutionContext(
+        null,
+        null,
+        SerialConsistencyLevel.NOT_SPECIFIED,
+        SerialConsistencyLevel.SERIAL,
+        null,
+        null));
+
+    // When
+    abstractQuery.executeStatement(session, simpleStatement, new Object[] {});
+
+    // Then
+    verify(abstractQuery).executeStatement(eq(session), statementAc.capture(), eq(0), eq(null), eq(new Object[] {}));
+    assertThat(statementAc.getValue().getConsistencyLevel()).isNull();
+    assertThat(statementAc.getValue().getSerialConsistencyLevel()).isEqualTo(com.datastax.oss.driver.api.core.ConsistencyLevel.SERIAL);
+    assertThat(statementAc.getValue().getExecutionProfile()).isNull();
+    assertThat(statementAc.getValue().getExecutionProfileName()).isNull();
+  }
+
+  @Test
+  void executeStatement_should_apply_serial_consistency_on_query_when_specified() {
+    // Given
+    ArgumentCaptor<SimpleStatement> statementAc = ArgumentCaptor.forClass(SimpleStatement.class);
+    when(abstractQuery.getExecutionContext()).thenReturn(new ExecutionContext(
+        null,
+        null,
+        SerialConsistencyLevel.LOCAL_SERIAL,
+        SerialConsistencyLevel.SERIAL,
+        null,
+        null));
+
+    // When
+    abstractQuery.executeStatement(session, simpleStatement, new Object[] {});
+
+    // Then
+    verify(abstractQuery).executeStatement(eq(session), statementAc.capture(), eq(0), eq(null), eq(new Object[] {}));
+    assertThat(statementAc.getValue().getConsistencyLevel()).isNull();
+    assertThat(statementAc.getValue().getSerialConsistencyLevel()).isEqualTo(com.datastax.oss.driver.api.core.ConsistencyLevel.LOCAL_SERIAL);
     assertThat(statementAc.getValue().getExecutionProfile()).isNull();
     assertThat(statementAc.getValue().getExecutionProfileName()).isNull();
   }
@@ -139,7 +218,10 @@ class AbstractQueryTest {
     when(driverExecutionProfile.getName()).thenReturn("olap");
     when(abstractQuery.getExecutionContext()).thenReturn(new ExecutionContext(
         null,
-        null, driverExecutionProfile,
+        null,
+        null,
+        null,
+        driverExecutionProfile,
         null));
 
     // When
@@ -148,6 +230,7 @@ class AbstractQueryTest {
     // Then
     verify(abstractQuery).executeStatement(eq(session), statementAc.capture(), eq(0), eq(null), eq(new Object[] {}));
     assertThat(statementAc.getValue().getConsistencyLevel()).isNull();
+    assertThat(statementAc.getValue().getSerialConsistencyLevel()).isNull();
     assertThat(statementAc.getValue().getExecutionProfile()).isNotNull();
     assertThat(statementAc.getValue().getExecutionProfile().getName()).isEqualTo("olap");
     assertThat(statementAc.getValue().getExecutionProfileName()).isNull();
@@ -161,6 +244,8 @@ class AbstractQueryTest {
         null,
         null,
         null,
+        null,
+        null,
         "olap"));
 
     // When
@@ -169,6 +254,7 @@ class AbstractQueryTest {
     // Then
     verify(abstractQuery).executeStatement(eq(session), statementAc.capture(), eq(0), eq(null), eq(new Object[] {}));
     assertThat(statementAc.getValue().getConsistencyLevel()).isNull();
+    assertThat(statementAc.getValue().getSerialConsistencyLevel()).isNull();
     assertThat(statementAc.getValue().getExecutionProfile()).isNull();
     assertThat(statementAc.getValue().getExecutionProfileName()).isEqualTo("olap");
   }

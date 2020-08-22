@@ -31,6 +31,7 @@ import ma.markware.charybdis.model.field.metadata.ColumnMetadata;
 import ma.markware.charybdis.model.field.metadata.PartitionKeyColumnMetadata;
 import ma.markware.charybdis.model.field.metadata.TableMetadata;
 import ma.markware.charybdis.model.option.ConsistencyLevel;
+import ma.markware.charybdis.model.option.SerialConsistencyLevel;
 
 /**
  * API to handle entities in DB through DSL operations.
@@ -46,6 +47,14 @@ public interface DslQuery {
    * @return a new dsl manager instance with a specific consistency level.
    */
   DslQuery withConsistency(ConsistencyLevel consistencyLevel);
+
+  /**
+   * Set serial consistency level that will be applied to LWT queries by our dsl manager.
+   *
+   * @param serialConsistencyLevel serial consistency level.
+   * @return a new dsl manager instance with a specific consistency level.
+   */
+  DslQuery withSerialConsistency(SerialConsistencyLevel serialConsistencyLevel);
 
   /**
    * Set execution profile that will be applied to queries by our dsl manager.
