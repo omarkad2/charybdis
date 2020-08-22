@@ -232,12 +232,45 @@ none provided we fallback on [DefaultSessionFactory](https://github.com/omarkad2
     boolean deleted = entityManager.delete(User_Table.user, persistedUser);
     ```
 
+### Lightweight Transaction
+Charybdis also handles lightweight transactions in order to prevent race conditions in
+cases where strong consistency is not enough and client needs to read, then write data.
+- LWT for Insert:
+
+    Insert a row only if it doesn't exist
+    ```java
+    dslQuery.insertInto(User_Table.user, User_Table.id, User_Table.joiningDate, User_Table.addresses)
+            .values(UUID.randomUUID(), Instant.now(), addresses)
+            .ifNotExists()
+            .execute();
+    ```
+- LWT for Update:
+
+    Update a row only if it fulfills a condition (in the example below user must have *ADMIN* role)
+    ```java
+    dslQuery.update(User_Table.user)
+            .set(User_Table.addresses, newAddresses)
+            .where(User_Table.id.eq(UUID.fromString("c9b593c0-f5cb-4e88-bd55-88dee10a4e97")))
+            .if_(User_Table.role.eq(RoleEnum.ADMIN))
+            .execute();
+    ```
+- LWT for Delete:
+
+    Delete a row only if it fulfills a condition (in the example below user must have *ADMIN* role)
+    ```java
+    dslQuery.delete()
+            .from(User_Table.user)
+            .where(User_Table.id.eq(UUID.fromString("c9b593c0-f5cb-4e88-bd55-88dee10a4e97")))
+            .if_(User_Table.role.eq(RoleEnum.ADMIN))
+            .execute();
+    ```
+ 
 ### Tuneable Consistency
 Consistency can be defined at table definition level, so as to be applied on all queries
 involving said table, like the following:
 ```java
 @Table(keyspace = "keyspace_demo", name = "table", writeConsistency = ConsistencyLevel.QUORUM, 
-              readConsistency = ConsistencyLevel.QUORUM)
+              readConsistency = ConsistencyLevel.QUORUM, serialConsistency = SerialConsistencyLevel.SERIAL)
 public class Table {
     // attributes and methods ... 
 }
@@ -247,20 +280,19 @@ We can also have a fine-grained control over consistency, by having a particular
 This can be done at runtime:
 - In Crud API:
     ```java
-    entityManager.withConsistency(ConsistencyLevel.EACH_QUORUM).create(User_Table.user, new User(...));
+    entityManager.withConsistency(ConsistencyLevel.EACH_QUORUM)
+                 .withSerialConsistency(SerialConsistencyLevel.LOCAL_SERIAL)
+                 .create(User_Table.user, new User(...));
     ```
 - In Dsl API:
     ```java
     dslQuery.withConsistency(ConsistencyLevel.EACH_QUORUM)
+            .withSerialConsistency(SerialConsistencyLevel.LOCAL_SERIAL)
             .insertInto(User_Table.user, User_Table.id, User_Table.joiningDate, User_Table.addresses)
             .values(UUID.randomUUID(), Instant.now(), addresses)
             .ifNotExists()
             .execute();
     ```
-    
-### Lightweight Transaction
-Charybdis also handles lightweight transactions in order to prevent race conditions in
-cases where client need to read, then write data when strong consistency is not enough.
 
 ## Licensing
 Charybdis is licensed under the Apache License, Version 2.0 (the "License"); 
