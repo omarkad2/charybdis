@@ -35,6 +35,7 @@ final class SerializationConstants {
   static final String GET_TABLE_NAME_METHOD = "getTableName";
   static final String GET_DEFAULT_WRITE_CONSISTENCY_METHOD = "getDefaultWriteConsistency";
   static final String GET_DEFAULT_READ_CONSISTENCY_METHOD = "getDefaultReadConsistency";
+  static final String GET_DEFAULT_SERIAL_CONSISTENCY_METHOD = "getDefaultSerialConsistency";
   static final String GET_NAME_METHOD = "getName";
   static final String GET_FIELD_CLASS_METHOD = "getFieldClass";
   static final String GET_PARTITION_KEY_INDEX_METHOD = "getPartitionKeyIndex";

@@ -18,6 +18,15 @@
  */
 package ma.markware.charybdis.apt.parser;
 
+import static java.lang.String.format;
+
+import java.util.Comparator;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import javax.lang.model.element.Element;
+import javax.lang.model.util.Types;
 import ma.markware.charybdis.apt.AptContext;
 import ma.markware.charybdis.apt.exception.CharybdisParsingException;
 import ma.markware.charybdis.apt.metatype.AbstractEntityMetaType;
@@ -26,16 +35,6 @@ import ma.markware.charybdis.apt.metatype.TableMetaType;
 import ma.markware.charybdis.apt.utils.ParserUtils;
 import ma.markware.charybdis.model.annotation.Table;
 import org.apache.commons.collections.CollectionUtils;
-
-import javax.lang.model.element.Element;
-import javax.lang.model.util.Types;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import static java.lang.String.format;
 
 /**
  * A specific Class parser.
@@ -73,6 +72,7 @@ public class TableParser extends AbstractEntityParser<TableMetaType> {
 
     tableMetaType.setDefaultReadConsistency(table.readConsistency());
     tableMetaType.setDefaultWriteConsistency(table.writeConsistency());
+    tableMetaType.setDefaultSerialConsistency(table.serialConsistency());
 
     Stream<? extends Element> fields = ParserUtils.extractFields(annotatedClass, types);
 

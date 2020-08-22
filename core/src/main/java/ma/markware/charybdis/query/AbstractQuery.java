@@ -25,6 +25,7 @@ import com.datastax.oss.driver.api.core.cql.SimpleStatement;
 import java.nio.ByteBuffer;
 import ma.markware.charybdis.ExecutionContext;
 import ma.markware.charybdis.model.option.ConsistencyLevel;
+import ma.markware.charybdis.model.option.SerialConsistencyLevel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,18 +67,25 @@ public abstract class AbstractQuery implements Query {
   }
 
   private SimpleStatement resolveExecutionContext(SimpleStatement statement) {
-    if (getExecutionContext().getConsistencyLevel() != null && getExecutionContext().getConsistencyLevel() != ConsistencyLevel.NOT_SPECIFIED) {
-      statement = statement.setConsistencyLevel(getExecutionContext().getConsistencyLevel().getDatastaxConsistencyLevel());
-    } else if (getExecutionContext().getDefaultConsistencyLevel() != null) {
-      statement = statement.setConsistencyLevel(getExecutionContext().getDefaultConsistencyLevel().getDatastaxConsistencyLevel());
+    ExecutionContext execContext = getExecutionContext(); // To simplify tests
+    if (execContext.getConsistencyLevel() != null && execContext.getConsistencyLevel() != ConsistencyLevel.NOT_SPECIFIED) {
+      statement = statement.setConsistencyLevel(execContext.getConsistencyLevel().getDatastaxConsistencyLevel());
+    } else if (execContext.getDefaultConsistencyLevel() != null && execContext.getDefaultConsistencyLevel() != ConsistencyLevel.NOT_SPECIFIED) {
+      statement = statement.setConsistencyLevel(execContext.getDefaultConsistencyLevel().getDatastaxConsistencyLevel());
     }
 
-    if (getExecutionContext().getDriverExecutionProfile() != null) {
-      statement = statement.setExecutionProfile(getExecutionContext().getDriverExecutionProfile());
+    if (execContext.getSerialConsistencyLevel() != null && execContext.getSerialConsistencyLevel() != SerialConsistencyLevel.NOT_SPECIFIED) {
+      statement = statement.setSerialConsistencyLevel(execContext.getSerialConsistencyLevel().getDatastaxSerialConsistencyLevel());
+    } else if (execContext.getDefaultSerialConsistencyLevel() != null && execContext.getDefaultSerialConsistencyLevel() != SerialConsistencyLevel.NOT_SPECIFIED) {
+      statement = statement.setSerialConsistencyLevel(execContext.getDefaultSerialConsistencyLevel().getDatastaxSerialConsistencyLevel());
     }
 
-    if (getExecutionContext().getExecutionProfileName() != null) {
-      statement = statement.setExecutionProfileName(getExecutionContext().getExecutionProfileName());
+    if (execContext.getDriverExecutionProfile() != null) {
+      statement = statement.setExecutionProfile(execContext.getDriverExecutionProfile());
+    }
+
+    if (execContext.getExecutionProfileName() != null) {
+      statement = statement.setExecutionProfileName(execContext.getExecutionProfileName());
     }
     return statement;
   }

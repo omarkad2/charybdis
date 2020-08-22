@@ -29,6 +29,7 @@ import ma.markware.charybdis.model.criteria.CriteriaExpression;
 import ma.markware.charybdis.model.criteria.ExtendedCriteriaExpression;
 import ma.markware.charybdis.model.field.metadata.TableMetadata;
 import ma.markware.charybdis.model.option.ConsistencyLevel;
+import ma.markware.charybdis.model.option.SerialConsistencyLevel;
 import ma.markware.charybdis.query.PageRequest;
 import ma.markware.charybdis.query.PageResult;
 import ma.markware.charybdis.session.DefaultSessionFactory;
@@ -96,6 +97,26 @@ public class DefaultEntityManager implements EntityManager {
    * {@inheritDoc}
    */
   @Override
+  public DefaultEntityManager withConsistency(ConsistencyLevel consistencyLevel) {
+    ExecutionContext executionContext = new ExecutionContext(this.executionContext);
+    executionContext.setConsistencyLevel(consistencyLevel);
+    return new DefaultEntityManager(sessionFactory, executionContext);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public DefaultEntityManager withSerialConsistency(SerialConsistencyLevel serialConsistencyLevel) {
+    ExecutionContext executionContext = new ExecutionContext(this.executionContext);
+    executionContext.setSerialConsistencyLevel(serialConsistencyLevel);
+    return new DefaultEntityManager(sessionFactory, executionContext);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
   public DefaultEntityManager withExecutionProfile(DriverExecutionProfile executionProfile) {
     ExecutionContext executionContext = new ExecutionContext(this.executionContext);
     executionContext.setDriverExecutionProfile(executionProfile);
@@ -109,16 +130,6 @@ public class DefaultEntityManager implements EntityManager {
   public DefaultEntityManager withExecutionProfile(String executionProfile) {
     ExecutionContext executionContext = new ExecutionContext(this.executionContext);
     executionContext.setExecutionProfileName(executionProfile);
-    return new DefaultEntityManager(sessionFactory, executionContext);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public DefaultEntityManager withConsistency(ConsistencyLevel consistencyLevel) {
-    ExecutionContext executionContext = new ExecutionContext(this.executionContext);
-    executionContext.setConsistencyLevel(consistencyLevel);
     return new DefaultEntityManager(sessionFactory, executionContext);
   }
 

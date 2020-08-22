@@ -26,6 +26,7 @@ import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.config.DriverExecutionProfile;
 import ma.markware.charybdis.ExecutionContext;
 import ma.markware.charybdis.model.option.ConsistencyLevel;
+import ma.markware.charybdis.model.option.SerialConsistencyLevel;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -42,7 +43,15 @@ class DefaultEntityManagerTest {
     DefaultEntityManager defaultDslQueryWithConsistency = new DefaultEntityManager(session).withConsistency(ConsistencyLevel.QUORUM);
 
     assertThat(defaultDslQueryWithConsistency.getExecutionContext()).isEqualTo(
-        new ExecutionContext(ConsistencyLevel.QUORUM, null, null, null));
+        new ExecutionContext(ConsistencyLevel.QUORUM, null, null, null, null, null));
+  }
+
+  @Test
+  void withSerialConsistency() {
+    DefaultEntityManager defaultDslQueryWithConsistency = new DefaultEntityManager(session).withSerialConsistency(SerialConsistencyLevel.SERIAL);
+
+    assertThat(defaultDslQueryWithConsistency.getExecutionContext()).isEqualTo(
+        new ExecutionContext(null, null, SerialConsistencyLevel.SERIAL, null, null, null));
   }
 
   @Test
@@ -51,7 +60,7 @@ class DefaultEntityManagerTest {
     DefaultEntityManager defaultDslQueryWithExecutionProfile = new DefaultEntityManager(session).withExecutionProfile(driverExecutionProfile);
 
     assertThat(defaultDslQueryWithExecutionProfile.getExecutionContext()).isEqualTo(
-        new ExecutionContext(null, null, driverExecutionProfile, null));
+        new ExecutionContext(null, null, null, null, driverExecutionProfile, null));
   }
 
   @Test
@@ -59,6 +68,6 @@ class DefaultEntityManagerTest {
     DefaultEntityManager defaultDslQueryWithExecutionProfile = new DefaultEntityManager(session).withExecutionProfile("olap");
 
     assertThat(defaultDslQueryWithExecutionProfile.getExecutionContext()).isEqualTo(
-        new ExecutionContext(null, null, null, "olap"));
+        new ExecutionContext(null, null, null, null, null, "olap"));
   }
 }

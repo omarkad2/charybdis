@@ -18,12 +18,12 @@
  */
 package ma.markware.charybdis.model.annotation;
 
-import ma.markware.charybdis.model.option.ConsistencyLevel;
-
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import ma.markware.charybdis.model.option.ConsistencyLevel;
+import ma.markware.charybdis.model.option.SerialConsistencyLevel;
 
 /**
  * Annotation to indicate that a class is a Cql table representation.
@@ -58,12 +58,17 @@ public @interface Table {
   String name();
 
   /**
-   * Default write consistency (overridable at query level)
+   * Default write consistency (overridable at query level).
    */
   ConsistencyLevel writeConsistency() default ConsistencyLevel.NOT_SPECIFIED;
 
   /**
-   * Default read consistency (overridable at query level)
+   * Default read consistency (overridable at query level).
    */
   ConsistencyLevel readConsistency() default ConsistencyLevel.NOT_SPECIFIED;
+
+  /**
+   * Default serial consistency (overridable at query level);
+   */
+  SerialConsistencyLevel serialConsistency() default SerialConsistencyLevel.NOT_SPECIFIED;
 }
