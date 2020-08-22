@@ -19,12 +19,16 @@
 package ma.markware.charybdis.crud;
 
 import com.datastax.oss.driver.api.core.CqlSession;
+import com.datastax.oss.driver.api.core.config.DriverExecutionProfile;
+import com.google.common.annotations.VisibleForTesting;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import ma.markware.charybdis.ExecutionContext;
 import ma.markware.charybdis.model.criteria.CriteriaExpression;
 import ma.markware.charybdis.model.criteria.ExtendedCriteriaExpression;
 import ma.markware.charybdis.model.field.metadata.TableMetadata;
+import ma.markware.charybdis.model.option.ConsistencyLevel;
 import ma.markware.charybdis.query.PageRequest;
 import ma.markware.charybdis.query.PageResult;
 import ma.markware.charybdis.session.DefaultSessionFactory;
@@ -40,6 +44,12 @@ import ma.markware.charybdis.session.StandaloneSessionFactory;
 public class DefaultEntityManager implements EntityManager {
 
   private final SessionFactory sessionFactory;
+  private ExecutionContext executionContext;
+
+  private DefaultEntityManager(SessionFactory sessionFactory, ExecutionContext executionContext) {
+    this.sessionFactory = sessionFactory;
+    this.executionContext = executionContext;
+  }
 
   /**
    * Initialize the entity manager using a custom session factory.
@@ -47,7 +57,7 @@ public class DefaultEntityManager implements EntityManager {
    * @param customSessionFactory Instance of {@link SessionFactory} responsible of creating cql sessions.
    */
   public DefaultEntityManager(SessionFactory customSessionFactory) {
-    this.sessionFactory = customSessionFactory;
+    this(customSessionFactory, new ExecutionContext());
   }
 
   /**
@@ -77,12 +87,47 @@ public class DefaultEntityManager implements EntityManager {
     this(new StandaloneSessionFactory(session));
   }
 
+  @VisibleForTesting
+  public ExecutionContext getExecutionContext() {
+    return executionContext;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public DefaultEntityManager withExecutionProfile(DriverExecutionProfile executionProfile) {
+    ExecutionContext executionContext = new ExecutionContext(this.executionContext);
+    executionContext.setDriverExecutionProfile(executionProfile);
+    return new DefaultEntityManager(sessionFactory, executionContext);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public DefaultEntityManager withExecutionProfile(String executionProfile) {
+    ExecutionContext executionContext = new ExecutionContext(this.executionContext);
+    executionContext.setExecutionProfileName(executionProfile);
+    return new DefaultEntityManager(sessionFactory, executionContext);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public DefaultEntityManager withConsistency(ConsistencyLevel consistencyLevel) {
+    ExecutionContext executionContext = new ExecutionContext(this.executionContext);
+    executionContext.setConsistencyLevel(consistencyLevel);
+    return new DefaultEntityManager(sessionFactory, executionContext);
+  }
+
   /**
    * {@inheritDoc}
    */
   @Override
   public <T> T create(final TableMetadata<T> table, final T entity) {
-    return new CreateEntityManager<T>().withTableMetadata(table).withEntity(entity).save(sessionFactory.getSession());
+    return new CreateEntityManager<T>(executionContext).withTableMetadata(table).withEntity(entity).save(sessionFactory.getSession());
   }
 
   /**
@@ -90,7 +135,7 @@ public class DefaultEntityManager implements EntityManager {
    */
   @Override
   public <T> T create(final TableMetadata<T> table, final T entity, final boolean ifNotExists) {
-    return new CreateEntityManager<T>().withTableMetadata(table).withEntity(entity).withIfNotExists(ifNotExists)
+    return new CreateEntityManager<T>(executionContext).withTableMetadata(table).withEntity(entity).withIfNotExists(ifNotExists)
                                        .save(sessionFactory.getSession());
   }
 
@@ -99,7 +144,7 @@ public class DefaultEntityManager implements EntityManager {
    */
   @Override
   public <T> T create(final TableMetadata<T> table, final T entity, final int seconds) {
-    return new CreateEntityManager<T>().withTableMetadata(table).withEntity(entity).withTtl(seconds)
+    return new CreateEntityManager<T>(executionContext).withTableMetadata(table).withEntity(entity).withTtl(seconds)
                                        .save(sessionFactory.getSession());
   }
 
@@ -108,7 +153,7 @@ public class DefaultEntityManager implements EntityManager {
    */
   @Override
   public <T> T create(final TableMetadata<T> table, final T entity, final boolean ifNotExists, final int seconds) {
-    return new CreateEntityManager<T>().withTableMetadata(table).withEntity(entity).withIfNotExists(ifNotExists).withTtl(seconds)
+    return new CreateEntityManager<T>(executionContext).withTableMetadata(table).withEntity(entity).withIfNotExists(ifNotExists).withTtl(seconds)
                                        .save(sessionFactory.getSession());
   }
 
@@ -117,7 +162,7 @@ public class DefaultEntityManager implements EntityManager {
    */
   @Override
   public <T> T create(final TableMetadata<T> table, final T entity, final Instant timestamp) {
-    return new CreateEntityManager<T>().withTableMetadata(table).withEntity(entity).withTimestamp(timestamp)
+    return new CreateEntityManager<T>(executionContext).withTableMetadata(table).withEntity(entity).withTimestamp(timestamp)
                                        .save(sessionFactory.getSession());
   }
 
@@ -126,7 +171,7 @@ public class DefaultEntityManager implements EntityManager {
    */
   @Override
   public <T> T create(final TableMetadata<T> table, final T entity, final long timestamp) {
-    return new CreateEntityManager<T>().withTableMetadata(table).withEntity(entity).withTimestamp(timestamp)
+    return new CreateEntityManager<T>(executionContext).withTableMetadata(table).withEntity(entity).withTimestamp(timestamp)
                                        .save(sessionFactory.getSession());
   }
 
@@ -135,7 +180,7 @@ public class DefaultEntityManager implements EntityManager {
    */
   @Override
   public <T> T update(final TableMetadata<T> table, final T entity) {
-    return new UpdateEntityManager<T>().withTableMetadata(table).withEntity(entity)
+    return new UpdateEntityManager<T>(executionContext).withTableMetadata(table).withEntity(entity)
                                        .save(sessionFactory.getSession());
   }
 
@@ -144,7 +189,7 @@ public class DefaultEntityManager implements EntityManager {
    */
   @Override
   public <T> boolean delete(final TableMetadata<T> table, final T entity) {
-    return new DeleteEntityManager<T>().withTableMetadata(table).withEntity(entity)
+    return new DeleteEntityManager<T>(executionContext).withTableMetadata(table).withEntity(entity)
                                        .save(sessionFactory.getSession());
   }
 
@@ -153,7 +198,7 @@ public class DefaultEntityManager implements EntityManager {
    */
   @Override
   public <T> T findOne(final TableMetadata<T> table, final ExtendedCriteriaExpression conditions) {
-    return new ReadEntityManager<T>().withTableMetadata(table).withConditions(conditions)
+    return new ReadEntityManager<T>(executionContext).withTableMetadata(table).withConditions(conditions)
                                      .fetchOne(sessionFactory.getSession());
   }
 
@@ -162,7 +207,7 @@ public class DefaultEntityManager implements EntityManager {
    */
   @Override
   public <T> T findOne(final TableMetadata<T> table, final CriteriaExpression condition) {
-    return new ReadEntityManager<T>().withTableMetadata(table).withCondition(condition)
+    return new ReadEntityManager<T>(executionContext).withTableMetadata(table).withCondition(condition)
                                      .fetchOne(sessionFactory.getSession());
   }
 
@@ -187,7 +232,7 @@ public class DefaultEntityManager implements EntityManager {
    */
   @Override
   public <T> List<T> find(final TableMetadata<T> table) {
-    return new ReadEntityManager<T>().withTableMetadata(table)
+    return new ReadEntityManager<T>(executionContext).withTableMetadata(table)
                                      .fetch(sessionFactory.getSession());
   }
 
@@ -196,7 +241,7 @@ public class DefaultEntityManager implements EntityManager {
    */
   @Override
   public <T> List<T> find(final TableMetadata<T> table, final ExtendedCriteriaExpression conditions) {
-    return new ReadEntityManager<T>().withTableMetadata(table).withConditions(conditions)
+    return new ReadEntityManager<T>(executionContext).withTableMetadata(table).withConditions(conditions)
                                      .fetch(sessionFactory.getSession());
   }
 
@@ -205,7 +250,7 @@ public class DefaultEntityManager implements EntityManager {
    */
   @Override
   public <T> List<T> find(final TableMetadata<T> table, final CriteriaExpression condition) {
-    return new ReadEntityManager<T>().withTableMetadata(table).withCondition(condition)
+    return new ReadEntityManager<T>(executionContext).withTableMetadata(table).withCondition(condition)
                                      .fetch(sessionFactory.getSession());
   }
 
@@ -214,7 +259,7 @@ public class DefaultEntityManager implements EntityManager {
    */
   @Override
   public <T> PageResult<T> find(final TableMetadata<T> table, final PageRequest pageRequest) {
-    return new ReadEntityManager<T>().withTableMetadata(table)
+    return new ReadEntityManager<T>(executionContext).withTableMetadata(table)
                                      .withPaging(pageRequest)
                                      .fetchPage(sessionFactory.getSession());
   }
@@ -224,7 +269,7 @@ public class DefaultEntityManager implements EntityManager {
    */
   @Override
   public <T> PageResult<T> find(final TableMetadata<T> table, final ExtendedCriteriaExpression conditions, final PageRequest pageRequest) {
-    return new ReadEntityManager<T>().withTableMetadata(table).withConditions(conditions)
+    return new ReadEntityManager<T>(executionContext).withTableMetadata(table).withConditions(conditions)
                                      .withPaging(pageRequest)
                                      .fetchPage(sessionFactory.getSession());
   }
@@ -234,7 +279,7 @@ public class DefaultEntityManager implements EntityManager {
    */
   @Override
   public <T> PageResult<T> find(final TableMetadata<T> table, final CriteriaExpression condition, final PageRequest pageRequest) {
-    return new ReadEntityManager<T>().withTableMetadata(table).withCondition(condition)
+    return new ReadEntityManager<T>(executionContext).withTableMetadata(table).withCondition(condition)
                                      .withPaging(pageRequest)
                                      .fetchPage(sessionFactory.getSession());
   }

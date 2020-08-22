@@ -18,6 +18,7 @@
  */
 package ma.markware.charybdis.dsl;
 
+import com.datastax.oss.driver.api.core.config.DriverExecutionProfile;
 import ma.markware.charybdis.dsl.delete.DeleteInitExpression;
 import ma.markware.charybdis.dsl.insert.InsertInitExpression;
 import ma.markware.charybdis.dsl.insert.InsertInitWithColumnsExpression;
@@ -29,6 +30,7 @@ import ma.markware.charybdis.model.field.SelectableField;
 import ma.markware.charybdis.model.field.metadata.ColumnMetadata;
 import ma.markware.charybdis.model.field.metadata.PartitionKeyColumnMetadata;
 import ma.markware.charybdis.model.field.metadata.TableMetadata;
+import ma.markware.charybdis.model.option.ConsistencyLevel;
 
 /**
  * API to handle entities in DB through DSL operations.
@@ -36,6 +38,30 @@ import ma.markware.charybdis.model.field.metadata.TableMetadata;
  * @author Oussama Markad
  */
 public interface DslQuery {
+
+  /**
+   * Set consistency level that will be applied to queries by our dsl manager.
+   *
+   * @param consistencyLevel consistency level.
+   * @return a new dsl manager instance with a specific consistency level.
+   */
+  DslQuery withConsistency(ConsistencyLevel consistencyLevel);
+
+  /**
+   * Set execution profile that will be applied to queries by our dsl manager.
+   *
+   * @param executionProfile driver execution profile.
+   * @return a new dsl manager instance with a specific execution profile.
+   */
+  DslQuery withExecutionProfile(DriverExecutionProfile executionProfile);
+
+  /**
+   * Set execution profile that will be applied to queries by our dsl manager.
+   *
+   * @param executionProfile execution profile name.
+   * @return a new dsl manager instance with a specific execution profile.
+   */
+  DslQuery withExecutionProfile(String executionProfile);
 
   /**
    * Create a new DSL select query with fields to select.

@@ -25,6 +25,7 @@ import com.datastax.oss.driver.api.core.cql.ResultSet;
 import java.time.Instant;
 import java.util.Map;
 import java.util.Map.Entry;
+import ma.markware.charybdis.ExecutionContext;
 import ma.markware.charybdis.model.criteria.CriteriaExpression;
 import ma.markware.charybdis.model.criteria.CriteriaOperator;
 import ma.markware.charybdis.model.field.metadata.ColumnMetadata;
@@ -49,8 +50,8 @@ class UpdateEntityManager<T> {
   private TableMetadata<T> tableMetadata;
   private T entity;
 
-  UpdateEntityManager() {
-    this.updateQuery = new UpdateQuery();
+  UpdateEntityManager(ExecutionContext executionContext) {
+    this.updateQuery = new UpdateQuery(executionContext);
   }
 
   /**

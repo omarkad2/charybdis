@@ -232,6 +232,30 @@ none provided we fallback on [DefaultSessionFactory](https://github.com/omarkad2
     boolean deleted = entityManager.delete(User_Table.user, persistedUser);
     ```
 
+### Tuneable Consistency
+Consistency can be defined at table definition level, so as to be applied on all queries
+involving said table, like the following:
+```java
+@Table(keyspace = "keyspace_demo", name = "table", writeConsistency = ConsistencyLevel.QUORUM, 
+              readConsistency = ConsistencyLevel.QUORUM)
+public class Table {
+    // attributes and methods ... 
+}
+```
+   
+We can also have a fine-grained control over consistency, by having a particular level for certain queries.
+- In Crud API:
+    ```java
+    entityManager.withConsistency(ConsistencyLevel.EACH_QUORUM).create(User_Table.user, new User(...));
+    ```
+- In Dsl API:
+    ```java
+    dslQuery.withConsistency(ConsistencyLevel.EACH_QUORUM)
+            .insertInto(User_Table.user, User_Table.id, User_Table.joiningDate, User_Table.addresses)
+            .values(UUID.randomUUID(), Instant.now(), addresses)
+            .ifNotExists()
+            .execute();
+    ```
 ## Licensing
 Charybdis is licensed under the Apache License, Version 2.0 (the "License"); 
 you may not use this project except in compliance with the License. 

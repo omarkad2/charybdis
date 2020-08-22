@@ -26,6 +26,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import ma.markware.charybdis.ExecutionContext;
 import ma.markware.charybdis.dsl.Record;
 import ma.markware.charybdis.dsl.utils.RecordUtils;
 import ma.markware.charybdis.model.criteria.CriteriaExpression;
@@ -49,9 +50,9 @@ public class SelectImpl implements SelectInitExpression, SelectWhereExpression, 
   private final SelectQuery selectQuery;
   private List<SelectableField> selectedFields;
 
-  public SelectImpl(final CqlSession session) {
+  public SelectImpl(final CqlSession session, final ExecutionContext executionContext) {
     this.session = session;
-    this.selectQuery = new SelectQuery();
+    this.selectQuery = new SelectQuery(executionContext);
   }
 
   SelectQuery getSelectQuery() {

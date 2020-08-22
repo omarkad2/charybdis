@@ -25,6 +25,7 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import ma.markware.charybdis.ExecutionContext;
 import ma.markware.charybdis.model.criteria.CriteriaExpression;
 import ma.markware.charybdis.model.criteria.ExtendedCriteriaExpression;
 import ma.markware.charybdis.model.field.metadata.TableMetadata;
@@ -45,8 +46,8 @@ class ReadEntityManager<T> {
   private final SelectQuery selectQuery;
   private TableMetadata<T> tableMetadata;
 
-  ReadEntityManager() {
-    this.selectQuery = new SelectQuery();
+  ReadEntityManager(ExecutionContext executionContext) {
+    this.selectQuery = new SelectQuery(executionContext);
   }
 
   /**

@@ -21,6 +21,7 @@ package ma.markware.charybdis.dsl.delete;
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.cql.ResultSet;
 import java.time.Instant;
+import ma.markware.charybdis.ExecutionContext;
 import ma.markware.charybdis.model.criteria.CriteriaExpression;
 import ma.markware.charybdis.model.field.DeletableField;
 import ma.markware.charybdis.model.field.metadata.TableMetadata;
@@ -37,9 +38,9 @@ public class DeleteImpl implements DeleteInitExpression, DeleteTimestampExpressi
   private final CqlSession session;
   private final DeleteQuery deleteQuery;
 
-  public DeleteImpl(final CqlSession session) {
+  public DeleteImpl(final CqlSession session, final ExecutionContext executionContext) {
     this.session = session;
-    this.deleteQuery = new DeleteQuery();
+    this.deleteQuery = new DeleteQuery(executionContext);
   }
 
   DeleteQuery getDeleteQuery() {

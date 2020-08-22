@@ -41,6 +41,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import ma.markware.charybdis.ExecutionContext;
+import ma.markware.charybdis.model.option.ConsistencyLevel;
 import ma.markware.charybdis.query.UpdateQuery;
 import ma.markware.charybdis.query.clause.AssignmentClause;
 import ma.markware.charybdis.query.clause.ConditionClause;
@@ -64,11 +66,13 @@ class UpdateImplTest {
   private CqlSession session;
 
   private UpdateImpl updateImpl;
+  private ExecutionContext executionContext;
   private TestUdt udt1, udt2;
 
   @BeforeEach
   void setup() {
-    updateImpl = new UpdateImpl(session);
+    executionContext = new ExecutionContext();
+    updateImpl = new UpdateImpl(session, executionContext);
 
     TestNestedUdt nestedUdt1 = new TestNestedUdt("nestedName1", "nestedValue1", Arrays.asList(12, 13));
     TestNestedUdt nestedUdt2 = new TestNestedUdt("nestedName2", "nestedValue2", Arrays.asList(14, 15, 16));
@@ -90,6 +94,12 @@ class UpdateImplTest {
     UpdateQuery updateQuery = updateImpl.getUpdateQuery();
     assertThat(updateQuery.getKeyspace()).isEqualTo(TestEntity_Table.KEYSPACE_NAME);
     assertThat(updateQuery.getTable()).isEqualTo(TestEntity_Table.TABLE_NAME);
+  }
+
+  @Test
+  void update_should_set_fallback_consistency() {
+    updateImpl.update(TestEntity_Table.test_entity);
+    assertThat(executionContext.getDefaultConsistencyLevel()).isEqualTo(ConsistencyLevel.QUORUM);
   }
 
   @Test
@@ -276,12 +286,13 @@ class UpdateImplTest {
               .set(TestEntity_Table.flag, true)
               .where(TestEntity_Table.id.eq(uuid))
               .and(TestEntity_Table.date.lt(now))
-              .and(TestEntity_Table.udt.in(udt1, udt2))
+              .and(TestEntity_Table.udt.in(Arrays.asList(udt1, udt2)))
               .and(TestEntity_Table.list.isNotNull())
               .and(TestEntity_Table.map.containsKey(mapKey))
               .and(TestEntity_Table.nestedSet.contains(nestedSetValue))
               .and(TestEntity_Table.enumMap.eq(ImmutableMap.of(0, TestEnum.TYPE_A, 1, TestEnum.TYPE_B)))
-              .and(TestEntity_Table.udtList.neq(Arrays.asList(udt1, udt2)));
+              .and(TestEntity_Table.udtList.neq(Arrays.asList(udt1, udt2)))
+              .and(TestEntity_Table.enumValue.in(TestEnum.TYPE_A));
 
     UpdateQuery updateQuery = updateImpl.getUpdateQuery();
 
@@ -296,7 +307,8 @@ class UpdateImplTest {
             tuple(CqlIdentifier.fromCql(TestEntity_Table.map.getName()), " CONTAINS KEY ", new Object[] { mapKey }),
             tuple(CqlIdentifier.fromCql(TestEntity_Table.nestedSet.getName()), " CONTAINS ", new Object[] { nestedSetValue }),
             tuple(CqlIdentifier.fromCql(TestEntity_Table.enumMap.getName()), "=", new Object[] { ImmutableMap.of(0, TestEnum.TYPE_A.name(), 1, TestEnum.TYPE_B.name()) }),
-            tuple(CqlIdentifier.fromCql(TestEntity_Table.udtList.getName()), "!=", new Object[] { Arrays.asList(TestEntity_Table.udt.serialize(udt1), TestEntity_Table.udt.serialize(udt2))})
+            tuple(CqlIdentifier.fromCql(TestEntity_Table.udtList.getName()), "!=", new Object[] { Arrays.asList(TestEntity_Table.udt.serialize(udt1), TestEntity_Table.udt.serialize(udt2))}),
+            tuple(CqlIdentifier.fromCql(TestEntity_Table.enumValue.getName()), " IN ", new Object[] { TestEntity_Table.enumValue.serialize(TestEnum.TYPE_A) })
         );
   }
 
@@ -307,6 +319,7 @@ class UpdateImplTest {
     updateImpl.update(TestEntity_Table.test_entity)
               .set(TestEntity_Table.flag, true)
               .where(TestEntity_Table.id.eq(uuid))
+              .and(TestEntity_Table.enumValue.in(Arrays.asList(TestEnum.TYPE_A, TestEnum.TYPE_B)))
               .if_(TestEntity_Table.date.lt(now));
 
     UpdateQuery updateQuery = updateImpl.getUpdateQuery();

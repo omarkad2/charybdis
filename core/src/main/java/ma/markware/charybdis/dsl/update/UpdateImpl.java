@@ -21,6 +21,7 @@ package ma.markware.charybdis.dsl.update;
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.cql.ResultSet;
 import java.time.Instant;
+import ma.markware.charybdis.ExecutionContext;
 import ma.markware.charybdis.model.assignment.AssignmentListValue;
 import ma.markware.charybdis.model.assignment.AssignmentMapValue;
 import ma.markware.charybdis.model.assignment.AssignmentSetValue;
@@ -47,9 +48,9 @@ public class UpdateImpl implements UpdateInitExpression, UpdateTtlExpression, Up
   private final CqlSession session;
   private final UpdateQuery updateQuery;
 
-  public UpdateImpl(final CqlSession session) {
+  public UpdateImpl(final CqlSession session, final ExecutionContext executionContext) {
     this.session = session;
-    this.updateQuery = new UpdateQuery();
+    this.updateQuery = new UpdateQuery(executionContext);
   }
 
   UpdateQuery getUpdateQuery() {

@@ -23,6 +23,7 @@ import static java.lang.String.format;
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.cql.ResultSet;
 import java.time.Instant;
+import ma.markware.charybdis.ExecutionContext;
 import ma.markware.charybdis.model.field.metadata.TableMetadata;
 import ma.markware.charybdis.query.InsertQuery;
 import org.slf4j.Logger;
@@ -44,8 +45,8 @@ class CreateEntityManager<T> {
   private TableMetadata<T> tableMetadata;
   private T entity;
 
-  CreateEntityManager() {
-    this.insertQuery = new InsertQuery();
+  CreateEntityManager(ExecutionContext executionContext) {
+    this.insertQuery = new InsertQuery(executionContext);
   }
 
   /**
