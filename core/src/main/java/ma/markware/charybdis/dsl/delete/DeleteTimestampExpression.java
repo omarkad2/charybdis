@@ -28,7 +28,7 @@ import java.time.Instant;
  *
  * @author Oussama Markad
  */
-public interface DeleteTimestampExpression extends DeleteWhereExpression  {
+public interface DeleteTimestampExpression<RETURN_TYPE> extends DeleteWhereExpression<RETURN_TYPE>  {
 
   /**
    * Set write time in delete DSL query.
@@ -36,7 +36,7 @@ public interface DeleteTimestampExpression extends DeleteWhereExpression  {
    * @param timestamp writetime as {@link Instant}.
    * @return updated delete DSL query expression.
    */
-  DeleteWhereExpression usingTimestamp(Instant timestamp);
+  DeleteWhereExpression<RETURN_TYPE> usingTimestamp(Instant timestamp);
 
   /**
    * Set write time in the delete DSL query.
@@ -44,5 +44,5 @@ public interface DeleteTimestampExpression extends DeleteWhereExpression  {
    * @param timestamp writetime as millis.
    * @return updated delete DSL query expression.
    */
-  DeleteWhereExpression usingTimestamp(long timestamp);
+  DeleteWhereExpression<RETURN_TYPE> usingTimestamp(long timestamp);
 }

@@ -24,6 +24,7 @@ import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.cql.ResultSet;
 import java.time.Instant;
 import ma.markware.charybdis.ExecutionContext;
+import ma.markware.charybdis.batch.Batch;
 import ma.markware.charybdis.model.field.metadata.TableMetadata;
 import ma.markware.charybdis.query.InsertQuery;
 import org.slf4j.Logger;
@@ -45,10 +46,13 @@ class CreateEntityManager<T> {
   private TableMetadata<T> tableMetadata;
   private T entity;
 
+  CreateEntityManager() {
+    this.insertQuery = new InsertQuery();
+  }
+
   CreateEntityManager(ExecutionContext executionContext) {
     this.insertQuery = new InsertQuery(executionContext);
   }
-
   /**
    * Specify table in insert query.
    */
@@ -106,16 +110,30 @@ class CreateEntityManager<T> {
    * @return inserted entity.
    */
   T save(CqlSession session) {
-    Instant now = Instant.now();
-    tableMetadata.setGeneratedValues(entity);
-    tableMetadata.setCreationDate(entity, now);
-    tableMetadata.setLastUpdatedDate(entity, now);
-    insertQuery.setColumnNameValueMapping(tableMetadata.serialize(entity));
+    prepareQuery();
     ResultSet resultSet = insertQuery.execute(session);
     if (resultSet.wasApplied()) {
       return entity;
     }
     log.warn(format("Entity [%s] was not created", entity));
     return null;
+  }
+
+  /**
+   * Add query to batch
+   *
+   * @param batch enclosing batch query
+   */
+  void addToBatch(Batch batch) {
+    prepareQuery();
+    insertQuery.addToBatch(batch);
+  }
+
+  private void prepareQuery() {
+    Instant now = Instant.now();
+    tableMetadata.setGeneratedValues(entity);
+    tableMetadata.setCreationDate(entity, now);
+    tableMetadata.setLastUpdatedDate(entity, now);
+    insertQuery.setColumnNameValueMapping(tableMetadata.serialize(entity));
   }
 }

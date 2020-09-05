@@ -27,7 +27,10 @@ import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.ParameterContext;
 import org.junit.jupiter.api.extension.ParameterResolutionException;
 import org.junit.jupiter.api.extension.ParameterResolver;
+import org.junit.jupiter.api.extension.TestExecutionExceptionHandler;
 import org.junit.platform.commons.support.ModifierSupport;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Junit5 extension that:
@@ -38,7 +41,9 @@ import org.junit.platform.commons.support.ModifierSupport;
  *
  * @author Oussama Markad
  */
-public class DatabaseSetupExtension implements BeforeAllCallback, AfterAllCallback, ParameterResolver {
+public class DatabaseSetupExtension implements BeforeAllCallback, AfterAllCallback, ParameterResolver, TestExecutionExceptionHandler {
+
+  private static final Logger log = LoggerFactory.getLogger(DatabaseSetupExtension.class);
 
   private DockerizedCassandra dockerizedCassandra;
   private static final Set<Class<?>> SUPPORTED_PARAMETERS;
@@ -78,10 +83,23 @@ public class DatabaseSetupExtension implements BeforeAllCallback, AfterAllCallba
         return;
       }
     }
+    log.info("Tests ended : Stopping cassandra");
+    stopDb();
+  }
+
+  private void stopDb() {
     dockerizedCassandra.close();
     System.clearProperty("datastax-java-driver.basic.request.timeout");
     System.clearProperty("datastax-java-driver.basic.contact-points.0");
     System.clearProperty("datastax-java-driver.basic.load-balancing-policy.local-datacenter");
+  }
+
+  @Override
+  public void handleTestExecutionException(final ExtensionContext context, final Throwable throwable) {
+    if (!(throwable instanceof AssertionError)) {
+      log.error("Unknown error occurred : Stopping cassandra", throwable);
+      stopDb();
+    }
   }
 
   /**

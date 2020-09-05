@@ -33,14 +33,14 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-class DefaultEntityManagerTest {
+class CrudQueryBuilderTest {
 
   @Mock
   private CqlSession session;
 
   @Test
   void withConsistency() {
-    DefaultEntityManager defaultDslQueryWithConsistency = new DefaultEntityManager(session).withConsistency(ConsistencyLevel.QUORUM);
+    CrudQueryBuilder defaultDslQueryWithConsistency = new CrudQueryBuilder(session).withConsistency(ConsistencyLevel.QUORUM);
 
     assertThat(defaultDslQueryWithConsistency.getExecutionContext()).isEqualTo(
         new ExecutionContext(ConsistencyLevel.QUORUM, null, null, null, null, null));
@@ -48,7 +48,7 @@ class DefaultEntityManagerTest {
 
   @Test
   void withSerialConsistency() {
-    DefaultEntityManager defaultDslQueryWithConsistency = new DefaultEntityManager(session).withSerialConsistency(SerialConsistencyLevel.SERIAL);
+    CrudQueryBuilder defaultDslQueryWithConsistency = new CrudQueryBuilder(session).withSerialConsistency(SerialConsistencyLevel.SERIAL);
 
     assertThat(defaultDslQueryWithConsistency.getExecutionContext()).isEqualTo(
         new ExecutionContext(null, null, SerialConsistencyLevel.SERIAL, null, null, null));
@@ -57,7 +57,7 @@ class DefaultEntityManagerTest {
   @Test
   void withExecutionProfile_driver_execution_profile() {
     DriverExecutionProfile driverExecutionProfile = mock(DriverExecutionProfile.class);
-    DefaultEntityManager defaultDslQueryWithExecutionProfile = new DefaultEntityManager(session).withExecutionProfile(driverExecutionProfile);
+    CrudQueryBuilder defaultDslQueryWithExecutionProfile = new CrudQueryBuilder(session).withExecutionProfile(driverExecutionProfile);
 
     assertThat(defaultDslQueryWithExecutionProfile.getExecutionContext()).isEqualTo(
         new ExecutionContext(null, null, null, null, driverExecutionProfile, null));
@@ -65,7 +65,7 @@ class DefaultEntityManagerTest {
 
   @Test
   void withExecutionProfile_execution_profile_name() {
-    DefaultEntityManager defaultDslQueryWithExecutionProfile = new DefaultEntityManager(session).withExecutionProfile("olap");
+    CrudQueryBuilder defaultDslQueryWithExecutionProfile = new CrudQueryBuilder(session).withExecutionProfile("olap");
 
     assertThat(defaultDslQueryWithExecutionProfile.getExecutionContext()).isEqualTo(
         new ExecutionContext(null, null, null, null, null, "olap"));

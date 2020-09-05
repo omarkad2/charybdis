@@ -31,9 +31,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import ma.markware.charybdis.AbstractIntegrationITest;
-import ma.markware.charybdis.dsl.DefaultDslQuery;
+import ma.markware.charybdis.CqlTemplate;
 import ma.markware.charybdis.dsl.DslFunctions;
-import ma.markware.charybdis.dsl.DslQuery;
+import ma.markware.charybdis.dsl.DslQueryBuilder;
 import ma.markware.charybdis.dsl.Record;
 import ma.markware.charybdis.model.field.SelectableField;
 import ma.markware.charybdis.query.PageRequest;
@@ -51,31 +51,32 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
 
 @TestInstance(Lifecycle.PER_CLASS)
-class DefaultEntityManagerITest extends AbstractIntegrationITest {
+class CrudQueryBuilderITest extends AbstractIntegrationITest {
 
-  private EntityManager entityManager;
-  private DslQuery dslQuery;
+  private DslQueryBuilder dsl;
+  private CrudQueryBuilder crud;
 
   @BeforeAll
   void setup(CqlSession session) {
-    entityManager = new DefaultEntityManager(session);
-    dslQuery = new DefaultDslQuery(session);
+    CqlTemplate cqlTemplate = new CqlTemplate(session);
+    dsl = cqlTemplate.dsl();
+    crud = cqlTemplate.crud();
+  }
+
+  @BeforeEach
+  void clean(CqlSession session) {
+    cleanDatabase(session);
   }
 
   @Nested
   @DisplayName("Entity manager create operations")
   class EntityManagerCreateITest {
 
-    @BeforeEach
-    void setup(CqlSession session) {
-      cleanDatabase(session);
-    }
-
     @Test
     void create() {
-      entityManager.create(TestEntity_Table.test_entity, TestEntity_INST1.entity1);
+      crud.create(TestEntity_Table.test_entity, TestEntity_INST1.entity1);
 
-      Record record = dslQuery.selectFrom(TestEntity_Table.test_entity)
+      Record record = dsl.selectFrom(TestEntity_Table.test_entity)
                               .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
                               .fetchOne();
 
@@ -94,12 +95,12 @@ class DefaultEntityManagerITest extends AbstractIntegrationITest {
     @Test
     void create_should_overwrite_when_not_ifNotExists() {
       TestEntity entity1 = new TestEntity(TestEntity_INST1.entity1);
-      entityManager.create(TestEntity_Table.test_entity, entity1);
+      crud.create(TestEntity_Table.test_entity, entity1);
 
       entity1.setFlag(false);
-      entityManager.create(TestEntity_Table.test_entity, entity1);
+      crud.create(TestEntity_Table.test_entity, entity1);
 
-      Record record = dslQuery.select(TestEntity_Table.flag)
+      Record record = dsl.select(TestEntity_Table.flag)
                               .from(TestEntity_Table.test_entity)
                               .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
                               .fetchOne();
@@ -111,12 +112,12 @@ class DefaultEntityManagerITest extends AbstractIntegrationITest {
     void create_should_not_overwrite_when_ifNotExists(CqlSession session) {
       cleanDatabase(session);
       TestEntity entity1 = new TestEntity(TestEntity_INST1.entity1);
-      entityManager.create(TestEntity_Table.test_entity, entity1);
+      crud.create(TestEntity_Table.test_entity, entity1);
 
       entity1.setFlag(false);
-      entityManager.create(TestEntity_Table.test_entity, entity1, true);
+      crud.create(TestEntity_Table.test_entity, entity1, true);
 
-      Record record = dslQuery.select(TestEntity_Table.flag)
+      Record record = dsl.select(TestEntity_Table.flag)
                               .from(TestEntity_Table.test_entity)
                               .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
                               .fetchOne();
@@ -127,10 +128,10 @@ class DefaultEntityManagerITest extends AbstractIntegrationITest {
     @Test
     void create_with_ttl() {
       int ttl = 86400;
-      entityManager.create(TestEntity_Table.test_entity, TestEntity_INST1.entity1, ttl);
+      crud.create(TestEntity_Table.test_entity, TestEntity_INST1.entity1, ttl);
 
       SelectableField<Integer> ttlField = DslFunctions.ttl(TestEntity_Table.flag);
-      Record record = dslQuery.select(ttlField)
+      Record record = dsl.select(ttlField)
                               .from(TestEntity_Table.test_entity)
                               .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
                               .fetchOne();
@@ -142,13 +143,13 @@ class DefaultEntityManagerITest extends AbstractIntegrationITest {
     @Test
     void create_with_ttl_should_not_overwrite_when_ifNotExists() {
       TestEntity entity1 = new TestEntity(TestEntity_INST1.entity1);
-      entityManager.create(TestEntity_Table.test_entity, entity1);
+      crud.create(TestEntity_Table.test_entity, entity1);
 
       entity1.setFlag(false);
-      entityManager.create(TestEntity_Table.test_entity, entity1, true, 60);
+      crud.create(TestEntity_Table.test_entity, entity1, true, 60);
 
       SelectableField<Integer> ttlField = DslFunctions.ttl(TestEntity_Table.flag);
-      Record record = dslQuery.select(ttlField, TestEntity_Table.flag)
+      Record record = dsl.select(ttlField, TestEntity_Table.flag)
                               .from(TestEntity_Table.test_entity)
                               .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
                               .fetchOne();
@@ -160,10 +161,10 @@ class DefaultEntityManagerITest extends AbstractIntegrationITest {
     @Test
     void create_with_timestamp() {
       Instant now = Instant.now();
-      entityManager.create(TestEntity_Table.test_entity, TestEntity_INST1.entity1, now);
+      crud.create(TestEntity_Table.test_entity, TestEntity_INST1.entity1, now);
 
       SelectableField<Long> writetimeField = DslFunctions.writetime(TestEntity_Table.flag);
-      Record record = dslQuery.select(writetimeField)
+      Record record = dsl.select(writetimeField)
                               .from(TestEntity_Table.test_entity)
                               .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
                               .fetchOne();
@@ -174,10 +175,10 @@ class DefaultEntityManagerITest extends AbstractIntegrationITest {
     @Test
     void create_with_timestamp_epoch_milli() {
       Instant now = Instant.now();
-      entityManager.create(TestEntity_Table.test_entity, TestEntity_INST1.entity1, now.toEpochMilli());
+      crud.create(TestEntity_Table.test_entity, TestEntity_INST1.entity1, now.toEpochMilli());
 
       SelectableField<Long> writetimeField = DslFunctions.writetime(TestEntity_Table.flag);
-      Record record = dslQuery.select(writetimeField)
+      Record record = dsl.select(writetimeField)
                               .from(TestEntity_Table.test_entity)
                               .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
                               .fetchOne();
@@ -189,11 +190,6 @@ class DefaultEntityManagerITest extends AbstractIntegrationITest {
   @Nested
   @DisplayName("Entity manager read operations")
   class EntityManagerReadITest {
-
-    @BeforeEach
-    void setup(CqlSession session) {
-      cleanDatabase(session);
-    }
 
     @Test
     void findOne(CqlSession session) {
@@ -219,7 +215,7 @@ class DefaultEntityManagerITest extends AbstractIntegrationITest {
       valuesToInsert.put(TestEntity_Table.flag.getName(), QueryBuilder.literal(TestEntity_Table.flag.serialize(TestEntity_INST1.flag)));
       insertRow(session, TestEntity_Table.KEYSPACE_NAME, TestEntity_Table.TABLE_NAME, valuesToInsert);
 
-      TestEntity entity = entityManager.findOne(TestEntity_Table.test_entity, TestEntity_Table.id.eq(TestEntity_INST1.id)
+      TestEntity entity = crud.findOne(TestEntity_Table.test_entity, TestEntity_Table.id.eq(TestEntity_INST1.id)
                                                                                                                    .and(TestEntity_Table.date.eq(
                                                                                                                        TestEntity_INST1.date))
                                                                                                                    .and(TestEntity_Table.udt.eq(
@@ -231,7 +227,7 @@ class DefaultEntityManagerITest extends AbstractIntegrationITest {
 
     @Test
     void findOne_should_return_null_when_entity_not_exist() {
-      TestEntity entity = entityManager.findOne(TestEntity_Table.test_entity, TestEntity_Table.id.eq(UUID.randomUUID()));
+      TestEntity entity = crud.findOne(TestEntity_Table.test_entity, TestEntity_Table.id.eq(UUID.randomUUID()));
       assertThat(entity).isNull();
     }
 
@@ -259,7 +255,7 @@ class DefaultEntityManagerITest extends AbstractIntegrationITest {
       valuesToInsert.put(TestEntity_Table.flag.getName(), QueryBuilder.literal(TestEntity_Table.flag.serialize(TestEntity_INST1.flag)));
       insertRow(session, TestEntity_Table.KEYSPACE_NAME, TestEntity_Table.TABLE_NAME, valuesToInsert);
 
-      Optional<TestEntity> entityOpt = entityManager.findOptional(TestEntity_Table.test_entity, TestEntity_Table.id.eq(TestEntity_INST1.id)
+      Optional<TestEntity> entityOpt = crud.findOptional(TestEntity_Table.test_entity, TestEntity_Table.id.eq(TestEntity_INST1.id)
                                                                                                                   .and(TestEntity_Table.date.eq(
                                                                                                                       TestEntity_INST1.date))
                                                                                                                   .and(TestEntity_Table.udt.eq(
@@ -272,7 +268,7 @@ class DefaultEntityManagerITest extends AbstractIntegrationITest {
 
     @Test
     void findOptional_should_return_empty_optional_when_entity_not_exist() {
-      Optional<TestEntity> entityOpt = entityManager.findOptional(TestEntity_Table.test_entity, TestEntity_Table.id.eq(UUID.randomUUID()));
+      Optional<TestEntity> entityOpt = crud.findOptional(TestEntity_Table.test_entity, TestEntity_Table.id.eq(UUID.randomUUID()));
       assertThat(entityOpt).isEmpty();
     }
 
@@ -292,7 +288,7 @@ class DefaultEntityManagerITest extends AbstractIntegrationITest {
                                 TestEntity_Table.udt.getName(), QueryBuilder.literal(TestEntity_Table.udt.serialize(TestEntity_INST1.udt2)),
                                 TestEntity_Table.list.getName(), QueryBuilder.literal(TestEntity_Table.list.serialize(TestEntity_INST2.list))));
 
-      List<TestEntity> entities= entityManager.find(TestEntity_Table.test_entity);
+      List<TestEntity> entities= crud.find(TestEntity_Table.test_entity);
       assertThat(entities).containsExactlyInAnyOrder(
           new TestEntity(TestEntity_INST1.id, TestEntity_INST1.date, TestEntity_INST1.udt1, TestEntity_INST1.list, null, null, null, null, null, null,
                          null, null, null, null, null, null, null, null, null),
@@ -324,7 +320,7 @@ class DefaultEntityManagerITest extends AbstractIntegrationITest {
       valuesToInsert.put(TestEntity_Table.flag.getName(), QueryBuilder.literal(TestEntity_Table.flag.serialize(TestEntity_INST1.flag)));
       insertRow(session, TestEntity_Table.KEYSPACE_NAME, TestEntity_Table.TABLE_NAME, valuesToInsert);
 
-      List<TestEntity> entities= entityManager.find(TestEntity_Table.test_entity, TestEntity_Table.id.eq(TestEntity_INST1.id)
+      List<TestEntity> entities= crud.find(TestEntity_Table.test_entity, TestEntity_Table.id.eq(TestEntity_INST1.id)
                                                                                                      .and(TestEntity_Table.date.eq(
                                                                                                                        TestEntity_INST1.date))
                                                                                                      .and(TestEntity_Table.udt.eq(
@@ -337,7 +333,7 @@ class DefaultEntityManagerITest extends AbstractIntegrationITest {
 
     @Test
     void find_should_return_empty_when_entity_not_exists() {
-      List<TestEntity> entities= entityManager.find(TestEntity_Table.test_entity, TestEntity_Table.id.eq(UUID.randomUUID()));
+      List<TestEntity> entities= crud.find(TestEntity_Table.test_entity, TestEntity_Table.id.eq(UUID.randomUUID()));
       assertThat(entities).isEmpty();
     }
 
@@ -372,24 +368,24 @@ class DefaultEntityManagerITest extends AbstractIntegrationITest {
                                 TestEntity_Table.list.getName(), QueryBuilder.literal(TestEntity_Table.list.serialize(TestEntity_INST1.list))));
 
       // First page
-      PageResult pageResult1 = entityManager.find(TestEntity_Table.test_entity, PageRequest.of(null, 2));
+      PageResult pageResult1 = crud.find(TestEntity_Table.test_entity, PageRequest.of(null, 2));
       assertThat(pageResult1.getPagingState()).isNotNull();
       assertThat(pageResult1.getResults()).hasSize(2);
 
       // Second page
-      PageResult pageResult2 = entityManager.find(TestEntity_Table.test_entity, PageRequest.of(pageResult1.getPagingState(), 2));
+      PageResult pageResult2 = crud.find(TestEntity_Table.test_entity, PageRequest.of(pageResult1.getPagingState(), 2));
       assertThat(pageResult2.getPagingState()).isNotNull();
       assertThat(pageResult2.getResults()).hasSize(2);
 
       // Third page
-      PageResult pageResult3 = entityManager.find(TestEntity_Table.test_entity, PageRequest.of(pageResult2.getPagingState(), 2));
+      PageResult pageResult3 = crud.find(TestEntity_Table.test_entity, PageRequest.of(pageResult2.getPagingState(), 2));
       assertThat(pageResult3.getPagingState()).isNull();
       assertThat(pageResult3.getResults()).isEmpty();
     }
 
     @Test
     void find_paged_should_return_empty_page_result_when_no_entity() {
-      PageResult pageResult = entityManager.find(TestEntity_Table.test_entity, PageRequest.of(null, 2));
+      PageResult pageResult = crud.find(TestEntity_Table.test_entity, PageRequest.of(null, 2));
       assertThat(pageResult.getPagingState()).isNull();
       assertThat(pageResult.getResults()).isEmpty();
     }
@@ -401,9 +397,8 @@ class DefaultEntityManagerITest extends AbstractIntegrationITest {
 
     @BeforeEach
     void setup(CqlSession session) {
-      cleanDatabase(session);
       // Insert TestEntity_INST1 to DB
-      dslQuery.insertInto(TestEntity_Table.test_entity, TestEntity_Table.id, TestEntity_Table.date, TestEntity_Table.udt, TestEntity_Table.list, TestEntity_Table.se, TestEntity_Table.map,
+      dsl.insertInto(TestEntity_Table.test_entity, TestEntity_Table.id, TestEntity_Table.date, TestEntity_Table.udt, TestEntity_Table.list, TestEntity_Table.se, TestEntity_Table.map,
                           TestEntity_Table.nestedList, TestEntity_Table.nestedSet, TestEntity_Table.nestedMap, TestEntity_Table.enumValue, TestEntity_Table.enumList, TestEntity_Table.enumMap,
                           TestEntity_Table.enumNestedList, TestEntity_Table.extraUdt, TestEntity_Table.udtList, TestEntity_Table.udtSet, TestEntity_Table.udtMap, TestEntity_Table.udtNestedList,
                           TestEntity_Table.flag)
@@ -417,9 +412,9 @@ class DefaultEntityManagerITest extends AbstractIntegrationITest {
     void update() {
       TestEntity newEntity = new TestEntity(TestEntity_INST1.entity1);
       newEntity.setFlag(false);
-      entityManager.update(TestEntity_Table.test_entity, newEntity);
+      crud.update(TestEntity_Table.test_entity, newEntity);
 
-      Record record = dslQuery.selectFrom(TestEntity_Table.test_entity)
+      Record record = dsl.selectFrom(TestEntity_Table.test_entity)
                               .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
                               .fetchOne();
 
@@ -453,9 +448,8 @@ class DefaultEntityManagerITest extends AbstractIntegrationITest {
 
     @BeforeEach
     void setup(CqlSession session) {
-      cleanDatabase(session);
       // Insert TestEntity_INST1 to DB
-      dslQuery.insertInto(TestEntity_Table.test_entity, TestEntity_Table.id, TestEntity_Table.date, TestEntity_Table.udt, TestEntity_Table.list, TestEntity_Table.se, TestEntity_Table.map,
+      dsl.insertInto(TestEntity_Table.test_entity, TestEntity_Table.id, TestEntity_Table.date, TestEntity_Table.udt, TestEntity_Table.list, TestEntity_Table.se, TestEntity_Table.map,
                           TestEntity_Table.nestedList, TestEntity_Table.nestedSet, TestEntity_Table.nestedMap, TestEntity_Table.enumValue, TestEntity_Table.enumList, TestEntity_Table.enumMap,
                           TestEntity_Table.enumNestedList, TestEntity_Table.extraUdt, TestEntity_Table.udtList, TestEntity_Table.udtSet, TestEntity_Table.udtMap, TestEntity_Table.udtNestedList,
                           TestEntity_Table.flag)
@@ -467,9 +461,9 @@ class DefaultEntityManagerITest extends AbstractIntegrationITest {
 
     @Test
     void delete() {
-      boolean isApplied = entityManager.delete(TestEntity_Table.test_entity, TestEntity_INST1.entity1);
+      boolean isApplied = crud.delete(TestEntity_Table.test_entity, TestEntity_INST1.entity1);
 
-      Record record = dslQuery.selectFrom(TestEntity_Table.test_entity)
+      Record record = dsl.selectFrom(TestEntity_Table.test_entity)
                               .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
                               .fetchOne();
 

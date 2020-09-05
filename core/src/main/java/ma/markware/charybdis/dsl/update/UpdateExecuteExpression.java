@@ -26,12 +26,12 @@ package ma.markware.charybdis.dsl.update;
  *
  * @author Oussama Markad
  */
-public interface UpdateExecuteExpression {
+public interface UpdateExecuteExpression<RETURN_TYPE> {
 
   /**
    * Execute Update DSL query.
    *
    * @return {@code true} if query is executed, {@code false} otherwise.
    */
-  boolean execute();
+  RETURN_TYPE execute();
 }

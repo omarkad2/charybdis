@@ -33,41 +33,41 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-class DefaultDslQueryTest {
+class DslQueryBuilderTest {
 
   @Mock
   private CqlSession session;
 
   @Test
   void withConsistency() {
-    DefaultDslQuery defaultDslQueryWithConsistency = new DefaultDslQuery(session).withConsistency(ConsistencyLevel.QUORUM);
+    DslQueryBuilder dslQueryBuilderWithConsistency = new DslQueryBuilder(session).withConsistency(ConsistencyLevel.QUORUM);
 
-    assertThat(defaultDslQueryWithConsistency.getExecutionContext()).isEqualTo(
+    assertThat(dslQueryBuilderWithConsistency.getExecutionContext()).isEqualTo(
         new ExecutionContext(ConsistencyLevel.QUORUM, null, null, null, null, null));
   }
 
   @Test
   void withSerialConsistency() {
-    DefaultDslQuery defaultDslQueryWithConsistency = new DefaultDslQuery(session).withSerialConsistency(SerialConsistencyLevel.LOCAL_SERIAL);
+    DslQueryBuilder dslQueryBuilderWithConsistency = new DslQueryBuilder(session).withSerialConsistency(SerialConsistencyLevel.LOCAL_SERIAL);
 
-    assertThat(defaultDslQueryWithConsistency.getExecutionContext()).isEqualTo(
+    assertThat(dslQueryBuilderWithConsistency.getExecutionContext()).isEqualTo(
         new ExecutionContext(null, null, SerialConsistencyLevel.LOCAL_SERIAL, null, null, null));
   }
 
   @Test
   void withExecutionProfile_driver_execution_profile() {
     DriverExecutionProfile driverExecutionProfile = mock(DriverExecutionProfile.class);
-    DefaultDslQuery defaultDslQueryWithExecutionProfile = new DefaultDslQuery(session).withExecutionProfile(driverExecutionProfile);
+    DslQueryBuilder dslQueryBuilderWithExecutionProfile = new DslQueryBuilder(session).withExecutionProfile(driverExecutionProfile);
 
-    assertThat(defaultDslQueryWithExecutionProfile.getExecutionContext()).isEqualTo(
+    assertThat(dslQueryBuilderWithExecutionProfile.getExecutionContext()).isEqualTo(
         new ExecutionContext(null, null, null, null, driverExecutionProfile, null));
   }
 
   @Test
   void withExecutionProfile_execution_profile_name() {
-    DefaultDslQuery defaultDslQueryWithExecutionProfile = new DefaultDslQuery(session).withExecutionProfile("olap");
+    DslQueryBuilder dslQueryBuilderWithExecutionProfile = new DslQueryBuilder(session).withExecutionProfile("olap");
 
-    assertThat(defaultDslQueryWithExecutionProfile.getExecutionContext()).isEqualTo(
+    assertThat(dslQueryBuilderWithExecutionProfile.getExecutionContext()).isEqualTo(
         new ExecutionContext(null, null, null, null, null, "olap"));
   }
 }

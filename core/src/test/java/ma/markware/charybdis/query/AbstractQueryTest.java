@@ -70,6 +70,7 @@ class AbstractQueryTest {
     when(boundStatement.setPageSize(anyInt())).thenReturn(boundStatement);
     when(boundStatement.setPagingState(eq(null))).thenReturn(boundStatement);
     when(session.execute(any(Statement.class))).thenReturn(null);
+    when(abstractQuery.buildStatement()).thenReturn(new StatementTuple(simpleStatement, new Object[] {}));
   }
 
   @Test
@@ -85,7 +86,7 @@ class AbstractQueryTest {
         null));
 
     // When
-    abstractQuery.executeStatement(session, simpleStatement, new Object[] {});
+    abstractQuery.execute(session);
 
     // Then
     verify(abstractQuery).executeStatement(eq(session), statementAc.capture(), eq(0), eq(null), eq(new Object[] {}));
@@ -108,7 +109,7 @@ class AbstractQueryTest {
         null));
 
     // When
-    abstractQuery.executeStatement(session, simpleStatement, new Object[] {});
+    abstractQuery.execute(session);
 
     // Then
     verify(abstractQuery).executeStatement(eq(session), statementAc.capture(), eq(0), eq(null), eq(new Object[] {}));
@@ -131,7 +132,7 @@ class AbstractQueryTest {
         null));
 
     // When
-    abstractQuery.executeStatement(session, simpleStatement, new Object[] {});
+    abstractQuery.execute(session);
 
     // Then
     verify(abstractQuery).executeStatement(eq(session), statementAc.capture(), eq(0), eq(null), eq(new Object[] {}));
@@ -154,7 +155,7 @@ class AbstractQueryTest {
         null));
 
     // When
-    abstractQuery.executeStatement(session, simpleStatement, new Object[] {});
+    abstractQuery.execute(session);
 
     // Then
     verify(abstractQuery).executeStatement(eq(session), statementAc.capture(), eq(0), eq(null), eq(new Object[] {}));
@@ -177,7 +178,7 @@ class AbstractQueryTest {
         null));
 
     // When
-    abstractQuery.executeStatement(session, simpleStatement, new Object[] {});
+    abstractQuery.execute(session);
 
     // Then
     verify(abstractQuery).executeStatement(eq(session), statementAc.capture(), eq(0), eq(null), eq(new Object[] {}));
@@ -200,7 +201,7 @@ class AbstractQueryTest {
         null));
 
     // When
-    abstractQuery.executeStatement(session, simpleStatement, new Object[] {});
+    abstractQuery.execute(session);
 
     // Then
     verify(abstractQuery).executeStatement(eq(session), statementAc.capture(), eq(0), eq(null), eq(new Object[] {}));
@@ -225,7 +226,7 @@ class AbstractQueryTest {
         null));
 
     // When
-    abstractQuery.executeStatement(session, simpleStatement, new Object[] {});
+    abstractQuery.execute(session);
 
     // Then
     verify(abstractQuery).executeStatement(eq(session), statementAc.capture(), eq(0), eq(null), eq(new Object[] {}));
@@ -249,7 +250,7 @@ class AbstractQueryTest {
         "olap"));
 
     // When
-    abstractQuery.executeStatement(session, simpleStatement, new Object[] {});
+    abstractQuery.execute(session);
 
     // Then
     verify(abstractQuery).executeStatement(eq(session), statementAc.capture(), eq(0), eq(null), eq(new Object[] {}));

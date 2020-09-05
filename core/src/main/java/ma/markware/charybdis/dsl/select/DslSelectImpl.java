@@ -43,14 +43,14 @@ import ma.markware.charybdis.query.SelectQuery;
  *
  * @author Oussama Markad
  */
-public class SelectImpl implements SelectInitExpression, SelectWhereExpression, SelectExtraWhereExpression, SelectLimitExpression, SelectOrderExpression,
+public class DslSelectImpl implements SelectInitExpression, SelectWhereExpression, SelectExtraWhereExpression, SelectLimitExpression, SelectOrderExpression,
     SelectFilteringExpression, SelectFetchExpression {
 
   private final CqlSession session;
   private final SelectQuery selectQuery;
   private List<SelectableField> selectedFields;
 
-  public SelectImpl(final CqlSession session, final ExecutionContext executionContext) {
+  public DslSelectImpl(final CqlSession session, final ExecutionContext executionContext) {
     this.session = session;
     this.selectQuery = new SelectQuery(executionContext);
   }

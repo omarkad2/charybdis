@@ -18,8 +18,6 @@
  */
 package ma.markware.charybdis.query;
 
-import com.datastax.oss.driver.api.core.CqlSession;
-import com.datastax.oss.driver.api.core.cql.ResultSet;
 import com.datastax.oss.driver.api.core.cql.SimpleStatement;
 import com.datastax.oss.driver.api.core.metadata.schema.ClusteringOrder;
 import com.datastax.oss.driver.api.querybuilder.QueryBuilder;
@@ -148,7 +146,7 @@ public class SelectQuery extends AbstractQuery {
    * {@inheritDoc}
    */
   @Override
-  public ResultSet execute(final CqlSession session) {
+  public StatementTuple buildStatement() {
     Select select;
     SelectFrom selectFrom = QueryBuilder.selectFrom(keyspace, table);
 
@@ -176,8 +174,8 @@ public class SelectQuery extends AbstractQuery {
     SimpleStatement simpleStatement = select.build();
     Object[] bindValues = QueryHelper.extractWhereBindValues(whereClauses).toArray();
     if (pageRequest != null) {
-      return executeStatement(session, simpleStatement, pageRequest.getFetchSize(), pageRequest.getPagingState(), bindValues);
+      return new StatementTuple(simpleStatement, pageRequest.getFetchSize(), pageRequest.getPagingState(), bindValues);
     }
-    return executeStatement(session, simpleStatement, bindValues);
+    return new StatementTuple(simpleStatement, bindValues);
   }
 }

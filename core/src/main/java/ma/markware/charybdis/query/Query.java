@@ -20,6 +20,7 @@ package ma.markware.charybdis.query;
 
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.cql.ResultSet;
+import ma.markware.charybdis.batch.Batch;
 
 /**
  * Cql Query
@@ -29,7 +30,19 @@ import com.datastax.oss.driver.api.core.cql.ResultSet;
 public interface Query {
 
   /**
+   * Build query statement.
+   *
+   * @return statement tuple.
+   */
+  StatementTuple buildStatement();
+
+  /**
    * Execute query and return results.
    */
   ResultSet execute(final CqlSession session);
+
+  /**
+   * Add query to batch.
+   */
+  void addToBatch(final Batch batch);
 }

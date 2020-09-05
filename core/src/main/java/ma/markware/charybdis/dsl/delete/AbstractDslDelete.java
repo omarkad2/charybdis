@@ -16,31 +16,28 @@
  * limitations under the License.
  *
  */
+
 package ma.markware.charybdis.dsl.delete;
 
-import com.datastax.oss.driver.api.core.CqlSession;
-import com.datastax.oss.driver.api.core.cql.ResultSet;
 import java.time.Instant;
-import ma.markware.charybdis.ExecutionContext;
 import ma.markware.charybdis.model.criteria.CriteriaExpression;
 import ma.markware.charybdis.model.field.DeletableField;
 import ma.markware.charybdis.model.field.metadata.TableMetadata;
 import ma.markware.charybdis.query.DeleteQuery;
 
 /**
- * Delete query builder.
+ * Abstract delete query builder.
+ * @param <T> query return type.
  *
  * @author Oussama Markad
  */
-public class DeleteImpl implements DeleteInitExpression, DeleteTimestampExpression, DeleteWhereExpression, DeleteExtraWhereExpression,
-    DeleteIfExpression, DeleteExtraIfExpression, DeleteExecuteExpression {
+abstract class AbstractDslDelete<T> implements DeleteInitExpression<T>, DeleteTimestampExpression<T>, DeleteWhereExpression<T>, DeleteExtraWhereExpression<T>,
+    DeleteIfExpression<T>, DeleteExtraIfExpression<T>, DeleteFinalExpression<T> {
 
-  private final CqlSession session;
-  private final DeleteQuery deleteQuery;
+  final DeleteQuery deleteQuery;
 
-  public DeleteImpl(final CqlSession session, final ExecutionContext executionContext) {
-    this.session = session;
-    this.deleteQuery = new DeleteQuery(executionContext);
+  AbstractDslDelete(final DeleteQuery deleteQuery) {
+    this.deleteQuery = deleteQuery;
   }
 
   DeleteQuery getDeleteQuery() {
@@ -50,14 +47,14 @@ public class DeleteImpl implements DeleteInitExpression, DeleteTimestampExpressi
   /**
    * No-op method. (commodity)
    */
-  public DeleteInitExpression delete() {
+  public DeleteInitExpression<T> delete() {
     return this;
   }
 
   /**
    * Set fields to delete in query.
    */
-  public DeleteInitExpression delete(DeletableField... fields) {
+  public DeleteInitExpression<T> delete(DeletableField... fields) {
     deleteQuery.setSelectors(fields);
     return this;
   }
@@ -66,7 +63,7 @@ public class DeleteImpl implements DeleteInitExpression, DeleteTimestampExpressi
    * {@inheritDoc}
    */
   @Override
-  public DeleteTimestampExpression from(final TableMetadata table) {
+  public DeleteTimestampExpression<T> from(final TableMetadata table) {
     deleteQuery.setTable(table);
     return this;
   }
@@ -75,7 +72,7 @@ public class DeleteImpl implements DeleteInitExpression, DeleteTimestampExpressi
    * {@inheritDoc}
    */
   @Override
-  public DeleteWhereExpression usingTimestamp(final Instant timestamp) {
+  public DeleteWhereExpression<T> usingTimestamp(final Instant timestamp) {
     deleteQuery.setTimestamp(timestamp);
     return this;
   }
@@ -84,7 +81,7 @@ public class DeleteImpl implements DeleteInitExpression, DeleteTimestampExpressi
    * {@inheritDoc}
    */
   @Override
-  public DeleteWhereExpression usingTimestamp(final long timestamp) {
+  public DeleteWhereExpression<T> usingTimestamp(final long timestamp) {
     deleteQuery.setTimestamp(timestamp);
     return this;
   }
@@ -93,7 +90,7 @@ public class DeleteImpl implements DeleteInitExpression, DeleteTimestampExpressi
    * {@inheritDoc}
    */
   @Override
-  public DeleteExtraWhereExpression where(final CriteriaExpression criteria) {
+  public DeleteExtraWhereExpression<T> where(final CriteriaExpression criteria) {
     deleteQuery.setWhere(criteria);
     return this;
   }
@@ -102,7 +99,7 @@ public class DeleteImpl implements DeleteInitExpression, DeleteTimestampExpressi
    * {@inheritDoc}
    */
   @Override
-  public DeleteExtraWhereExpression and(final CriteriaExpression criteria) {
+  public DeleteExtraWhereExpression<T> and(final CriteriaExpression criteria) {
     deleteQuery.setWhere(criteria);
     return this;
   }
@@ -111,7 +108,7 @@ public class DeleteImpl implements DeleteInitExpression, DeleteTimestampExpressi
    * {@inheritDoc}
    */
   @Override
-  public DeleteExtraIfExpression if_(final CriteriaExpression condition) {
+  public DeleteExtraIfExpression<T> if_(final CriteriaExpression condition) {
     deleteQuery.setIf(condition);
     return this;
   }
@@ -120,17 +117,8 @@ public class DeleteImpl implements DeleteInitExpression, DeleteTimestampExpressi
    * {@inheritDoc}
    */
   @Override
-  public DeleteExtraIfExpression and_(final CriteriaExpression condition) {
+  public DeleteExtraIfExpression<T> and_(final CriteriaExpression condition) {
     deleteQuery.setIf(condition);
     return this;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public boolean execute() {
-    ResultSet resultSet = deleteQuery.execute(session);
-    return resultSet != null && resultSet.wasApplied();
   }
 }

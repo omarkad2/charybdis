@@ -22,7 +22,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 
 import com.datastax.oss.driver.api.core.CqlIdentifier;
-import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.internal.querybuilder.condition.DefaultCondition;
 import com.datastax.oss.driver.internal.querybuilder.lhs.ColumnLeftOperand;
 import com.datastax.oss.driver.internal.querybuilder.relation.DefaultRelation;
@@ -33,8 +32,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
-import ma.markware.charybdis.ExecutionContext;
-import ma.markware.charybdis.model.option.ConsistencyLevel;
 import ma.markware.charybdis.query.DeleteQuery;
 import ma.markware.charybdis.query.clause.ConditionClause;
 import ma.markware.charybdis.query.clause.WhereClause;
@@ -45,24 +42,19 @@ import ma.markware.charybdis.test.metadata.TestEntity_Table;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-class DeleteImplTest {
+abstract class AbstractDslDeleteTest<T extends AbstractDslDelete> {
 
-  @Mock
-  private CqlSession session;
-
-  private DeleteImpl deleteImpl;
-  private ExecutionContext executionContext;
+  private T instance;
   private TestUdt udt1, udt2;
+
+  abstract T getInstance();
 
   @BeforeEach
   void setup() {
-    executionContext = new ExecutionContext();
-    deleteImpl = new DeleteImpl(session, executionContext);
-
+    instance = getInstance();
     TestNestedUdt nestedUdt1 = new TestNestedUdt("nestedName1", "nestedValue1", Arrays.asList(12, 13));
     TestNestedUdt nestedUdt2 = new TestNestedUdt("nestedName2", "nestedValue2", Arrays.asList(14, 15, 16));
     TestNestedUdt nestedUdt3 = new TestNestedUdt("nestedName3", "nestedValue3", Arrays.asList(17, 18));
@@ -78,9 +70,9 @@ class DeleteImplTest {
 
   @Test
   void delete() {
-    deleteImpl.delete(TestEntity_Table.list, TestEntity_Table.map);
+    instance.delete(TestEntity_Table.list, TestEntity_Table.map);
 
-    DeleteQuery deleteQuery = deleteImpl.getDeleteQuery();
+    DeleteQuery deleteQuery = instance.getDeleteQuery();
     assertThat(deleteQuery.getSelectors()).extracting(selector -> ((ColumnSelector) selector).getColumnId())
                                           .containsExactlyInAnyOrder(
                                               CqlIdentifier.fromCql(TestEntity_Table.list.getName()),
@@ -88,16 +80,10 @@ class DeleteImplTest {
   }
 
   @Test
-  void delete_should_set_fallback_consistency() {
-    deleteImpl.delete().from(TestEntity_Table.test_entity);
-    assertThat(executionContext.getDefaultConsistencyLevel()).isEqualTo(ConsistencyLevel.QUORUM);
-  }
-
-  @Test
   void from() {
-    deleteImpl.from(TestEntity_Table.test_entity);
+    instance.from(TestEntity_Table.test_entity);
 
-    DeleteQuery deleteQuery = deleteImpl.getDeleteQuery();
+    DeleteQuery deleteQuery = instance.getDeleteQuery();
     assertThat(deleteQuery.getKeyspace()).isEqualTo(TestEntity_Table.KEYSPACE_NAME);
     assertThat(deleteQuery.getTable()).isEqualTo(TestEntity_Table.TABLE_NAME);
   }
@@ -105,30 +91,30 @@ class DeleteImplTest {
   @Test
   void usingTimestamp() {
     Instant now = Instant.now();
-    deleteImpl.from(TestEntity_Table.test_entity)
-              .usingTimestamp(now);
+    instance.from(TestEntity_Table.test_entity)
+                 .usingTimestamp(now);
 
-    DeleteQuery deleteQuery = deleteImpl.getDeleteQuery();
+    DeleteQuery deleteQuery = instance.getDeleteQuery();
     assertThat(deleteQuery.getTimestamp()).isEqualTo(now.toEpochMilli());
   }
 
   @Test
   void usingTimestamp_epoch_milli() {
     Instant now = Instant.now();
-    deleteImpl.from(TestEntity_Table.test_entity)
-              .usingTimestamp(now.toEpochMilli());
+    instance.from(TestEntity_Table.test_entity)
+                 .usingTimestamp(now.toEpochMilli());
 
-    DeleteQuery deleteQuery = deleteImpl.getDeleteQuery();
+    DeleteQuery deleteQuery = instance.getDeleteQuery();
     assertThat(deleteQuery.getTimestamp()).isEqualTo(now.toEpochMilli());
   }
 
   @Test
   void where() {
     UUID uuid = UUID.randomUUID();
-    deleteImpl.from(TestEntity_Table.test_entity)
-              .where(TestEntity_Table.id.eq(uuid));
+    instance.from(TestEntity_Table.test_entity)
+                 .where(TestEntity_Table.id.eq(uuid));
 
-    DeleteQuery deleteQuery = deleteImpl.getDeleteQuery();
+    DeleteQuery deleteQuery = instance.getDeleteQuery();
 
     assertThat(deleteQuery.getWhereClauses())
         .extracting(whereClause -> ((ColumnLeftOperand) ((DefaultRelation) whereClause.getRelation()).getLeftOperand()).getColumnId(),
@@ -144,17 +130,17 @@ class DeleteImplTest {
     Instant now = Instant.now();
     String mapKey = "key0";
     List<Integer> nestedSetValue = Collections.singletonList(10);
-    deleteImpl.from(TestEntity_Table.test_entity)
-              .where(TestEntity_Table.id.eq(uuid))
-              .and(TestEntity_Table.date.lt(now))
-              .and(TestEntity_Table.udt.in(udt1, udt2))
-              .and(TestEntity_Table.list.isNotNull())
-              .and(TestEntity_Table.map.containsKey(mapKey))
-              .and(TestEntity_Table.nestedSet.contains(nestedSetValue))
-              .and(TestEntity_Table.enumMap.eq(ImmutableMap.of(0, TestEnum.TYPE_A, 1, TestEnum.TYPE_B)))
-              .and(TestEntity_Table.udtList.neq(Arrays.asList(udt1, udt2)));
+    instance.from(TestEntity_Table.test_entity)
+                 .where(TestEntity_Table.id.eq(uuid))
+                 .and(TestEntity_Table.date.lt(now))
+                 .and(TestEntity_Table.udt.in(udt1, udt2))
+                 .and(TestEntity_Table.list.isNotNull())
+                 .and(TestEntity_Table.map.containsKey(mapKey))
+                 .and(TestEntity_Table.nestedSet.contains(nestedSetValue))
+                 .and(TestEntity_Table.enumMap.eq(ImmutableMap.of(0, TestEnum.TYPE_A, 1, TestEnum.TYPE_B)))
+                 .and(TestEntity_Table.udtList.neq(Arrays.asList(udt1, udt2)));
 
-    DeleteQuery deleteQuery = deleteImpl.getDeleteQuery();
+    DeleteQuery deleteQuery = instance.getDeleteQuery();
 
     assertThat(deleteQuery.getWhereClauses())
         .extracting(whereClause -> ((ColumnLeftOperand) ((DefaultRelation) whereClause.getRelation()).getLeftOperand()).getColumnId(),
@@ -174,10 +160,10 @@ class DeleteImplTest {
   @Test
   void if_() {
     UUID uuid = UUID.randomUUID();
-    deleteImpl.from(TestEntity_Table.test_entity)
-              .if_(TestEntity_Table.id.eq(uuid));
+    instance.from(TestEntity_Table.test_entity)
+                 .if_(TestEntity_Table.id.eq(uuid));
 
-    DeleteQuery deleteQuery = deleteImpl.getDeleteQuery();
+    DeleteQuery deleteQuery = instance.getDeleteQuery();
 
     assertThat(deleteQuery.getConditionClauses())
         .extracting(conditionClause -> ((ColumnLeftOperand) ((DefaultCondition) conditionClause.getCondition()).getLeftOperand()).getColumnId(),
@@ -191,14 +177,14 @@ class DeleteImplTest {
   void and_() {
     UUID uuid = UUID.randomUUID();
     Instant now = Instant.now();
-    deleteImpl.from(TestEntity_Table.test_entity)
-              .if_(TestEntity_Table.id.eq(uuid))
-              .and_(TestEntity_Table.date.lt(now))
-              .and_(TestEntity_Table.udt.in(udt1, udt2))
-              .and_(TestEntity_Table.enumMap.eq(ImmutableMap.of(0, TestEnum.TYPE_A, 1, TestEnum.TYPE_B)))
-              .and_(TestEntity_Table.udtList.neq(Arrays.asList(udt1, udt2)));
+    instance.from(TestEntity_Table.test_entity)
+                 .if_(TestEntity_Table.id.eq(uuid))
+                 .and_(TestEntity_Table.date.lt(now))
+                 .and_(TestEntity_Table.udt.in(udt1, udt2))
+                 .and_(TestEntity_Table.enumMap.eq(ImmutableMap.of(0, TestEnum.TYPE_A, 1, TestEnum.TYPE_B)))
+                 .and_(TestEntity_Table.udtList.neq(Arrays.asList(udt1, udt2)));
 
-    DeleteQuery deleteQuery = deleteImpl.getDeleteQuery();
+    DeleteQuery deleteQuery = instance.getDeleteQuery();
 
     assertThat(deleteQuery.getConditionClauses())
         .extracting(conditionClause -> ((ColumnLeftOperand) ((DefaultCondition) conditionClause.getCondition()).getLeftOperand()).getColumnId(),

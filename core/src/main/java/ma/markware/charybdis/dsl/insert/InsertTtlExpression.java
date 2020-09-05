@@ -26,7 +26,7 @@ package ma.markware.charybdis.dsl.insert;
  *
  * @author Oussama Markad
  */
-public interface InsertTtlExpression extends InsertExecuteExpression {
+public interface InsertTtlExpression<RETURN_TYPE> extends InsertExecuteExpression<RETURN_TYPE> {
 
   /**
    * Set {@code TTL} in insert DSL query.
@@ -34,5 +34,5 @@ public interface InsertTtlExpression extends InsertExecuteExpression {
    * @param seconds ttl in seconds.
    * @return updated insert DSL query expression.
    */
-  InsertExecuteExpression usingTtl(int seconds);
+  InsertExecuteExpression<RETURN_TYPE> usingTtl(int seconds);
 }

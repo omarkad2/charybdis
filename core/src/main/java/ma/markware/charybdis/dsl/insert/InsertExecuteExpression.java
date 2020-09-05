@@ -26,12 +26,12 @@ package ma.markware.charybdis.dsl.insert;
  *
  * @author Oussama Markad
  */
-public interface InsertExecuteExpression {
+public interface InsertExecuteExpression<RETURN_TYPE> {
 
   /**
    * Execute Insert DSL query.
    *
    * @return {@code true} if query is executed, {@code false} otherwise.
    */
-  boolean execute();
+  RETURN_TYPE execute();
 }

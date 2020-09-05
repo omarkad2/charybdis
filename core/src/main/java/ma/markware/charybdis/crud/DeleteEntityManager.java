@@ -20,10 +20,10 @@ package ma.markware.charybdis.crud;
 
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.cql.ResultSet;
-import java.time.Instant;
 import java.util.Map;
 import java.util.Map.Entry;
 import ma.markware.charybdis.ExecutionContext;
+import ma.markware.charybdis.batch.Batch;
 import ma.markware.charybdis.model.criteria.CriteriaExpression;
 import ma.markware.charybdis.model.criteria.CriteriaOperator;
 import ma.markware.charybdis.model.field.metadata.TableMetadata;
@@ -47,6 +47,10 @@ public class DeleteEntityManager<T> {
   private TableMetadata<T> tableMetadata;
   private T entity;
 
+  DeleteEntityManager() {
+    this.deleteQuery = new DeleteQuery();
+  }
+
   DeleteEntityManager(ExecutionContext executionContext) {
     this.deleteQuery = new DeleteQuery(executionContext);
   }
@@ -68,21 +72,21 @@ public class DeleteEntityManager<T> {
     return this;
   }
 
-  /**
-   * Add writetime to delete query.
-   */
-  public DeleteEntityManager<T> withTimestamp(Instant timestamp) {
-    deleteQuery.setTimestamp(timestamp);
-    return this;
-  }
-
-  /**
-   * Add writetime in millis to delete query.
-   */
-  public DeleteEntityManager<T> withTimestamp(long timestamp) {
-    deleteQuery.setTimestamp(timestamp);
-    return this;
-  }
+//  /**
+//   * Add writetime to delete query.
+//   */
+//  public DeleteEntityManager<T> withTimestamp(Instant timestamp) {
+//    deleteQuery.setTimestamp(timestamp);
+//    return this;
+//  }
+//
+//  /**
+//   * Add writetime in millis to delete query.
+//   */
+//  public DeleteEntityManager<T> withTimestamp(long timestamp) {
+//    deleteQuery.setTimestamp(timestamp);
+//    return this;
+//  }
 
   /**
    * Execute delete query.
@@ -90,6 +94,22 @@ public class DeleteEntityManager<T> {
    * @return if delete was applied
    */
   boolean save(CqlSession session) {
+    prepareQuery();
+    ResultSet resultSet = deleteQuery.execute(session);
+    return resultSet.wasApplied();
+  }
+
+  /**
+   * Add query to batch
+   *
+   * @param batch enclosing batch query
+   */
+  void addToBatch(Batch batch) {
+    prepareQuery();
+    deleteQuery.addToBatch(batch);
+  }
+
+  private void prepareQuery() {
     Map<String, Object> columnValueMap = tableMetadata.serialize(entity);
     for (Entry<String, Object> columnEntry : columnValueMap.entrySet()) {
       String columnName = columnEntry.getKey();
@@ -98,7 +118,5 @@ public class DeleteEntityManager<T> {
         deleteQuery.setWhere(new CriteriaExpression(tableMetadata.getColumnMetadata(columnName), CriteriaOperator.EQ, value));
       }
     }
-    ResultSet resultSet = deleteQuery.execute(session);
-    return resultSet.wasApplied();
   }
 }

@@ -16,30 +16,27 @@
  * limitations under the License.
  *
  */
+
 package ma.markware.charybdis.dsl.insert;
 
-import com.datastax.oss.driver.api.core.CqlSession;
-import com.datastax.oss.driver.api.core.cql.ResultSet;
 import java.time.Instant;
-import ma.markware.charybdis.ExecutionContext;
 import ma.markware.charybdis.model.field.metadata.ColumnMetadata;
 import ma.markware.charybdis.model.field.metadata.TableMetadata;
 import ma.markware.charybdis.query.InsertQuery;
 
 /**
- * Insert query builder.
+ * Abstract insert query builder.
+ * @param <T> query return type.
  *
  * @author Oussama Markad
  */
-public class InsertImpl implements InsertInitExpression, InsertInitWithColumnsExpression, InsertValuesExpression, InsertSetExpression,
-    InsertOnExistExpression, InsertTtlExpression, InsertTimestampExpression, InsertExecuteExpression {
+abstract class AbstractDslInsert<T> implements InsertInitExpression<T>, InsertInitWithColumnsExpression<T>, InsertValuesExpression<T>, InsertSetExpression<T>,
+    InsertOnExistExpression<T>, InsertTtlExpression<T>, InsertTimestampExpression<T>, InsertExecuteExpression<T> {
 
-  private final CqlSession session;
-  private final InsertQuery insertQuery;
+  final InsertQuery insertQuery;
 
-  public InsertImpl(final CqlSession session, final ExecutionContext executionContext) {
-    this.session = session;
-    this.insertQuery = new InsertQuery(executionContext);
+  AbstractDslInsert(final InsertQuery insertQuery) {
+    this.insertQuery = insertQuery;
   }
 
   InsertQuery getInsertQuery() {
@@ -49,7 +46,7 @@ public class InsertImpl implements InsertInitExpression, InsertInitWithColumnsEx
   /**
    * Set table to insert.
    */
-  public InsertInitExpression insertInto(TableMetadata tableMetadata) {
+  public InsertInitExpression<T> insertInto(TableMetadata tableMetadata) {
     insertQuery.setTable(tableMetadata);
     return this;
   }
@@ -57,7 +54,7 @@ public class InsertImpl implements InsertInitExpression, InsertInitWithColumnsEx
   /**
    * Set table and columns to insert.
    */
-  public InsertInitWithColumnsExpression insertInto(TableMetadata table, ColumnMetadata... columns) {
+  public InsertInitWithColumnsExpression<T> insertInto(TableMetadata table, ColumnMetadata... columns) {
     insertQuery.setTableAndColumns(table, columns);
     return this;
   }
@@ -66,7 +63,7 @@ public class InsertImpl implements InsertInitExpression, InsertInitWithColumnsEx
    * {@inheritDoc}
    */
   @Override
-  public InsertValuesExpression values(final Object... values) {
+  public InsertValuesExpression<T> values(final Object... values) {
     insertQuery.setValues(values);
     return this;
   }
@@ -75,7 +72,7 @@ public class InsertImpl implements InsertInitExpression, InsertInitWithColumnsEx
    * {@inheritDoc}
    */
   @Override
-  public <D, S> InsertSetExpression set(final ColumnMetadata<D, S> column, final D value) {
+  public <D, S> InsertSetExpression<T> set(final ColumnMetadata<D, S> column, final D value) {
     insertQuery.setSet(column, value);
     return this;
   }
@@ -84,16 +81,16 @@ public class InsertImpl implements InsertInitExpression, InsertInitWithColumnsEx
    * {@inheritDoc}
    */
   @Override
-  public <T extends InsertTtlExpression & InsertTimestampExpression> T ifNotExists() {
+  public <D extends InsertTtlExpression<T> & InsertTimestampExpression<T>> D ifNotExists() {
     insertQuery.enableIfNotExists();
-    return (T) this;
+    return (D) this;
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public InsertExecuteExpression usingTtl(final int ttl) {
+  public InsertExecuteExpression<T> usingTtl(final int ttl) {
     insertQuery.setTtl(ttl);
     return this;
   }
@@ -102,7 +99,7 @@ public class InsertImpl implements InsertInitExpression, InsertInitWithColumnsEx
    * {@inheritDoc}
    */
   @Override
-  public InsertExecuteExpression usingTimestamp(final Instant timestamp) {
+  public InsertExecuteExpression<T> usingTimestamp(final Instant timestamp) {
     insertQuery.setTimestamp(timestamp);
     return this;
   }
@@ -111,17 +108,8 @@ public class InsertImpl implements InsertInitExpression, InsertInitWithColumnsEx
    * {@inheritDoc}
    */
   @Override
-  public InsertExecuteExpression usingTimestamp(final long timestamp) {
+  public InsertExecuteExpression<T> usingTimestamp(final long timestamp) {
     insertQuery.setTimestamp(timestamp);
     return this;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public boolean execute() {
-    ResultSet resultSet = insertQuery.execute(session);
-    return resultSet.wasApplied();
   }
 }

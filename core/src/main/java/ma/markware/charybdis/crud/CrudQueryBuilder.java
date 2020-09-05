@@ -18,10 +18,15 @@
  */
 package ma.markware.charybdis.crud;
 
+import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.config.DriverExecutionProfile;
+import com.google.common.annotations.VisibleForTesting;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import ma.markware.charybdis.ConsistencyTunable;
+import ma.markware.charybdis.ExecutionContext;
+import ma.markware.charybdis.QueryBuilder;
 import ma.markware.charybdis.model.criteria.CriteriaExpression;
 import ma.markware.charybdis.model.criteria.ExtendedCriteriaExpression;
 import ma.markware.charybdis.model.field.metadata.TableMetadata;
@@ -31,43 +36,66 @@ import ma.markware.charybdis.query.PageRequest;
 import ma.markware.charybdis.query.PageResult;
 
 /**
- * API that allows handling entities in DB through CRUD operations.
+ * Implementation of {@link QueryBuilder}, handle cql entities using crud semantics.
  *
  * @author Oussama Markad
  */
-public interface EntityManager {
+public class CrudQueryBuilder implements QueryBuilder, ConsistencyTunable<CrudQueryBuilder> {
+
+  private final CqlSession session;
+  private final ExecutionContext executionContext;
+
+  private CrudQueryBuilder(CqlSession session, ExecutionContext executionContext) {
+    this.session = session;
+    this.executionContext = executionContext;
+  }
+
+  public CrudQueryBuilder(CqlSession session) {
+    this(session, new ExecutionContext());
+  }
+
+  @VisibleForTesting
+  ExecutionContext getExecutionContext() {
+    return executionContext;
+  }
 
   /**
-   * Set consistency level that will be applied to queries by our entity manager.
-   *
-   * @param consistencyLevel consistency level.
-   * @return a new entity manager instance with a specific consistency level.
+   * {@inheritDoc}
    */
-  EntityManager withConsistency(ConsistencyLevel consistencyLevel);
+  @Override
+  public CrudQueryBuilder withConsistency(ConsistencyLevel consistencyLevel) {
+    ExecutionContext executionContext = new ExecutionContext(this.executionContext);
+    executionContext.setConsistencyLevel(consistencyLevel);
+    return new CrudQueryBuilder(session, executionContext);
+  }
 
   /**
-   * Set serial consistency level that will be applied to LWT queries by our entity manager.
-   *
-   * @param serialConsistencyLevel serial consistency level.
-   * @return a new entity manager instance with a specific consistency level.
+   * {@inheritDoc}
    */
-  EntityManager withSerialConsistency(SerialConsistencyLevel serialConsistencyLevel);
+  @Override
+  public CrudQueryBuilder withSerialConsistency(SerialConsistencyLevel serialConsistencyLevel) {
+    ExecutionContext executionContext = new ExecutionContext(this.executionContext);
+    executionContext.setSerialConsistencyLevel(serialConsistencyLevel);
+    return new CrudQueryBuilder(session, executionContext);
+  }
 
   /**
-   * Set execution profile that will be applied to queries by our entity manager.
-   *
-   * @param executionProfile driver execution profile.
-   * @return a new entity manager instance with a specific execution profile.
+   * {@inheritDoc}
    */
-  EntityManager withExecutionProfile(DriverExecutionProfile executionProfile);
+  public CrudQueryBuilder withExecutionProfile(DriverExecutionProfile executionProfile) {
+    ExecutionContext executionContext = new ExecutionContext(this.executionContext);
+    executionContext.setDriverExecutionProfile(executionProfile);
+    return new CrudQueryBuilder(session, executionContext);
+  }
 
   /**
-   * Set execution profile that will be applied to queries by our entity manager.
-   *
-   * @param executionProfile execution profile name.
-   * @return a new entity manager instance with a specific execution profile.
+   * {@inheritDoc}
    */
-  EntityManager withExecutionProfile(String executionProfile);
+  public CrudQueryBuilder withExecutionProfile(String executionProfile) {
+    ExecutionContext executionContext = new ExecutionContext(this.executionContext);
+    executionContext.setExecutionProfileName(executionProfile);
+    return new CrudQueryBuilder(session, executionContext);
+  }
 
   /**
    * Create entity in DB.
@@ -77,7 +105,9 @@ public interface EntityManager {
    * @param <T> type of entity.
    * @return persisted entity.
    */
-  <T> T create(TableMetadata<T> table, T entity);
+  public <T> T create(final TableMetadata<T> table, final T entity) {
+    return new CreateEntityManager<T>(executionContext).withTableMetadata(table).withEntity(entity).save(session);
+  }
 
   /**
    * Create entity in DB if it doesn't exist (no overwriting).
@@ -90,7 +120,10 @@ public interface EntityManager {
    * @param <T> type of entity.
    * @return persisted entity.
    */
-  <T> T create(TableMetadata<T> table, T entity, boolean ifNotExists);
+  public <T> T create(final TableMetadata<T> table, final T entity, final boolean ifNotExists) {
+    return new CreateEntityManager<T>(executionContext).withTableMetadata(table).withEntity(entity).withIfNotExists(ifNotExists)
+                                       .save(session);
+  }
 
   /**
    * Create entity in DB with TTL in seconds.
@@ -101,7 +134,10 @@ public interface EntityManager {
    * @param <T> type of entity.
    * @return persisted entity.
    */
-  <T> T create(TableMetadata<T> table, T entity, int seconds);
+  public <T> T create(final TableMetadata<T> table, final T entity, final int seconds) {
+    return new CreateEntityManager<T>(executionContext).withTableMetadata(table).withEntity(entity).withTtl(seconds)
+                                       .save(session);
+  }
 
   /**
    * Create entity in DB if it doesn't exist (no overwriting) with TTL in seconds.
@@ -115,7 +151,10 @@ public interface EntityManager {
    * @param <T> type of entity.
    * @return persisted entity.
    */
-  <T> T create(TableMetadata<T> table, T entity, boolean ifNotExists, int seconds);
+  public <T> T create(final TableMetadata<T> table, final T entity, final boolean ifNotExists, final int seconds) {
+    return new CreateEntityManager<T>(executionContext).withTableMetadata(table).withEntity(entity).withIfNotExists(ifNotExists).withTtl(seconds)
+                                       .save(session);
+  }
 
   /**
    * Create entity in DB with custom write time.
@@ -126,7 +165,10 @@ public interface EntityManager {
    * @param <T> type of entity.
    * @return persisted entity.
    */
-  <T> T create(TableMetadata<T> table, T entity, Instant timestamp);
+  public <T> T create(final TableMetadata<T> table, final T entity, final Instant timestamp) {
+    return new CreateEntityManager<T>(executionContext).withTableMetadata(table).withEntity(entity).withTimestamp(timestamp)
+                                       .save(session);
+  }
 
   /**
    * Create entity in DB with custom write time in millis.
@@ -137,7 +179,10 @@ public interface EntityManager {
    * @param <T> type of entity.
    * @return persisted entity.
    */
-  <T> T create(TableMetadata<T> table, T entity, long timestamp);
+  public <T> T create(final TableMetadata<T> table, final T entity, final long timestamp) {
+    return new CreateEntityManager<T>(executionContext).withTableMetadata(table).withEntity(entity).withTimestamp(timestamp)
+                                       .save(session);
+  }
 
   /**
    * Update entity in DB.
@@ -148,7 +193,10 @@ public interface EntityManager {
    * @param <T> type of entity.
    * @return updated entity.
    */
-  <T> T update(TableMetadata<T> table, T entity);
+  public <T> T update(final TableMetadata<T> table, final T entity) {
+    return new UpdateEntityManager<T>(executionContext).withTableMetadata(table).withEntity(entity)
+                                       .save(session);
+  }
 
   /**
    * Delete entity in DB.
@@ -158,7 +206,10 @@ public interface EntityManager {
    * @param <T> type of entity.
    * @return true if entity deleted.
    */
-  <T> boolean delete(TableMetadata<T> table, T entity);
+  public <T> boolean delete(final TableMetadata<T> table, final T entity) {
+    return new DeleteEntityManager<T>(executionContext).withTableMetadata(table).withEntity(entity)
+                                       .save(session);
+  }
 
   /**
    * Fetch one entity from DB fulfilling given conditions.
@@ -168,7 +219,10 @@ public interface EntityManager {
    * @param <T> type of entity.
    * @return the entity if found otherwise {@code null}.
    */
-  <T> T findOne(TableMetadata<T> table, ExtendedCriteriaExpression conditions);
+  public <T> T findOne(final TableMetadata<T> table, final ExtendedCriteriaExpression conditions) {
+    return new ReadEntityManager<T>(executionContext).withTableMetadata(table).withConditions(conditions)
+                                     .fetchOne(session);
+  }
 
   /**
    * Fetch one entity from DB fulfilling a given condition.
@@ -178,7 +232,10 @@ public interface EntityManager {
    * @param <T> type of entity.
    * @return the entity if found otherwise {@code null}.
    */
-  <T> T findOne(TableMetadata<T> table, CriteriaExpression condition);
+  public <T> T findOne(final TableMetadata<T> table, final CriteriaExpression condition) {
+    return new ReadEntityManager<T>(executionContext).withTableMetadata(table).withCondition(condition)
+                                     .fetchOne(session);
+  }
 
   /**
    * Fetch one entity wrapped in {@code Optional} from DB fulfilling given conditions.
@@ -188,7 +245,9 @@ public interface EntityManager {
    * @param <T> type of entity.
    * @return the entity wrapped in {@code Optional} if found otherwise {@code Optional.empty()}.
    */
-  <T> Optional<T> findOptional(TableMetadata<T> table, ExtendedCriteriaExpression conditions);
+  public <T> Optional<T> findOptional(final TableMetadata<T> table, final ExtendedCriteriaExpression conditions) {
+    return Optional.ofNullable(findOne(table, conditions));
+  }
 
   /**
    * Fetch one entity wrapped in {@code Optional} from DB fulfilling a given condition.
@@ -198,7 +257,9 @@ public interface EntityManager {
    * @param <T> type of entity.
    * @return the entity wrapped in {@code Optional} if found otherwise {@code Optional.empty()}.
    */
-  <T> Optional<T> findOptional(TableMetadata<T> table, CriteriaExpression condition);
+  public <T> Optional<T> findOptional(final TableMetadata<T> table, final CriteriaExpression condition) {
+    return Optional.ofNullable(findOne(table, condition));
+  }
 
   /**
    * Fetch entities from DB.
@@ -207,7 +268,10 @@ public interface EntityManager {
    * @param <T> type of entities.
    * @return entities from DB.
    */
-  <T> List<T> find(TableMetadata<T> table);
+  public <T> List<T> find(final TableMetadata<T> table) {
+    return new ReadEntityManager<T>(executionContext).withTableMetadata(table)
+                                     .fetch(session);
+  }
 
   /**
    * Fetch entities from DB fulfilling given conditions.
@@ -217,7 +281,10 @@ public interface EntityManager {
    * @param <T> type of entities.
    * @return entities from DB.
    */
-  <T> List<T> find(TableMetadata<T> table, ExtendedCriteriaExpression conditions);
+  public <T> List<T> find(final TableMetadata<T> table, final ExtendedCriteriaExpression conditions) {
+    return new ReadEntityManager<T>(executionContext).withTableMetadata(table).withConditions(conditions)
+                                     .fetch(session);
+  }
 
   /**
    * Fetch entities from DB fulfilling a given condition.
@@ -227,7 +294,10 @@ public interface EntityManager {
    * @param <T> type of entities.
    * @return entities from DB.
    */
-  <T> List<T> find(TableMetadata<T> table, CriteriaExpression condition);
+  public <T> List<T> find(final TableMetadata<T> table, final CriteriaExpression condition) {
+    return new ReadEntityManager<T>(executionContext).withTableMetadata(table).withCondition(condition)
+                                     .fetch(session);
+  }
 
   /**
    * Fetch a page of entities from DB.
@@ -238,7 +308,11 @@ public interface EntityManager {
    * @param <T> type of entities.
    * @return page result of entities from DB and updated paging state {@link PageResult}.
    */
-  <T> PageResult<T> find(TableMetadata<T> table, PageRequest pageRequest);
+  public <T> PageResult<T> find(final TableMetadata<T> table, final PageRequest pageRequest) {
+    return new ReadEntityManager<T>(executionContext).withTableMetadata(table)
+                                     .withPaging(pageRequest)
+                                     .fetchPage(session);
+  }
 
   /**
    * Fetch a page of entities from DB fulfilling given conditions.
@@ -250,7 +324,11 @@ public interface EntityManager {
    * @param <T> type of entities.
    * @return page result of entities from DB and updated paging state {@link PageResult}.
    */
-  <T> PageResult<T> find(TableMetadata<T> table, ExtendedCriteriaExpression conditions, PageRequest pageRequest);
+  public <T> PageResult<T> find(final TableMetadata<T> table, final ExtendedCriteriaExpression conditions, final PageRequest pageRequest) {
+    return new ReadEntityManager<T>(executionContext).withTableMetadata(table).withConditions(conditions)
+                                     .withPaging(pageRequest)
+                                     .fetchPage(session);
+  }
 
   /**
    * Fetch a page of entities from DB fulfilling a given condition.
@@ -262,5 +340,9 @@ public interface EntityManager {
    * @param <T> type of entities.
    * @return page result of entities from DB and updated paging state {@link PageResult}.
    */
-  <T> PageResult<T> find(TableMetadata<T> table, CriteriaExpression condition, PageRequest pageRequest);
+  public <T> PageResult<T> find(final TableMetadata<T> table, final CriteriaExpression condition, final PageRequest pageRequest) {
+    return new ReadEntityManager<T>(executionContext).withTableMetadata(table).withCondition(condition)
+                                     .withPaging(pageRequest)
+                                     .fetchPage(session);
+  }
 }

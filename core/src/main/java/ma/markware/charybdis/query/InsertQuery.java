@@ -20,8 +20,6 @@ package ma.markware.charybdis.query;
 
 import static java.lang.String.format;
 
-import com.datastax.oss.driver.api.core.CqlSession;
-import com.datastax.oss.driver.api.core.cql.ResultSet;
 import com.datastax.oss.driver.api.core.cql.SimpleStatement;
 import com.datastax.oss.driver.api.querybuilder.QueryBuilder;
 import com.datastax.oss.driver.api.querybuilder.insert.Insert;
@@ -32,6 +30,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import javax.annotation.Nonnull;
 import ma.markware.charybdis.ExecutionContext;
 import ma.markware.charybdis.model.field.metadata.ColumnMetadata;
 import ma.markware.charybdis.model.field.metadata.TableMetadata;
@@ -52,8 +51,12 @@ public class InsertQuery extends AbstractQuery {
   private Long timestamp;
   private boolean ifNotExists;
 
-  public InsertQuery(ExecutionContext executionContext) {
+  public InsertQuery(@Nonnull ExecutionContext executionContext) {
     super(executionContext);
+  }
+
+  public InsertQuery() {
+    super(new ExecutionContext());
   }
 
   public String getKeyspace() {
@@ -130,7 +133,7 @@ public class InsertQuery extends AbstractQuery {
    * {@inheritDoc}
    */
   @Override
-  public ResultSet execute(final CqlSession session) {
+  public StatementTuple buildStatement() {
     InsertInto insertInto = QueryBuilder.insertInto(keyspace, table);
     Object[] bindValueArray = new Object[columnNameValueMapping.size()];
     int bindIndex = 0;
@@ -157,7 +160,7 @@ public class InsertQuery extends AbstractQuery {
     }
 
     SimpleStatement simpleStatement = insert.build();
-    return executeStatement(session, simpleStatement, bindValueArray);
+    return new StatementTuple(simpleStatement, bindValueArray);
   }
 
   public static final class ColumnNameValueMapping {

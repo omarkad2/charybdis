@@ -16,22 +16,19 @@
  * limitations under the License.
  *
  */
-package ma.markware.charybdis.dsl.delete;
 
-/**
- * Delete DSL query expression.
- *
- * <p>
- * It is not recommended to reference any object with type {@link DeleteExecuteExpression}.
- *
- * @author Oussama Markad
- */
-public interface DeleteExecuteExpression {
+package ma.markware.charybdis.dsl.update;
 
-  /**
-   * Execute Delete DSL query.
-   *
-   * @return {@code true} if query is executed, {@code false} otherwise.
-   */
-  boolean execute();
+import ma.markware.charybdis.batch.Batch;
+import org.mockito.Mock;
+
+class DslUpdateBatchImplTest extends AbstractDslUpdateTest<DslUpdateBatchImpl> {
+
+  @Mock
+  private Batch batch;
+
+  @Override
+  DslUpdateBatchImpl getInstance() {
+    return new DslUpdateBatchImpl(batch);
+  }
 }

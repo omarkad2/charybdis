@@ -26,6 +26,7 @@ import java.time.Instant;
 import java.util.Map;
 import java.util.Map.Entry;
 import ma.markware.charybdis.ExecutionContext;
+import ma.markware.charybdis.batch.Batch;
 import ma.markware.charybdis.model.criteria.CriteriaExpression;
 import ma.markware.charybdis.model.criteria.CriteriaOperator;
 import ma.markware.charybdis.model.field.metadata.ColumnMetadata;
@@ -50,6 +51,10 @@ class UpdateEntityManager<T> {
   private TableMetadata<T> tableMetadata;
   private T entity;
 
+  UpdateEntityManager() {
+    this.updateQuery = new UpdateQuery();
+  }
+
   UpdateEntityManager(ExecutionContext executionContext) {
     this.updateQuery = new UpdateQuery(executionContext);
   }
@@ -71,29 +76,29 @@ class UpdateEntityManager<T> {
     return this;
   }
 
-  /**
-   * Add ttl in seconds to update query.
-   */
-  UpdateEntityManager<T> withTtl(int seconds) {
-    updateQuery.setTtl(seconds);
-    return this;
-  }
-
-  /**
-   * Add writetime to update query.
-   */
-  UpdateEntityManager<T> withTimestamp(Instant timestamp) {
-    updateQuery.setTimestamp(timestamp);
-    return this;
-  }
-
-  /**
-   * Add writetime in millis to update query.
-   */
-  UpdateEntityManager<T> withTimestamp(long timestamp) {
-    updateQuery.setTimestamp(timestamp);
-    return this;
-  }
+//  /**
+//   * Add ttl in seconds to update query.
+//   */
+//  UpdateEntityManager<T> withTtl(int seconds) {
+//    updateQuery.setTtl(seconds);
+//    return this;
+//  }
+//
+//  /**
+//   * Add writetime to update query.
+//   */
+//  UpdateEntityManager<T> withTimestamp(Instant timestamp) {
+//    updateQuery.setTimestamp(timestamp);
+//    return this;
+//  }
+//
+//  /**
+//   * Add writetime in millis to update query.
+//   */
+//  UpdateEntityManager<T> withTimestamp(long timestamp) {
+//    updateQuery.setTimestamp(timestamp);
+//    return this;
+//  }
 
   /**
    * Execute udpate query.
@@ -101,6 +106,26 @@ class UpdateEntityManager<T> {
    * @return updated entity.
    */
   T save(CqlSession session) {
+    prepareQuery();
+    ResultSet resultSet = updateQuery.execute(session);
+    if (resultSet.wasApplied()) {
+      return entity;
+    }
+    log.warn(format("Entity [%s] was not updated", entity));
+    return null;
+  }
+
+  /**
+   * Add query to batch
+   *
+   * @param batch enclosing batch query
+   */
+  void addToBatch(Batch batch) {
+    prepareQuery();
+    updateQuery.addToBatch(batch);
+  }
+
+  private void prepareQuery() {
     Instant now = Instant.now();
     tableMetadata.setLastUpdatedDate(entity, now);
 
@@ -115,12 +140,5 @@ class UpdateEntityManager<T> {
         updateQuery.setSerializedAssignment(columnMetadata, value);
       }
     }
-
-    ResultSet resultSet = updateQuery.execute(session);
-    if (resultSet.wasApplied()) {
-      return entity;
-    }
-    log.warn(format("Entity [%s] was not updated", entity));
-    return null;
   }
 }

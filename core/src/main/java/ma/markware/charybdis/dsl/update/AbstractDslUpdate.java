@@ -16,12 +16,10 @@
  * limitations under the License.
  *
  */
+
 package ma.markware.charybdis.dsl.update;
 
-import com.datastax.oss.driver.api.core.CqlSession;
-import com.datastax.oss.driver.api.core.cql.ResultSet;
 import java.time.Instant;
-import ma.markware.charybdis.ExecutionContext;
 import ma.markware.charybdis.model.assignment.AssignmentListValue;
 import ma.markware.charybdis.model.assignment.AssignmentMapValue;
 import ma.markware.charybdis.model.assignment.AssignmentSetValue;
@@ -37,20 +35,19 @@ import ma.markware.charybdis.model.field.nested.UdtNestedField;
 import ma.markware.charybdis.query.UpdateQuery;
 
 /**
- * Update query builder.
+ * Abstract update query builder.
+ * @param <T> query return type.
  *
  * @author Oussama Markad
  */
-public class UpdateImpl implements UpdateInitExpression, UpdateTtlExpression, UpdateTimestampExpression, UpdateAssignmentExpression,
-    UpdateExtraAssignmentExpression, UpdateWhereExpression, UpdateExtraWhereExpression, UpdateIfExpression,
-    UpdateExtraIfExpression, UpdateExecuteExpression {
+abstract class AbstractDslUpdate<T> implements UpdateInitExpression<T>, UpdateTtlExpression<T>, UpdateTimestampExpression<T>, UpdateAssignmentExpression<T>,
+    UpdateExtraAssignmentExpression<T>, UpdateWhereExpression<T>, UpdateExtraWhereExpression<T>, UpdateIfExpression<T>,
+    UpdateExtraIfExpression<T>, UpdateExecuteExpression<T> {
 
-  private final CqlSession session;
-  private final UpdateQuery updateQuery;
+  final UpdateQuery updateQuery;
 
-  public UpdateImpl(final CqlSession session, final ExecutionContext executionContext) {
-    this.session = session;
-    this.updateQuery = new UpdateQuery(executionContext);
+  AbstractDslUpdate(final UpdateQuery updateQuery) {
+    this.updateQuery = updateQuery;
   }
 
   UpdateQuery getUpdateQuery() {
@@ -60,7 +57,7 @@ public class UpdateImpl implements UpdateInitExpression, UpdateTtlExpression, Up
   /**
    * Set table to update.
    */
-  public UpdateInitExpression update(TableMetadata table) {
+  public UpdateInitExpression<T> update(TableMetadata table) {
     updateQuery.setTable(table);
     return this;
   }
@@ -69,7 +66,7 @@ public class UpdateImpl implements UpdateInitExpression, UpdateTtlExpression, Up
    * {@inheritDoc}
    */
   @Override
-  public UpdateAssignmentExpression usingTimestamp(final long timestamp) {
+  public UpdateAssignmentExpression<T> usingTimestamp(final long timestamp) {
     updateQuery.setTimestamp(timestamp);
     return this;
   }
@@ -78,7 +75,7 @@ public class UpdateImpl implements UpdateInitExpression, UpdateTtlExpression, Up
    * {@inheritDoc}
    */
   @Override
-  public UpdateAssignmentExpression usingTimestamp(final Instant timestamp) {
+  public UpdateAssignmentExpression<T> usingTimestamp(final Instant timestamp) {
     updateQuery.setTimestamp(timestamp);
     return this;
   }
@@ -87,7 +84,7 @@ public class UpdateImpl implements UpdateInitExpression, UpdateTtlExpression, Up
    * {@inheritDoc}
    */
   @Override
-  public UpdateAssignmentExpression usingTtl(final int seconds) {
+  public UpdateAssignmentExpression<T> usingTtl(final int seconds) {
     updateQuery.setTtl(seconds);
     return this;
   }
@@ -96,7 +93,7 @@ public class UpdateImpl implements UpdateInitExpression, UpdateTtlExpression, Up
    * {@inheritDoc}
    */
   @Override
-  public <D, S> UpdateExtraAssignmentExpression set(ColumnMetadata<D, S> columnMetadata, D value) {
+  public <D, S> UpdateExtraAssignmentExpression<T> set(ColumnMetadata<D, S> columnMetadata, D value) {
     updateQuery.setAssignment(columnMetadata, value);
     return this;
   }
@@ -105,7 +102,7 @@ public class UpdateImpl implements UpdateInitExpression, UpdateTtlExpression, Up
    * {@inheritDoc}
    */
   @Override
-  public <D, S> UpdateExtraAssignmentExpression set(final ListColumnMetadata<D, S> column, final AssignmentListValue<D, S> value) {
+  public <D, S> UpdateExtraAssignmentExpression<T> set(final ListColumnMetadata<D, S> column, final AssignmentListValue<D, S> value) {
     updateQuery.setAssignment(column, value);
     return this;
   }
@@ -114,7 +111,7 @@ public class UpdateImpl implements UpdateInitExpression, UpdateTtlExpression, Up
    * {@inheritDoc}
    */
   @Override
-  public <D, S> UpdateExtraAssignmentExpression set(final SetColumnMetadata<D, S> column, final AssignmentSetValue<D, S> value) {
+  public <D, S> UpdateExtraAssignmentExpression<T> set(final SetColumnMetadata<D, S> column, final AssignmentSetValue<D, S> value) {
     updateQuery.setAssignment(column, value);
     return this;
   }
@@ -123,7 +120,7 @@ public class UpdateImpl implements UpdateInitExpression, UpdateTtlExpression, Up
    * {@inheritDoc}
    */
   @Override
-  public <D_KEY, D_VALUE, S_KEY, S_VALUE> UpdateExtraAssignmentExpression set(final MapColumnMetadata<D_KEY, D_VALUE, S_KEY, S_VALUE> column,
+  public <D_KEY, D_VALUE, S_KEY, S_VALUE> UpdateExtraAssignmentExpression<T> set(final MapColumnMetadata<D_KEY, D_VALUE, S_KEY, S_VALUE> column,
       final AssignmentMapValue<D_KEY, D_VALUE, S_KEY, S_VALUE> value) {
     updateQuery.setAssignment(column, value);
     return this;
@@ -133,7 +130,7 @@ public class UpdateImpl implements UpdateInitExpression, UpdateTtlExpression, Up
    * {@inheritDoc}
    */
   @Override
-  public <D_KEY, D_VALUE, S_KEY, S_VALUE> UpdateExtraAssignmentExpression set(final MapNestedField<D_KEY, D_VALUE, S_KEY, S_VALUE> field, final D_VALUE value) {
+  public <D_KEY, D_VALUE, S_KEY, S_VALUE> UpdateExtraAssignmentExpression<T> set(final MapNestedField<D_KEY, D_VALUE, S_KEY, S_VALUE> field, final D_VALUE value) {
     updateQuery.setAssignment(field, value);
     return this;
   }
@@ -142,7 +139,7 @@ public class UpdateImpl implements UpdateInitExpression, UpdateTtlExpression, Up
    * {@inheritDoc}
    */
   @Override
-  public <D, S> UpdateExtraAssignmentExpression set(final ListNestedField<D, S> field, final D value) {
+  public <D, S> UpdateExtraAssignmentExpression<T> set(final ListNestedField<D, S> field, final D value) {
     updateQuery.setAssignment(field, value);
     return this;
   }
@@ -151,7 +148,7 @@ public class UpdateImpl implements UpdateInitExpression, UpdateTtlExpression, Up
    * {@inheritDoc}
    */
   @Override
-  public <D, S> UpdateExtraAssignmentExpression set(final UdtNestedField<D, S> field, final D value) {
+  public <D, S> UpdateExtraAssignmentExpression<T> set(final UdtNestedField<D, S> field, final D value) {
     updateQuery.setAssignment(field, value);
     return this;
   }
@@ -160,7 +157,7 @@ public class UpdateImpl implements UpdateInitExpression, UpdateTtlExpression, Up
    * {@inheritDoc}
    */
   @Override
-  public UpdateExtraWhereExpression where(final CriteriaExpression condition) {
+  public UpdateExtraWhereExpression<T> where(final CriteriaExpression condition) {
     updateQuery.setWhere(condition);
     return this;
   }
@@ -169,7 +166,7 @@ public class UpdateImpl implements UpdateInitExpression, UpdateTtlExpression, Up
    * {@inheritDoc}
    */
   @Override
-  public UpdateExtraWhereExpression and(final CriteriaExpression condition) {
+  public UpdateExtraWhereExpression<T> and(final CriteriaExpression condition) {
     updateQuery.setWhere(condition);
     return this;
   }
@@ -178,7 +175,7 @@ public class UpdateImpl implements UpdateInitExpression, UpdateTtlExpression, Up
    * {@inheritDoc}
    */
   @Override
-  public UpdateExtraIfExpression if_(final CriteriaExpression condition) {
+  public UpdateExtraIfExpression<T> if_(final CriteriaExpression condition) {
     updateQuery.setIf(condition);
     return this;
   }
@@ -187,17 +184,8 @@ public class UpdateImpl implements UpdateInitExpression, UpdateTtlExpression, Up
    * {@inheritDoc}
    */
   @Override
-  public UpdateExtraIfExpression and_(final CriteriaExpression condition) {
+  public UpdateExtraIfExpression<T> and_(final CriteriaExpression condition) {
     updateQuery.setIf(condition);
     return this;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public boolean execute() {
-    ResultSet resultSet = updateQuery.execute(session);
-    return resultSet != null && resultSet.wasApplied();
   }
 }

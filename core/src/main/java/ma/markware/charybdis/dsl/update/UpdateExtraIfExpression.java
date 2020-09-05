@@ -28,7 +28,7 @@ import ma.markware.charybdis.model.criteria.CriteriaExpression;
  *
  * @author Oussama Markad
  */
-public interface UpdateExtraIfExpression extends UpdateExecuteExpression {
+public interface UpdateExtraIfExpression<RETURN_TYPE> extends UpdateExecuteExpression<RETURN_TYPE> {
 
   /**
    * Add condition to {@code IF} clause in update DSL query.
@@ -36,5 +36,5 @@ public interface UpdateExtraIfExpression extends UpdateExecuteExpression {
    * @param condition additional condition
    * @return updated update DSL query expression.
    */
-  UpdateExtraIfExpression and_(CriteriaExpression condition);
+  UpdateExtraIfExpression<RETURN_TYPE> and_(CriteriaExpression condition);
 }
