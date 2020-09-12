@@ -48,19 +48,19 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-class SelectImplTest {
+class DslSelectImplTest {
 
   @Mock
   private CqlSession session;
 
-  private SelectImpl selectImpl;
+  private DslSelectImpl dslSelectImpl;
   private ExecutionContext executionContext;
   private TestUdt udt1, udt2;
 
   @BeforeEach
   void setup() {
     executionContext = new ExecutionContext();
-    selectImpl = new SelectImpl(session, executionContext);
+    dslSelectImpl = new DslSelectImpl(session, executionContext);
 
     TestNestedUdt nestedUdt1 = new TestNestedUdt("nestedName1", "nestedValue1", Arrays.asList(12, 13));
     TestNestedUdt nestedUdt2 = new TestNestedUdt("nestedName2", "nestedValue2", Arrays.asList(14, 15, 16));
@@ -77,9 +77,9 @@ class SelectImplTest {
 
   @Test
   void select() {
-    selectImpl.select(TestEntity_Table.id, TestEntity_Table.udt);
+    dslSelectImpl.select(TestEntity_Table.id, TestEntity_Table.udt);
 
-    SelectQuery selectQuery = selectImpl.getSelectQuery();
+    SelectQuery selectQuery = dslSelectImpl.getSelectQuery();
     assertThat(selectQuery.getSelectors()).extracting(selector -> ((ColumnSelector) selector).getColumnId())
                                           .containsExactlyInAnyOrder(
         CqlIdentifier.fromCql(TestEntity_Table.id.getName()),
@@ -88,15 +88,15 @@ class SelectImplTest {
 
   @Test
   void select_should_set_fallback_consistency() {
-    selectImpl.selectFrom(TestEntity_Table.test_entity);
+    dslSelectImpl.selectFrom(TestEntity_Table.test_entity);
     assertThat(executionContext.getDefaultConsistencyLevel()).isEqualTo(ConsistencyLevel.QUORUM);
   }
 
   @Test
   void selectDistinct() {
-    selectImpl.selectDistinct(TestEntity_Table.id);
+    dslSelectImpl.selectDistinct(TestEntity_Table.id);
 
-    SelectQuery selectQuery = selectImpl.getSelectQuery();
+    SelectQuery selectQuery = dslSelectImpl.getSelectQuery();
     assertThat(selectQuery.isDistinct()).isTrue();
     assertThat(selectQuery.getSelectors()).extracting(selector -> ((ColumnSelector) selector).getColumnId())
                                           .containsExactlyInAnyOrder(
@@ -105,9 +105,9 @@ class SelectImplTest {
 
   @Test
   void selectFrom() {
-    selectImpl.selectFrom(TestEntity_Table.test_entity);
+    dslSelectImpl.selectFrom(TestEntity_Table.test_entity);
 
-    SelectQuery selectQuery = selectImpl.getSelectQuery();
+    SelectQuery selectQuery = dslSelectImpl.getSelectQuery();
 
     assertThat(selectQuery.getKeyspace()).isEqualTo(TestEntity_Table.KEYSPACE_NAME);
     assertThat(selectQuery.getTable()).isEqualTo(TestEntity_Table.TABLE_NAME);
@@ -117,9 +117,9 @@ class SelectImplTest {
 
   @Test
   void from() {
-    selectImpl.selectFrom(TestEntity_Table.test_entity);
+    dslSelectImpl.selectFrom(TestEntity_Table.test_entity);
 
-    SelectQuery selectQuery = selectImpl.getSelectQuery();
+    SelectQuery selectQuery = dslSelectImpl.getSelectQuery();
 
     assertThat(selectQuery.getKeyspace()).isEqualTo(TestEntity_Table.KEYSPACE_NAME);
     assertThat(selectQuery.getTable()).isEqualTo(TestEntity_Table.TABLE_NAME);
@@ -128,10 +128,10 @@ class SelectImplTest {
   @Test
   void where() {
     UUID uuid = UUID.randomUUID();
-    selectImpl.selectFrom(TestEntity_Table.test_entity)
-              .where(TestEntity_Table.id.eq(uuid));
+    dslSelectImpl.selectFrom(TestEntity_Table.test_entity)
+                 .where(TestEntity_Table.id.eq(uuid));
 
-    SelectQuery selectQuery = selectImpl.getSelectQuery();
+    SelectQuery selectQuery = dslSelectImpl.getSelectQuery();
 
     assertThat(selectQuery.getWhereClauses())
         .extracting(whereClause -> ((ColumnLeftOperand) ((DefaultRelation) whereClause.getRelation()).getLeftOperand()).getColumnId(),
@@ -147,16 +147,16 @@ class SelectImplTest {
     Instant now = Instant.now();
     String mapKey = "key0";
     List<Integer> nestedSetValue = Collections.singletonList(10);
-    selectImpl.selectFrom(TestEntity_Table.test_entity)
-              .where(TestEntity_Table.id.eq(uuid))
-              .and(TestEntity_Table.date.lt(now))
-              .and(TestEntity_Table.udt.in(udt1, udt2))
-              .and(TestEntity_Table.list.isNotNull())
-              .and(TestEntity_Table.map.containsKey(mapKey))
-              .and(TestEntity_Table.nestedSet.contains(nestedSetValue))
-              .and(TestEntity_Table.enumMap.eq(ImmutableMap.of(0, TestEnum.TYPE_A, 1, TestEnum.TYPE_B)));
+    dslSelectImpl.selectFrom(TestEntity_Table.test_entity)
+                 .where(TestEntity_Table.id.eq(uuid))
+                 .and(TestEntity_Table.date.lt(now))
+                 .and(TestEntity_Table.udt.in(udt1, udt2))
+                 .and(TestEntity_Table.list.isNotNull())
+                 .and(TestEntity_Table.map.containsKey(mapKey))
+                 .and(TestEntity_Table.nestedSet.contains(nestedSetValue))
+                 .and(TestEntity_Table.enumMap.eq(ImmutableMap.of(0, TestEnum.TYPE_A, 1, TestEnum.TYPE_B)));
 
-    SelectQuery selectQuery = selectImpl.getSelectQuery();
+    SelectQuery selectQuery = dslSelectImpl.getSelectQuery();
 
     assertThat(selectQuery.getWhereClauses())
         .extracting(whereClause -> ((ColumnLeftOperand) ((DefaultRelation) whereClause.getRelation()).getLeftOperand()).getColumnId(),
@@ -175,32 +175,32 @@ class SelectImplTest {
   @Test
   void orderBy() {
     UUID uuid = UUID.randomUUID();
-    selectImpl.selectFrom(TestEntity_Table.test_entity)
-              .where(TestEntity_Table.id.eq(uuid))
-              .orderBy(TestEntity_Table.date.desc());
+    dslSelectImpl.selectFrom(TestEntity_Table.test_entity)
+                 .where(TestEntity_Table.id.eq(uuid))
+                 .orderBy(TestEntity_Table.date.desc());
 
-    SelectQuery selectQuery = selectImpl.getSelectQuery();
+    SelectQuery selectQuery = dslSelectImpl.getSelectQuery();
 
     assertThat(selectQuery.getOrderings()).containsEntry(TestEntity_Table.date.getName(), ClusteringOrder.DESC);
   }
 
   @Test
   void limit() {
-    selectImpl.selectFrom(TestEntity_Table.test_entity)
-              .limit(100);
+    dslSelectImpl.selectFrom(TestEntity_Table.test_entity)
+                 .limit(100);
 
-    SelectQuery selectQuery = selectImpl.getSelectQuery();
+    SelectQuery selectQuery = dslSelectImpl.getSelectQuery();
 
     assertThat(selectQuery.getLimit()).isEqualTo(100);
   }
 
   @Test
   void allowFiltering() {
-    selectImpl.selectFrom(TestEntity_Table.test_entity)
-              .where(TestEntity_Table.udt.eq(udt1))
-              .allowFiltering();
+    dslSelectImpl.selectFrom(TestEntity_Table.test_entity)
+                 .where(TestEntity_Table.udt.eq(udt1))
+                 .allowFiltering();
 
-    SelectQuery selectQuery = selectImpl.getSelectQuery();
+    SelectQuery selectQuery = dslSelectImpl.getSelectQuery();
 
     assertThat(selectQuery.isAllowFiltering()).isTrue();
   }

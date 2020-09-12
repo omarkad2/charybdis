@@ -36,6 +36,7 @@ class PreparedStatementFactory {
 
   private static final Logger log = LoggerFactory.getLogger(PreparedStatementFactory.class);
 
+  //TODO: cannot use session as HashMap key (doesn't implement equals and hashCode)
   private static final Map<Session, Map<String, PreparedStatement>> PREPARED_STATEMENT_CACHE = new ConcurrentHashMap<>();
 
   private static String buildKey(final String sessionName, final String query) {

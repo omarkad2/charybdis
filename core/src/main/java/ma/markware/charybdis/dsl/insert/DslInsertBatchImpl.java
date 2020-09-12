@@ -16,22 +16,32 @@
  * limitations under the License.
  *
  */
+
 package ma.markware.charybdis.dsl.insert;
 
+import ma.markware.charybdis.batch.Batch;
+import ma.markware.charybdis.query.InsertQuery;
+
 /**
- * Insert DSL query expression.
- *
- * <p>
- * It is not recommended to reference any object with type {@link InsertExecuteExpression}.
+ * Insert in batch query builder.
  *
  * @author Oussama Markad
  */
-public interface InsertExecuteExpression {
+public class DslInsertBatchImpl extends AbstractDslInsert<Void> {
+
+  private final Batch batch;
+
+  public DslInsertBatchImpl(final Batch batch) {
+    super(new InsertQuery());
+    this.batch = batch;
+  }
 
   /**
-   * Execute Insert DSL query.
-   *
-   * @return {@code true} if query is executed, {@code false} otherwise.
+   * {@inheritDoc}
    */
-  boolean execute();
+  @Override
+  public Void execute() {
+    insertQuery.addToBatch(batch);
+    return null;
+  }
 }

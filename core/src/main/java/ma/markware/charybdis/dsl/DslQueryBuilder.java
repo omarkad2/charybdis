@@ -18,12 +18,22 @@
  */
 package ma.markware.charybdis.dsl;
 
+import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.config.DriverExecutionProfile;
+import com.google.common.annotations.VisibleForTesting;
+import ma.markware.charybdis.ConsistencyTunable;
+import ma.markware.charybdis.ExecutionContext;
+import ma.markware.charybdis.ExecutionProfileTunable;
+import ma.markware.charybdis.QueryBuilder;
 import ma.markware.charybdis.dsl.delete.DeleteInitExpression;
+import ma.markware.charybdis.dsl.delete.DslDeleteImpl;
+import ma.markware.charybdis.dsl.insert.DslInsertImpl;
 import ma.markware.charybdis.dsl.insert.InsertInitExpression;
 import ma.markware.charybdis.dsl.insert.InsertInitWithColumnsExpression;
+import ma.markware.charybdis.dsl.select.DslSelectImpl;
 import ma.markware.charybdis.dsl.select.SelectInitExpression;
 import ma.markware.charybdis.dsl.select.SelectWhereExpression;
+import ma.markware.charybdis.dsl.update.DslUpdateImpl;
 import ma.markware.charybdis.dsl.update.UpdateInitExpression;
 import ma.markware.charybdis.model.field.DeletableField;
 import ma.markware.charybdis.model.field.SelectableField;
@@ -34,43 +44,68 @@ import ma.markware.charybdis.model.option.ConsistencyLevel;
 import ma.markware.charybdis.model.option.SerialConsistencyLevel;
 
 /**
- * API to handle entities in DB through DSL operations.
+ * Implementation of {@link QueryBuilder}, handle cql entities using dsl-like semantics.
  *
  * @author Oussama Markad
  */
-public interface DslQuery {
+public class DslQueryBuilder implements QueryBuilder, ConsistencyTunable<DslQueryBuilder>, ExecutionProfileTunable<DslQueryBuilder> {
+
+  private final CqlSession session;
+  private final ExecutionContext executionContext;
+
+  private DslQueryBuilder(CqlSession session, ExecutionContext executionContext) {
+    this.session = session;
+    this.executionContext = executionContext;
+  }
+
+  public DslQueryBuilder(CqlSession session) {
+    this(session, new ExecutionContext());
+  }
+
+  @VisibleForTesting
+  ExecutionContext getExecutionContext() {
+    return executionContext;
+  }
 
   /**
-   * Set consistency level that will be applied to queries by our dsl manager.
-   *
-   * @param consistencyLevel consistency level.
-   * @return a new dsl manager instance with a specific consistency level.
+   * {@inheritDoc}
    */
-  DslQuery withConsistency(ConsistencyLevel consistencyLevel);
+  @Override
+  public DslQueryBuilder withExecutionProfile(DriverExecutionProfile executionProfile) {
+    ExecutionContext executionContext = new ExecutionContext(this.executionContext);
+    executionContext.setDriverExecutionProfile(executionProfile);
+    return new DslQueryBuilder(session, executionContext);
+  }
 
   /**
-   * Set serial consistency level that will be applied to LWT queries by our dsl manager.
-   *
-   * @param serialConsistencyLevel serial consistency level.
-   * @return a new dsl manager instance with a specific consistency level.
+   * {@inheritDoc}
    */
-  DslQuery withSerialConsistency(SerialConsistencyLevel serialConsistencyLevel);
+  @Override
+  public DslQueryBuilder withExecutionProfile(String executionProfile) {
+    ExecutionContext executionContext = new ExecutionContext(this.executionContext);
+    executionContext.setExecutionProfileName(executionProfile);
+    return new DslQueryBuilder(session, executionContext);
+  }
 
   /**
-   * Set execution profile that will be applied to queries by our dsl manager.
-   *
-   * @param executionProfile driver execution profile.
-   * @return a new dsl manager instance with a specific execution profile.
+   * {@inheritDoc}
    */
-  DslQuery withExecutionProfile(DriverExecutionProfile executionProfile);
+  @Override
+  public DslQueryBuilder withConsistency(ConsistencyLevel consistencyLevel) {
+    ExecutionContext executionContext = new ExecutionContext(this.executionContext);
+    executionContext.setConsistencyLevel(consistencyLevel);
+    return new DslQueryBuilder(session, executionContext);
+  }
 
   /**
-   * Set execution profile that will be applied to queries by our dsl manager.
-   *
-   * @param executionProfile execution profile name.
-   * @return a new dsl manager instance with a specific execution profile.
+   * {@inheritDoc}
    */
-  DslQuery withExecutionProfile(String executionProfile);
+  @Override
+  public DslQueryBuilder withSerialConsistency(SerialConsistencyLevel serialConsistencyLevel) {
+    ExecutionContext executionContext = new ExecutionContext(this.executionContext);
+    executionContext.setSerialConsistencyLevel(serialConsistencyLevel);
+    return new DslQueryBuilder(session, executionContext);
+  }
 
   /**
    * Create a new DSL select query with fields to select.
@@ -84,7 +119,9 @@ public interface DslQuery {
    * @param fields fields to select.
    * @return initialized select expression.
    */
-  SelectInitExpression select(SelectableField... fields);
+  public SelectInitExpression select(final SelectableField... fields) {
+    return new DslSelectImpl(session, executionContext).select(fields);
+  }
 
   /**
    * Create a new DSL select distinct query with partition key fields.
@@ -98,7 +135,9 @@ public interface DslQuery {
    * @param fields partition key fields to select.
    * @return initialized select expression.
    */
-  SelectInitExpression selectDistinct(PartitionKeyColumnMetadata... fields);
+  public SelectInitExpression selectDistinct(final PartitionKeyColumnMetadata... fields) {
+    return new DslSelectImpl(session, executionContext).selectDistinct(fields);
+  }
 
   /**
    * Create a new DSL select expression.
@@ -112,7 +151,9 @@ public interface DslQuery {
    * @param table table of select query.
    * @return initialized select expression.
    */
-  SelectWhereExpression selectFrom(TableMetadata table);
+  public SelectWhereExpression selectFrom(final TableMetadata table) {
+    return new DslSelectImpl(session, executionContext).selectFrom(table);
+  }
 
   /**
    * Create a new DSL insert expression.
@@ -127,7 +168,9 @@ public interface DslQuery {
    * @param table table of insert query.
    * @return initialized insert expression.
    */
-  InsertInitExpression insertInto(TableMetadata table);
+  public InsertInitExpression<Boolean> insertInto(final TableMetadata table) {
+    return new DslInsertImpl(session, executionContext).insertInto(table);
+  }
 
   /**
    * Create a new DSL insert expression.
@@ -142,7 +185,9 @@ public interface DslQuery {
    * @param columns columns to insert.
    * @return initialized insert expression.
    */
-  InsertInitWithColumnsExpression insertInto(TableMetadata table, ColumnMetadata... columns);
+  public InsertInitWithColumnsExpression<Boolean> insertInto(TableMetadata table, ColumnMetadata... columns) {
+    return new DslInsertImpl(session, executionContext).insertInto(table, columns);
+  }
 
   /**
    * Create a new DSL update expression.
@@ -158,7 +203,9 @@ public interface DslQuery {
    * @param table table of update query.
    * @return initialized update expression.
    */
-  UpdateInitExpression update(TableMetadata table);
+  public UpdateInitExpression<Boolean> update(TableMetadata table) {
+    return new DslUpdateImpl(session, executionContext).update(table);
+  }
 
   /**
    * Create a new DSL delete expression.
@@ -173,7 +220,9 @@ public interface DslQuery {
    *
    * @return initialized delete expression.
    */
-  DeleteInitExpression delete();
+  public DeleteInitExpression<Boolean> delete() {
+    return new DslDeleteImpl(session, executionContext).delete();
+  }
 
   /**
    * Create a new DSL delete expression with fields to delete.
@@ -187,5 +236,7 @@ public interface DslQuery {
    *
    * @return initialized delete expression.
    */
-  DeleteInitExpression delete(DeletableField... fields);
+  public DeleteInitExpression<Boolean> delete(final DeletableField... fields) {
+    return new DslDeleteImpl(session, executionContext).delete(fields);
+  }
 }

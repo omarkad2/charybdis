@@ -53,6 +53,7 @@ import ma.markware.charybdis.apt.metatype.UdtMetaType;
 import ma.markware.charybdis.apt.utils.TypeUtils;
 import ma.markware.charybdis.model.annotation.Udt;
 import ma.markware.charybdis.test.entities.TestEntity;
+import ma.markware.charybdis.test.entities.TestEntityByDate;
 import ma.markware.charybdis.test.entities.TestExtraUdt;
 import ma.markware.charybdis.test.entities.TestKeyspaceDefinition;
 import ma.markware.charybdis.test.entities.TestNestedUdt;
@@ -97,8 +98,8 @@ class DdlScriptSerializerTest {
                  .parse(elements.getTypeElement(TestKeyspaceDefinition.class.getCanonicalName())));
     udtMetaTypes = Arrays.asList(configuration.getUdtParser().parse(testUdtElement), configuration.getUdtParser().parse(testNestedUdtElement),
                                  configuration.getUdtParser().parse(testExtraUdtElement));
-    tableMetaTypes = Collections.singletonList(configuration.getTableParser()
-                 .parse(elements.getTypeElement(TestEntity.class.getCanonicalName())));
+    tableMetaTypes = Arrays.asList(configuration.getTableParser().parse(elements.getTypeElement(TestEntity.class.getCanonicalName())),
+                                   configuration.getTableParser().parse(elements.getTypeElement(TestEntityByDate.class.getCanonicalName())));
   }
 
   @Test

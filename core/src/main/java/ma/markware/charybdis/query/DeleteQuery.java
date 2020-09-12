@@ -18,8 +18,6 @@
  */
 package ma.markware.charybdis.query;
 
-import com.datastax.oss.driver.api.core.CqlSession;
-import com.datastax.oss.driver.api.core.cql.ResultSet;
 import com.datastax.oss.driver.api.core.cql.SimpleStatement;
 import com.datastax.oss.driver.api.querybuilder.QueryBuilder;
 import com.datastax.oss.driver.api.querybuilder.delete.Delete;
@@ -30,6 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Stream;
+import javax.annotation.Nonnull;
 import ma.markware.charybdis.ExecutionContext;
 import ma.markware.charybdis.model.criteria.CriteriaExpression;
 import ma.markware.charybdis.model.field.DeletableField;
@@ -51,8 +50,12 @@ public class DeleteQuery extends AbstractQuery {
   private List<ConditionClause> conditionClauses = new ArrayList<>();
   private Long timestamp;
 
-  public DeleteQuery(ExecutionContext executionContext) {
+  public DeleteQuery(@Nonnull ExecutionContext executionContext) {
     super(executionContext);
+  }
+
+  public DeleteQuery() {
+    super(new ExecutionContext());
   }
 
   public String getKeyspace() {
@@ -111,7 +114,7 @@ public class DeleteQuery extends AbstractQuery {
    * {@inheritDoc}
    */
   @Override
-  public ResultSet execute(final CqlSession session) {
+  public StatementTuple buildStatement() {
     DeleteSelection deleteSelection = QueryBuilder.deleteFrom(keyspace, table);
 
     if (!selectors.isEmpty()) {
@@ -127,7 +130,7 @@ public class DeleteQuery extends AbstractQuery {
     delete = delete.if_(QueryHelper.extractConditions(conditionClauses));
 
     SimpleStatement simpleStatement = delete.build();
-    return executeStatement(session, simpleStatement, Stream.of(QueryHelper.extractWhereBindValues(whereClauses),
+    return new StatementTuple(simpleStatement, Stream.of(QueryHelper.extractWhereBindValues(whereClauses),
                                                                 QueryHelper.extractConditionBindValues(conditionClauses))
                                                             .flatMap(Function.identity())
                                                             .toArray());

@@ -1,0 +1,125 @@
+/*
+ * Charybdis - Cassandra ORM framework
+ *
+ * Copyright (C) 2020 Charybdis authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
+package ma.markware.charybdis;
+
+import com.datastax.oss.driver.api.core.CqlSession;
+import ma.markware.charybdis.batch.Batch;
+import ma.markware.charybdis.batch.BatchQueryBuilder;
+import ma.markware.charybdis.crud.CrudQueryBatchBuilder;
+import ma.markware.charybdis.crud.CrudQueryBuilder;
+import ma.markware.charybdis.dsl.DslQueryBatchBuilder;
+import ma.markware.charybdis.dsl.DslQueryBuilder;
+import ma.markware.charybdis.session.DefaultSessionFactory;
+import ma.markware.charybdis.session.SessionFactory;
+import ma.markware.charybdis.session.StandaloneSessionFactory;
+
+/**
+ * Interface used to interact with Cql database. This API gives access to :
+ * <ul>
+ *   <li>Crud API {@link CrudQueryBuilder}</li>
+ *   <li>Dsl API {@link DslQueryBuilder}</li>
+ *   <li>Batch API{@link BatchQueryBuilder}</li>
+ * </ul>
+ */
+public class CqlTemplate {
+
+  private final SessionFactory sessionFactory;
+
+  /**
+   * Initialize the data manager using a custom session factory.
+   *
+   * @param customSessionFactory Instance of {@link SessionFactory} responsible of creating cql sessions.
+   */
+  public CqlTemplate(SessionFactory customSessionFactory) {
+    this.sessionFactory = customSessionFactory;
+  }
+
+  /**
+   * Initialize the data manager using datastax default driver configuration.
+   * For details: <a href="https://docs.datastax.com/en/developer/java-driver/4.5/manual/core/configuration/reference/">
+   *   https://docs.datastax.com/en/developer/java-driver/4.5/manual/core/configuration/reference/</a>
+   */
+  public CqlTemplate() {
+    this(new DefaultSessionFactory());
+  }
+
+  /**
+   * Initialize the data manager with custom configuration file loaded from classpath.
+   *
+   * @param customConfiguration driver configuration file name in classpath.
+   */
+  public CqlTemplate(final String customConfiguration) {
+    this(new DefaultSessionFactory(customConfiguration));
+  }
+
+  /**
+   * Initialize the data manager with an existing session.
+   *
+   * @param session open cql session.
+   */
+  public CqlTemplate(CqlSession session) {
+    this(new StandaloneSessionFactory(session));
+  }
+
+  /**
+   * Create a Dsl API entry point.
+   *
+   * @return Dsl API
+   */
+  public DslQueryBuilder dsl() {
+    return new DslQueryBuilder(sessionFactory.getSession());
+  }
+
+  /**
+   * Create a Dsl API entry point, for queries executed in batch
+   *
+   * @param batch enclosing batch query
+   * @return Dsl API
+   */
+  public DslQueryBatchBuilder dsl(Batch batch) {
+    return new DslQueryBatchBuilder(batch);
+  }
+
+  /**
+   * Create a Crud API entry point.
+   *
+   * @return Crud API
+   */
+  public CrudQueryBuilder crud() {
+    return new CrudQueryBuilder(sessionFactory.getSession());
+  }
+
+  /**
+   * Create a Crud API entry point, for queries executed in batch
+   *
+   * @param batch enclosing batch query
+   * @return Crud API
+   */
+  public CrudQueryBatchBuilder crud(Batch batch) {
+    return new CrudQueryBatchBuilder(batch);
+  }
+
+  /**
+   * @return entry point to Batch API
+   */
+  public BatchQueryBuilder batch() {
+    return new BatchQueryBuilder(sessionFactory.getSession());
+  }
+}

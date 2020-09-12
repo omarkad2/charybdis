@@ -68,7 +68,7 @@ public class AbstractIntegrationITest {
 
   protected void cleanDatabase(CqlSession session) {
     logger.info("Cleaning database");
-    session.execute(SimpleStatement.builder("TRUNCATE test_keyspace.test_entity;")
-                                   .build());
+    session.execute(SimpleStatement.builder("TRUNCATE test_keyspace.test_entity;").build());
+    session.execute(SimpleStatement.builder("TRUNCATE test_keyspace.test_entity_by_date;").build());
   }
 }

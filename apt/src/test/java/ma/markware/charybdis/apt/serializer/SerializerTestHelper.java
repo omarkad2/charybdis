@@ -58,8 +58,8 @@ class SerializerTestHelper {
     }
     for (int i = 0; i < actualSplit.length; i++) {
       softly.assertThat(actualSplit[i])
-            .withFailMessage(String.format("Different line of code.\n[\n\tExpected:\n\t\t%s\n\n\tActual:\n\t\t%s\n]\n",
-                                           expectedSplit[i], actualSplit[i]))
+            .withFailMessage(String.format("Different line [%d] of code.\n[\n\tExpected:\n\t\t%s\n\n\tActual:\n\t\t%s\n]\n",
+                                           i, expectedSplit[i], actualSplit[i]))
             .isEqualTo(expectedSplit[i]);
     }
 

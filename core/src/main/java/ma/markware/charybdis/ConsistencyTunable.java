@@ -1,0 +1,50 @@
+/*
+ * Charybdis - Cassandra ORM framework
+ *
+ * Copyright (C) 2020 Charybdis authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
+package ma.markware.charybdis;
+
+import ma.markware.charybdis.model.option.ConsistencyLevel;
+import ma.markware.charybdis.model.option.SerialConsistencyLevel;
+
+/**
+ * A class implements the {@link ConsistencyTunable} interface to indicate that it can tune consistency
+ * of a query.
+ *
+ * @param <T> query builder type.
+ *
+ * @author Oussama Markad
+ */
+public interface ConsistencyTunable<T extends QueryBuilder> {
+
+  /**
+   * Set consistency level that will be applied to queries by our entity manager.
+   *
+   * @param consistencyLevel consistency level.
+   * @return a new entity manager instance with a specific consistency level.
+   */
+  T withConsistency(ConsistencyLevel consistencyLevel);
+
+  /**
+   * Set serial consistency level that will be applied to LWT queries by our entity manager.
+   *
+   * @param serialConsistencyLevel serial consistency level.
+   * @return a new entity manager instance with a specific consistency level.
+   */
+  T withSerialConsistency(SerialConsistencyLevel serialConsistencyLevel);
+}

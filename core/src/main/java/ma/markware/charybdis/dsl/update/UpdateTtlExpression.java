@@ -26,7 +26,7 @@ package ma.markware.charybdis.dsl.update;
  *
  * @author Oussama Markad
  */
-public interface UpdateTtlExpression extends UpdateAssignmentExpression {
+public interface UpdateTtlExpression<RETURN_TYPE> extends UpdateAssignmentExpression<RETURN_TYPE> {
 
   /**
    * Set {@code TTL} in insert DSL query.
@@ -34,5 +34,5 @@ public interface UpdateTtlExpression extends UpdateAssignmentExpression {
    * @param seconds ttl in seconds.
    * @return updated insert DSL query expression.
    */
-  UpdateAssignmentExpression usingTtl(int seconds);
+  UpdateAssignmentExpression<RETURN_TYPE> usingTtl(int seconds);
 }

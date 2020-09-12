@@ -63,50 +63,92 @@ public class ExecutionContext {
     this.executionProfileName = executionProfileName;
   }
 
+  /**
+   * @return consistency level.
+   */
   public ConsistencyLevel getConsistencyLevel() {
     return consistencyLevel;
   }
 
+  /**
+   * Set consistency level
+   * @param consistencyLevel consistency level to use at execution.
+   */
   public void setConsistencyLevel(ConsistencyLevel consistencyLevel) {
     this.consistencyLevel = consistencyLevel;
   }
 
+  /**
+   * @return table default consistency level.
+   */
   public ConsistencyLevel getDefaultConsistencyLevel() {
     return defaultConsistencyLevel;
   }
 
+  /**
+   * Set default consistency level
+   * @param defaultConsistencyLevel table default consistency level to use at execution.
+   */
   public void setDefaultConsistencyLevel(ConsistencyLevel defaultConsistencyLevel) {
     this.defaultConsistencyLevel = defaultConsistencyLevel;
   }
 
+  /**
+   * @return serial consistency level.
+   */
   public SerialConsistencyLevel getSerialConsistencyLevel() {
     return serialConsistencyLevel;
   }
 
+  /**
+   * Set serial consistency level
+   * @param serialConsistencyLevel serial consistency level to use at execution.
+   */
   public void setSerialConsistencyLevel(final SerialConsistencyLevel serialConsistencyLevel) {
     this.serialConsistencyLevel = serialConsistencyLevel;
   }
 
+  /**
+   * @return table default serial consistency level.
+   */
   public SerialConsistencyLevel getDefaultSerialConsistencyLevel() {
     return defaultSerialConsistencyLevel;
   }
 
+  /**
+   * Set default serial consistency level
+   * @param defaultSerialConsistencyLevel table default serial consistency level to use at execution.
+   */
   public void setDefaultSerialConsistencyLevel(final SerialConsistencyLevel defaultSerialConsistencyLevel) {
     this.defaultSerialConsistencyLevel = defaultSerialConsistencyLevel;
   }
 
+  /**
+   * @return driver execution profile.
+   */
   public DriverExecutionProfile getDriverExecutionProfile() {
     return driverExecutionProfile;
   }
 
+  /**
+   * Set driver execution profile
+   * @param driverExecutionProfile driver execution profile to use at execution.
+   */
   public void setDriverExecutionProfile(DriverExecutionProfile driverExecutionProfile) {
     this.driverExecutionProfile = driverExecutionProfile;
   }
 
+  /**
+   * @return execution profile name.
+   */
   public String getExecutionProfileName() {
     return executionProfileName;
   }
 
+  /**
+   * Set execution profile name.
+   * @param executionProfileName execution profile name to use at execution.
+   */
   public void setExecutionProfileName(String executionProfileName) {
     this.executionProfileName = executionProfileName;
   }

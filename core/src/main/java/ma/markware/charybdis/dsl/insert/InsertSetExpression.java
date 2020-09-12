@@ -28,7 +28,7 @@ import ma.markware.charybdis.model.field.metadata.ColumnMetadata;
  *
  * @author Oussama Markad
  */
-public interface InsertSetExpression extends InsertOnExistExpression {
+public interface InsertSetExpression<RETURN_TYPE> extends InsertOnExistExpression<RETURN_TYPE> {
 
   /**
    * Assign value to column in insert DSL query.
@@ -37,5 +37,5 @@ public interface InsertSetExpression extends InsertOnExistExpression {
    * @param value assigned value.
    * @return updated insert DSL query expression.
    */
-  <D, S> InsertSetExpression set(ColumnMetadata<D, S> column, D value);
+  <D, S> InsertSetExpression<RETURN_TYPE> set(ColumnMetadata<D, S> column, D value);
 }

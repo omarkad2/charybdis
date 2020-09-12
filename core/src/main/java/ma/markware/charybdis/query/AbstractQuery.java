@@ -19,11 +19,14 @@
 package ma.markware.charybdis.query;
 
 import com.datastax.oss.driver.api.core.CqlSession;
+import com.datastax.oss.driver.api.core.cql.BoundStatement;
 import com.datastax.oss.driver.api.core.cql.PreparedStatement;
 import com.datastax.oss.driver.api.core.cql.ResultSet;
 import com.datastax.oss.driver.api.core.cql.SimpleStatement;
+import com.google.common.annotations.VisibleForTesting;
 import java.nio.ByteBuffer;
 import ma.markware.charybdis.ExecutionContext;
+import ma.markware.charybdis.batch.Batch;
 import ma.markware.charybdis.model.option.ConsistencyLevel;
 import ma.markware.charybdis.model.option.SerialConsistencyLevel;
 import org.slf4j.Logger;
@@ -48,12 +51,27 @@ public abstract class AbstractQuery implements Query {
     return executionContext;
   }
 
-  ResultSet executeStatement(final CqlSession session, SimpleStatement statement, final Object[] bindValueArray) {
-    statement = resolveExecutionContext(statement);
-    return executeStatement(session, statement, 0, null, bindValueArray);
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public ResultSet execute(final CqlSession session) {
+    StatementTuple statementTuple = buildStatement();
+    SimpleStatement statement = resolveExecutionContext(statementTuple.getSimpleStatement());
+    return executeStatement(session, statement, statementTuple.getFetchSize(), statementTuple.getPagingState(), statementTuple.getBindValues());
   }
 
-  public ResultSet executeStatement(final CqlSession session, final SimpleStatement statement, final int fetchSize, final ByteBuffer pagingState,
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void addToBatch(final Batch batch) {
+    StatementTuple statementTuple = buildStatement();
+    addStatementToBatch(batch, statementTuple.getSimpleStatement(), statementTuple.getBindValues());
+  }
+
+  @VisibleForTesting
+  ResultSet executeStatement(final CqlSession session, final SimpleStatement statement, final int fetchSize, final ByteBuffer pagingState,
       final Object[] bindValueArray) {
     ResultSet resultSet = null;
     log.info("Statement query: {}", statement.getQuery());
@@ -64,6 +82,13 @@ public abstract class AbstractQuery implements Query {
       log.error("Error executing [{}] statement ({})", statement.getConsistencyLevel(), statement, e);
     }
     return resultSet;
+  }
+
+  private void addStatementToBatch(final Batch batch, final SimpleStatement statement, final Object[] bindValueArray) {
+    final PreparedStatement preparedStatement = PreparedStatementFactory.createPreparedStatement(batch.getSession(), statement.getQuery());
+    BoundStatement boundStatement = preparedStatement.bind(bindValueArray);
+    log.info("Statement query: {} added to batch", statement.getQuery());
+    batch.addStatement(boundStatement);
   }
 
   private SimpleStatement resolveExecutionContext(SimpleStatement statement) {

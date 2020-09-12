@@ -26,6 +26,6 @@ package ma.markware.charybdis.dsl.update;
  *
  * @author Oussama Markad
  */
-public interface UpdateInitExpression extends UpdateTtlExpression, UpdateTimestampExpression {
+public interface UpdateInitExpression<RETURN_TYPE> extends UpdateTtlExpression<RETURN_TYPE>, UpdateTimestampExpression<RETURN_TYPE> {
 
 }

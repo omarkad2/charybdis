@@ -30,6 +30,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import ma.markware.charybdis.AbstractIntegrationITest;
+import ma.markware.charybdis.CqlTemplate;
 import ma.markware.charybdis.model.field.SelectableField;
 import ma.markware.charybdis.test.instances.TestEntity_INST1;
 import ma.markware.charybdis.test.instances.TestEntity_INST2;
@@ -44,11 +45,12 @@ import org.junit.jupiter.api.TestInstance.Lifecycle;
 @TestInstance(Lifecycle.PER_CLASS)
 class DslAggregationsITest extends AbstractIntegrationITest {
 
-  private DslQuery dslQuery;
+  private DslQueryBuilder dsl;
 
   @BeforeAll
   void init(CqlSession session) {
-    dslQuery = new DefaultDslQuery(session);
+    CqlTemplate cqlTemplate = new CqlTemplate(session);
+    dsl = cqlTemplate.dsl();
   }
 
   @BeforeEach
@@ -106,7 +108,7 @@ class DslAggregationsITest extends AbstractIntegrationITest {
   @Test
   void count_with_field() {
     SelectableField<?> countIdsField = DslAggregations.count(TestEntity_Table.id);
-    Collection<Record> records = dslQuery.select(countIdsField)
+    Collection<Record> records = dsl.select(countIdsField)
                                          .from(TestEntity_Table.test_entity)
                                          .fetch();
 
@@ -118,7 +120,7 @@ class DslAggregationsITest extends AbstractIntegrationITest {
   @Test
   void count() {
     SelectableField<?> countAllField = DslAggregations.count();
-    Collection<Record> records = dslQuery.select(countAllField)
+    Collection<Record> records = dsl.select(countAllField)
                                          .from(TestEntity_Table.test_entity)
                                          .fetch();
 
@@ -130,7 +132,7 @@ class DslAggregationsITest extends AbstractIntegrationITest {
   @Test
   void max() {
     SelectableField<?> maxField = DslAggregations.max(TestEntity_Table.extraUdt.entry(TestExtraUdt_Udt.intValue));
-    Collection<Record> records = dslQuery.select(maxField)
+    Collection<Record> records = dsl.select(maxField)
                                          .from(TestEntity_Table.test_entity)
                                          .fetch();
 
@@ -142,7 +144,7 @@ class DslAggregationsITest extends AbstractIntegrationITest {
   @Test
   void min() {
     SelectableField<?> minField = DslAggregations.min(TestEntity_Table.date);
-    Collection<Record> records = dslQuery.select(minField)
+    Collection<Record> records = dsl.select(minField)
                                          .from(TestEntity_Table.test_entity)
                                          .fetch();
 
@@ -154,7 +156,7 @@ class DslAggregationsITest extends AbstractIntegrationITest {
   @Test
   void sum() {
     SelectableField<?> sumField = DslAggregations.sum(TestEntity_Table.extraUdt.entry(TestExtraUdt_Udt.intValue));
-    Collection<Record> records = dslQuery.select(sumField)
+    Collection<Record> records = dsl.select(sumField)
                                          .from(TestEntity_Table.test_entity)
                                          .fetch();
 
@@ -166,7 +168,7 @@ class DslAggregationsITest extends AbstractIntegrationITest {
   @Test
   void avg() {
     SelectableField<?> avgField = DslAggregations.avg(TestEntity_Table.extraUdt.entry(TestExtraUdt_Udt.doubleValue));
-    Collection<Record> records = dslQuery.select(avgField)
+    Collection<Record> records = dsl.select(avgField)
                                          .from(TestEntity_Table.test_entity)
                                          .fetch();
 

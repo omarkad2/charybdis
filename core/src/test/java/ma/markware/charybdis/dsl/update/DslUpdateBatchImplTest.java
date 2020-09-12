@@ -16,22 +16,19 @@
  * limitations under the License.
  *
  */
+
 package ma.markware.charybdis.dsl.update;
 
-/**
- * Update DSL query expression.
- *
- * <p>
- * It is not recommended to reference any object with type {@link UpdateExecuteExpression}.
- *
- * @author Oussama Markad
- */
-public interface UpdateExecuteExpression {
+import ma.markware.charybdis.batch.Batch;
+import org.mockito.Mock;
 
-  /**
-   * Execute Update DSL query.
-   *
-   * @return {@code true} if query is executed, {@code false} otherwise.
-   */
-  boolean execute();
+class DslUpdateBatchImplTest extends AbstractDslUpdateTest<DslUpdateBatchImpl> {
+
+  @Mock
+  private Batch batch;
+
+  @Override
+  DslUpdateBatchImpl getInstance() {
+    return new DslUpdateBatchImpl(batch);
+  }
 }

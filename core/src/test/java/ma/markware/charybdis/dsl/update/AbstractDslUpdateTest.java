@@ -16,13 +16,13 @@
  * limitations under the License.
  *
  */
+
 package ma.markware.charybdis.dsl.update;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 
 import com.datastax.oss.driver.api.core.CqlIdentifier;
-import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.internal.querybuilder.condition.DefaultCondition;
 import com.datastax.oss.driver.internal.querybuilder.lhs.ColumnComponentLeftOperand;
 import com.datastax.oss.driver.internal.querybuilder.lhs.ColumnLeftOperand;
@@ -41,8 +41,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import ma.markware.charybdis.ExecutionContext;
-import ma.markware.charybdis.model.option.ConsistencyLevel;
 import ma.markware.charybdis.query.UpdateQuery;
 import ma.markware.charybdis.query.clause.AssignmentClause;
 import ma.markware.charybdis.query.clause.ConditionClause;
@@ -56,23 +54,19 @@ import ma.markware.charybdis.test.metadata.TestExtraUdt_Udt;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-class UpdateImplTest {
+abstract class AbstractDslUpdateTest <T extends AbstractDslUpdate> {
 
-  @Mock
-  private CqlSession session;
-
-  private UpdateImpl updateImpl;
-  private ExecutionContext executionContext;
+  private T instance;
   private TestUdt udt1, udt2;
+
+  abstract T getInstance();
 
   @BeforeEach
   void setup() {
-    executionContext = new ExecutionContext();
-    updateImpl = new UpdateImpl(session, executionContext);
+    instance = getInstance();
 
     TestNestedUdt nestedUdt1 = new TestNestedUdt("nestedName1", "nestedValue1", Arrays.asList(12, 13));
     TestNestedUdt nestedUdt2 = new TestNestedUdt("nestedName2", "nestedValue2", Arrays.asList(14, 15, 16));
@@ -89,49 +83,43 @@ class UpdateImplTest {
 
   @Test
   void update() {
-    updateImpl.update(TestEntity_Table.test_entity);
+    instance.update(TestEntity_Table.test_entity);
 
-    UpdateQuery updateQuery = updateImpl.getUpdateQuery();
+    UpdateQuery updateQuery = instance.getUpdateQuery();
     assertThat(updateQuery.getKeyspace()).isEqualTo(TestEntity_Table.KEYSPACE_NAME);
     assertThat(updateQuery.getTable()).isEqualTo(TestEntity_Table.TABLE_NAME);
   }
 
   @Test
-  void update_should_set_fallback_consistency() {
-    updateImpl.update(TestEntity_Table.test_entity);
-    assertThat(executionContext.getDefaultConsistencyLevel()).isEqualTo(ConsistencyLevel.QUORUM);
-  }
-
-  @Test
   void usingTimestamp() {
     Instant now = Instant.now();
-    updateImpl.update(TestEntity_Table.test_entity)
+    instance.update(TestEntity_Table.test_entity)
               .usingTimestamp(now)
               .set(TestEntity_Table.flag, true);
 
-    UpdateQuery updateQuery = updateImpl.getUpdateQuery();
+    UpdateQuery updateQuery = instance.getUpdateQuery();
     assertThat(updateQuery.getTimestamp()).isEqualTo(now.toEpochMilli());
   }
 
   @Test
   void usingTimestamp_epoch_milli() {
     Instant now = Instant.now();
-    updateImpl.update(TestEntity_Table.test_entity)
+    instance.update(TestEntity_Table.test_entity)
               .usingTimestamp(now.toEpochMilli())
               .set(TestEntity_Table.flag, true);
 
-    UpdateQuery updateQuery = updateImpl.getUpdateQuery();
+    UpdateQuery updateQuery = instance.getUpdateQuery();
     assertThat(updateQuery.getTimestamp()).isEqualTo(now.toEpochMilli());
   }
 
   @Test
   void usingTtl() {
     int ttlInSeconds = 86400;
-    updateImpl.update(TestEntity_Table.test_entity)
+    instance.update(TestEntity_Table.test_entity)
               .usingTtl(ttlInSeconds)
               .set(TestEntity_Table.flag, true);
 
-    UpdateQuery updateQuery = updateImpl.getUpdateQuery();
+    UpdateQuery updateQuery = instance.getUpdateQuery();
     assertThat(updateQuery.getTtl()).isEqualTo(ttlInSeconds);
   }
 
@@ -141,34 +129,34 @@ class UpdateImplTest {
     List<String> listValue = Arrays.asList("test1", "test2");
     ImmutableMap<Integer, TestEnum> enumMapValue = ImmutableMap.of(0, TestEnum.TYPE_A, 1, TestEnum.TYPE_B);
     TestExtraUdt extraUdt = new TestExtraUdt(10, 12.12);
-    updateImpl.update(TestEntity_Table.test_entity)
+    instance.update(TestEntity_Table.test_entity)
               .set(TestEntity_Table.se, setValue)
               .set(TestEntity_Table.list, listValue)
               .set(TestEntity_Table.enumMap, enumMapValue)
               .set(TestEntity_Table.extraUdt, extraUdt)
               .set(TestEntity_Table.flag, true);
 
-    UpdateQuery updateQuery = updateImpl.getUpdateQuery();
+    UpdateQuery updateQuery = instance.getUpdateQuery();
     assertThat(updateQuery.getAssignmentClauses())
         .extracting(assignmentClause -> ((ColumnLeftOperand) ((DefaultAssignment) assignmentClause.getAssignment()).getLeftOperand()).getColumnId(),
-            AssignmentClause::getBindValues)
+                    AssignmentClause::getBindValues)
         .containsExactlyInAnyOrder(
-          tuple(CqlIdentifier.fromCql(TestEntity_Table.se.getName()), new Object[] { setValue }),
-          tuple(CqlIdentifier.fromCql(TestEntity_Table.list.getName()), new Object[] { listValue }),
-          tuple(CqlIdentifier.fromCql(TestEntity_Table.enumMap.getName()), new Object[] { ImmutableMap.of(0, "TYPE_A", 1, "TYPE_B") }),
-          tuple(CqlIdentifier.fromCql(TestEntity_Table.extraUdt.getName()), new Object[] { TestEntity_Table.extraUdt.serialize(extraUdt) }),
-          tuple(CqlIdentifier.fromCql(TestEntity_Table.flag.getName()), new Object[] { true })
+            tuple(CqlIdentifier.fromCql(TestEntity_Table.se.getName()), new Object[] { setValue }),
+            tuple(CqlIdentifier.fromCql(TestEntity_Table.list.getName()), new Object[] { listValue }),
+            tuple(CqlIdentifier.fromCql(TestEntity_Table.enumMap.getName()), new Object[] { ImmutableMap.of(0, "TYPE_A", 1, "TYPE_B") }),
+            tuple(CqlIdentifier.fromCql(TestEntity_Table.extraUdt.getName()), new Object[] { TestEntity_Table.extraUdt.serialize(extraUdt) }),
+            tuple(CqlIdentifier.fromCql(TestEntity_Table.flag.getName()), new Object[] { true })
         );
   }
 
   @Test
   void set_nested_collection_fields() {
     ImmutableMap<Integer, String> mapValue = ImmutableMap.of(0, "value1");
-    updateImpl.update(TestEntity_Table.test_entity)
+    instance.update(TestEntity_Table.test_entity)
               .set(TestEntity_Table.udtList.entry(0), udt2)
               .set(TestEntity_Table.nestedMap.entry("key0"), mapValue);
 
-    UpdateQuery updateQuery = updateImpl.getUpdateQuery();
+    UpdateQuery updateQuery = instance.getUpdateQuery();
     assertThat(updateQuery.getAssignmentClauses())
         .extracting(assignmentClause -> ((ColumnComponentLeftOperand) ((DefaultAssignment) assignmentClause.getAssignment()).getLeftOperand()).getColumnId(),
                     AssignmentClause::getBindValues)
@@ -180,10 +168,10 @@ class UpdateImplTest {
 
   @Test
   void set_nested_udt_field() {
-    updateImpl.update(TestEntity_Table.test_entity)
+    instance.update(TestEntity_Table.test_entity)
               .set(TestEntity_Table.extraUdt.entry(TestExtraUdt_Udt.doubleValue), 10.123456);
 
-    UpdateQuery updateQuery = updateImpl.getUpdateQuery();
+    UpdateQuery updateQuery = instance.getUpdateQuery();
     assertThat(updateQuery.getAssignmentClauses())
         .extracting(assignmentClause -> ((FieldLeftOperand) ((DefaultAssignment) assignmentClause.getAssignment()).getLeftOperand()).getColumnId(),
                     assignmentClause -> ((FieldLeftOperand) ((DefaultAssignment) assignmentClause.getAssignment()).getLeftOperand()).getFieldId(),
@@ -200,12 +188,12 @@ class UpdateImplTest {
     Set<Integer> seValues = new HashSet<>();
     seValues.add(1);
     seValues.add(2);
-    updateImpl.update(TestEntity_Table.test_entity)
+    instance.update(TestEntity_Table.test_entity)
               .set(TestEntity_Table.udtList, TestEntity_Table.udtList.append(udt1, udt2))
               .set(TestEntity_Table.se, TestEntity_Table.se.append(seValues))
               .set(TestEntity_Table.nestedMap, TestEntity_Table.nestedMap.append(nestedMapAppendValue));
 
-    UpdateQuery updateQuery = updateImpl.getUpdateQuery();
+    UpdateQuery updateQuery = instance.getUpdateQuery();
     assertThat(updateQuery.getAssignmentClauses())
         .extracting(assignmentClause -> ((AppendAssignment) assignmentClause.getAssignment()).getColumnId(),
                     AssignmentClause::getBindValues)
@@ -221,11 +209,11 @@ class UpdateImplTest {
     Set<Integer> seValues = new HashSet<>();
     seValues.add(1);
     seValues.add(2);
-    updateImpl.update(TestEntity_Table.test_entity)
+    instance.update(TestEntity_Table.test_entity)
               .set(TestEntity_Table.udtList, TestEntity_Table.udtList.prepend(udt1, udt2))
               .set(TestEntity_Table.se, TestEntity_Table.se.prepend(seValues));
 
-    UpdateQuery updateQuery = updateImpl.getUpdateQuery();
+    UpdateQuery updateQuery = instance.getUpdateQuery();
     assertThat(updateQuery.getAssignmentClauses())
         .extracting(assignmentClause -> ((PrependAssignment) assignmentClause.getAssignment()).getColumnId(),
                     AssignmentClause::getBindValues)
@@ -243,12 +231,12 @@ class UpdateImplTest {
     Set<String> mapKeysToRemove = new HashSet<>();
     mapKeysToRemove.add("key0");
     mapKeysToRemove.add("key1");
-    updateImpl.update(TestEntity_Table.test_entity)
+    instance.update(TestEntity_Table.test_entity)
               .set(TestEntity_Table.udtList, TestEntity_Table.udtList.remove(udt2))
               .set(TestEntity_Table.se, TestEntity_Table.se.remove(seValuesToRemove))
               .set(TestEntity_Table.nestedMap, TestEntity_Table.nestedMap.remove(mapKeysToRemove));
 
-    UpdateQuery updateQuery = updateImpl.getUpdateQuery();
+    UpdateQuery updateQuery = instance.getUpdateQuery();
     assertThat(updateQuery.getAssignmentClauses())
         .extracting(assignmentClause -> ((RemoveAssignment) assignmentClause.getAssignment()).getColumnId(),
                     AssignmentClause::getBindValues)
@@ -262,11 +250,11 @@ class UpdateImplTest {
   @Test
   void where() {
     UUID uuid = UUID.randomUUID();
-    updateImpl.update(TestEntity_Table.test_entity)
+    instance.update(TestEntity_Table.test_entity)
               .set(TestEntity_Table.flag, true)
               .where(TestEntity_Table.id.eq(uuid));
 
-    UpdateQuery updateQuery = updateImpl.getUpdateQuery();
+    UpdateQuery updateQuery = instance.getUpdateQuery();
 
     assertThat(updateQuery.getWhereClauses())
         .extracting(whereClause -> ((ColumnLeftOperand) ((DefaultRelation) whereClause.getRelation()).getLeftOperand()).getColumnId(),
@@ -282,7 +270,7 @@ class UpdateImplTest {
     Instant now = Instant.now();
     String mapKey = "key0";
     List<Integer> nestedSetValue = Collections.singletonList(10);
-    updateImpl.update(TestEntity_Table.test_entity)
+    instance.update(TestEntity_Table.test_entity)
               .set(TestEntity_Table.flag, true)
               .where(TestEntity_Table.id.eq(uuid))
               .and(TestEntity_Table.date.lt(now))
@@ -294,7 +282,7 @@ class UpdateImplTest {
               .and(TestEntity_Table.udtList.neq(Arrays.asList(udt1, udt2)))
               .and(TestEntity_Table.enumValue.in(TestEnum.TYPE_A));
 
-    UpdateQuery updateQuery = updateImpl.getUpdateQuery();
+    UpdateQuery updateQuery = instance.getUpdateQuery();
 
     assertThat(updateQuery.getWhereClauses())
         .extracting(whereClause -> ((ColumnLeftOperand) ((DefaultRelation) whereClause.getRelation()).getLeftOperand()).getColumnId(),
@@ -316,13 +304,13 @@ class UpdateImplTest {
   void if_() {
     UUID uuid = UUID.randomUUID();
     Instant now = Instant.now();
-    updateImpl.update(TestEntity_Table.test_entity)
+    instance.update(TestEntity_Table.test_entity)
               .set(TestEntity_Table.flag, true)
               .where(TestEntity_Table.id.eq(uuid))
               .and(TestEntity_Table.enumValue.in(Arrays.asList(TestEnum.TYPE_A, TestEnum.TYPE_B)))
               .if_(TestEntity_Table.date.lt(now));
 
-    UpdateQuery updateQuery = updateImpl.getUpdateQuery();
+    UpdateQuery updateQuery = instance.getUpdateQuery();
 
     assertThat(updateQuery.getConditionClauses())
         .extracting(conditionClause -> ((ColumnLeftOperand) ((DefaultCondition) conditionClause.getCondition()).getLeftOperand()).getColumnId(),
@@ -336,7 +324,7 @@ class UpdateImplTest {
   void and_() {
     UUID uuid = UUID.randomUUID();
     Instant now = Instant.now();
-    updateImpl.update(TestEntity_Table.test_entity)
+    instance.update(TestEntity_Table.test_entity)
               .set(TestEntity_Table.flag, true)
               .where(TestEntity_Table.id.eq(uuid))
               .if_(TestEntity_Table.date.lt(now))
@@ -344,7 +332,7 @@ class UpdateImplTest {
               .and_(TestEntity_Table.enumMap.eq(ImmutableMap.of(0, TestEnum.TYPE_A, 1, TestEnum.TYPE_B)))
               .and_(TestEntity_Table.udtList.neq(Arrays.asList(udt1, udt2)));
 
-    UpdateQuery updateQuery = updateImpl.getUpdateQuery();
+    UpdateQuery updateQuery = instance.getUpdateQuery();
 
     assertThat(updateQuery.getConditionClauses())
         .extracting(conditionClause -> ((ColumnLeftOperand) ((DefaultCondition) conditionClause.getCondition()).getLeftOperand()).getColumnId(),

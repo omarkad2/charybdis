@@ -16,6 +16,7 @@
  * limitations under the License.
  *
  */
+
 package ma.markware.charybdis.dsl;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -39,6 +40,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import ma.markware.charybdis.AbstractIntegrationITest;
+import ma.markware.charybdis.CqlTemplate;
 import ma.markware.charybdis.model.field.SelectableField;
 import ma.markware.charybdis.query.PageRequest;
 import ma.markware.charybdis.query.PageResult;
@@ -58,13 +60,14 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
 
 @TestInstance(Lifecycle.PER_CLASS)
-class DefaultDslQueryITest extends AbstractIntegrationITest {
+class DslQueryBuilderITest extends AbstractIntegrationITest {
 
-  private DslQuery dslQuery;
+  private DslQueryBuilder dsl;
 
   @BeforeAll
   void setup(CqlSession session) {
-    dslQuery = new DefaultDslQuery(session);
+    CqlTemplate cqlTemplate = new CqlTemplate(session);
+    dsl = cqlTemplate.dsl();
   }
 
   @Nested
@@ -103,9 +106,9 @@ class DefaultDslQueryITest extends AbstractIntegrationITest {
       insertRow(session, TestEntity_Table.KEYSPACE_NAME, TestEntity_Table.TABLE_NAME, valuesToInsert);
 
       // When
-      Record record = dslQuery.selectFrom(TestEntity_Table.test_entity)
-                              .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
-                              .fetchOne();
+      Record record = dsl.selectFrom(TestEntity_Table.test_entity)
+                         .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
+                         .fetchOne();
 
       // Then
       TestEntity actual = new TestEntity(record.get(TestEntity_Table.id), record.get(TestEntity_Table.date), record.get(TestEntity_Table.udt),
@@ -157,9 +160,9 @@ class DefaultDslQueryITest extends AbstractIntegrationITest {
                                 TestEntity_Table.list.getName(), QueryBuilder.literal(TestEntity_Table.list.serialize(TestEntity_INST1.list))));
 
       // When
-      Collection<Record> records = dslQuery.selectDistinct(TestEntity_Table.id)
-                                           .from(TestEntity_Table.test_entity)
-                                           .fetch();
+      Collection<Record> records = dsl.selectDistinct(TestEntity_Table.id)
+                                      .from(TestEntity_Table.test_entity)
+                                      .fetch();
 
       // Then
       assertThat(records).hasSize(3);
@@ -171,31 +174,31 @@ class DefaultDslQueryITest extends AbstractIntegrationITest {
     void selectFrom() {
 
       // Given (Using my own API because datastax's querybuilder replaces null with empty collections)
-      dslQuery.insertInto(TestEntity_Table.test_entity)
-              .set(TestEntity_Table.id, TestEntity_INST2.id)
-              .set(TestEntity_Table.date, TestEntity_INST2.date)
-              .set(TestEntity_Table.udt, TestEntity_INST2.udt)
-              .set(TestEntity_Table.list, TestEntity_INST2.list)
-              .set(TestEntity_Table.se, TestEntity_INST2.se)
-              .set(TestEntity_Table.map, TestEntity_INST2.map)
-              .set(TestEntity_Table.nestedList, TestEntity_INST2.nestedList)
-              .set(TestEntity_Table.nestedSet, TestEntity_INST2.nestedSet)
-              .set(TestEntity_Table.nestedMap, TestEntity_INST2.nestedMap)
-              .set(TestEntity_Table.enumValue, TestEntity_INST2.enumValue)
-              .set(TestEntity_Table.enumList, TestEntity_INST2.enumList)
-              .set(TestEntity_Table.enumMap, TestEntity_INST2.enumMap)
-              .set(TestEntity_Table.enumNestedList, TestEntity_INST2.enumNestedList)
-              .set(TestEntity_Table.extraUdt, TestEntity_INST2.extraUdt)
-              .set(TestEntity_Table.udtList, TestEntity_INST2.udtList)
-              .set(TestEntity_Table.udtSet, TestEntity_INST2.udtSet)
-              .set(TestEntity_Table.udtMap, TestEntity_INST2.udtMap)
-              .set(TestEntity_Table.udtNestedList, TestEntity_INST2.udtNestedList)
-              .set(TestEntity_Table.flag, TestEntity_INST2.flag)
-              .execute();
+      dsl.insertInto(TestEntity_Table.test_entity)
+         .set(TestEntity_Table.id, TestEntity_INST2.id)
+         .set(TestEntity_Table.date, TestEntity_INST2.date)
+         .set(TestEntity_Table.udt, TestEntity_INST2.udt)
+         .set(TestEntity_Table.list, TestEntity_INST2.list)
+         .set(TestEntity_Table.se, TestEntity_INST2.se)
+         .set(TestEntity_Table.map, TestEntity_INST2.map)
+         .set(TestEntity_Table.nestedList, TestEntity_INST2.nestedList)
+         .set(TestEntity_Table.nestedSet, TestEntity_INST2.nestedSet)
+         .set(TestEntity_Table.nestedMap, TestEntity_INST2.nestedMap)
+         .set(TestEntity_Table.enumValue, TestEntity_INST2.enumValue)
+         .set(TestEntity_Table.enumList, TestEntity_INST2.enumList)
+         .set(TestEntity_Table.enumMap, TestEntity_INST2.enumMap)
+         .set(TestEntity_Table.enumNestedList, TestEntity_INST2.enumNestedList)
+         .set(TestEntity_Table.extraUdt, TestEntity_INST2.extraUdt)
+         .set(TestEntity_Table.udtList, TestEntity_INST2.udtList)
+         .set(TestEntity_Table.udtSet, TestEntity_INST2.udtSet)
+         .set(TestEntity_Table.udtMap, TestEntity_INST2.udtMap)
+         .set(TestEntity_Table.udtNestedList, TestEntity_INST2.udtNestedList)
+         .set(TestEntity_Table.flag, TestEntity_INST2.flag)
+         .execute();
 
       // When
-      Collection<Record> records = dslQuery.selectFrom(TestEntity_Table.test_entity)
-                                           .fetch();
+      Collection<Record> records = dsl.selectFrom(TestEntity_Table.test_entity)
+                                      .fetch();
 
       // Then
       assertThat(records).hasSize(1);
@@ -239,20 +242,20 @@ class DefaultDslQueryITest extends AbstractIntegrationITest {
                                                                                                       TestEntity_Table.list.getName(), QueryBuilder.literal(TestEntity_Table.list.serialize(TestEntity_INST1.list))));
 
       // First page
-      PageResult pageResult1 = dslQuery.selectFrom(TestEntity_Table.test_entity)
-                                       .fetchPage(PageRequest.of(null, 2));
+      PageResult pageResult1 = dsl.selectFrom(TestEntity_Table.test_entity)
+                                  .fetchPage(PageRequest.of(null, 2));
       assertThat(pageResult1.getPagingState()).isNotNull();
       assertThat(pageResult1.getResults()).hasSize(2);
 
       // Second page
-      PageResult pageResult2 = dslQuery.selectFrom(TestEntity_Table.test_entity)
-                                       .fetchPage(PageRequest.of(pageResult1.getPagingState(), 2));
+      PageResult pageResult2 = dsl.selectFrom(TestEntity_Table.test_entity)
+                                  .fetchPage(PageRequest.of(pageResult1.getPagingState(), 2));
       assertThat(pageResult2.getPagingState()).isNotNull();
       assertThat(pageResult2.getResults()).hasSize(2);
 
       // Third page
-      PageResult pageResult3 = dslQuery.selectFrom(TestEntity_Table.test_entity)
-                                       .fetchPage(PageRequest.of(pageResult2.getPagingState(), 2));
+      PageResult pageResult3 = dsl.selectFrom(TestEntity_Table.test_entity)
+                                  .fetchPage(PageRequest.of(pageResult2.getPagingState(), 2));
       assertThat(pageResult3.getPagingState()).isNull();
       assertThat(pageResult3.getResults()).isEmpty();
     }
@@ -265,14 +268,14 @@ class DefaultDslQueryITest extends AbstractIntegrationITest {
           TestEntity_Table.udt.getName(), QueryBuilder.literal(TestEntity_Table.udt.serialize(TestEntity_INST1.udt1)),
           TestEntity_Table.list.getName(), QueryBuilder.literal(TestEntity_Table.list.serialize(TestEntity_INST1.list))));
 
-      Optional<Record> presentRecord = dslQuery.selectFrom(TestEntity_Table.test_entity)
-                                               .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
-                                               .fetchOptional();
+      Optional<Record> presentRecord = dsl.selectFrom(TestEntity_Table.test_entity)
+                                          .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
+                                          .fetchOptional();
       assertThat(presentRecord).isPresent();
 
-      Optional<Record> absentRecord = dslQuery.selectFrom(TestEntity_Table.test_entity)
-                                              .where(TestEntity_Table.id.eq(UUID.randomUUID()))
-                                              .fetchOptional();
+      Optional<Record> absentRecord = dsl.selectFrom(TestEntity_Table.test_entity)
+                                         .where(TestEntity_Table.id.eq(UUID.randomUUID()))
+                                         .fetchOptional();
       assertThat(absentRecord).isEmpty();
     }
   }
@@ -285,19 +288,19 @@ class DefaultDslQueryITest extends AbstractIntegrationITest {
     void insertInto(CqlSession session) {
       cleanDatabase(session);
       // Given
-      dslQuery.insertInto(TestEntity_Table.test_entity, TestEntity_Table.id, TestEntity_Table.date, TestEntity_Table.udt, TestEntity_Table.list, TestEntity_Table.se, TestEntity_Table.map,
-                          TestEntity_Table.nestedList, TestEntity_Table.nestedSet, TestEntity_Table.nestedMap, TestEntity_Table.enumValue, TestEntity_Table.enumList, TestEntity_Table.enumMap,
-                          TestEntity_Table.enumNestedList, TestEntity_Table.extraUdt, TestEntity_Table.udtList, TestEntity_Table.udtSet, TestEntity_Table.udtMap, TestEntity_Table.udtNestedList,
-                          TestEntity_Table.flag)
-              .values(TestEntity_INST1.id, TestEntity_INST1.date, TestEntity_INST1.udt1, TestEntity_INST1.list, TestEntity_INST1.se, TestEntity_INST1.map, TestEntity_INST1.nestedList,
-                      TestEntity_INST1.nestedSet, TestEntity_INST1.nestedMap, TestEntity_INST1.enumValue, TestEntity_INST1.enumList, TestEntity_INST1.enumMap, TestEntity_INST1.enumNestedList,
-                      TestEntity_INST1.extraUdt, TestEntity_INST1.udtList, TestEntity_INST1.udtSet, TestEntity_INST1.udtMap, TestEntity_INST1.udtNestedList, TestEntity_INST1.flag)
-              .execute();
+      dsl.insertInto(TestEntity_Table.test_entity, TestEntity_Table.id, TestEntity_Table.date, TestEntity_Table.udt, TestEntity_Table.list, TestEntity_Table.se, TestEntity_Table.map,
+                     TestEntity_Table.nestedList, TestEntity_Table.nestedSet, TestEntity_Table.nestedMap, TestEntity_Table.enumValue, TestEntity_Table.enumList, TestEntity_Table.enumMap,
+                     TestEntity_Table.enumNestedList, TestEntity_Table.extraUdt, TestEntity_Table.udtList, TestEntity_Table.udtSet, TestEntity_Table.udtMap, TestEntity_Table.udtNestedList,
+                     TestEntity_Table.flag)
+         .values(TestEntity_INST1.id, TestEntity_INST1.date, TestEntity_INST1.udt1, TestEntity_INST1.list, TestEntity_INST1.se, TestEntity_INST1.map, TestEntity_INST1.nestedList,
+                 TestEntity_INST1.nestedSet, TestEntity_INST1.nestedMap, TestEntity_INST1.enumValue, TestEntity_INST1.enumList, TestEntity_INST1.enumMap, TestEntity_INST1.enumNestedList,
+                 TestEntity_INST1.extraUdt, TestEntity_INST1.udtList, TestEntity_INST1.udtSet, TestEntity_INST1.udtMap, TestEntity_INST1.udtNestedList, TestEntity_INST1.flag)
+         .execute();
 
       // When
-      Record record = dslQuery.selectFrom(TestEntity_Table.test_entity)
-                              .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
-                              .fetchOne();
+      Record record = dsl.selectFrom(TestEntity_Table.test_entity)
+                         .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
+                         .fetchOne();
 
       // Then
       TestEntity actual = new TestEntity(record.get(TestEntity_Table.id),
@@ -317,19 +320,19 @@ class DefaultDslQueryITest extends AbstractIntegrationITest {
     void insertInto_ifNotExists(CqlSession session) {
       cleanDatabase(session);
       // Given
-      dslQuery.insertInto(TestEntity_Table.test_entity, TestEntity_Table.id, TestEntity_Table.date, TestEntity_Table.udt, TestEntity_Table.list, TestEntity_Table.flag)
-              .values(TestEntity_INST1.id, TestEntity_INST1.date, TestEntity_INST1.udt1, TestEntity_INST1.list, false)
-              .execute();
+      dsl.insertInto(TestEntity_Table.test_entity, TestEntity_Table.id, TestEntity_Table.date, TestEntity_Table.udt, TestEntity_Table.list, TestEntity_Table.flag)
+         .values(TestEntity_INST1.id, TestEntity_INST1.date, TestEntity_INST1.udt1, TestEntity_INST1.list, false)
+         .execute();
 
-      dslQuery.insertInto(TestEntity_Table.test_entity, TestEntity_Table.id, TestEntity_Table.date, TestEntity_Table.udt, TestEntity_Table.list, TestEntity_Table.flag)
-              .values(TestEntity_INST1.id, TestEntity_INST1.date, TestEntity_INST1.udt1, TestEntity_INST1.list, true)
-              .ifNotExists()
-              .execute();
+      dsl.insertInto(TestEntity_Table.test_entity, TestEntity_Table.id, TestEntity_Table.date, TestEntity_Table.udt, TestEntity_Table.list, TestEntity_Table.flag)
+         .values(TestEntity_INST1.id, TestEntity_INST1.date, TestEntity_INST1.udt1, TestEntity_INST1.list, true)
+         .ifNotExists()
+         .execute();
 
       // When
-      Collection<Record> records = dslQuery.selectFrom(TestEntity_Table.test_entity)
-                              .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
-                              .fetch();
+      Collection<Record> records = dsl.selectFrom(TestEntity_Table.test_entity)
+                                      .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
+                                      .fetch();
 
       // Then
       assertThat(records).hasSize(1);
@@ -345,24 +348,24 @@ class DefaultDslQueryITest extends AbstractIntegrationITest {
     void setup(CqlSession session) {
       cleanDatabase(session);
       // Insert TestEntity_INST1 to DB
-      dslQuery.insertInto(TestEntity_Table.test_entity, TestEntity_Table.id, TestEntity_Table.date, TestEntity_Table.udt, TestEntity_Table.list, TestEntity_Table.se, TestEntity_Table.map,
-                          TestEntity_Table.nestedList, TestEntity_Table.nestedSet, TestEntity_Table.nestedMap, TestEntity_Table.enumValue, TestEntity_Table.enumList, TestEntity_Table.enumMap,
-                          TestEntity_Table.enumNestedList, TestEntity_Table.extraUdt, TestEntity_Table.udtList, TestEntity_Table.udtSet, TestEntity_Table.udtMap, TestEntity_Table.udtNestedList,
-                          TestEntity_Table.flag)
-              .values(TestEntity_INST1.id, TestEntity_INST1.date, TestEntity_INST1.udt1, TestEntity_INST1.list, TestEntity_INST1.se, TestEntity_INST1.map, TestEntity_INST1.nestedList,
-                      TestEntity_INST1.nestedSet, TestEntity_INST1.nestedMap, TestEntity_INST1.enumValue, TestEntity_INST1.enumList, TestEntity_INST1.enumMap, TestEntity_INST1.enumNestedList,
-                      TestEntity_INST1.extraUdt, TestEntity_INST1.udtList, TestEntity_INST1.udtSet, TestEntity_INST1.udtMap, null, TestEntity_INST1.flag)
-              .execute();
+      dsl.insertInto(TestEntity_Table.test_entity, TestEntity_Table.id, TestEntity_Table.date, TestEntity_Table.udt, TestEntity_Table.list, TestEntity_Table.se, TestEntity_Table.map,
+                     TestEntity_Table.nestedList, TestEntity_Table.nestedSet, TestEntity_Table.nestedMap, TestEntity_Table.enumValue, TestEntity_Table.enumList, TestEntity_Table.enumMap,
+                     TestEntity_Table.enumNestedList, TestEntity_Table.extraUdt, TestEntity_Table.udtList, TestEntity_Table.udtSet, TestEntity_Table.udtMap, TestEntity_Table.udtNestedList,
+                     TestEntity_Table.flag)
+         .values(TestEntity_INST1.id, TestEntity_INST1.date, TestEntity_INST1.udt1, TestEntity_INST1.list, TestEntity_INST1.se, TestEntity_INST1.map, TestEntity_INST1.nestedList,
+                 TestEntity_INST1.nestedSet, TestEntity_INST1.nestedMap, TestEntity_INST1.enumValue, TestEntity_INST1.enumList, TestEntity_INST1.enumMap, TestEntity_INST1.enumNestedList,
+                 TestEntity_INST1.extraUdt, TestEntity_INST1.udtList, TestEntity_INST1.udtSet, TestEntity_INST1.udtMap, null, TestEntity_INST1.flag)
+         .execute();
 
       // Insert TestEntity_INST2 to DB
-      dslQuery.insertInto(TestEntity_Table.test_entity, TestEntity_Table.id, TestEntity_Table.date, TestEntity_Table.udt, TestEntity_Table.list, TestEntity_Table.se, TestEntity_Table.map,
-                          TestEntity_Table.nestedList, TestEntity_Table.nestedSet, TestEntity_Table.nestedMap, TestEntity_Table.enumValue, TestEntity_Table.enumList, TestEntity_Table.enumMap,
-                          TestEntity_Table.enumNestedList, TestEntity_Table.extraUdt, TestEntity_Table.udtList, TestEntity_Table.udtSet, TestEntity_Table.udtMap, TestEntity_Table.udtNestedList,
-                          TestEntity_Table.flag)
-              .values(TestEntity_INST2.id, TestEntity_INST2.date, TestEntity_INST2.udt, TestEntity_INST2.list, TestEntity_INST2.se, TestEntity_INST2.map, TestEntity_INST2.nestedList,
-                      TestEntity_INST2.nestedSet, TestEntity_INST2.nestedMap, TestEntity_INST2.enumValue, TestEntity_INST2.enumList, TestEntity_INST2.enumMap, TestEntity_INST2.enumNestedList,
-                      TestEntity_INST2.extraUdt, TestEntity_INST2.udtList, TestEntity_INST2.udtSet, TestEntity_INST2.udtMap, TestEntity_INST2.udtNestedList, TestEntity_INST2.flag)
-              .execute();
+      dsl.insertInto(TestEntity_Table.test_entity, TestEntity_Table.id, TestEntity_Table.date, TestEntity_Table.udt, TestEntity_Table.list, TestEntity_Table.se, TestEntity_Table.map,
+                     TestEntity_Table.nestedList, TestEntity_Table.nestedSet, TestEntity_Table.nestedMap, TestEntity_Table.enumValue, TestEntity_Table.enumList, TestEntity_Table.enumMap,
+                     TestEntity_Table.enumNestedList, TestEntity_Table.extraUdt, TestEntity_Table.udtList, TestEntity_Table.udtSet, TestEntity_Table.udtMap, TestEntity_Table.udtNestedList,
+                     TestEntity_Table.flag)
+         .values(TestEntity_INST2.id, TestEntity_INST2.date, TestEntity_INST2.udt, TestEntity_INST2.list, TestEntity_INST2.se, TestEntity_INST2.map, TestEntity_INST2.nestedList,
+                 TestEntity_INST2.nestedSet, TestEntity_INST2.nestedMap, TestEntity_INST2.enumValue, TestEntity_INST2.enumList, TestEntity_INST2.enumMap, TestEntity_INST2.enumNestedList,
+                 TestEntity_INST2.extraUdt, TestEntity_INST2.udtList, TestEntity_INST2.udtSet, TestEntity_INST2.udtMap, TestEntity_INST2.udtNestedList, TestEntity_INST2.flag)
+         .execute();
     }
 
     @SuppressWarnings("unchecked")
@@ -370,24 +373,24 @@ class DefaultDslQueryITest extends AbstractIntegrationITest {
     void update() {
 
       // When
-      dslQuery.update(TestEntity_Table.test_entity)
-              .set(TestEntity_Table.se, TestEntity_Table.se.append(1000, 1100))
-              .set(TestEntity_Table.map, TestEntity_Table.map.append(ImmutableMap.of("appendKey", "appendValue")))
-              .set(TestEntity_Table.nestedList, null)
-              .set(TestEntity_Table.nestedSet, TestEntity_Table.nestedSet.remove(TestEntity_INST1.nestedSet))
-              .set(TestEntity_Table.nestedMap, TestEntity_Table.nestedMap.remove(Collections.singleton("key0")))
-              .set(TestEntity_Table.enumNestedList, TestEntity_Table.enumNestedList.prepend(ImmutableSet.of(TestEnum.TYPE_B)))
-              .set(TestEntity_Table.udtNestedList, TestEntity_Table.udtNestedList.prepend(
-                  Collections.singletonList(Collections.singletonList(TestEntity_INST1.udt1))))
-              .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
-              .and(TestEntity_Table.date.eq(TestEntity_INST1.date))
-              .and(TestEntity_Table.udt.eq(TestEntity_INST1.udt1))
-              .and(TestEntity_Table.list.eq(TestEntity_INST1.list))
-              .execute();
+      dsl.update(TestEntity_Table.test_entity)
+         .set(TestEntity_Table.se, TestEntity_Table.se.append(1000, 1100))
+         .set(TestEntity_Table.map, TestEntity_Table.map.append(ImmutableMap.of("appendKey", "appendValue")))
+         .set(TestEntity_Table.nestedList, null)
+         .set(TestEntity_Table.nestedSet, TestEntity_Table.nestedSet.remove(TestEntity_INST1.nestedSet))
+         .set(TestEntity_Table.nestedMap, TestEntity_Table.nestedMap.remove(Collections.singleton("key0")))
+         .set(TestEntity_Table.enumNestedList, TestEntity_Table.enumNestedList.prepend(ImmutableSet.of(TestEnum.TYPE_B)))
+         .set(TestEntity_Table.udtNestedList, TestEntity_Table.udtNestedList.prepend(
+             Collections.singletonList(Collections.singletonList(TestEntity_INST1.udt1))))
+         .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
+         .and(TestEntity_Table.date.eq(TestEntity_INST1.date))
+         .and(TestEntity_Table.udt.eq(TestEntity_INST1.udt1))
+         .and(TestEntity_Table.list.eq(TestEntity_INST1.list))
+         .execute();
 
-      Record record = dslQuery.selectFrom(TestEntity_Table.test_entity)
-                              .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
-                              .fetchOne();
+      Record record = dsl.selectFrom(TestEntity_Table.test_entity)
+                         .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
+                         .fetchOne();
 
       // Then
       assertThat(record).isNotNull();
@@ -425,18 +428,18 @@ class DefaultDslQueryITest extends AbstractIntegrationITest {
     void update_should_be_applied_when_if_condition_true() {
 
       // When
-      boolean applied = dslQuery.update(TestEntity_Table.test_entity)
-                                .set(TestEntity_Table.se, TestEntity_Table.se.append(1_000_000))
-                                .where(TestEntity_Table.id.eq(TestEntity_INST2.id))
-                                .and(TestEntity_Table.date.eq(TestEntity_INST2.date))
-                                .and(TestEntity_Table.udt.eq(TestEntity_INST2.udt))
-                                .and(TestEntity_Table.list.eq(TestEntity_INST2.list))
-                                .if_(TestEntity_Table.flag.eq(TestEntity_INST2.flag))
-                                .execute();
+      boolean applied = dsl.update(TestEntity_Table.test_entity)
+                           .set(TestEntity_Table.se, TestEntity_Table.se.append(1_000_000))
+                           .where(TestEntity_Table.id.eq(TestEntity_INST2.id))
+                           .and(TestEntity_Table.date.eq(TestEntity_INST2.date))
+                           .and(TestEntity_Table.udt.eq(TestEntity_INST2.udt))
+                           .and(TestEntity_Table.list.eq(TestEntity_INST2.list))
+                           .if_(TestEntity_Table.flag.eq(TestEntity_INST2.flag))
+                           .execute();
 
-      Record record = dslQuery.selectFrom(TestEntity_Table.test_entity)
-                              .where(TestEntity_Table.id.eq(TestEntity_INST2.id))
-                              .fetchOne();
+      Record record = dsl.selectFrom(TestEntity_Table.test_entity)
+                         .where(TestEntity_Table.id.eq(TestEntity_INST2.id))
+                         .fetchOne();
 
       // Then
       assertThat(applied).isTrue();
@@ -452,18 +455,18 @@ class DefaultDslQueryITest extends AbstractIntegrationITest {
     void update_should_not_be_applied_when_if_condition_false() {
 
       // When
-      boolean applied = dslQuery.update(TestEntity_Table.test_entity)
-                                .set(TestEntity_Table.se, TestEntity_Table.se.append(1_000_000))
-                                .where(TestEntity_Table.id.eq(TestEntity_INST2.id))
-                                .and(TestEntity_Table.date.eq(TestEntity_INST2.date))
-                                .and(TestEntity_Table.udt.eq(TestEntity_INST2.udt))
-                                .and(TestEntity_Table.list.eq(TestEntity_INST2.list))
-                                .if_(TestEntity_Table.flag.eq(!TestEntity_INST2.flag))
-                                .execute();
+      boolean applied = dsl.update(TestEntity_Table.test_entity)
+                           .set(TestEntity_Table.se, TestEntity_Table.se.append(1_000_000))
+                           .where(TestEntity_Table.id.eq(TestEntity_INST2.id))
+                           .and(TestEntity_Table.date.eq(TestEntity_INST2.date))
+                           .and(TestEntity_Table.udt.eq(TestEntity_INST2.udt))
+                           .and(TestEntity_Table.list.eq(TestEntity_INST2.list))
+                           .if_(TestEntity_Table.flag.eq(!TestEntity_INST2.flag))
+                           .execute();
 
-      Record record = dslQuery.selectFrom(TestEntity_Table.test_entity)
-                              .where(TestEntity_Table.id.eq(TestEntity_INST2.id))
-                              .fetchOne();
+      Record record = dsl.selectFrom(TestEntity_Table.test_entity)
+                         .where(TestEntity_Table.id.eq(TestEntity_INST2.id))
+                         .fetchOne();
 
       // Then
       assertThat(applied).isFalse();
@@ -479,24 +482,24 @@ class DefaultDslQueryITest extends AbstractIntegrationITest {
     @Test
     void update_nested_field() {
 
-      boolean applied = dslQuery.update(TestEntity_Table.test_entity)
-                                .set(TestEntity_Table.map.entry("key1"), "newValue")
-                                .set(TestEntity_Table.nestedMap.entry("key1"), ImmutableMap.of(10, "newValue"))
-                                .set(TestEntity_Table.enumList.entry(0), TestEnum.TYPE_B)
-                                .set(TestEntity_Table.enumMap.entry(1), TestEnum.TYPE_B)
-                                .set(TestEntity_Table.enumNestedList.entry(0), new HashSet<>(Arrays.asList(TestEnum.TYPE_A, TestEnum.TYPE_B)))
-                                .set(TestEntity_Table.extraUdt.entry(TestExtraUdt_Udt.intValue), 1_000_000)
-                                .set(TestEntity_Table.udtList.entry(1), TestEntity_INST1.udt1)
-                                .set(TestEntity_Table.udtMap.entry(1), TestEntity_INST1.udt2)
-                                .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
-                                .and(TestEntity_Table.date.eq(TestEntity_INST1.date))
-                                .and(TestEntity_Table.udt.eq(TestEntity_INST1.udt1))
-                                .and(TestEntity_Table.list.eq(TestEntity_INST1.list))
-                                .execute();
+      boolean applied = dsl.update(TestEntity_Table.test_entity)
+                           .set(TestEntity_Table.map.entry("key1"), "newValue")
+                           .set(TestEntity_Table.nestedMap.entry("key1"), ImmutableMap.of(10, "newValue"))
+                           .set(TestEntity_Table.enumList.entry(0), TestEnum.TYPE_B)
+                           .set(TestEntity_Table.enumMap.entry(1), TestEnum.TYPE_B)
+                           .set(TestEntity_Table.enumNestedList.entry(0), new HashSet<>(Arrays.asList(TestEnum.TYPE_A, TestEnum.TYPE_B)))
+                           .set(TestEntity_Table.extraUdt.entry(TestExtraUdt_Udt.intValue), 1_000_000)
+                           .set(TestEntity_Table.udtList.entry(1), TestEntity_INST1.udt1)
+                           .set(TestEntity_Table.udtMap.entry(1), TestEntity_INST1.udt2)
+                           .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
+                           .and(TestEntity_Table.date.eq(TestEntity_INST1.date))
+                           .and(TestEntity_Table.udt.eq(TestEntity_INST1.udt1))
+                           .and(TestEntity_Table.list.eq(TestEntity_INST1.list))
+                           .execute();
 
-      Record record = dslQuery.selectFrom(TestEntity_Table.test_entity)
-                              .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
-                              .fetchOne();
+      Record record = dsl.selectFrom(TestEntity_Table.test_entity)
+                         .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
+                         .fetchOne();
 
       // Then
       assertThat(applied).isTrue();
@@ -542,20 +545,20 @@ class DefaultDslQueryITest extends AbstractIntegrationITest {
 
       // When
       long micros = Instant.now().plus(1, ChronoUnit.DAYS).toEpochMilli() * 1000;
-      boolean applied = dslQuery.update(TestEntity_Table.test_entity)
-                                .usingTimestamp(micros)
-                                .set(TestEntity_Table.flag, true)
-                                .where(TestEntity_Table.id.eq(TestEntity_INST2.id))
-                                .and(TestEntity_Table.date.eq(TestEntity_INST2.date))
-                                .and(TestEntity_Table.udt.eq(TestEntity_INST2.udt))
-                                .and(TestEntity_Table.list.eq(TestEntity_INST2.list))
-                                .execute();
+      boolean applied = dsl.update(TestEntity_Table.test_entity)
+                           .usingTimestamp(micros)
+                           .set(TestEntity_Table.flag, true)
+                           .where(TestEntity_Table.id.eq(TestEntity_INST2.id))
+                           .and(TestEntity_Table.date.eq(TestEntity_INST2.date))
+                           .and(TestEntity_Table.udt.eq(TestEntity_INST2.udt))
+                           .and(TestEntity_Table.list.eq(TestEntity_INST2.list))
+                           .execute();
 
       SelectableField<Long> writetime = DslFunctions.writetime(TestEntity_Table.flag);
-      Record record = dslQuery.select(writetime)
-                              .from(TestEntity_Table.test_entity)
-                              .where(TestEntity_Table.id.eq(TestEntity_INST2.id))
-                              .fetchOne();
+      Record record = dsl.select(writetime)
+                         .from(TestEntity_Table.test_entity)
+                         .where(TestEntity_Table.id.eq(TestEntity_INST2.id))
+                         .fetchOne();
 
       // Then
       assertThat(applied).isTrue();
@@ -568,20 +571,20 @@ class DefaultDslQueryITest extends AbstractIntegrationITest {
 
       // When
       int ttlInSeconds = 86400;
-      boolean applied = dslQuery.update(TestEntity_Table.test_entity)
-                                .usingTtl(ttlInSeconds)
-                                .set(TestEntity_Table.flag, false)
-                                .where(TestEntity_Table.id.eq(TestEntity_INST2.id))
-                                .and(TestEntity_Table.date.eq(TestEntity_INST2.date))
-                                .and(TestEntity_Table.udt.eq(TestEntity_INST2.udt))
-                                .and(TestEntity_Table.list.eq(TestEntity_INST2.list))
-                                .execute();
+      boolean applied = dsl.update(TestEntity_Table.test_entity)
+                           .usingTtl(ttlInSeconds)
+                           .set(TestEntity_Table.flag, false)
+                           .where(TestEntity_Table.id.eq(TestEntity_INST2.id))
+                           .and(TestEntity_Table.date.eq(TestEntity_INST2.date))
+                           .and(TestEntity_Table.udt.eq(TestEntity_INST2.udt))
+                           .and(TestEntity_Table.list.eq(TestEntity_INST2.list))
+                           .execute();
 
       SelectableField<Integer> ttl = DslFunctions.ttl(TestEntity_Table.flag);
-      Record record = dslQuery.select(ttl)
-                              .from(TestEntity_Table.test_entity)
-                              .where(TestEntity_Table.id.eq(TestEntity_INST2.id))
-                              .fetchOne();
+      Record record = dsl.select(ttl)
+                         .from(TestEntity_Table.test_entity)
+                         .where(TestEntity_Table.id.eq(TestEntity_INST2.id))
+                         .fetchOne();
 
       // Then
       assertThat(applied).isTrue();
@@ -598,31 +601,31 @@ class DefaultDslQueryITest extends AbstractIntegrationITest {
     void setup(CqlSession session) {
       cleanDatabase(session);
       // Insert TestEntity_INST1 to DB
-      dslQuery.insertInto(TestEntity_Table.test_entity, TestEntity_Table.id, TestEntity_Table.date, TestEntity_Table.udt, TestEntity_Table.list, TestEntity_Table.se, TestEntity_Table.map,
-                          TestEntity_Table.nestedList, TestEntity_Table.nestedSet, TestEntity_Table.nestedMap, TestEntity_Table.enumValue, TestEntity_Table.enumList, TestEntity_Table.enumMap,
-                          TestEntity_Table.enumNestedList, TestEntity_Table.extraUdt, TestEntity_Table.udtList, TestEntity_Table.udtSet, TestEntity_Table.udtMap, TestEntity_Table.udtNestedList,
-                          TestEntity_Table.flag)
-              .values(TestEntity_INST1.id, TestEntity_INST1.date, TestEntity_INST1.udt1, TestEntity_INST1.list, TestEntity_INST1.se, TestEntity_INST1.map, TestEntity_INST1.nestedList,
-                      TestEntity_INST1.nestedSet, TestEntity_INST1.nestedMap, TestEntity_INST1.enumValue, TestEntity_INST1.enumList, TestEntity_INST1.enumMap, TestEntity_INST1.enumNestedList,
-                      TestEntity_INST1.extraUdt, TestEntity_INST1.udtList, TestEntity_INST1.udtSet, TestEntity_INST1.udtMap, TestEntity_INST1.udtNestedList, TestEntity_INST1.flag)
-              .execute();
+      dsl.insertInto(TestEntity_Table.test_entity, TestEntity_Table.id, TestEntity_Table.date, TestEntity_Table.udt, TestEntity_Table.list, TestEntity_Table.se, TestEntity_Table.map,
+                     TestEntity_Table.nestedList, TestEntity_Table.nestedSet, TestEntity_Table.nestedMap, TestEntity_Table.enumValue, TestEntity_Table.enumList, TestEntity_Table.enumMap,
+                     TestEntity_Table.enumNestedList, TestEntity_Table.extraUdt, TestEntity_Table.udtList, TestEntity_Table.udtSet, TestEntity_Table.udtMap, TestEntity_Table.udtNestedList,
+                     TestEntity_Table.flag)
+         .values(TestEntity_INST1.id, TestEntity_INST1.date, TestEntity_INST1.udt1, TestEntity_INST1.list, TestEntity_INST1.se, TestEntity_INST1.map, TestEntity_INST1.nestedList,
+                 TestEntity_INST1.nestedSet, TestEntity_INST1.nestedMap, TestEntity_INST1.enumValue, TestEntity_INST1.enumList, TestEntity_INST1.enumMap, TestEntity_INST1.enumNestedList,
+                 TestEntity_INST1.extraUdt, TestEntity_INST1.udtList, TestEntity_INST1.udtSet, TestEntity_INST1.udtMap, TestEntity_INST1.udtNestedList, TestEntity_INST1.flag)
+         .execute();
     }
 
     @Test
     void delete() {
 
       // When
-      boolean applied = dslQuery.delete()
-                                .from(TestEntity_Table.test_entity)
-                                .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
-                                .and(TestEntity_Table.date.eq(TestEntity_INST1.date))
-                                .and(TestEntity_Table.udt.eq(TestEntity_INST1.udt1))
-                                .and(TestEntity_Table.list.eq(TestEntity_INST1.list))
-                                .execute();
+      Boolean applied = dsl.delete()
+                           .from(TestEntity_Table.test_entity)
+                           .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
+                           .and(TestEntity_Table.date.eq(TestEntity_INST1.date))
+                           .and(TestEntity_Table.udt.eq(TestEntity_INST1.udt1))
+                           .and(TestEntity_Table.list.eq(TestEntity_INST1.list))
+                           .execute();
 
-      Record record = dslQuery.selectFrom(TestEntity_Table.test_entity)
-                              .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
-                              .fetchOne();
+      Record record = dsl.selectFrom(TestEntity_Table.test_entity)
+                         .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
+                         .fetchOne();
 
       // Then
       assertThat(applied).isTrue();
@@ -633,18 +636,18 @@ class DefaultDslQueryITest extends AbstractIntegrationITest {
     void delete_should_delete_if_condition_true() {
 
       // When
-      boolean applied = dslQuery.delete()
-                                .from(TestEntity_Table.test_entity)
-                                .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
-                                .and(TestEntity_Table.date.eq(TestEntity_INST1.date))
-                                .and(TestEntity_Table.udt.eq(TestEntity_INST1.udt1))
-                                .and(TestEntity_Table.list.eq(TestEntity_INST1.list))
-                                .if_(TestEntity_Table.flag.eq(TestEntity_INST1.flag))
-                                .execute();
+      boolean applied = dsl.delete()
+                           .from(TestEntity_Table.test_entity)
+                           .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
+                           .and(TestEntity_Table.date.eq(TestEntity_INST1.date))
+                           .and(TestEntity_Table.udt.eq(TestEntity_INST1.udt1))
+                           .and(TestEntity_Table.list.eq(TestEntity_INST1.list))
+                           .if_(TestEntity_Table.flag.eq(TestEntity_INST1.flag))
+                           .execute();
 
-      Record record = dslQuery.selectFrom(TestEntity_Table.test_entity)
-                              .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
-                              .fetchOne();
+      Record record = dsl.selectFrom(TestEntity_Table.test_entity)
+                         .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
+                         .fetchOne();
 
       // Then
       assertThat(applied).isTrue();
@@ -655,18 +658,18 @@ class DefaultDslQueryITest extends AbstractIntegrationITest {
     void delete_should_not_delete_if_condition_false() {
 
       // When
-      boolean applied = dslQuery.delete()
-                                .from(TestEntity_Table.test_entity)
-                                .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
-                                .and(TestEntity_Table.date.eq(TestEntity_INST1.date))
-                                .and(TestEntity_Table.udt.eq(TestEntity_INST1.udt1))
-                                .and(TestEntity_Table.list.eq(TestEntity_INST1.list))
-                                .if_(TestEntity_Table.flag.eq(!TestEntity_INST1.flag))
-                                .execute();
+      boolean applied = dsl.delete()
+                           .from(TestEntity_Table.test_entity)
+                           .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
+                           .and(TestEntity_Table.date.eq(TestEntity_INST1.date))
+                           .and(TestEntity_Table.udt.eq(TestEntity_INST1.udt1))
+                           .and(TestEntity_Table.list.eq(TestEntity_INST1.list))
+                           .if_(TestEntity_Table.flag.eq(!TestEntity_INST1.flag))
+                           .execute();
 
-      Record record = dslQuery.selectFrom(TestEntity_Table.test_entity)
-                              .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
-                              .fetchOne();
+      Record record = dsl.selectFrom(TestEntity_Table.test_entity)
+                         .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
+                         .fetchOne();
 
       // Then
       assertThat(applied).isFalse();
@@ -677,20 +680,20 @@ class DefaultDslQueryITest extends AbstractIntegrationITest {
     void delete_columns() {
 
       // When
-      boolean applied = dslQuery.delete(TestEntity_Table.se, TestEntity_Table.map, TestEntity_Table.nestedList, TestEntity_Table.nestedSet, TestEntity_Table.nestedMap,
-                                        TestEntity_Table.enumValue, TestEntity_Table.enumList, TestEntity_Table.enumMap, TestEntity_Table.enumNestedList,
-                                        TestEntity_Table.extraUdt, TestEntity_Table.udtList, TestEntity_Table.udtSet, TestEntity_Table.udtMap, TestEntity_Table.udtNestedList,
-                                        TestEntity_Table.flag)
-                                .from(TestEntity_Table.test_entity)
-                                .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
-                                .and(TestEntity_Table.date.eq(TestEntity_INST1.date))
-                                .and(TestEntity_Table.udt.eq(TestEntity_INST1.udt1))
-                                .and(TestEntity_Table.list.eq(TestEntity_INST1.list))
-                                .execute();
+      boolean applied = dsl.delete(TestEntity_Table.se, TestEntity_Table.map, TestEntity_Table.nestedList, TestEntity_Table.nestedSet, TestEntity_Table.nestedMap,
+                                   TestEntity_Table.enumValue, TestEntity_Table.enumList, TestEntity_Table.enumMap, TestEntity_Table.enumNestedList,
+                                   TestEntity_Table.extraUdt, TestEntity_Table.udtList, TestEntity_Table.udtSet, TestEntity_Table.udtMap, TestEntity_Table.udtNestedList,
+                                   TestEntity_Table.flag)
+                           .from(TestEntity_Table.test_entity)
+                           .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
+                           .and(TestEntity_Table.date.eq(TestEntity_INST1.date))
+                           .and(TestEntity_Table.udt.eq(TestEntity_INST1.udt1))
+                           .and(TestEntity_Table.list.eq(TestEntity_INST1.list))
+                           .execute();
 
-      Record record = dslQuery.selectFrom(TestEntity_Table.test_entity)
-                              .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
-                              .fetchOne();
+      Record record = dsl.selectFrom(TestEntity_Table.test_entity)
+                         .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
+                         .fetchOne();
 
       // Then
       assertThat(applied).isTrue();
@@ -716,20 +719,20 @@ class DefaultDslQueryITest extends AbstractIntegrationITest {
     void delete_nested_field() {
 
       // When
-      boolean applied = dslQuery.delete(TestEntity_Table.map.entry("key1"), TestEntity_Table.nestedMap.entry("key1"),
-                                        TestEntity_Table.enumList.entry(0), TestEntity_Table.enumMap.entry(1),
-                                        TestEntity_Table.enumNestedList.entry(0), TestEntity_Table.extraUdt.entry(TestExtraUdt_Udt.intValue),
-                                        TestEntity_Table.udtList.entry(1), TestEntity_Table.udtMap.entry(1), TestEntity_Table.udtNestedList.entry(0))
-                                .from(TestEntity_Table.test_entity)
-                                .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
-                                .and(TestEntity_Table.date.eq(TestEntity_INST1.date))
-                                .and(TestEntity_Table.udt.eq(TestEntity_INST1.udt1))
-                                .and(TestEntity_Table.list.eq(TestEntity_INST1.list))
-                                .execute();
+      boolean applied = dsl.delete(TestEntity_Table.map.entry("key1"), TestEntity_Table.nestedMap.entry("key1"),
+                                   TestEntity_Table.enumList.entry(0), TestEntity_Table.enumMap.entry(1),
+                                   TestEntity_Table.enumNestedList.entry(0), TestEntity_Table.extraUdt.entry(TestExtraUdt_Udt.intValue),
+                                   TestEntity_Table.udtList.entry(1), TestEntity_Table.udtMap.entry(1), TestEntity_Table.udtNestedList.entry(0))
+                           .from(TestEntity_Table.test_entity)
+                           .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
+                           .and(TestEntity_Table.date.eq(TestEntity_INST1.date))
+                           .and(TestEntity_Table.udt.eq(TestEntity_INST1.udt1))
+                           .and(TestEntity_Table.list.eq(TestEntity_INST1.list))
+                           .execute();
 
-      Record record = dslQuery.selectFrom(TestEntity_Table.test_entity)
-                              .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
-                              .fetchOne();
+      Record record = dsl.selectFrom(TestEntity_Table.test_entity)
+                         .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
+                         .fetchOne();
 
       // Then
       assertThat(applied).isTrue();
@@ -771,22 +774,22 @@ class DefaultDslQueryITest extends AbstractIntegrationITest {
 
       // When
       long micros = Instant.now().plus(1, ChronoUnit.DAYS).toEpochMilli() * 1000;
-      boolean applied = dslQuery.delete(TestEntity_Table.flag)
-                                .from(TestEntity_Table.test_entity)
-                                .usingTimestamp(micros)
-                                .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
-                                .and(TestEntity_Table.date.eq(TestEntity_INST1.date))
-                                .and(TestEntity_Table.udt.eq(TestEntity_INST1.udt1))
-                                .and(TestEntity_Table.list.eq(TestEntity_INST1.list))
-                                .execute();
+      boolean applied = dsl.delete(TestEntity_Table.flag)
+                           .from(TestEntity_Table.test_entity)
+                           .usingTimestamp(micros)
+                           .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
+                           .and(TestEntity_Table.date.eq(TestEntity_INST1.date))
+                           .and(TestEntity_Table.udt.eq(TestEntity_INST1.udt1))
+                           .and(TestEntity_Table.list.eq(TestEntity_INST1.list))
+                           .execute();
 
-      Record record = dslQuery.select(TestEntity_Table.flag)
-                              .from(TestEntity_Table.test_entity)
-                              .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
-                              .and(TestEntity_Table.date.eq(TestEntity_INST1.date))
-                              .and(TestEntity_Table.udt.eq(TestEntity_INST1.udt1))
-                              .and(TestEntity_Table.list.eq(TestEntity_INST1.list))
-                              .fetchOne();
+      Record record = dsl.select(TestEntity_Table.flag)
+                         .from(TestEntity_Table.test_entity)
+                         .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
+                         .and(TestEntity_Table.date.eq(TestEntity_INST1.date))
+                         .and(TestEntity_Table.udt.eq(TestEntity_INST1.udt1))
+                         .and(TestEntity_Table.list.eq(TestEntity_INST1.list))
+                         .fetchOne();
 
       // Then
       assertThat(applied).isTrue();

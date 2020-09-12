@@ -25,6 +25,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import ma.markware.charybdis.AbstractIntegrationITest;
+import ma.markware.charybdis.CqlTemplate;
 import ma.markware.charybdis.model.field.SelectableField;
 import ma.markware.charybdis.test.instances.TestEntity_INST1;
 import ma.markware.charybdis.test.metadata.TestEntity_Table;
@@ -38,11 +39,12 @@ import org.junit.jupiter.api.TestInstance.Lifecycle;
 @TestInstance(Lifecycle.PER_CLASS)
 class DslFunctionsITest extends AbstractIntegrationITest {
 
-  private DslQuery dslQuery;
+  private DslQueryBuilder dsl;
 
   @BeforeAll
   void init(CqlSession session) {
-    dslQuery = new DefaultDslQuery(session);
+    CqlTemplate cqlTemplate = new CqlTemplate(session);
+    dsl = cqlTemplate.dsl();
   }
 
   @BeforeEach
@@ -64,7 +66,7 @@ class DslFunctionsITest extends AbstractIntegrationITest {
 
     // When
     SelectableField<Long> writetimeField = DslFunctions.writetime(TestEntity_Table.flag);
-    Collection<Record> records = dslQuery.select(writetimeField)
+    Collection<Record> records = dsl.select(writetimeField)
                                          .from(TestEntity_Table.test_entity)
                                          .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
                                          .and(TestEntity_Table.date.eq(TestEntity_INST1.date))
@@ -92,7 +94,7 @@ class DslFunctionsITest extends AbstractIntegrationITest {
 
     // When
     SelectableField<Integer> ttlField = DslFunctions.ttl(TestEntity_Table.flag);
-    Collection<Record> records = dslQuery.select(ttlField)
+    Collection<Record> records = dsl.select(ttlField)
                                          .from(TestEntity_Table.test_entity)
                                          .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
                                          .and(TestEntity_Table.date.eq(TestEntity_INST1.date))

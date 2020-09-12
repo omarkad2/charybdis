@@ -18,8 +18,6 @@
  */
 package ma.markware.charybdis.query;
 
-import com.datastax.oss.driver.api.core.CqlSession;
-import com.datastax.oss.driver.api.core.cql.ResultSet;
 import com.datastax.oss.driver.api.core.cql.SimpleStatement;
 import com.datastax.oss.driver.api.querybuilder.QueryBuilder;
 import com.datastax.oss.driver.api.querybuilder.update.Update;
@@ -30,6 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Stream;
+import javax.annotation.Nonnull;
 import ma.markware.charybdis.ExecutionContext;
 import ma.markware.charybdis.model.assignment.AssignmentListValue;
 import ma.markware.charybdis.model.assignment.AssignmentMapValue;
@@ -62,8 +61,12 @@ public class UpdateQuery extends AbstractQuery {
   private Integer ttl;
   private Long timestamp;
 
-  public UpdateQuery(ExecutionContext executionContext) {
+  public UpdateQuery(@Nonnull ExecutionContext executionContext) {
     super(executionContext);
+  }
+
+  public UpdateQuery() {
+    super(new ExecutionContext());
   }
 
   public String getKeyspace() {
@@ -157,7 +160,7 @@ public class UpdateQuery extends AbstractQuery {
    * {@inheritDoc}
    */
   @Override
-  public ResultSet execute(final CqlSession session) {
+  public StatementTuple buildStatement() {
     UpdateStart updateStart = QueryBuilder.update(keyspace, table);
 
     if (ttl != null) {
@@ -176,7 +179,7 @@ public class UpdateQuery extends AbstractQuery {
     update = update.if_(QueryHelper.extractConditions(conditionClauses));
 
     SimpleStatement simpleStatement = update.build();
-    return executeStatement(session, simpleStatement, Stream.of(QueryHelper.extractAssignmentBindValues(assignmentClauses),
+    return new StatementTuple(simpleStatement, Stream.of(QueryHelper.extractAssignmentBindValues(assignmentClauses),
                                                                 QueryHelper.extractWhereBindValues(whereClauses),
                                                                 QueryHelper.extractConditionBindValues(conditionClauses))
                                                             .flatMap(Function.identity())
