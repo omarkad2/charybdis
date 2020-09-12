@@ -94,6 +94,9 @@ public class DatabaseSetupExtension implements BeforeAllCallback, AfterAllCallba
     System.clearProperty("datastax-java-driver.basic.load-balancing-policy.local-datacenter");
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public void handleTestExecutionException(final ExtensionContext context, final Throwable throwable) {
     if (!(throwable instanceof AssertionError)) {
