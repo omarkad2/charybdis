@@ -28,7 +28,7 @@ import java.time.Instant;
  *
  * @author Oussama Markad
  */
-public interface InsertTimestampExpression<RETURN_TYPE> extends InsertExecuteExpression<RETURN_TYPE> {
+public interface InsertTimestampExpression<RETURN_TYPE> extends InsertFinalExpression<RETURN_TYPE> {
 
   /**
    * Set write time in insert DSL query.
@@ -36,7 +36,7 @@ public interface InsertTimestampExpression<RETURN_TYPE> extends InsertExecuteExp
    * @param timestamp writetime as {@link Instant}.
    * @return updated insert DSL query expression.
    */
-  InsertExecuteExpression<RETURN_TYPE> usingTimestamp(Instant timestamp);
+  InsertFinalExpression<RETURN_TYPE> usingTimestamp(Instant timestamp);
 
   /**
    * Set write time in insert DSL query.
@@ -44,5 +44,5 @@ public interface InsertTimestampExpression<RETURN_TYPE> extends InsertExecuteExp
    * @param timestamp writetime as millis.
    * @return updated insert DSL query expression.
    */
-  InsertExecuteExpression<RETURN_TYPE> usingTimestamp(long timestamp);
+  InsertFinalExpression<RETURN_TYPE> usingTimestamp(long timestamp);
 }

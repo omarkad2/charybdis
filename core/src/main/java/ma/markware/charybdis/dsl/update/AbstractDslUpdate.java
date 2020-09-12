@@ -42,7 +42,7 @@ import ma.markware.charybdis.query.UpdateQuery;
  */
 abstract class AbstractDslUpdate<T> implements UpdateInitExpression<T>, UpdateTtlExpression<T>, UpdateTimestampExpression<T>, UpdateAssignmentExpression<T>,
     UpdateExtraAssignmentExpression<T>, UpdateWhereExpression<T>, UpdateExtraWhereExpression<T>, UpdateIfExpression<T>,
-    UpdateExtraIfExpression<T>, UpdateExecuteExpression<T> {
+    UpdateExtraIfExpression<T>, UpdateFinalExpression<T> {
 
   final UpdateQuery updateQuery;
 

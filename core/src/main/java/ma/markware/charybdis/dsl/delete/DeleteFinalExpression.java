@@ -24,14 +24,16 @@ package ma.markware.charybdis.dsl.delete;
  * <p>
  * It is not recommended to reference any object with type {@link DeleteFinalExpression}.
  *
+ * @param <RETURN_TYPE> query execution return type.
+ *
  * @author Oussama Markad
  */
 public interface DeleteFinalExpression<RETURN_TYPE> {
 
   /**
-   * Execute Delete DSL query.
+   * Added to a batch query if enclosed in one, otherwise execute update DSL query.
    *
-   * @return {@code true} if query is executed, {@code false} otherwise.
+   * @return {@code true} or {@code false} to inform if changes are applied in case query is executed, otherwise void (if we are in a batch context).
    */
   RETURN_TYPE execute();
 }

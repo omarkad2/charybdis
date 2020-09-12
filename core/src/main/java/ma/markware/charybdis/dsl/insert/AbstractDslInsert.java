@@ -31,7 +31,7 @@ import ma.markware.charybdis.query.InsertQuery;
  * @author Oussama Markad
  */
 abstract class AbstractDslInsert<T> implements InsertInitExpression<T>, InsertInitWithColumnsExpression<T>, InsertValuesExpression<T>, InsertSetExpression<T>,
-    InsertOnExistExpression<T>, InsertTtlExpression<T>, InsertTimestampExpression<T>, InsertExecuteExpression<T> {
+    InsertOnExistExpression<T>, InsertTtlExpression<T>, InsertTimestampExpression<T>, InsertFinalExpression<T> {
 
   final InsertQuery insertQuery;
 
@@ -90,7 +90,7 @@ abstract class AbstractDslInsert<T> implements InsertInitExpression<T>, InsertIn
    * {@inheritDoc}
    */
   @Override
-  public InsertExecuteExpression<T> usingTtl(final int ttl) {
+  public InsertFinalExpression<T> usingTtl(final int ttl) {
     insertQuery.setTtl(ttl);
     return this;
   }
@@ -99,7 +99,7 @@ abstract class AbstractDslInsert<T> implements InsertInitExpression<T>, InsertIn
    * {@inheritDoc}
    */
   @Override
-  public InsertExecuteExpression<T> usingTimestamp(final Instant timestamp) {
+  public InsertFinalExpression<T> usingTimestamp(final Instant timestamp) {
     insertQuery.setTimestamp(timestamp);
     return this;
   }
@@ -108,7 +108,7 @@ abstract class AbstractDslInsert<T> implements InsertInitExpression<T>, InsertIn
    * {@inheritDoc}
    */
   @Override
-  public InsertExecuteExpression<T> usingTimestamp(final long timestamp) {
+  public InsertFinalExpression<T> usingTimestamp(final long timestamp) {
     insertQuery.setTimestamp(timestamp);
     return this;
   }

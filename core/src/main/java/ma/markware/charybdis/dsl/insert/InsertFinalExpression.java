@@ -16,22 +16,24 @@
  * limitations under the License.
  *
  */
-package ma.markware.charybdis.dsl.update;
+package ma.markware.charybdis.dsl.insert;
 
 /**
- * Update DSL query expression.
+ * Insert DSL query expression.
  *
  * <p>
- * It is not recommended to reference any object with type {@link UpdateExecuteExpression}.
+ * It is not recommended to reference any object with type {@link InsertFinalExpression}.
+ *
+ * @param <RETURN_TYPE> query execution return type.
  *
  * @author Oussama Markad
  */
-public interface UpdateExecuteExpression<RETURN_TYPE> {
+public interface InsertFinalExpression<RETURN_TYPE> {
 
   /**
-   * Execute Update DSL query.
+   * Added to a batch query if enclosed in one, otherwise execute insert DSL query.
    *
-   * @return {@code true} if query is executed, {@code false} otherwise.
+   * @return {@code true} or {@code false} to inform if changes are applied in case query is executed, otherwise void (if we are in a batch context).
    */
   RETURN_TYPE execute();
 }
