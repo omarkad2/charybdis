@@ -87,13 +87,6 @@ public class DatabaseSetupExtension implements BeforeAllCallback, AfterAllCallba
     stopDb();
   }
 
-  private void stopDb() {
-    dockerizedCassandra.close();
-    System.clearProperty("datastax-java-driver.basic.request.timeout");
-    System.clearProperty("datastax-java-driver.basic.contact-points.0");
-    System.clearProperty("datastax-java-driver.basic.load-balancing-policy.local-datacenter");
-  }
-
   /**
    * {@inheritDoc}
    */
@@ -131,5 +124,12 @@ public class DatabaseSetupExtension implements BeforeAllCallback, AfterAllCallba
 
   private boolean isNestedClass(Class<?> currentClass) {
     return !ModifierSupport.isStatic(currentClass) && currentClass.isMemberClass();
+  }
+
+  private void stopDb() {
+    dockerizedCassandra.close();
+    System.clearProperty("datastax-java-driver.basic.request.timeout");
+    System.clearProperty("datastax-java-driver.basic.contact-points.0");
+    System.clearProperty("datastax-java-driver.basic.load-balancing-policy.local-datacenter");
   }
 }
