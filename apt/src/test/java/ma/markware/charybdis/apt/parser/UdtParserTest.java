@@ -168,7 +168,8 @@ class UdtParserTest {
     assertThatExceptionOfType(CharybdisParsingException.class)
         .isThrownBy(() -> configuration.getUdtParser()
                                     .parse(elements.getTypeElement(TestUdtWithMissingGetter.class.getCanonicalName())))
-        .withMessage("Getter 'getValue' is mandatory for field 'value' in class '" + TestUdtWithMissingGetter.class.getSimpleName() + "'");
+        .withMessage("A public getter [name: 'getValue', parameter type: <empty>, return type: 'java.lang.String'] is mandatory for field 'value' in class '"
+                         + TestUdtWithMissingGetter.class.getSimpleName() + "'");
   }
 
   @Test
@@ -177,7 +178,8 @@ class UdtParserTest {
     assertThatExceptionOfType(CharybdisParsingException.class)
         .isThrownBy(() -> configuration.getUdtParser()
                                     .parse(elements.getTypeElement(TestUdtWithMissingSetter.class.getCanonicalName())))
-        .withMessage("Setter 'setValue' is mandatory for field 'value' in class '" + TestUdtWithMissingSetter.class.getSimpleName() + "'");
+        .withMessage("A public setter [name: 'setValue', parameter type: 'java.lang.String', return type: void] is mandatory for field 'value' in class '"
+                         + TestUdtWithMissingSetter.class.getSimpleName() + "'");
   }
 
   @Test

@@ -133,10 +133,51 @@ public class TestEntityByDate_Table implements TableMetadata<TestEntityByDate> {
       if (row == null || row.isNull("flag")) return null;
       return row.get("flag", java.lang.Boolean.class);
     }
+  };
+
+  public static final ColumnMetadata<Instant, Instant> creationDate = new ColumnMetadata<Instant, Instant>() {
+    @Override
+    public String getName() {
+      return "creation_date";
+    }
 
     @Override
-    public String getIndexName() {
-      return "test_entity_by_date_flag_idx";
+    public Class getFieldClass() {
+      return java.time.Instant.class;
+    }
+
+    @Override
+    public Instant serialize(Instant field) {
+      return field;
+    }
+
+    @Override
+    public Instant deserialize(Row row) {
+      if (row == null || row.isNull("creation_date")) return null;
+      return row.get("creation_date", java.time.Instant.class);
+    }
+  };
+
+  public static final ColumnMetadata<Instant, Instant> lastUpdatedDate = new ColumnMetadata<Instant, Instant>() {
+    @Override
+    public String getName() {
+      return "last_updated_date";
+    }
+
+    @Override
+    public Class getFieldClass() {
+      return java.time.Instant.class;
+    }
+
+    @Override
+    public Instant serialize(Instant field) {
+      return field;
+    }
+
+    @Override
+    public Instant deserialize(Row row) {
+      if (row == null || row.isNull("last_updated_date")) return null;
+      return row.get("last_updated_date", java.time.Instant.class);
     }
   };
 
@@ -181,6 +222,8 @@ public class TestEntityByDate_Table implements TableMetadata<TestEntityByDate> {
     results.put("udt", udt);
     results.put("list", list);
     results.put("flag", flag);
+    results.put("creation_date", creationDate);
+    results.put("last_updated_date", lastUpdatedDate);
     return results;
   }
 
@@ -236,12 +279,14 @@ public class TestEntityByDate_Table implements TableMetadata<TestEntityByDate> {
   @Override
   public void setCreationDate(TestEntityByDate entity, Instant creationDate) {
     if (entity != null) {
+      entity.setCreationDate(creationDate);
     }
   }
 
   @Override
   public void setLastUpdatedDate(TestEntityByDate entity, Instant lastUpdatedDate) {
     if (entity != null) {
+      entity.setLastUpdatedDate(lastUpdatedDate);
     }
   }
 
@@ -253,6 +298,8 @@ public class TestEntityByDate_Table implements TableMetadata<TestEntityByDate> {
     columnValueMap.put("udt", udt.serialize(entity.getUdt()));
     columnValueMap.put("list", list.serialize(entity.getList()));
     columnValueMap.put("flag", flag.serialize(entity.isFlag()));
+    columnValueMap.put("creation_date", creationDate.serialize(entity.getCreationDate()));
+    columnValueMap.put("last_updated_date", lastUpdatedDate.serialize(entity.getLastUpdatedDate()));
     return columnValueMap;
   }
 
@@ -264,6 +311,8 @@ public class TestEntityByDate_Table implements TableMetadata<TestEntityByDate> {
     entity.setUdt(udt.deserialize(row));
     entity.setList(list.deserialize(row));
     entity.setFlag(flag.deserialize(row));
+    entity.setCreationDate(creationDate.deserialize(row));
+    entity.setLastUpdatedDate(lastUpdatedDate.deserialize(row));
     return entity;
   }
 }

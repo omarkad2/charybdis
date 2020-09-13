@@ -48,7 +48,7 @@ import java.lang.annotation.Target;
  *
  * @author Oussama Markad
  */
-@Target(ElementType.FIELD)
+@Target({ElementType.FIELD, ElementType.METHOD})
 @Retention(RetentionPolicy.CLASS)
 public @interface Column {
 

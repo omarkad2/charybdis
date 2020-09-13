@@ -74,9 +74,10 @@ public class TableParser extends AbstractEntityParser<TableMetaType> {
     tableMetaType.setDefaultWriteConsistency(table.writeConsistency());
     tableMetaType.setDefaultSerialConsistency(table.serialConsistency());
 
+    // Extract fields and super fields annotated with @Column
     Stream<? extends Element> fields = ParserUtils.extractFields(annotatedClass, types);
 
-    final List<ColumnFieldMetaType> columns = fields.map(fieldElement -> columnFieldParser.parse(fieldElement, tableMetaType.getTableName()))
+    final List<ColumnFieldMetaType> columns = fields.map(fieldElement -> columnFieldParser.parse(annotatedClass, fieldElement, tableMetaType.getTableName()))
                                                     .filter(Objects::nonNull)
                                                     .collect(Collectors.toList());
 

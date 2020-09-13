@@ -22,6 +22,7 @@ import javax.lang.model.element.Element;
 import javax.lang.model.util.Types;
 import ma.markware.charybdis.apt.metatype.AbstractFieldMetaType;
 import ma.markware.charybdis.apt.metatype.UdtFieldMetaType;
+import ma.markware.charybdis.apt.utils.FieldUtils;
 import ma.markware.charybdis.model.annotation.UdtField;
 
 /**
@@ -40,20 +41,20 @@ public class UdtFieldParser extends AbstractFieldParser<UdtFieldMetaType> {
    * {@inheritDoc}
    */
   @Override
-  public UdtFieldMetaType parse(final Element annotatedField, final String udtName) {
-    final UdtField udtField = annotatedField.getAnnotation(UdtField.class);
-    if (udtField != null) {
-      AbstractFieldMetaType abstractFieldMetaType = parseGenericField(annotatedField);
-      UdtFieldMetaType udtFieldMetaType = new UdtFieldMetaType(abstractFieldMetaType);
-
-      String udtFieldName = udtField.name();
-      if (org.apache.commons.lang.StringUtils.isBlank(udtFieldName)) {
-        udtFieldName = udtFieldMetaType.getDeserializationName();
-      }
-      udtFieldMetaType.setSerializationName(udtFieldName.toLowerCase());
-
-      return udtFieldMetaType;
+  public UdtFieldMetaType parse(final Element classElement, final Element fieldElement, final String udtName) {
+    final UdtField udtField = FieldUtils.getAnnotation(classElement, fieldElement, UdtField.class, types);
+    if (udtField == null) {
+      return null;
     }
-    return null;
+    AbstractFieldMetaType abstractFieldMetaType = parseGenericField(fieldElement);
+    UdtFieldMetaType udtFieldMetaType = new UdtFieldMetaType(abstractFieldMetaType);
+
+    String udtFieldName = udtField.name();
+    if (org.apache.commons.lang.StringUtils.isBlank(udtFieldName)) {
+      udtFieldName = udtFieldMetaType.getDeserializationName();
+    }
+    udtFieldMetaType.setSerializationName(udtFieldName.toLowerCase());
+
+    return udtFieldMetaType;
   }
 }

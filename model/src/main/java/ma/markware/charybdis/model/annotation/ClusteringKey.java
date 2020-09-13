@@ -49,7 +49,7 @@ import ma.markware.charybdis.model.option.ClusteringOrder;
  *
  * @author Oussama Markad
  */
-@Target(ElementType.FIELD)
+@Target({ElementType.FIELD, ElementType.METHOD})
 @Retention(RetentionPolicy.CLASS)
 public @interface ClusteringKey {
 

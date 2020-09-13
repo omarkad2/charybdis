@@ -67,112 +67,12 @@ public class TestEntity_Table implements TableMetadata<TestEntity> {
     @Override
     public UUID deserialize(Row row) {
       if (row == null || row.isNull("id")) return null;
-      return row.get("id", UUID.class);
+      return row.get("id", java.util.UUID.class);
     }
 
     @Override
     public int getPartitionKeyIndex() {
       return 0;
-    }
-  };
-
-  public static final ClusteringKeyColumnMetadata<Instant, Instant> date = new ClusteringKeyColumnMetadata<Instant, Instant>() {
-    @Override
-    public String getName() {
-      return "date";
-    }
-
-    @Override
-    public Class getFieldClass() {
-      return java.time.Instant.class;
-    }
-
-    @Override
-    public Instant serialize(Instant field) {
-      return field;
-    }
-
-    @Override
-    public Instant deserialize(Row row) {
-      if (row == null || row.isNull("date")) return null;
-      return row.get("date", Instant.class);
-    }
-
-    @Override
-    public int getClusteringKeyIndex() {
-      return 0;
-    }
-
-    @Override
-    public ClusteringOrder getClusteringOrder() {
-      return ClusteringOrder.DESC;
-    }
-  };
-
-  public static final ClusteringKeyColumnMetadata<TestUdt, UdtValue> udt = new ClusteringKeyColumnMetadata<TestUdt, UdtValue>() {
-    @Override
-    public String getName() {
-      return "udt";
-    }
-
-    @Override
-    public Class getFieldClass() {
-      return ma.markware.charybdis.test.entities.TestUdt.class;
-    }
-
-    @Override
-    public UdtValue serialize(TestUdt field) {
-      if (field == null) return null;
-      return TestUdt_Udt.test_udt.serialize(field);
-    }
-
-    @Override
-    public TestUdt deserialize(Row row) {
-      if (row == null || row.isNull("udt")) return null;
-      return TestUdt_Udt.test_udt.deserialize(row.getUdtValue("udt"));
-    }
-
-    @Override
-    public int getClusteringKeyIndex() {
-      return 1;
-    }
-
-    @Override
-    public ClusteringOrder getClusteringOrder() {
-      return ClusteringOrder.ASC;
-    }
-  };
-
-  public static final ClusteringKeyColumnMetadata<List<String>, List<String>> list = new ClusteringKeyColumnMetadata<List<String>, List<String>>() {
-    @Override
-    public String getName() {
-      return "list";
-    }
-
-    @Override
-    public Class getFieldClass() {
-      return java.util.List.class;
-    }
-
-    @Override
-    public List<String> serialize(List<String> field) {
-      return field;
-    }
-
-    @Override
-    public List<String> deserialize(Row row) {
-      if (row == null || row.isNull("list")) return null;
-      return row.getList("list", String.class);
-    }
-
-    @Override
-    public int getClusteringKeyIndex() {
-      return 2;
-    }
-
-    @Override
-    public ClusteringOrder getClusteringOrder() {
-      return ClusteringOrder.ASC;
     }
   };
 
@@ -195,7 +95,7 @@ public class TestEntity_Table implements TableMetadata<TestEntity> {
     @Override
     public Set<Integer> deserialize(Row row) {
       if (row == null || row.isNull("se")) return null;
-      return row.getSet("se", Integer.class);
+      return row.getSet("se", java.lang.Integer.class);
     }
   };
 
@@ -218,7 +118,7 @@ public class TestEntity_Table implements TableMetadata<TestEntity> {
     @Override
     public Map<String, String> deserialize(Row row) {
       if (row == null || row.isNull("map")) return null;
-      return row.getMap("map", String.class, String.class);
+      return row.getMap("map", java.lang.String.class, java.lang.String.class);
     }
 
     @Override
@@ -331,7 +231,7 @@ public class TestEntity_Table implements TableMetadata<TestEntity> {
     @Override
     public TestEnum deserialize(Row row) {
       if (row == null || row.isNull("enumvalue")) return null;
-      return row.getString("enumvalue") != null ? TestEnum.valueOf(row.getString("enumvalue")) : null;
+      return row.getString("enumvalue") != null ? ma.markware.charybdis.test.entities.TestEnum.valueOf(row.getString("enumvalue")) : null;
     }
   };
 
@@ -739,6 +639,106 @@ public class TestEntity_Table implements TableMetadata<TestEntity> {
     }
   };
 
+  public static final ClusteringKeyColumnMetadata<Instant, Instant> date = new ClusteringKeyColumnMetadata<Instant, Instant>() {
+    @Override
+    public String getName() {
+      return "date";
+    }
+
+    @Override
+    public Class getFieldClass() {
+      return java.time.Instant.class;
+    }
+
+    @Override
+    public Instant serialize(Instant field) {
+      return field;
+    }
+
+    @Override
+    public Instant deserialize(Row row) {
+      if (row == null || row.isNull("date")) return null;
+      return row.get("date", java.time.Instant.class);
+    }
+
+    @Override
+    public int getClusteringKeyIndex() {
+      return 0;
+    }
+
+    @Override
+    public ClusteringOrder getClusteringOrder() {
+      return ClusteringOrder.DESC;
+    }
+  };
+
+  public static final ClusteringKeyColumnMetadata<TestUdt, UdtValue> udt = new ClusteringKeyColumnMetadata<TestUdt, UdtValue>() {
+    @Override
+    public String getName() {
+      return "udt";
+    }
+
+    @Override
+    public Class getFieldClass() {
+      return ma.markware.charybdis.test.entities.TestUdt.class;
+    }
+
+    @Override
+    public UdtValue serialize(TestUdt field) {
+      if (field == null) return null;
+      return TestUdt_Udt.test_udt.serialize(field);
+    }
+
+    @Override
+    public TestUdt deserialize(Row row) {
+      if (row == null || row.isNull("udt")) return null;
+      return TestUdt_Udt.test_udt.deserialize(row.getUdtValue("udt"));
+    }
+
+    @Override
+    public int getClusteringKeyIndex() {
+      return 1;
+    }
+
+    @Override
+    public ClusteringOrder getClusteringOrder() {
+      return ClusteringOrder.ASC;
+    }
+  };
+
+  public static final ClusteringKeyColumnMetadata<List<String>, List<String>> list = new ClusteringKeyColumnMetadata<List<String>, List<String>>() {
+    @Override
+    public String getName() {
+      return "list";
+    }
+
+    @Override
+    public Class getFieldClass() {
+      return java.util.List.class;
+    }
+
+    @Override
+    public List<String> serialize(List<String> field) {
+      return field;
+    }
+
+    @Override
+    public List<String> deserialize(Row row) {
+      if (row == null || row.isNull("list")) return null;
+      return row.getList("list", java.lang.String.class);
+    }
+
+    @Override
+    public int getClusteringKeyIndex() {
+      return 2;
+    }
+
+    @Override
+    public ClusteringOrder getClusteringOrder() {
+      return ClusteringOrder.ASC;
+    }
+  };
+
   public static final ColumnMetadata<Boolean, Boolean> flag = new ColumnMetadata<Boolean, Boolean>() {
     @Override
     public String getName() {
@@ -758,7 +758,7 @@ public class TestEntity_Table implements TableMetadata<TestEntity> {
     @Override
     public Boolean deserialize(Row row) {
       if (row == null || row.isNull("flag")) return null;
-      return row.get("flag", Boolean.class);
+      return row.get("flag", java.lang.Boolean.class);
     }
 
     @Override
@@ -786,7 +786,7 @@ public class TestEntity_Table implements TableMetadata<TestEntity> {
     @Override
     public Instant deserialize(Row row) {
       if (row == null || row.isNull("creation_date")) return null;
-      return row.get("creation_date", Instant.class);
+      return row.get("creation_date", java.time.Instant.class);
     }
   };
 
@@ -809,7 +809,7 @@ public class TestEntity_Table implements TableMetadata<TestEntity> {
     @Override
     public Instant deserialize(Row row) {
       if (row == null || row.isNull("last_updated_date")) return null;
-      return row.get("last_updated_date", Instant.class);
+      return row.get("last_updated_date", java.time.Instant.class);
     }
   };
 
@@ -851,9 +851,6 @@ public class TestEntity_Table implements TableMetadata<TestEntity> {
   public Map<String, ColumnMetadata> getColumnsMetadata() {
     Map<String, ColumnMetadata> results = new HashMap<>();
     results.put("id", id);
-    results.put("date", date);
-    results.put("udt", udt);
-    results.put("list", list);
     results.put("se", se);
     results.put("map", map);
     results.put("nestedlist", nestedList);
@@ -868,6 +865,9 @@ public class TestEntity_Table implements TableMetadata<TestEntity> {
     results.put("udtset", udtSet);
     results.put("udtmap", udtMap);
     results.put("udtnestedlist", udtNestedList);
+    results.put("date", date);
+    results.put("udt", udt);
+    results.put("list", list);
     results.put("flag", flag);
     results.put("creation_date", creationDate);
     results.put("last_updated_date", lastUpdatedDate);
@@ -943,9 +943,6 @@ public class TestEntity_Table implements TableMetadata<TestEntity> {
     if (entity == null) return null;
     Map<String, Object> columnValueMap = new HashMap<>();
     columnValueMap.put("id", id.serialize(entity.getId()));
-    columnValueMap.put("date", date.serialize(entity.getDate()));
-    columnValueMap.put("udt", udt.serialize(entity.getUdt()));
-    columnValueMap.put("list", list.serialize(entity.getList()));
     columnValueMap.put("se", se.serialize(entity.getSe()));
     columnValueMap.put("map", map.serialize(entity.getMap()));
     columnValueMap.put("nestedlist", nestedList.serialize(entity.getNestedList()));
@@ -960,6 +957,9 @@ public class TestEntity_Table implements TableMetadata<TestEntity> {
     columnValueMap.put("udtset", udtSet.serialize(entity.getUdtSet()));
     columnValueMap.put("udtmap", udtMap.serialize(entity.getUdtMap()));
     columnValueMap.put("udtnestedlist", udtNestedList.serialize(entity.getUdtNestedList()));
+    columnValueMap.put("date", date.serialize(entity.getDate()));
+    columnValueMap.put("udt", udt.serialize(entity.getUdt()));
+    columnValueMap.put("list", list.serialize(entity.getList()));
     columnValueMap.put("flag", flag.serialize(entity.isFlag()));
     columnValueMap.put("creation_date", creationDate.serialize(entity.getCreationDate()));
     columnValueMap.put("last_updated_date", lastUpdatedDate.serialize(entity.getLastUpdatedDate()));
@@ -971,9 +971,6 @@ public class TestEntity_Table implements TableMetadata<TestEntity> {
     if (row == null) return null;
     TestEntity entity = new TestEntity();
     entity.setId(id.deserialize(row));
-    entity.setDate(date.deserialize(row));
-    entity.setUdt(udt.deserialize(row));
-    entity.setList(list.deserialize(row));
     entity.setSe(se.deserialize(row));
     entity.setMap(map.deserialize(row));
     entity.setNestedList(nestedList.deserialize(row));
@@ -988,6 +985,9 @@ public class TestEntity_Table implements TableMetadata<TestEntity> {
     entity.setUdtSet(udtSet.deserialize(row));
     entity.setUdtMap(udtMap.deserialize(row));
     entity.setUdtNestedList(udtNestedList.deserialize(row));
+    entity.setDate(date.deserialize(row));
+    entity.setUdt(udt.deserialize(row));
+    entity.setList(list.deserialize(row));
     entity.setFlag(flag.deserialize(row));
     entity.setCreationDate(creationDate.deserialize(row));
     entity.setLastUpdatedDate(lastUpdatedDate.deserialize(row));
