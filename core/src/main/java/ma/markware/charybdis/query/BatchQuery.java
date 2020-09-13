@@ -95,7 +95,7 @@ public class BatchQuery {
     try {
       batchStatement = resolveExecutionContext(batchStatement);
       ResultSet resultSet = session.execute(batchStatement);
-      log.info("Batch applied => {}", resultSet.wasApplied());
+      log.debug("Batch applied => {}", resultSet.wasApplied());
     } catch (final Exception e) {
       log.error("Error executing batch query", e);
     }

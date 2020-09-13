@@ -63,7 +63,6 @@ class BatchQueryBuilderITest extends AbstractIntegrationITest {
     cleanDatabase(session);
   }
 
-
   @Nested
   @DisplayName("Batch create operations")
   class BatchCreateITest {

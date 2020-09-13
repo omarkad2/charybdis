@@ -69,8 +69,8 @@ class CrudQueryBuilderITest extends AbstractIntegrationITest {
   }
 
   @Nested
-  @DisplayName("Entity manager create operations")
-  class EntityManagerCreateITest {
+  @DisplayName("Crud query builder create operations")
+  class CrudQueryBuilderCreateITest {
 
     @Test
     void create() {
@@ -110,7 +110,6 @@ class CrudQueryBuilderITest extends AbstractIntegrationITest {
 
     @Test
     void create_should_not_overwrite_when_ifNotExists(CqlSession session) {
-      cleanDatabase(session);
       TestEntity entity1 = new TestEntity(TestEntity_INST1.entity1);
       crud.create(TestEntity_Table.test_entity, entity1);
 
@@ -188,8 +187,8 @@ class CrudQueryBuilderITest extends AbstractIntegrationITest {
   }
 
   @Nested
-  @DisplayName("Entity manager read operations")
-  class EntityManagerReadITest {
+  @DisplayName("Crud query builder read operations")
+  class CrudQueryBuilderReadITest {
 
     @Test
     void findOne(CqlSession session) {
@@ -392,8 +391,8 @@ class CrudQueryBuilderITest extends AbstractIntegrationITest {
   }
 
   @Nested
-  @DisplayName("Entity manager update operations")
-  class EntityManagerUpdateITest {
+  @DisplayName("Crud query builder update operations")
+  class CrudQueryBuilderUpdateITest {
 
     @BeforeEach
     void setup(CqlSession session) {
@@ -443,8 +442,8 @@ class CrudQueryBuilderITest extends AbstractIntegrationITest {
   }
 
   @Nested
-  @DisplayName("Entity manager delete operations")
-  class EntityManagerDeleteITest {
+  @DisplayName("Crud query builder delete operations")
+  class CrudQueryBuilderDeleteITest {
 
     @BeforeEach
     void setup(CqlSession session) {

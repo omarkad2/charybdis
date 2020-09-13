@@ -55,7 +55,7 @@ class PreparedStatementFactory {
     PreparedStatement preparedStatement = sessionPreparedStatementCache.get(cacheKey);
     if (preparedStatement == null) {
       log.debug("New Prepared statement (will be stored in cache)");
-      log.info("Query : {}", query);
+      log.debug("Query : {}", query);
       preparedStatement = session.prepare(query);
 
       sessionPreparedStatementCache.put(cacheKey, preparedStatement);

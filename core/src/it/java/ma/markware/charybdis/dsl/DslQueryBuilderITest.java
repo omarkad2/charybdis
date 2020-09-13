@@ -70,14 +70,14 @@ class DslQueryBuilderITest extends AbstractIntegrationITest {
     dsl = cqlTemplate.dsl();
   }
 
+  @BeforeEach
+  void clean(CqlSession session) {
+    cleanDatabase(session);
+  }
+
   @Nested
   @DisplayName("DSL select queries")
   class DslSelectQueryITest {
-
-    @BeforeEach
-    void setup(CqlSession session) {
-      cleanDatabase(session);
-    }
 
     @Test
     void select(CqlSession session) {
@@ -286,7 +286,6 @@ class DslQueryBuilderITest extends AbstractIntegrationITest {
 
     @Test
     void insertInto(CqlSession session) {
-      cleanDatabase(session);
       // Given
       dsl.insertInto(TestEntity_Table.test_entity, TestEntity_Table.id, TestEntity_Table.date, TestEntity_Table.udt, TestEntity_Table.list, TestEntity_Table.se, TestEntity_Table.map,
                      TestEntity_Table.nestedList, TestEntity_Table.nestedSet, TestEntity_Table.nestedMap, TestEntity_Table.enumValue, TestEntity_Table.enumList, TestEntity_Table.enumMap,
@@ -318,7 +317,6 @@ class DslQueryBuilderITest extends AbstractIntegrationITest {
 
     @Test
     void insertInto_ifNotExists(CqlSession session) {
-      cleanDatabase(session);
       // Given
       dsl.insertInto(TestEntity_Table.test_entity, TestEntity_Table.id, TestEntity_Table.date, TestEntity_Table.udt, TestEntity_Table.list, TestEntity_Table.flag)
          .values(TestEntity_INST1.id, TestEntity_INST1.date, TestEntity_INST1.udt1, TestEntity_INST1.list, false)
@@ -346,7 +344,6 @@ class DslQueryBuilderITest extends AbstractIntegrationITest {
 
     @BeforeEach
     void setup(CqlSession session) {
-      cleanDatabase(session);
       // Insert TestEntity_INST1 to DB
       dsl.insertInto(TestEntity_Table.test_entity, TestEntity_Table.id, TestEntity_Table.date, TestEntity_Table.udt, TestEntity_Table.list, TestEntity_Table.se, TestEntity_Table.map,
                      TestEntity_Table.nestedList, TestEntity_Table.nestedSet, TestEntity_Table.nestedMap, TestEntity_Table.enumValue, TestEntity_Table.enumList, TestEntity_Table.enumMap,
@@ -599,7 +596,6 @@ class DslQueryBuilderITest extends AbstractIntegrationITest {
 
     @BeforeEach
     void setup(CqlSession session) {
-      cleanDatabase(session);
       // Insert TestEntity_INST1 to DB
       dsl.insertInto(TestEntity_Table.test_entity, TestEntity_Table.id, TestEntity_Table.date, TestEntity_Table.udt, TestEntity_Table.list, TestEntity_Table.se, TestEntity_Table.map,
                      TestEntity_Table.nestedList, TestEntity_Table.nestedSet, TestEntity_Table.nestedMap, TestEntity_Table.enumValue, TestEntity_Table.enumList, TestEntity_Table.enumMap,

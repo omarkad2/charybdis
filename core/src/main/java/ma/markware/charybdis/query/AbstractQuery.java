@@ -74,7 +74,7 @@ public abstract class AbstractQuery implements Query {
   ResultSet executeStatement(final CqlSession session, final SimpleStatement statement, final int fetchSize, final ByteBuffer pagingState,
       final Object[] bindValueArray) {
     ResultSet resultSet = null;
-    log.info("Statement query: {}", statement.getQuery());
+    log.debug("Statement query: {}", statement.getQuery());
     final PreparedStatement preparedStatement = PreparedStatementFactory.createPreparedStatement(session, statement.getQuery());
     try {
       resultSet = session.execute(preparedStatement.bind(bindValueArray).setPageSize(fetchSize).setPagingState(pagingState));
@@ -87,7 +87,7 @@ public abstract class AbstractQuery implements Query {
   private void addStatementToBatch(final Batch batch, final SimpleStatement statement, final Object[] bindValueArray) {
     final PreparedStatement preparedStatement = PreparedStatementFactory.createPreparedStatement(batch.getSession(), statement.getQuery());
     BoundStatement boundStatement = preparedStatement.bind(bindValueArray);
-    log.info("Statement query: {} added to batch", statement.getQuery());
+    log.debug("Statement query: {} added to batch", statement.getQuery());
     batch.addStatement(boundStatement);
   }
 

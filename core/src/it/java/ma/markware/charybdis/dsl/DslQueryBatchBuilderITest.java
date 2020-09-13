@@ -69,14 +69,14 @@ class DslQueryBatchBuilderITest  extends AbstractIntegrationITest {
     dsl = cqlTemplate.dsl();
   }
 
+  @BeforeEach
+  void clean(CqlSession session) {
+    cleanDatabase(session);
+  }
+
   @Nested
   @DisplayName("DSL insert queries")
   class DslInsertQueryITest {
-
-    @BeforeEach
-    void setup(CqlSession session) {
-      cleanDatabase(session);
-    }
 
     @Test
     void insertInto() {
@@ -144,8 +144,6 @@ class DslQueryBatchBuilderITest  extends AbstractIntegrationITest {
 
     @BeforeEach
     void setup(CqlSession session) {
-      cleanDatabase(session);
-
       // Insert TestEntity_INST1 to DB
       dsl.insertInto(TestEntity_Table.test_entity, TestEntity_Table.id, TestEntity_Table.date, TestEntity_Table.udt, TestEntity_Table.list, TestEntity_Table.se, TestEntity_Table.map,
                      TestEntity_Table.nestedList, TestEntity_Table.nestedSet, TestEntity_Table.nestedMap, TestEntity_Table.enumValue, TestEntity_Table.enumList, TestEntity_Table.enumMap,
@@ -399,8 +397,6 @@ class DslQueryBatchBuilderITest  extends AbstractIntegrationITest {
 
     @BeforeEach
     void setup(CqlSession session) {
-      cleanDatabase(session);
-
       // Insert TestEntity_INST1 to DB
       dsl.insertInto(TestEntity_Table.test_entity, TestEntity_Table.id, TestEntity_Table.date, TestEntity_Table.udt, TestEntity_Table.list, TestEntity_Table.se, TestEntity_Table.map,
                      TestEntity_Table.nestedList, TestEntity_Table.nestedSet, TestEntity_Table.nestedMap, TestEntity_Table.enumValue, TestEntity_Table.enumList, TestEntity_Table.enumMap,

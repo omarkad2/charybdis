@@ -18,8 +18,6 @@
  */
 package ma.markware.charybdis.crud;
 
-import static java.lang.String.format;
-
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.cql.ResultSet;
 import java.time.Instant;
@@ -53,6 +51,7 @@ class CreateEntityManager<T> {
   CreateEntityManager(ExecutionContext executionContext) {
     this.insertQuery = new InsertQuery(executionContext);
   }
+
   /**
    * Specify table in insert query.
    */
@@ -115,7 +114,7 @@ class CreateEntityManager<T> {
     if (resultSet.wasApplied()) {
       return entity;
     }
-    log.warn(format("Entity [%s] was not created", entity));
+    log.warn("Entity [{}] was not created. execution info: {}", entity, resultSet.getExecutionInfo());
     return null;
   }
 

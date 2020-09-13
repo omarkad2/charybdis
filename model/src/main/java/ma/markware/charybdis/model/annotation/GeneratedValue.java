@@ -34,7 +34,8 @@ import java.lang.annotation.Target;
  *  @literal @GeneratedValue
  *  @literal @Column
  *  private UUID id;
- * }}</pre>
+ * }
+ * }</pre>
  *
  * @author Oussama Markad
  */

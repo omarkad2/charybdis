@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Optional;
 import ma.markware.charybdis.ConsistencyTunable;
 import ma.markware.charybdis.ExecutionContext;
+import ma.markware.charybdis.ExecutionProfileTunable;
 import ma.markware.charybdis.QueryBuilder;
 import ma.markware.charybdis.model.criteria.CriteriaExpression;
 import ma.markware.charybdis.model.criteria.ExtendedCriteriaExpression;
@@ -40,7 +41,7 @@ import ma.markware.charybdis.query.PageResult;
  *
  * @author Oussama Markad
  */
-public class CrudQueryBuilder implements QueryBuilder, ConsistencyTunable<CrudQueryBuilder> {
+public class CrudQueryBuilder implements QueryBuilder, ConsistencyTunable<CrudQueryBuilder>, ExecutionProfileTunable<CrudQueryBuilder> {
 
   private final CqlSession session;
   private final ExecutionContext executionContext;
@@ -82,6 +83,7 @@ public class CrudQueryBuilder implements QueryBuilder, ConsistencyTunable<CrudQu
   /**
    * {@inheritDoc}
    */
+  @Override
   public CrudQueryBuilder withExecutionProfile(DriverExecutionProfile executionProfile) {
     ExecutionContext executionContext = new ExecutionContext(this.executionContext);
     executionContext.setDriverExecutionProfile(executionProfile);
@@ -91,6 +93,7 @@ public class CrudQueryBuilder implements QueryBuilder, ConsistencyTunable<CrudQu
   /**
    * {@inheritDoc}
    */
+  @Override
   public CrudQueryBuilder withExecutionProfile(String executionProfile) {
     ExecutionContext executionContext = new ExecutionContext(this.executionContext);
     executionContext.setExecutionProfileName(executionProfile);

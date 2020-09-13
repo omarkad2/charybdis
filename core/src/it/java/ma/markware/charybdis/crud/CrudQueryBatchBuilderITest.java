@@ -56,14 +56,14 @@ class CrudQueryBatchBuilderITest extends AbstractIntegrationITest {
     crudBatch = cqlTemplate.crud(batch);
   }
 
-  @Nested
-  @DisplayName("Entity manager create operations")
-  class EntityManagerCreateITest {
+  @BeforeEach
+  void clean(CqlSession session) {
+    cleanDatabase(session);
+  }
 
-    @BeforeEach
-    void setup(CqlSession session) {
-      cleanDatabase(session);
-    }
+  @Nested
+  @DisplayName("Crud query builder create operations")
+  class CrudQueryBuilderCreateITest {
 
     @Test
     void create() {
@@ -108,7 +108,6 @@ class CrudQueryBatchBuilderITest extends AbstractIntegrationITest {
 
     @Test
     void create_should_not_overwrite_when_ifNotExists(CqlSession session) {
-      cleanDatabase(session);
       TestEntity entity1 = new TestEntity(TestEntity_INST1.entity1);
       crudBatch.create(TestEntity_Table.test_entity, entity1);
 
@@ -196,13 +195,11 @@ class CrudQueryBatchBuilderITest extends AbstractIntegrationITest {
   }
 
   @Nested
-  @DisplayName("Entity manager update operations")
-  class EntityManagerUpdateITest {
+  @DisplayName("Crud query builder update operations")
+  class CrudQueryBuilderUpdateITest {
 
     @BeforeEach
     void setup(CqlSession session) {
-      cleanDatabase(session);
-
       // Insert TestEntity_INST1 to DB
       dsl.insertInto(TestEntity_Table.test_entity, TestEntity_Table.id, TestEntity_Table.date, TestEntity_Table.udt, TestEntity_Table.list,
                      TestEntity_Table.se, TestEntity_Table.map, TestEntity_Table.nestedList, TestEntity_Table.nestedSet, TestEntity_Table.nestedMap,
@@ -252,13 +249,11 @@ class CrudQueryBatchBuilderITest extends AbstractIntegrationITest {
   }
 
   @Nested
-  @DisplayName("Entity manager delete operations")
-  class EntityManagerDeleteITest {
+  @DisplayName("Crud query builder delete operations")
+  class CrudQueryBuilderDeleteITest {
 
     @BeforeEach
     void setup(CqlSession session) {
-      cleanDatabase(session);
-
       // Insert TestEntity_INST1 to DB
       dsl.insertInto(TestEntity_Table.test_entity, TestEntity_Table.id, TestEntity_Table.date, TestEntity_Table.udt, TestEntity_Table.list,
                      TestEntity_Table.se, TestEntity_Table.map, TestEntity_Table.nestedList, TestEntity_Table.nestedSet, TestEntity_Table.nestedMap,
