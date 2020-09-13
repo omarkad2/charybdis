@@ -23,9 +23,6 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
 import ma.markware.charybdis.model.annotation.ClusteringKey;
-import ma.markware.charybdis.model.annotation.Column;
-import ma.markware.charybdis.model.annotation.Frozen;
-import ma.markware.charybdis.model.annotation.Index;
 import ma.markware.charybdis.model.annotation.PartitionKey;
 import ma.markware.charybdis.model.annotation.Table;
 import ma.markware.charybdis.model.option.ConsistencyLevel;
@@ -33,23 +30,7 @@ import ma.markware.charybdis.model.option.SerialConsistencyLevel;
 
 @Table(keyspace = "test_keyspace", name = "test_entity_by_date", readConsistency = ConsistencyLevel.TWO,
     writeConsistency = ConsistencyLevel.TWO, serialConsistency = SerialConsistencyLevel.SERIAL)
-public class TestEntityByDate {
-
-  @Column
-  @PartitionKey
-  private Instant date;
-
-  @Column
-  @ClusteringKey
-  private @Frozen TestUdt udt;
-
-  @Column
-  @ClusteringKey(index = 1)
-  private @Frozen List<String> list;
-
-  @Column
-  @Index
-  private Boolean flag;
+public class TestEntityByDate extends TestSuperEntity {
 
   public TestEntityByDate() {
   }
@@ -61,26 +42,35 @@ public class TestEntityByDate {
     this.flag = flag;
   }
 
+  @Override
+  @PartitionKey
   public Instant getDate() {
     return date;
   }
 
+  @Override
   public void setDate(final Instant date) {
     this.date = date;
   }
 
+  @Override
+  @ClusteringKey
   public TestUdt getUdt() {
     return udt;
   }
 
+  @Override
   public void setUdt(final TestUdt udt) {
     this.udt = udt;
   }
 
+  @Override
+  @ClusteringKey(index = 1)
   public List<String> getList() {
     return list;
   }
 
+  @Override
   public void setList(final List<String> list) {
     this.list = list;
   }
@@ -89,6 +79,7 @@ public class TestEntityByDate {
     return flag;
   }
 
+  @Override
   public void setFlag(final Boolean flag) {
     this.flag = flag;
   }

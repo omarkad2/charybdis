@@ -16,32 +16,17 @@
  * limitations under the License.
  *
  */
-package ma.markware.charybdis.model.annotation;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+package ma.markware.charybdis.apt.utils;
 
-/**
- * Annotation to indicate that a field holds entity's creation
- * date.
- *
- * Example:
- *
- * // Define Column <i>'creationDate'</i>
- * <pre>{@code
- * public class Entity {
- *
- *  @literal @Column
- *  @literal @CreationDate
- *  private Instant creationDate;
- * }}</pre>
- *
- * @author Oussama Markad
- */
-@Target({ElementType.FIELD, ElementType.METHOD})
-@Retention(RetentionPolicy.CLASS)
-public @interface CreationDate {
+import static org.assertj.core.api.Assertions.assertThat;
 
+import org.junit.jupiter.api.Test;
+
+class NameUtilsTest {
+
+  @Test
+  void resolveGenericTypeName() {
+    assertThat(NameUtils.resolveGenericTypeName("test")).isEqualTo("testGenericType");
+  }
 }

@@ -69,7 +69,7 @@ public class UdtParser extends AbstractEntityParser<UdtMetaType> {
 
     Stream<? extends Element> fields = ParserUtils.extractFields(annotatedClass, types);
 
-    List<UdtFieldMetaType> udtFields = fields.map(fieldElement -> udtFieldParser.parse(fieldElement, udtMetaType.getUdtName()))
+    List<UdtFieldMetaType> udtFields = fields.map(fieldElement -> udtFieldParser.parse(annotatedClass, fieldElement, udtMetaType.getUdtName()))
                                              .filter(Objects::nonNull)
                                              .collect(Collectors.toList());
     udtMetaType.setUdtFields(udtFields);

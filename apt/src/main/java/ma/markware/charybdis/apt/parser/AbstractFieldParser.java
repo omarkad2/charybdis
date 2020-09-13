@@ -22,26 +22,18 @@ import static java.lang.String.format;
 
 import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.SymbolMetadata;
-import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 import javax.lang.model.element.Element;
-import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.Modifier;
-import javax.lang.model.type.ExecutableType;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Types;
 import ma.markware.charybdis.apt.exception.CharybdisFieldTypeParsingException;
 import ma.markware.charybdis.apt.exception.CharybdisParsingException;
 import ma.markware.charybdis.apt.metatype.AbstractFieldMetaType;
 import ma.markware.charybdis.apt.metatype.FieldTypeMetaType;
-import ma.markware.charybdis.apt.utils.ClassUtils;
-import ma.markware.charybdis.apt.utils.ParserUtils;
+import ma.markware.charybdis.apt.utils.FieldUtils;
 import ma.markware.charybdis.apt.utils.TypeUtils;
 import ma.markware.charybdis.model.annotation.Frozen;
-import org.apache.commons.lang.WordUtils;
 
 /**
  * A generic Field parser.
@@ -52,7 +44,7 @@ import org.apache.commons.lang.WordUtils;
 abstract class AbstractFieldParser<FIELD_META_TYPE extends AbstractFieldMetaType> implements FieldParser<FIELD_META_TYPE> {
 
   private final FieldTypeParser fieldTypeParser;
-  private final Types types;
+  final Types types;
 
   AbstractFieldParser(FieldTypeParser fieldTypeParser, Types types) {
     this.fieldTypeParser = fieldTypeParser;
@@ -75,8 +67,8 @@ abstract class AbstractFieldParser<FIELD_META_TYPE extends AbstractFieldMetaType
       FieldTypeMetaType fieldType = fieldTypeParser.parseFieldType(typeMirror);
       fieldMetaType.setFieldType(fieldType);
 
-      fieldMetaType.setGetterName(buildGetterName(rawFieldName, fieldType.getDeserializationTypeCanonicalName()));
-      fieldMetaType.setSetterName(buildSetterName(rawFieldName));
+      fieldMetaType.setGetterName(FieldUtils.resolveGetterName(rawFieldName, fieldType.getDeserializationTypeCanonicalName()));
+      fieldMetaType.setSetterName(FieldUtils.resolveSetterName(rawFieldName));
 
     } catch (CharybdisFieldTypeParsingException e) {
       throw new CharybdisParsingException(format("Error while parsing field '%s'", rawFieldName), e);
@@ -89,54 +81,21 @@ abstract class AbstractFieldParser<FIELD_META_TYPE extends AbstractFieldMetaType
 
   private void validateMandatoryMethods(Element annotatedField, AbstractFieldMetaType fieldMetaType, Types types) {
     Element enclosingClass = annotatedField.getEnclosingElement();
-    List<ExecutableElement> methods = ParserUtils.extractMethods(enclosingClass, types)
-                                            .filter(method -> method instanceof ExecutableElement && method.getModifiers().contains(Modifier.PUBLIC))
-                                            .map(method -> (ExecutableElement) method)
-                                            .collect(Collectors.toList());
 
     // Field must have a public getter
-    methods.stream()
-           .filter(method -> {
-             List<? extends TypeMirror> parameterTypes = ((ExecutableType) method.asType()).getParameterTypes();
-             String methodName = method.getSimpleName().toString();
-             return parameterTypes.size() == 0 && methodName.equals(fieldMetaType.getGetterName())
-                 && TypeUtils.isTypeEquals(
-                     ClassUtils.primitiveToWrapper(method.getReturnType()),
-                     fieldMetaType.getFieldType().getDeserializationTypeName());
-           })
-           .findAny()
-           .orElseThrow(() -> new CharybdisParsingException(
-               format("Getter '%s' is mandatory for field '%s' in class '%s'", fieldMetaType.getGetterName(), fieldMetaType.getDeserializationName(),
-                      enclosingClass.getSimpleName())));
+    FieldUtils.getGetterMethodFromField(annotatedField, types)
+              .orElseThrow(() -> new CharybdisParsingException(
+                  format("A public getter [name: '%s', parameter type: <empty>, return type: '%s'] is mandatory for field '%s' in class '%s'", fieldMetaType.getGetterName(),
+                         fieldMetaType.getFieldType().getDeserializationTypeCanonicalName(), fieldMetaType.getDeserializationName(), enclosingClass.getSimpleName())));
 
     // Field must have a public setter
-    methods.stream()
-           .filter(method -> {
-             List<? extends TypeMirror> parameterTypes = ((ExecutableType) method.asType()).getParameterTypes();
-             String methodName = method.getSimpleName().toString();
-             return parameterTypes.size() == 1 && methodName.equals(fieldMetaType.getSetterName())
-                 && TypeUtils.isTypeEquals(
-                     ClassUtils.primitiveToWrapper(parameterTypes.get(0)),
-                     fieldMetaType.getFieldType().getDeserializationTypeName());
-           })
-           .findAny()
-           .orElseThrow(() -> new CharybdisParsingException(
-               format("Setter '%s' is mandatory for field '%s' in class '%s'", fieldMetaType.getSetterName(), fieldMetaType.getDeserializationName(),
-                      enclosingClass.getSimpleName().toString())));
-
+    FieldUtils.getSetterMethodFromField(annotatedField, types)
+              .orElseThrow(() -> new CharybdisParsingException(
+                  format("A public setter [name: '%s', parameter type: '%s', return type: void] is mandatory for field '%s' in class '%s'", fieldMetaType.getSetterName(),
+                         fieldMetaType.getFieldType().getDeserializationTypeCanonicalName(), fieldMetaType.getDeserializationName(), enclosingClass.getSimpleName())));
   }
 
-  private String buildGetterName(final String rawFieldName, final String typeCanonicalName) {
-    return new HashSet<>(Arrays.asList("java.lang.Boolean", "boolean")).contains(typeCanonicalName) ?
-        format("is%s", WordUtils.capitalize(rawFieldName)) :
-        format("get%s", WordUtils.capitalize(rawFieldName));
-  }
-
-  private String buildSetterName(final String rawFieldName) {
-    return format("set%s", WordUtils.capitalize(rawFieldName));
-  }
-
-  Set<TypePosition> getFrozenAnnotationPositions(Element el) {
+  private Set<TypePosition> getFrozenAnnotationPositions(Element el) {
     Set<TypePosition> typePositions = new HashSet<>();
     if (el instanceof Symbol) {
       SymbolMetadata meta = ((Symbol) el).getMetadata();

@@ -31,5 +31,5 @@ public interface FieldParser<FIELD_META_TYPE> {
   /**
    * Parses annotated field and returns metadata.
    */
-  FIELD_META_TYPE parse(Element annotatedField, String entityName);
+  FIELD_META_TYPE parse(Element classElement, Element fieldElement, String entityName);
 }

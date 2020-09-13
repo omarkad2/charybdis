@@ -26,18 +26,6 @@ public class TestEntity extends TestSuperEntity {
   private UUID id;
 
   @Column
-  @ClusteringKey(order = ClusteringOrder.DESC)
-  private Instant date;
-
-  @Column
-  @ClusteringKey(index = 1)
-  private @Frozen TestUdt udt;
-
-  @Column
-  @ClusteringKey(index = 2)
-  private @Frozen List<String> list;
-
-  @Column
   private Set<Integer> se;
 
   @Column
@@ -78,10 +66,6 @@ public class TestEntity extends TestSuperEntity {
 
   @Column
   private List<@Frozen List<TestUdt>> udtNestedList;
-
-  @Column
-  @Index
-  private Boolean flag;
 
   public TestEntity() {
   }
@@ -143,18 +127,35 @@ public class TestEntity extends TestSuperEntity {
     this.id = id;
   }
 
+  @Override
+  @ClusteringKey(order = ClusteringOrder.DESC)
   public Instant getDate() {
     return date;
   }
 
+  @Override
   public void setDate(final Instant date) {
     this.date = date;
   }
 
+  @Override
+  @ClusteringKey(index = 1)
+  public TestUdt getUdt() {
+    return udt;
+  }
+
+  @Override
+  public void setUdt(final TestUdt udt) {
+    this.udt = udt;
+  }
+
+  @Override
+  @ClusteringKey(index = 2)
   public List<String> getList() {
     return list;
   }
 
+  @Override
   public void setList(final List<String> list) {
     this.list = list;
   }
@@ -231,14 +232,6 @@ public class TestEntity extends TestSuperEntity {
     this.enumNestedList = enumNestedList;
   }
 
-  public TestUdt getUdt() {
-    return udt;
-  }
-
-  public void setUdt(final TestUdt udt) {
-    this.udt = udt;
-  }
-
   public TestExtraUdt getExtraUdt() {
     return extraUdt;
   }
@@ -279,10 +272,13 @@ public class TestEntity extends TestSuperEntity {
     this.udtNestedList = udtNestedList;
   }
 
+  @Index
+  @Override
   public Boolean isFlag() {
     return flag;
   }
 
+  @Override
   public void setFlag(final Boolean flag) {
     this.flag = flag;
   }

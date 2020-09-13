@@ -28,6 +28,7 @@ import ma.markware.charybdis.apt.metatype.AbstractFieldMetaType;
 import ma.markware.charybdis.apt.metatype.ColumnFieldMetaType;
 import ma.markware.charybdis.apt.metatype.FieldTypeMetaType;
 import ma.markware.charybdis.apt.metatype.FieldTypeMetaType.FieldTypeKind;
+import ma.markware.charybdis.apt.utils.FieldUtils;
 import ma.markware.charybdis.model.annotation.ClusteringKey;
 import ma.markware.charybdis.model.annotation.Column;
 import ma.markware.charybdis.model.annotation.CreationDate;
@@ -50,68 +51,71 @@ public class ColumnFieldParser extends AbstractFieldParser<ColumnFieldMetaType> 
     super(fieldTypeParser, types);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public ColumnFieldMetaType parse(final Element annotatedField, final String tableName) {
-    final Column column = annotatedField.getAnnotation(Column.class);
-    if (column != null) {
-      AbstractFieldMetaType abstractFieldMetaType = parseGenericField(annotatedField);
-      final ColumnFieldMetaType columnMetaType = new ColumnFieldMetaType(abstractFieldMetaType);
-
-      String columnName = column.name();
-      if (StringUtils.isBlank(columnName)) {
-        columnName = columnMetaType.getDeserializationName();
-      }
-      columnMetaType.setSerializationName(columnName.toLowerCase());
-
-      final PartitionKey partitionKey = annotatedField.getAnnotation(PartitionKey.class);
-      if (partitionKey != null) {
-        columnMetaType.setPartitionKeyIndex(partitionKey.index());
-        columnMetaType.setPartitionKey(true);
-      }
-
-      final ClusteringKey clusteringKey = annotatedField.getAnnotation(ClusteringKey.class);
-      if (clusteringKey != null) {
-        if (partitionKey != null) {
-          throw new CharybdisParsingException("Column can either be a partition key or a clustering key not both");
-        }
-        columnMetaType.setClusteringKeyIndex(clusteringKey.index());
-        columnMetaType.setClusteringKey(true);
-        columnMetaType.setClusteringOrder(clusteringKey.order());
-      }
-
-      final Index index = annotatedField.getAnnotation(Index.class);
-      if (index != null && partitionKey == null) {
-        columnMetaType.setIndexed(true);
-        columnMetaType.setIndexName(format("%s_%s_idx", tableName.toLowerCase(), columnMetaType.getSerializationName().toLowerCase()));
-      }
-
-      final GeneratedValue generatedValue = annotatedField.getAnnotation(GeneratedValue.class);
-      if (generatedValue != null) {
-        try {
-          final SequenceModel sequenceModel = SequenceModel.findSequenceModel(Class.forName(columnMetaType.getFieldType()
-                                                                                                          .getDeserializationTypeCanonicalName()));
-          if (sequenceModel != null) {
-            columnMetaType.setSequenceModel(sequenceModel);
-          } else {
-            throw new CharybdisParsingException(format("Type %s of column '%s' is not supported for automatic value generation",
-                                                       columnMetaType.getFieldType(), columnMetaType.getSerializationName()));
-          }
-        } catch (final ClassNotFoundException e) {
-          throw new CharybdisParsingException(format("Class not found %s values for column '%s' will not be automatically generated",
-                                                     columnMetaType.getFieldType(), columnMetaType.getSerializationName()), e);
-        }
-      }
-
-      if (columnMetaType.isPartitionKey() || columnMetaType.isClusteringKey()) {
-        validatePrimaryKeyTypes(columnMetaType);
-      }
-
-      // TODO: ...Check if date type supported
-      columnMetaType.setCreationDate(annotatedField.getAnnotation(CreationDate.class) != null);
-      columnMetaType.setLastUpdatedDate(annotatedField.getAnnotation(LastUpdatedDate.class) != null);
-      return columnMetaType;
+  public ColumnFieldMetaType parse(final Element classElement, final Element fieldElement, final String tableName) {
+    final Column column = FieldUtils.getAnnotation(classElement, fieldElement, Column.class, types);
+    if (column == null) {
+      return null;
     }
-    return null;
+    AbstractFieldMetaType abstractFieldMetaType = parseGenericField(fieldElement);
+    final ColumnFieldMetaType columnMetaType = new ColumnFieldMetaType(abstractFieldMetaType);
+
+    String columnName = column.name();
+    if (StringUtils.isBlank(columnName)) {
+      columnName = columnMetaType.getDeserializationName();
+    }
+    columnMetaType.setSerializationName(columnName.toLowerCase());
+
+    final PartitionKey partitionKey = FieldUtils.getAnnotation(classElement, fieldElement, PartitionKey.class, types);
+    if (partitionKey != null) {
+      columnMetaType.setPartitionKeyIndex(partitionKey.index());
+      columnMetaType.setPartitionKey(true);
+    }
+
+    final ClusteringKey clusteringKey = FieldUtils.getAnnotation(classElement, fieldElement, ClusteringKey.class, types);
+    if (clusteringKey != null) {
+      if (partitionKey != null) {
+        throw new CharybdisParsingException("Column can either be a partition key or a clustering key not both");
+      }
+      columnMetaType.setClusteringKeyIndex(clusteringKey.index());
+      columnMetaType.setClusteringKey(true);
+      columnMetaType.setClusteringOrder(clusteringKey.order());
+    }
+
+    final Index index = FieldUtils.getAnnotation(classElement, fieldElement, Index.class, types);
+    if (index != null && partitionKey == null) {
+      columnMetaType.setIndexed(true);
+      columnMetaType.setIndexName(format("%s_%s_idx", tableName.toLowerCase(), columnMetaType.getSerializationName().toLowerCase()));
+    }
+
+    final GeneratedValue generatedValue = FieldUtils.getAnnotation(classElement, fieldElement, GeneratedValue.class, types);
+    if (generatedValue != null) {
+      try {
+        final SequenceModel sequenceModel = SequenceModel.findSequenceModel(Class.forName(columnMetaType.getFieldType()
+                                                                                                        .getDeserializationTypeCanonicalName()));
+        if (sequenceModel != null) {
+          columnMetaType.setSequenceModel(sequenceModel);
+        } else {
+          throw new CharybdisParsingException(format("Type %s of column '%s' is not supported for automatic value generation",
+                                                     columnMetaType.getFieldType(), columnMetaType.getSerializationName()));
+        }
+      } catch (final ClassNotFoundException e) {
+        throw new CharybdisParsingException(format("Class not found %s values for column '%s' will not be automatically generated",
+                                                   columnMetaType.getFieldType(), columnMetaType.getSerializationName()), e);
+      }
+    }
+
+    if (columnMetaType.isPartitionKey() || columnMetaType.isClusteringKey()) {
+      validatePrimaryKeyTypes(columnMetaType);
+    }
+
+    // TODO: ...Check if date type supported
+    columnMetaType.setCreationDate(FieldUtils.getAnnotation(classElement, fieldElement, CreationDate.class, types) != null);
+    columnMetaType.setLastUpdatedDate(FieldUtils.getAnnotation(classElement, fieldElement, LastUpdatedDate.class, types) != null);
+    return columnMetaType;
   }
 
   private void validatePrimaryKeyTypes(final ColumnFieldMetaType columnFieldMetaType) {
