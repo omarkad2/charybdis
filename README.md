@@ -162,20 +162,22 @@ The following Cql files are generated for the modelling above:
     ```
 
 ### Querying
-In order to query our Cassandra database, we can either use a **Dsl API** or **Crud API**. 
-Both can be instantiated by providing an implementation of [SessionFactory](https://github.com/omarkad2/charybdis/blob/master/core/src/main/java/ma/markware/charybdis/session/SessionFactory.java) if 
-none provided we fallback on [DefaultSessionFactory](https://github.com/omarkad2/charybdis/blob/master/core/src/main/java/ma/markware/charybdis/session/DefaultSessionFactory.java).
-#### Dsl API
+In order to interact with our database, we need to instantiate [CqlTemplate](https://github.com/omarkad2/charybdis/blob/master/core/src/main/java/ma/markware/charybdis/CqlTemplate.java).
 
-- Instantiate the API:
-    ```java
-    DslQuery dsl = new DefaultDslQuery();
-    ```
+It is the main class in Charybdis core package. It can be instantiated by providing an implementation of [SessionFactory](https://github.com/omarkad2/charybdis/blob/master/core/src/main/java/ma/markware/charybdis/session/SessionFactory.java),
+if none provided we fallback on [DefaultSessionFactory](https://github.com/omarkad2/charybdis/blob/master/core/src/main/java/ma/markware/charybdis/session/DefaultSessionFactory.java).
+```java
+CqlTemplate cqlTemplate = new CqlTemplate();
+// or with a specific implementation of SessionFactory
+CqlTemplate cqlTemplate = new CqlTemplate(customSessionFactory);
+```
+This class gives us access to different APIs **Dsl API** or **Crud API** in order to manage our Cql queries. 
+#### Dsl API
 
 - Insert:
     ```java
     List<Adress> addresses = List.of(...);
-    boolean applied = dsl.insertInto(User_Table.user, User_Table.id, User_Table.joiningDate, User_Table.addresses)
+    boolean applied = cqlTemplate.dsl().insertInto(User_Table.user, User_Table.id, User_Table.joiningDate, User_Table.addresses)
                        .values(UUID.randomUUID(), Instant.now(), addresses)
                        .ifNotExists()
                        .execute();
@@ -183,7 +185,7 @@ none provided we fallback on [DefaultSessionFactory](https://github.com/omarkad2
 
 - Update:
     ```java
-    boolean applied = dsl.update(User_Table.user)
+    boolean applied = cqlTemplate.dsl().update(User_Table.user)
                        .set(User_Table.addresses.entry(0), new Address(...)) // Updates address at index 0.
                        .set(User_Table.role, RoleEnum.ADMIN)
                        .set(User_Table.accessLogs, User_Table.accessLogs.append(Map.of(Instant.now(), "Ubuntu"))) // Adds entry to column 'access_logs'
@@ -192,45 +194,83 @@ none provided we fallback on [DefaultSessionFactory](https://github.com/omarkad2
 
 - Select: 
     ```java
-    User user = dsl.selectFrom(User_Table.user)
+    User user = cqlTemplate.dsl().selectFrom(User_Table.user)
                        .where(User_Table.joiningDate.lt(Instant.parse("2020-01-01T00:00:00Z")))
                        .allowFiltering()
                        .fetchOne();
     ```
 - Delete:
     ```java
-    boolean applied = dsl.delete()
+    boolean applied = cqlTemplate.dsl().delete()
                        .from(User_Table.user)
                        .where(User_Table.id.eq(UUID.fromString("c9b593c0-f5cb-4e88-bd55-88dee10a4e97")))
                        .execute();
     ```
 #### Crud API
-- Instantiate the API:
-    ```java
-    EntityManager entityManager = new DefaultEntityManager();
-    ```
-
 - Insert:
     ```java
-    User persistedUser = entityManager.create(User_Table.user, new User(...));
+    User persistedUser = cqlTemplate.crud().create(User_Table.user, new User(...));
     ```
 
 - Update:
     ```java
     persistedUser.setJoiningDate(Instant.now());
-    persistedUser = entityManager.update(User_Table.user, persistedUser);
+    persistedUser = cqlTemplate.crud().update(User_Table.user, persistedUser);
     ```
 
 - Select: 
     ```java
-    Optional<User> adminUser = entityManager.findOptional(User_Table.user, User_Table.id.eq(userId)
+    Optional<User> adminUser = cqlTemplate.crud().findOptional(User_Table.user, User_Table.id.eq(userId)
                                                                         .and(User_Table.joiningDate.lt(Instant.now()))
                                                                         .and(User_Table.role.eq(RoleEnum.ADMIN)))
     ```
 - Delete:
     ```java
-    boolean deleted = entityManager.delete(User_Table.user, persistedUser);
+    boolean deleted = cqlTemplate.crud().delete(User_Table.user, persistedUser);
     ```
+
+### Batch queries
+Charybdis also supports Cql Batch queries. For convenience we chose to have the same syntax as before to build batch enclosed queries, using both **Crud** and **Dsl** APIs.
+
+Let's suppose we have two tables : 
+- **person** : table with partition key id.
+- **person_by_ssn** : table with same data in table person but with different partition key "ssn" *(social security number)*.
+#### Batch logged
+```java
+// Instantiate batch API
+Batch batch = cqlTemplate.batch().logged();
+
+// Add update query to our batch on table 'person' (Dsl API)
+cqlTemplate.dsl(batch).update(Person_Table.person)
+           .set(Person_Table.name, "John Doe")
+           .where(Person_Table.id.eq(1))
+           .execute();
+// Add update query to our batch on table 'person_by_ssn' (Dsl API)
+cqlTemplate.dsl(batch).update(PersonBySsn_Table.person_by_ssn)
+           .set(PersonBySsn_Table.name, "John Doe")
+           .where(PersonBySsn_Table.ssn.eq("999-00-1111"))
+           .execute();
+
+// Execute batch query
+batch.execute();
+```
+
+#### Batch Unlogged
+```java
+// Instantiate batch API
+Batch batch = cqlTemplate.batch().unlogged();
+
+// Add insert query to our batch on table 'person' (Dsl API)
+cqlTemplate.dsl(batch).insertInto(Person_Table.person, Person_Table.id, Person_Table.ssn, Person_Table.name)
+           .values(1, "999-00-1111", "Franklin Roosevelt")
+           .execute();
+// Add insert query to our batch on table 'person' (Crud API)
+new Person newPerson = new Person(1, "999-00-2222", "Theodore Roosevelt"); 
+cqlTemplate.crud(batch).create(Person_Table.person, newPerson);
+
+// Execute batch query
+batch.execute();
+```
 
 ### Lightweight Transaction
 Charybdis also handles lightweight transactions in order to prevent race conditions in
@@ -239,7 +279,7 @@ cases where strong consistency is not enough and client needs to read, then writ
 
     Insert a row only if it doesn't exist
     ```java
-    dslQuery.insertInto(User_Table.user, User_Table.id, User_Table.joiningDate, User_Table.addresses)
+    cqlTemplate.dsl().insertInto(User_Table.user, User_Table.id, User_Table.joiningDate, User_Table.addresses)
             .values(UUID.randomUUID(), Instant.now(), addresses)
             .ifNotExists()
             .execute();
@@ -248,17 +288,17 @@ cases where strong consistency is not enough and client needs to read, then writ
 
     Update a row only if it fulfills a condition (in the example below user must have *ADMIN* role)
     ```java
-    dslQuery.update(User_Table.user)
-            .set(User_Table.addresses, newAddresses)
-            .where(User_Table.id.eq(UUID.fromString("c9b593c0-f5cb-4e88-bd55-88dee10a4e97")))
-            .if_(User_Table.role.eq(RoleEnum.ADMIN))
-            .execute();
+    cqlTemplate.dsl().update(User_Table.user)
+               .set(User_Table.addresses, newAddresses)
+               .where(User_Table.id.eq(UUID.fromString("c9b593c0-f5cb-4e88-bd55-88dee10a4e97")))
+               .if_(User_Table.role.eq(RoleEnum.ADMIN))
+               .execute();
     ```
 - LWT for Delete:
 
     Delete a row only if it fulfills a condition (in the example below user must have *ADMIN* role)
     ```java
-    dslQuery.delete()
+    cqlTemplate.dsl().delete()
             .from(User_Table.user)
             .where(User_Table.id.eq(UUID.fromString("c9b593c0-f5cb-4e88-bd55-88dee10a4e97")))
             .if_(User_Table.role.eq(RoleEnum.ADMIN))
@@ -280,13 +320,13 @@ We can also have a fine-grained control over consistency, by having a particular
 This can be done at runtime:
 - In Crud API:
     ```java
-    entityManager.withConsistency(ConsistencyLevel.EACH_QUORUM)
+    cqlTemplate.crud().withConsistency(ConsistencyLevel.EACH_QUORUM)
                  .withSerialConsistency(SerialConsistencyLevel.LOCAL_SERIAL)
                  .create(User_Table.user, new User(...));
     ```
 - In Dsl API:
     ```java
-    dslQuery.withConsistency(ConsistencyLevel.EACH_QUORUM)
+    cqlTemplate.dsl().withConsistency(ConsistencyLevel.EACH_QUORUM)
             .withSerialConsistency(SerialConsistencyLevel.LOCAL_SERIAL)
             .insertInto(User_Table.user, User_Table.id, User_Table.joiningDate, User_Table.addresses)
             .values(UUID.randomUUID(), Instant.now(), addresses)
