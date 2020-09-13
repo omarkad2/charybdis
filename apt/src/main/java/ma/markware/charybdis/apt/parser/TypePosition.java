@@ -41,7 +41,7 @@ public class TypePosition {
   }
 
   /**
-   * Creates instance from {@link List<TypePathEntry>}.
+   * Creates instance from a list of {@link TypePathEntry}.
    */
   public static TypePosition from(List<TypePathEntry> location) {
     if (location.size() == 0) {

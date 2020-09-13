@@ -29,22 +29,24 @@ import java.lang.annotation.Target;
  * Examples:
  *
  * // partition key column <i>'field'</i> at index 0
- * <pre>{@code
+ * <pre><code>
  * public class Entity {
  *
  *  @literal @Column
  *  @literal @PartitionKey
  *  private String field;
- * }}</pre>
+ * }
+ * </code></pre>
  *
  * // partition key column <i>'field'</i> at index 2
- * <pre>{@code
+ * <pre><code>
  * public class Entity {
  *
  *  @literal @Column
  *  @literal @PartitionKey(index = 2)
  *  private String field;
- * }}</pre>
+ * }
+ * </code></pre>
  *
  * @author Oussama Markad
  */

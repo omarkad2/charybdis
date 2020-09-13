@@ -30,22 +30,24 @@ import java.lang.annotation.Target;
  * Examples:
  *
  * // Define udt field <i>'field'</i>
- * <pre>{@code
+ * <pre><code>
  * @literal @Udt
  * public class Entity {
  *
  *  @literal @UdtField
  *  private String field;
- * }}</pre>
+ * }
+ * </code></pre>
  *
  * // Define udt field <i>'custom_name'</i>
- * <pre>{@code
+ * <pre><code>
  * @literal @Udt
  * public class Entity {
  *
  *  @literal @UdtField(name = "custom_name")
  *  private String field;
- * }}</pre>
+ * }
+ * </code></pre>
  *
  * @author Oussama Markad
  */

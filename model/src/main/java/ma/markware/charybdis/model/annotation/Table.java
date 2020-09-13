@@ -31,11 +31,12 @@ import ma.markware.charybdis.model.option.SerialConsistencyLevel;
  * Example:
  *
  * // Define table <i>'test_table'</i> in keyspace <i>'test_keyspace'</i>.
- * <pre>{@code
+ * <pre><code>
  * @literal @Table(keyspace="test_keyspace", name = "test_table")
  * public class TableDefinition {
  *  ...<Column definitions>...
- * }}</pre>
+ * }
+ * <code></pre>
  *
  * @author Oussama Markad
  */

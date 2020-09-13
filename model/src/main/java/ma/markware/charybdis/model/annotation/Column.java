@@ -29,22 +29,24 @@ import java.lang.annotation.Target;
  * Examples:
  *
  * // Define Column <i>'field'</i>
- * <pre>{@code
+ * <pre><code>
  * @literal @Table
  * public class Entity {
  *
  *  @literal @Column
  *  private String field;
- * }}</pre>
+ * }
+ * </code></pre>
  *
  * // Define column <i>'custom_name'</i>
- * <pre>{@code
+ * <pre><code>
  * @literal @Table
  * public class Entity {
  *
  *  @literal @Column(name = "custom_name")
  *  private String field;
- * }}</pre>
+ * }
+ * </code></pre>
  *
  * @author Oussama Markad
  */

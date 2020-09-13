@@ -28,14 +28,14 @@ import java.lang.annotation.Target;
  * Exclusively used by CRUD API.
  *
  * Example:
- * <pre>{@code
+ * <pre><code>
  * public class Entity {
  *
  *  @literal @GeneratedValue
  *  @literal @Column
  *  private UUID id;
  * }
- * }</pre>
+ * </code></pre>
  *
  * @author Oussama Markad
  */

@@ -29,11 +29,12 @@ import java.lang.annotation.Target;
  * Example:
  *
  * // Define table <i>'test_udt'</i> in keyspace <i>'test_keyspace'</i>.
- * <pre>{@code
+ * <pre><code>
  * @literal @Udt(keyspace="test_keyspace", name = "test_udt")
  * public class UdtDefinition {
  *  ...<Column definitions>...
- * }}</pre>
+ * }
+ * </code></pre>
  *
  * @author Oussama Markad
  */

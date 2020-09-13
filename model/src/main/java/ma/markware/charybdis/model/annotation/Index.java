@@ -27,13 +27,14 @@ import java.lang.annotation.Target;
  * This annotation indicates that a column is a secondary index.
  *
  * Example:
- * <pre>{@code
+ * <pre><code>
  * public class Entity {
  *
  *  @literal @Index
  *  @literal @Column
  *  private String indexed;
- * }}</pre>
+ * }
+ * </code></pre>
  *
  * @author Oussama Markad
  */

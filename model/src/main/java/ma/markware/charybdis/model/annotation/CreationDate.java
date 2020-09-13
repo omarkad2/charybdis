@@ -30,13 +30,14 @@ import java.lang.annotation.Target;
  * Example:
  *
  * // Define Column <i>'creationDate'</i>
- * <pre>{@code
+ * <pre><code>
  * public class Entity {
  *
  *  @literal @Column
  *  @literal @CreationDate
  *  private Instant creationDate;
- * }}</pre>
+ * }
+ * </code></pre>
  *
  * @author Oussama Markad
  */

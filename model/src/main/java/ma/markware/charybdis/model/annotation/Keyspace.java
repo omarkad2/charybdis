@@ -30,18 +30,20 @@ import ma.markware.charybdis.model.option.ReplicationStrategyClass;
  * Examples:
  *
  * // Define Keyspace <i>'test_keyspace'</i>.
- * <pre>{@code
+ * <pre><code>
  * @literal @Keyspace(name = "test_keyspace")
  * public class KeyspaceDefinition {
  *
- * }}</pre>
+ * }
+ * </code></pre>
  *
  * // Define keyspace <i>'test_keyspace'</i> with replication factor equals to 2.
- * <pre>{@code
+ * <pre><code>
  * @literal @Keyspace(name = "test_keyspace", replicationFactor = 2)
  * public class KeyspaceDefinition {
  *
- * }}</pre>
+ * }
+ * </code></pre>
  *
  * @author Oussama Markad
  */
