@@ -54,6 +54,8 @@
     <apache-commons.lang3.version>3.9</apache-commons.lang3.version>
     <junit-platform-surefire-provider.version>1.0.3</junit-platform-surefire-provider.version>
     <mockito.version>3.3.3</mockito.version>
+    <jcache.version>1.1.1</jcache.version>
+    <concurrentlinkedhashmap-lru.version>1.4.2</concurrentlinkedhashmap-lru.version>
 
     <!-- maven plugins -->
     <build-helper-maven-plugin.version>1.9.1</build-helper-maven-plugin.version>
@@ -137,6 +139,20 @@
         <groupId>com.squareup</groupId>
         <artifactId>javapoet</artifactId>
         <version>${javapoet.version}</version>
+      </dependency>
+
+      <!-- Cache API -->
+      <dependency>
+        <groupId>javax.cache</groupId>
+        <artifactId>cache-api</artifactId>
+        <version>${jcache.version}</version>
+      </dependency>
+
+      <!-- Data Structures -->
+      <dependency>
+        <groupId>com.googlecode.concurrentlinkedhashmap</groupId>
+        <artifactId>concurrentlinkedhashmap-lru</artifactId>
+        <version>${concurrentlinkedhashmap-lru.version}</version>
       </dependency>
 
       <!-- Docker client -->

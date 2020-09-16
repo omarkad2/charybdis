@@ -32,6 +32,18 @@
       <artifactId>java-driver-query-builder</artifactId>
     </dependency>
 
+    <!-- Cache API -->
+    <dependency>
+      <groupId>javax.cache</groupId>
+      <artifactId>cache-api</artifactId>
+    </dependency>
+
+    <!-- Data Structures -->
+    <dependency>
+      <groupId>com.googlecode.concurrentlinkedhashmap</groupId>
+      <artifactId>concurrentlinkedhashmap-lru</artifactId>
+    </dependency>
+
     <!-- Test -->
     <dependency>
       <groupId>ma.markware.charybdis</groupId>

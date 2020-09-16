@@ -54,15 +54,15 @@ class AbstractQueryTest {
   private CqlSession session;
 
   private AbstractQuery abstractQuery;
-  private SimpleStatement simpleStatement;
 
   @BeforeEach
   void setup() {
     abstractQuery = mock(AbstractQuery.class, Mockito.CALLS_REAL_METHODS);
-    simpleStatement = QueryBuilder.update("\"keyspace\"", "\"table\"")
-                                  .setColumn("column", QueryBuilder.literal(100))
-                                  .where(Relation.column("column").isEqualTo(QueryBuilder.literal(99)))
-                                  .build();
+    final SimpleStatement simpleStatement = QueryBuilder.update("\"keyspace\"", "\"table\"")
+                                                        .setColumn("column", QueryBuilder.literal(100))
+                                                        .where(Relation.column("column")
+                                                                       .isEqualTo(QueryBuilder.literal(99)))
+                                                        .build();
     PreparedStatement preparedStatement = mock(PreparedStatement.class);
     when(session.prepare(anyString())).thenReturn(preparedStatement);
     BoundStatement boundStatement = mock(BoundStatement.class);
@@ -71,6 +71,7 @@ class AbstractQueryTest {
     when(boundStatement.setPagingState(eq(null))).thenReturn(boundStatement);
     when(session.execute(any(Statement.class))).thenReturn(null);
     when(abstractQuery.buildStatement()).thenReturn(new StatementTuple(simpleStatement, new Object[] {}));
+    PreparedStatementFactory.CACHE_MANAGER.destroyCache(PreparedStatementFactory.CACHE_NAME);
   }
 
   @Test
