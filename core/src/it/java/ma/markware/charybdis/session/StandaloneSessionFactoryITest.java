@@ -22,7 +22,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 
 import com.datastax.oss.driver.api.core.CqlSession;
+import java.net.InetSocketAddress;
 import ma.markware.charybdis.test.tools.DatabaseSetupExtension;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -32,15 +34,24 @@ import org.mockito.junit.jupiter.MockitoExtension;
 })
 class StandaloneSessionFactoryITest {
 
+  private CqlSession session;
+  @BeforeEach
+  void setup(int port) {
+    session = CqlSession.builder()
+                        .addContactPoint(new InetSocketAddress(port))
+                        .withLocalDatacenter("datacenter1")
+                        .build();
+  }
+
   @Test
-  void instantiate(CqlSession session) {
+  void instantiate() {
     StandaloneSessionFactory standaloneSessionFactory = new StandaloneSessionFactory(session);
 
     assertThat(standaloneSessionFactory.getSession()).isEqualTo(session);
   }
 
   @Test
-  void shutdown(CqlSession session) {
+  void shutdown() {
     // Given
     StandaloneSessionFactory standaloneSessionFactory = new StandaloneSessionFactory(session);
 
