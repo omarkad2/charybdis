@@ -30,6 +30,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import javax.cache.Cache;
+import javax.cache.configuration.Configuration;
 import ma.markware.charybdis.cache.LRUCache.LRUCacheEntry;
 import org.junit.jupiter.api.Test;
 
@@ -37,7 +38,7 @@ class LRUCacheTest {
 
   @Test
   void get() {
-    LRUCache<Integer, String> cache = new LRUCache<>("test_cache", 1, 1);
+    LRUCache<Integer, String> cache = new LRUCache<>("test_cache", 1, 1, new CacheConfiguration<>(Integer.class, String.class));
     cache.put(0, "test0");
 
     assertThat(cache.get(0)).isEqualTo("test0");
@@ -46,7 +47,7 @@ class LRUCacheTest {
   @Test
   @SuppressWarnings("unchecked")
   void get_should_evict_least_recently_used_when_max_capacity_exceeded() {
-    LRUCache<Integer, String> cache = new LRUCache<>("test_cache", 2, 2);
+    LRUCache<Integer, String> cache = new LRUCache<>("test_cache", 2, 2, new CacheConfiguration<>(Integer.class, String.class));
     cache.put(0, "test0");
     cache.put(1, "test1");
 
@@ -64,7 +65,7 @@ class LRUCacheTest {
 
   @Test
   void get_should_throw_exception_when_cache_closed() {
-    LRUCache<Integer, String> cache = new LRUCache<>("test_cache", 1, 1);
+    LRUCache<Integer, String> cache = new LRUCache<>("test_cache", 1, 1, new CacheConfiguration<>(Integer.class, String.class));
     cache.put(0, "test0");
     cache.close();
 
@@ -76,7 +77,7 @@ class LRUCacheTest {
   @Test
   @SuppressWarnings("unchecked")
   void put() {
-    LRUCache<Integer, String> cache = new LRUCache<>("test_cache", 3, 3);
+    LRUCache<Integer, String> cache = new LRUCache<>("test_cache", 3, 3, new CacheConfiguration<>(Integer.class, String.class));
     cache.put(0, "test0");
     cache.put(1, "test1");
     cache.put(2, "test2");
@@ -92,7 +93,7 @@ class LRUCacheTest {
   @Test
   @SuppressWarnings("unchecked")
   void put_should_evict_least_recently_used_value_when_max_capacity_exceeded() {
-    LRUCache<Integer, String> cache = new LRUCache<>("test_cache", 3, 3);
+    LRUCache<Integer, String> cache = new LRUCache<>("test_cache", 3, 3, new CacheConfiguration<>(Integer.class, String.class));
     cache.put(0, "test0");
     cache.put(1, "test1");
     cache.put(2, "test2");
@@ -108,7 +109,7 @@ class LRUCacheTest {
 
   @Test
   void containsKey() {
-    LRUCache<Integer, String> cache = new LRUCache<>("test_cache", 1, 1);
+    LRUCache<Integer, String> cache = new LRUCache<>("test_cache", 1, 1, new CacheConfiguration<>(Integer.class, String.class));
     cache.put(0, "test0");
 
     assertThat(cache.containsKey(0)).isTrue();
@@ -116,7 +117,7 @@ class LRUCacheTest {
 
   @Test
   void containsKey_should_return_false_when_element_not_found() {
-    LRUCache<Integer, String> cache = new LRUCache<>("test_cache", 1, 1);
+    LRUCache<Integer, String> cache = new LRUCache<>("test_cache", 1, 1, new CacheConfiguration<>(Integer.class, String.class));
     cache.put(0, "test0");
     cache.put(1, "test1");
 
@@ -125,14 +126,14 @@ class LRUCacheTest {
 
   @Test
   void getAndPut() {
-    LRUCache<Integer, String> cache = new LRUCache<>("test_cache", 2, 2);
+    LRUCache<Integer, String> cache = new LRUCache<>("test_cache", 2, 2, new CacheConfiguration<>(Integer.class, String.class));
     assertThat(cache.getAndPut(0, "test0")).isNull();
     assertThat(cache.getAndPut(0, "test1")).isEqualTo("test0");
   }
 
   @Test
   void getAll() {
-    LRUCache<Integer, String> cache = new LRUCache<>("test_cache", 2, 2);
+    LRUCache<Integer, String> cache = new LRUCache<>("test_cache", 2, 2, new CacheConfiguration<>(Integer.class, String.class));
     cache.put(0, "test0");
     cache.put(1, "test1");
     cache.put(2, "test2");
@@ -147,7 +148,7 @@ class LRUCacheTest {
 
   @Test
   void iterator() {
-    LRUCache<Integer, String> cache = new LRUCache<>("test_cache", 2, 2);
+    LRUCache<Integer, String> cache = new LRUCache<>("test_cache", 2, 2, new CacheConfiguration<>(Integer.class, String.class));
     cache.put(0, "test0");
     cache.put(1, "test1");
 
@@ -162,7 +163,7 @@ class LRUCacheTest {
   @Test
   @SuppressWarnings("unchecked")
   void putAll() {
-    LRUCache<Integer, String> cache = new LRUCache<>("test_cache", 2, 2);
+    LRUCache<Integer, String> cache = new LRUCache<>("test_cache", 2, 2, new CacheConfiguration<>(Integer.class, String.class));
     cache.putAll(ImmutableMap.of(0, "test0", 1, "test1", 2, "test2"));
 
     Iterator<Cache.Entry<Integer, String>> iterator = cache.iterator();
@@ -174,7 +175,7 @@ class LRUCacheTest {
 
   @Test
   void putIfAbsent() {
-    LRUCache<Integer, String> cache = new LRUCache<>("test_cache", 2, 2);
+    LRUCache<Integer, String> cache = new LRUCache<>("test_cache", 2, 2, new CacheConfiguration<>(Integer.class, String.class));
     cache.putIfAbsent(0, "test0");
     assertThat(cache.get(0)).isEqualTo("test0");
 
@@ -184,7 +185,7 @@ class LRUCacheTest {
 
   @Test
   void remove() {
-    LRUCache<Integer, String> cache = new LRUCache<>("test_cache", 2, 2);
+    LRUCache<Integer, String> cache = new LRUCache<>("test_cache", 2, 2, new CacheConfiguration<>(Integer.class, String.class));
     cache.put(0, "test0");
     assertThat(cache.get(0)).isEqualTo("test0");
 
@@ -194,7 +195,7 @@ class LRUCacheTest {
 
   @Test
   void remove_with_value() {
-    LRUCache<Integer, String> cache = new LRUCache<>("test_cache", 2, 2);
+    LRUCache<Integer, String> cache = new LRUCache<>("test_cache", 2, 2, new CacheConfiguration<>(Integer.class, String.class));
     cache.put(0, "test0");
     assertThat(cache.get(0)).isEqualTo("test0");
 
@@ -208,7 +209,7 @@ class LRUCacheTest {
 
   @Test
   void getAndRemove() {
-    LRUCache<Integer, String> cache = new LRUCache<>("test_cache", 2, 2);
+    LRUCache<Integer, String> cache = new LRUCache<>("test_cache", 2, 2, new CacheConfiguration<>(Integer.class, String.class));
     cache.put(0, "test0");
 
     assertThat(cache.getAndRemove(0)).isEqualTo("test0");
@@ -217,7 +218,7 @@ class LRUCacheTest {
 
   @Test
   void replace() {
-    LRUCache<Integer, String> cache = new LRUCache<>("test_cache", 2, 2);
+    LRUCache<Integer, String> cache = new LRUCache<>("test_cache", 2, 2, new CacheConfiguration<>(Integer.class, String.class));
     cache.put(0, "test0");
 
     assertThat(cache.replace(0, "test1")).isTrue();
@@ -228,7 +229,7 @@ class LRUCacheTest {
 
   @Test
   void replace_with_value() {
-    LRUCache<Integer, String> cache = new LRUCache<>("test_cache", 2, 2);
+    LRUCache<Integer, String> cache = new LRUCache<>("test_cache", 2, 2, new CacheConfiguration<>(Integer.class, String.class));
     cache.put(0, "test0");
 
     assertThat(cache.replace(0, "test1", "test2")).isFalse();
@@ -240,7 +241,7 @@ class LRUCacheTest {
 
   @Test
   void getAndReplace() {
-    LRUCache<Integer, String> cache = new LRUCache<>("test_cache", 2, 2);
+    LRUCache<Integer, String> cache = new LRUCache<>("test_cache", 2, 2, new CacheConfiguration<>(Integer.class, String.class));
     cache.put(0, "test0");
 
     assertThat(cache.getAndReplace(0, "test1")).isEqualTo("test0");
@@ -249,7 +250,7 @@ class LRUCacheTest {
 
   @Test
   void removeAll() {
-    LRUCache<Integer, String> cache = new LRUCache<>("test_cache", 2, 2);
+    LRUCache<Integer, String> cache = new LRUCache<>("test_cache", 2, 2, new CacheConfiguration<>(Integer.class, String.class));
     cache.put(0, "test0");
 
     cache.removeAll();
@@ -258,7 +259,7 @@ class LRUCacheTest {
 
   @Test
   void removeAll_with_subset() {
-    LRUCache<Integer, String> cache = new LRUCache<>("test_cache", 2, 2);
+    LRUCache<Integer, String> cache = new LRUCache<>("test_cache", 2, 2, new CacheConfiguration<>(Integer.class, String.class));
     cache.put(0, "test0");
 
     cache.removeAll(Collections.singleton(1));
@@ -270,7 +271,7 @@ class LRUCacheTest {
 
   @Test
   void clear() {
-    LRUCache<Integer, String> cache = new LRUCache<>("test_cache", 2, 2);
+    LRUCache<Integer, String> cache = new LRUCache<>("test_cache", 2, 2, new CacheConfiguration<>(Integer.class, String.class));
     cache.put(0, "test0");
 
     cache.clear();
@@ -279,24 +280,24 @@ class LRUCacheTest {
 
   @Test
   void getName() {
-    assertThat(new LRUCache<>("test_cache", 2, 2).getName()).isEqualTo("test_cache");
+    assertThat(new LRUCache<>("test_cache", 2, 2, new CacheConfiguration<>(Integer.class, String.class)).getName()).isEqualTo("test_cache");
   }
 
   @Test
   void close() {
-    LRUCache<Object, Object> cache = new LRUCache<>("test_cache", 2, 2);
+    LRUCache<Object, Object> cache = new LRUCache<>("test_cache", 2, 2, new CacheConfiguration<>(Object.class, Object.class));
     cache.close();
     assertThat(cache.isClosed()).isTrue();
   }
 
   @Test
   void getCacheManager() {
-    assertThat(new LRUCache<>("test_cache", 2, 2).getCacheManager()).isEqualTo(InMemoryCacheManager.INSTANCE);
+    assertThat(new LRUCache<>("test_cache", 2, 2, new CacheConfiguration<>(Integer.class, String.class)).getCacheManager()).isEqualTo(InMemoryCacheManager.INSTANCE);
   }
 
   @Test
   void unwrap() {
-    LRUCache<Object, Object> cache = new LRUCache<>("test_cache", 2, 2);
+    LRUCache<Object, Object> cache = new LRUCache<>("test_cache", 2, 2, new CacheConfiguration<>(Object.class, Object.class));
     assertThat(cache.unwrap(LRUCache.class)).isEqualTo(cache);
 
     assertThatExceptionOfType(IllegalArgumentException.class)
@@ -304,39 +305,67 @@ class LRUCacheTest {
         .withMessage("Cannot unwrap to class java.lang.Integer");
   }
 
+  @Test
+  @SuppressWarnings("unchecked")
+  void getConfiguration() {
+    CacheConfiguration<Object, Object> cacheConfiguration = new CacheConfiguration<>(Object.class, Object.class);
+    LRUCache<Object, Object> cache = new LRUCache<>("test_cache", 2, 2, cacheConfiguration);
+    assertThat(cache.getConfiguration(CacheConfiguration.class)).isEqualTo(cacheConfiguration);
+
+    Configuration<?, ?> dummyConfiguration = new Configuration() {
+      @Override
+      public Class getKeyType() {
+        return null;
+      }
+
+      @Override
+      public Class getValueType() {
+        return null;
+      }
+
+      @Override
+      public boolean isStoreByValue() {
+        return false;
+      }
+    };
+    assertThatExceptionOfType(IllegalArgumentException.class)
+        .isThrownBy(() -> cache.getConfiguration(dummyConfiguration.getClass()))
+        .withMessage("The configuration class " + dummyConfiguration.getClass() + " is not supported by this implementation");
+  }
+
   // Not supported methods
   @Test
   void invoke() {
     assertThatExceptionOfType(UnsupportedOperationException.class)
-        .isThrownBy(() -> new LRUCache<>("test_cache", 3, 3).invoke(null, null, new Object[]{}))
+        .isThrownBy(() -> new LRUCache<>("test_cache", 3, 3, new CacheConfiguration<>(Integer.class, String.class)).invoke(null, null, new Object[]{}))
         .withMessage("LRUCache invoke method unsupported");
   }
 
   @Test
   void invokeAll() {
     assertThatExceptionOfType(UnsupportedOperationException.class)
-        .isThrownBy(() -> new LRUCache<>("test_cache", 3, 3).invokeAll(null, null, new Object[]{}))
+        .isThrownBy(() -> new LRUCache<>("test_cache", 3, 3, new CacheConfiguration<>(Integer.class, String.class)).invokeAll(null, null, new Object[]{}))
         .withMessage("LRUCache invokeAll method unsupported");
   }
 
   @Test
   void loadAll() {
     assertThatExceptionOfType(UnsupportedOperationException.class)
-        .isThrownBy(() -> new LRUCache<>("test_cache", 3, 3).loadAll(null, false, null))
+        .isThrownBy(() -> new LRUCache<>("test_cache", 3, 3, new CacheConfiguration<>(Integer.class, String.class)).loadAll(null, false, null))
         .withMessage("LRUCache loadAll method unsupported");
   }
 
   @Test
   void registerCacheEntryListener() {
     assertThatExceptionOfType(UnsupportedOperationException.class)
-        .isThrownBy(() -> new LRUCache<>("test_cache", 3, 3).registerCacheEntryListener(null))
+        .isThrownBy(() -> new LRUCache<>("test_cache", 3, 3, new CacheConfiguration<>(Integer.class, String.class)).registerCacheEntryListener(null))
         .withMessage("LRUCache registerCacheEntryListener method unsupported");
   }
 
   @Test
   void deregisterCacheEntryListener() {
     assertThatExceptionOfType(UnsupportedOperationException.class)
-        .isThrownBy(() -> new LRUCache<>("test_cache", 3, 3).deregisterCacheEntryListener(null))
+        .isThrownBy(() -> new LRUCache<>("test_cache", 3, 3, new CacheConfiguration<>(Integer.class, String.class)).deregisterCacheEntryListener(null))
         .withMessage("LRUCache deregisterCacheEntryListener method unsupported");
   }
 }

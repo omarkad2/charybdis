@@ -19,10 +19,7 @@
 
 package ma.markware.charybdis.cache;
 
-import javax.cache.CacheException;
 import javax.cache.CacheManager;
-import javax.cache.Caching;
-import javax.cache.spi.CachingProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,16 +33,21 @@ public class CacheManagerFactory {
   private static final Logger log = LoggerFactory.getLogger(CacheManagerFactory.class);
 
   /**
+   * Cache is needed primarily to cache prepared statements. Our aim here was to reuse any JCache provider
+   * present in client code, yet since the cached value {@link com.datastax.oss.driver.api.core.cql.PreparedStatement} is not serializable,
+   * it is not safe to use any non in-memory cache. So this is why we only use internal solution {@link LRUCache}
+   *
    * @return cache manager
    */
   public static CacheManager getCacheManager() {
-    try {
+    /*try {
       CachingProvider cachingProvider = Caching.getCachingProvider();
       log.info("Using cache provider: {}", cachingProvider.getDefaultURI());
       return cachingProvider.getCacheManager();
     } catch (CacheException e) {
       log.info("No caching provider found, fallback on in memory cache");
       return InMemoryCacheManager.INSTANCE;
-    }
+    }*/
+    return InMemoryCacheManager.INSTANCE;
   }
 }

@@ -34,6 +34,11 @@ import javax.cache.spi.CachingProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Internal use only. Our main cache manager
+ *
+ * @author Oussama Markad
+ */
 class InMemoryCacheManager implements CacheManager {
 
   static final InMemoryCacheManager INSTANCE = new InMemoryCacheManager();
@@ -42,7 +47,7 @@ class InMemoryCacheManager implements CacheManager {
   private static final int CACHE_INITIAL_CAPACITY = 200;
   private static final int CACHE_MAX_CAPACITY = 500;
 
-  private final ConcurrentMap<String, Cache> caches = new ConcurrentHashMap<String, Cache>();
+  private final ConcurrentMap<String, Cache> caches = new ConcurrentHashMap<>();
   private final AtomicBoolean isClosed = new AtomicBoolean(false);
 
   @Override
@@ -69,22 +74,34 @@ class InMemoryCacheManager implements CacheManager {
   public <K, V, C extends Configuration<K, V>> Cache<K, V> createCache(final String name, final C configuration) {
     ensureOpen();
     checkNotNull(name, "cache name cannot be null");
+    checkNotNull(configuration, "cache configuration cannot be null");
     if (caches.containsKey(name)) {
       throw new CacheException(format("A cache named '%s' already exists", name));
     }
-    LRUCache<K, V> newCache = new LRUCache<>(name, CACHE_INITIAL_CAPACITY, CACHE_MAX_CAPACITY);
+    LRUCache<K, V> newCache = new LRUCache<>(name, CACHE_INITIAL_CAPACITY, CACHE_MAX_CAPACITY, configuration);
     caches.put(name, newCache);
     return newCache;
   }
 
   @Override
   @SuppressWarnings("unchecked")
-  public <K, V> Cache<K, V> getCache(final String name, final Class<K> keyClass, final Class<V> valueClass) {
+  public <K, V> Cache<K, V> getCache(final String name, final Class<K> keyType, final Class<V> valueType) {
     ensureOpen();
-    checkNotNull(keyClass, "key class can not be null");
-    checkNotNull(valueClass, "value class can not be null");
-    log.warn("(Internal use only) No guarantees on type safety of the returned cache");
-    return caches.get(name);
+    checkNotNull(keyType, "key class can not be null");
+    checkNotNull(valueType, "value class can not be null");
+    Cache cache = caches.get(name);
+    Configuration configuration = cache.getConfiguration(CacheConfiguration.class);
+    Class actualKeyType = configuration.getKeyType();
+    Class actualValueType = configuration.getValueType();
+    if (keyType != actualKeyType) {
+      throw new ClassCastException("Cache has key type " + actualKeyType.getName()
+                                       + ", but getCache() called with key type " + keyType.getName());
+    }
+    if (valueType != actualValueType) {
+      throw new ClassCastException("Cache has value type " + actualValueType.getName()
+                                       + ", but getCache() called with value type " + valueType.getName());
+    }
+    return cache;
   }
 
   @Override

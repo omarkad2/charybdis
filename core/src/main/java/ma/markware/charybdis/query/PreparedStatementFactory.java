@@ -20,9 +20,11 @@ package ma.markware.charybdis.query;
 
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.cql.PreparedStatement;
+import java.io.Serializable;
 import java.util.Objects;
 import javax.cache.Cache;
 import javax.cache.CacheManager;
+import ma.markware.charybdis.cache.CacheConfiguration;
 import ma.markware.charybdis.cache.CacheManagerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,12 +61,12 @@ class PreparedStatementFactory {
   private static Cache<CacheKey, PreparedStatement> resolveCache() {
     Cache<CacheKey, PreparedStatement> cache = CACHE_MANAGER.getCache(CACHE_NAME);
     if (cache == null || cache.isClosed()) {
-      cache = CACHE_MANAGER.createCache(CACHE_NAME, null);
+      cache = CACHE_MANAGER.createCache(CACHE_NAME, new CacheConfiguration<>(CacheKey.class, PreparedStatement.class));
     }
     return cache;
   }
 
-  static class CacheKey {
+  static class CacheKey implements Serializable {
 
     private final String sessionName;
     private final String query;

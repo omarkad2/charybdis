@@ -19,6 +19,8 @@
 
 package ma.markware.charybdis.cache;
 
+import static java.lang.String.format;
+
 import com.googlecode.concurrentlinkedhashmap.ConcurrentLinkedHashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -38,6 +40,14 @@ import javax.cache.processor.EntryProcessorResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Least recently used cache.
+ *
+ * @param <K> key type
+ * @param <V> value type
+ *
+ * @author Oussama Markad
+ */
 class LRUCache<K, V> implements Cache<K, V> {
 
   private static final Logger log = LoggerFactory.getLogger(LRUCache.class);
@@ -45,15 +55,17 @@ class LRUCache<K, V> implements Cache<K, V> {
   private final String name;
   private final ConcurrentLinkedHashMap<K, V> cache;
   private final AtomicBoolean isClosed;
+  private final Configuration<K, V> cacheConfig;
 
-  LRUCache(final String name, final int initialCacheCapacity, final int maxCacheCapacity) {
+  LRUCache(final String name, final int initialCacheCapacity, final int maxCacheCapacity, final Configuration<K, V> cacheConfig) {
     this.name = name;
     this.cache = new ConcurrentLinkedHashMap.Builder<K, V>()
         .initialCapacity(initialCacheCapacity)
         .maximumWeightedCapacity(maxCacheCapacity)
         .listener((key, value) -> log.info("Cache Eviction : [key: {}, value: {}]", key, value))
         .build();
-    isClosed = new AtomicBoolean(false);
+    this.isClosed = new AtomicBoolean(false);
+    this.cacheConfig = cacheConfig;
   }
 
   @Override
@@ -168,9 +180,11 @@ class LRUCache<K, V> implements Cache<K, V> {
   }
 
   @Override
-  public <C extends Configuration<K, V>> C getConfiguration(final Class<C> aClass) {
-    // we use default configuration no need to have a custom implementation
-    return null;
+  public <C extends Configuration<K, V>> C getConfiguration(final Class<C> clazz) {
+    if (clazz.isInstance(cacheConfig)) {
+      return clazz.cast(this.cacheConfig);
+    }
+    throw new IllegalArgumentException(format("The configuration class %s is not supported by this implementation", clazz));
   }
 
   @Override
