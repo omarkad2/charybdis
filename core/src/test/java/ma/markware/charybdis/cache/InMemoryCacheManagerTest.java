@@ -59,16 +59,16 @@ class InMemoryCacheManagerTest {
 
   @Test
   void createCache() {
-    Cache<Object, Object> cache = inMemoryCacheManager.createCache("test_cache", null);
+    Cache<Integer, String> cache = inMemoryCacheManager.createCache("test_cache", new CacheConfiguration<>(Integer.class, String.class));
     assertThat(cache).isNotNull();
   }
 
   @Test
   void createCache_should_throw_exception_when_cache_already_exist() {
-    inMemoryCacheManager.createCache("test_cache", null);
+    inMemoryCacheManager.createCache("test_cache", new CacheConfiguration<>(Integer.class, String.class));
 
     assertThatExceptionOfType(CacheException.class)
-        .isThrownBy(() -> inMemoryCacheManager.createCache("test_cache", null))
+        .isThrownBy(() -> inMemoryCacheManager.createCache("test_cache", new CacheConfiguration<>(Integer.class, String.class)))
         .withMessage("A cache named 'test_cache' already exists");
   }
 
@@ -83,13 +83,13 @@ class InMemoryCacheManagerTest {
   void createCache_should_throw_exception_when_cache_manager_closed() {
     inMemoryCacheManager.close();
     assertThatExceptionOfType(IllegalStateException.class)
-        .isThrownBy(() -> inMemoryCacheManager.createCache("test_cache", null))
+        .isThrownBy(() -> inMemoryCacheManager.createCache("test_cache", new CacheConfiguration<>(Integer.class, String.class)))
         .withMessage("CacheManager InMemoryCacheManager is already closed");
   }
 
   @Test
   void getCache() {
-    inMemoryCacheManager.createCache("test_cache", null);
+    inMemoryCacheManager.createCache("test_cache", new CacheConfiguration<>(Integer.class, String.class));
     //For now we ignore type parameters
     Cache<Object, Object> cache = inMemoryCacheManager.getCache("test_cache");
     assertThat(cache).isNotNull();
@@ -97,16 +97,24 @@ class InMemoryCacheManagerTest {
 
   @Test
   void getCache_with_types() {
-    inMemoryCacheManager.createCache("test_cache", null);
-    //For now we ignore type parameters
+    inMemoryCacheManager.createCache("test_cache", new CacheConfiguration<>(Integer.class, String.class));
+
     Cache<Integer, String> cache = inMemoryCacheManager.getCache("test_cache", Integer.class, String.class);
     assertThat(cache).isNotNull();
+
+    assertThatExceptionOfType(ClassCastException.class)
+        .isThrownBy(() -> inMemoryCacheManager.getCache("test_cache", String.class, String.class))
+        .withMessage("Cache has key type java.lang.Integer, but getCache() called with key type java.lang.String");
+
+    assertThatExceptionOfType(ClassCastException.class)
+        .isThrownBy(() -> inMemoryCacheManager.getCache("test_cache", Integer.class, Long.class))
+        .withMessage("Cache has value type java.lang.String, but getCache() called with value type java.lang.Long");
   }
 
   @Test
   void getCacheNames() {
-    inMemoryCacheManager.createCache("test_cache1", null);
-    inMemoryCacheManager.createCache("test_cache2", null);
+    inMemoryCacheManager.createCache("test_cache1", new CacheConfiguration<>(Integer.class, String.class));
+    inMemoryCacheManager.createCache("test_cache2", new CacheConfiguration<>(Integer.class, String.class));
 
     Iterable<String> cacheNames = inMemoryCacheManager.getCacheNames();
     assertThat(cacheNames).containsExactlyInAnyOrder("test_cache1", "test_cache2");
@@ -114,7 +122,7 @@ class InMemoryCacheManagerTest {
 
   @Test
   void destroyCache() {
-    Cache<Object, Object> cache = inMemoryCacheManager.createCache("test_cache", null);
+    Cache<Integer, String> cache = inMemoryCacheManager.createCache("test_cache", new CacheConfiguration<>(Integer.class, String.class));
 
     inMemoryCacheManager.destroyCache("test_cache");
     assertThat(cache.isClosed()).isTrue();
@@ -122,8 +130,8 @@ class InMemoryCacheManagerTest {
 
   @Test
   void close() {
-    Cache<Object, Object> cache1 = inMemoryCacheManager.createCache("test_cache1", null);
-    Cache<Object, Object> cache2 = inMemoryCacheManager.createCache("test_cache2", null);
+    Cache<Object, Object> cache1 = inMemoryCacheManager.createCache("test_cache1", new CacheConfiguration<>(Object.class, Object.class));
+    Cache<Object, Object> cache2 = inMemoryCacheManager.createCache("test_cache2", new CacheConfiguration<>(Object.class, Object.class));
 
     inMemoryCacheManager.close();
 
