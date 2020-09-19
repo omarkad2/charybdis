@@ -20,9 +20,10 @@ package ma.markware.charybdis.query;
 
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.cql.PreparedStatement;
-import com.datastax.oss.driver.api.core.session.Session;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Objects;
+import javax.cache.Cache;
+import javax.cache.CacheManager;
+import ma.markware.charybdis.cache.CacheManagerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,32 +36,59 @@ import org.slf4j.LoggerFactory;
 class PreparedStatementFactory {
 
   private static final Logger log = LoggerFactory.getLogger(PreparedStatementFactory.class);
-
-  //TODO: cannot use session as HashMap key (doesn't implement equals and hashCode)
-  private static final Map<Session, Map<String, PreparedStatement>> PREPARED_STATEMENT_CACHE = new ConcurrentHashMap<>();
-
-  private static String buildKey(final String sessionName, final String query) {
-    return sessionName + "_" + query;
-  }
+  static final CacheManager CACHE_MANAGER = CacheManagerFactory.getCacheManager();
+  static final String CACHE_NAME = "charybdis_prepared_statements";
 
   /**
    * Create prepared statement.
    */
   static PreparedStatement createPreparedStatement(final CqlSession session, final String query) {
-    Map<String, PreparedStatement> sessionPreparedStatementCache = PREPARED_STATEMENT_CACHE.get(session);
-    if (sessionPreparedStatementCache == null) {
-      sessionPreparedStatementCache = new ConcurrentHashMap<>();
-    }
-    final String cacheKey = buildKey(session.getName(), query);
-    PreparedStatement preparedStatement = sessionPreparedStatementCache.get(cacheKey);
+    Cache<CacheKey, PreparedStatement> preparedStatementCache = resolveCache();
+    final CacheKey cacheKey = new CacheKey(session.getName(), query);
+    PreparedStatement preparedStatement = preparedStatementCache.get(cacheKey);
     if (preparedStatement == null) {
       log.debug("New Prepared statement (will be stored in cache)");
       log.debug("Query : {}", query);
       preparedStatement = session.prepare(query);
 
-      sessionPreparedStatementCache.put(cacheKey, preparedStatement);
-      PREPARED_STATEMENT_CACHE.put(session, sessionPreparedStatementCache);
+      preparedStatementCache.put(cacheKey, preparedStatement);
     }
     return preparedStatement;
+  }
+
+  private static Cache<CacheKey, PreparedStatement> resolveCache() {
+    Cache<CacheKey, PreparedStatement> cache = CACHE_MANAGER.getCache(CACHE_NAME);
+    if (cache == null || cache.isClosed()) {
+      cache = CACHE_MANAGER.createCache(CACHE_NAME, null);
+    }
+    return cache;
+  }
+
+  static class CacheKey {
+
+    private final String sessionName;
+    private final String query;
+
+    CacheKey(final String sessionName, final String query) {
+      this.sessionName = sessionName;
+      this.query = query;
+    }
+
+    @Override
+    public boolean equals(final Object o) {
+      if (this == o) {
+        return true;
+      }
+      if (!(o instanceof CacheKey)) {
+        return false;
+      }
+      final CacheKey cacheKey = (CacheKey) o;
+      return Objects.equals(sessionName, cacheKey.sessionName) && Objects.equals(query, cacheKey.query);
+    }
+
+    @Override
+    public int hashCode() {
+      return Objects.hash(sessionName, query);
+    }
   }
 }
