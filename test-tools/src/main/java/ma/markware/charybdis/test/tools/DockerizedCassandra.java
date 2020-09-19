@@ -33,6 +33,7 @@ import java.net.ServerSocket;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import org.junit.jupiter.api.extension.ExtensionContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,26 +42,39 @@ import org.slf4j.LoggerFactory;
  *
  * @author Oussama Markad
  */
-public class DockerizedCassandra implements AutoCloseable {
+public class DockerizedCassandra implements ExtensionContext.Store.CloseableResource {
 
   private static final Logger logger = LoggerFactory.getLogger(DockerizedCassandra.class);
 
+  // Docker image
   private static final String DOCKER_IMAGE_NAME = "cassandra:3.11.7";
 //  private static final String DOCKER_IMAGE_NAME = "scylladb/scylla";
+
+  // Datastax properties
+  private static final String REQUEST_TIMEOUT_PROPERTY = "datastax-java-driver.basic.request.timeout";
+  private static final String CONTACT_POINT_PROPERTY = "datastax-java-driver.basic.contact-points.0";
+  private static final String LOCAL_DATACENTER_PROPERTY = "datastax-java-driver.basic.load-balancing-policy.local-datacenter";
+
+  // Values
   private static final int CQL_PORT = 9042;
   private static final String DEFAULT_DATACENTER = "datacenter1";
 
-  private final BackoffService backoffService;
   private final DockerClient dockerClient;
+  private final BackoffService backoffService;
   private String containerId;
   private int port;
   private CqlSession session;
-  private boolean connection;
+  private boolean isUp;
 
   DockerizedCassandra() throws IOException {
     this.dockerClient = DockerClientBuilder.getInstance().build();
     this.backoffService = new BackoffService(10, 10000);
     this.port = findFreePort();
+    this.isUp = false;
+    System.setProperty(REQUEST_TIMEOUT_PROPERTY, "10 minutes");
+    System.setProperty(CONTACT_POINT_PROPERTY, "127.0.0.1:" + port);
+    System.setProperty(LOCAL_DATACENTER_PROPERTY, DEFAULT_DATACENTER);
+    start();
   }
 
   public CqlSession getSession() {
@@ -74,7 +88,7 @@ public class DockerizedCassandra implements AutoCloseable {
   /**
    * Start docker image.
    */
-  void start() {
+  private void start() {
     ExposedPort tcp = ExposedPort.tcp(CQL_PORT);
 
     Ports portBindings = new Ports();
@@ -99,14 +113,14 @@ public class DockerizedCassandra implements AutoCloseable {
                             .withLocalDatacenter(DEFAULT_DATACENTER)
                             .build();
         backoffService.doNotRetry();
-        connection = true;
+        isUp = true;
       } catch (AllNodesFailedException e) {
         logger.info("Connection failed, will try back in: {}ms. Number of tries left: {}", backoffService.getTimeToWait(), backoffService.getNumberOfTriesLeft());
         backoffService.retry();
       }
     }
 
-    if (!connection) {
+    if (!isUp) {
       throw new IllegalStateException("Couldn't establish connection with cassandra instance");
     }
     logger.info("Connection established with success");
@@ -124,6 +138,9 @@ public class DockerizedCassandra implements AutoCloseable {
       logger.info("Kill & Remove Container");
       dockerClient.killContainerCmd(containerId).exec();
       dockerClient.removeContainerCmd(containerId).exec();
+      System.clearProperty(REQUEST_TIMEOUT_PROPERTY);
+      System.clearProperty(CONTACT_POINT_PROPERTY);
+      System.clearProperty(LOCAL_DATACENTER_PROPERTY);
     }
   }
 

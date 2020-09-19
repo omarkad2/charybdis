@@ -21,14 +21,12 @@ package ma.markware.charybdis.test.tools;
 import com.datastax.oss.driver.api.core.CqlSession;
 import java.util.HashSet;
 import java.util.Set;
-import org.junit.jupiter.api.extension.AfterAllCallback;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
+import org.junit.jupiter.api.extension.ExtensionContext.Namespace;
 import org.junit.jupiter.api.extension.ParameterContext;
 import org.junit.jupiter.api.extension.ParameterResolutionException;
 import org.junit.jupiter.api.extension.ParameterResolver;
-import org.junit.jupiter.api.extension.TestExecutionExceptionHandler;
-import org.junit.platform.commons.support.ModifierSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,7 +39,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Oussama Markad
  */
-public class DatabaseSetupExtension implements BeforeAllCallback, AfterAllCallback, ParameterResolver, TestExecutionExceptionHandler {
+public class DatabaseSetupExtension implements BeforeAllCallback, ParameterResolver {
 
   private static final Logger log = LoggerFactory.getLogger(DatabaseSetupExtension.class);
 
@@ -58,44 +56,9 @@ public class DatabaseSetupExtension implements BeforeAllCallback, AfterAllCallba
    * {@inheritDoc}
    */
   @Override
-  public void beforeAll(final ExtensionContext extensionContext) throws Exception {
-    if (extensionContext.getTestClass().isPresent()) {
-      Class<?> currentClass = extensionContext.getTestClass().get();
-      if (isNestedClass(currentClass)) {
-        return;
-      }
-    }
-    dockerizedCassandra = new DockerizedCassandra();
-    dockerizedCassandra.start();
-    System.setProperty("datastax-java-driver.basic.request.timeout", "10 minutes");
-    System.setProperty("datastax-java-driver.basic.contact-points.0", "127.0.0.1:" + dockerizedCassandra.getPort());
-    System.setProperty("datastax-java-driver.basic.load-balancing-policy.local-datacenter", "datacenter1");
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public void afterAll(final ExtensionContext extensionContext) {
-    if (extensionContext.getTestClass().isPresent()) {
-      Class<?> currentClass = extensionContext.getTestClass().get();
-      if (isNestedClass(currentClass)) {
-        return;
-      }
-    }
-    log.info("Tests ended : Stopping cassandra");
-    stopDb();
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public void handleTestExecutionException(final ExtensionContext context, final Throwable throwable) {
-    if (!(throwable instanceof AssertionError)) {
-      log.error("Unknown error occurred : Stopping cassandra", throwable);
-      stopDb();
-    }
+  public void beforeAll(final ExtensionContext extensionContext) {
+    dockerizedCassandra = extensionContext.getRoot().getStore(Namespace.GLOBAL)
+                                          .getOrComputeIfAbsent(DockerizedCassandra.class);
   }
 
   /**
@@ -120,16 +83,5 @@ public class DatabaseSetupExtension implements BeforeAllCallback, AfterAllCallba
       return dockerizedCassandra.getPort();
     }
     return null;
-  }
-
-  private boolean isNestedClass(Class<?> currentClass) {
-    return !ModifierSupport.isStatic(currentClass) && currentClass.isMemberClass();
-  }
-
-  private void stopDb() {
-    dockerizedCassandra.close();
-    System.clearProperty("datastax-java-driver.basic.request.timeout");
-    System.clearProperty("datastax-java-driver.basic.contact-points.0");
-    System.clearProperty("datastax-java-driver.basic.load-balancing-policy.local-datacenter");
   }
 }
