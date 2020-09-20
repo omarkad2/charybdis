@@ -387,7 +387,7 @@ class DslQueryBatchBuilderITest  extends AbstractIntegrationITest {
 
       // Then
       assertThat(record).isNotNull();
-      assertThat(record.get(ttl)).isEqualTo(ttlInSeconds);
+      assertThat(record.get(ttl)).isLessThanOrEqualTo(ttlInSeconds);
     }
   }
 
