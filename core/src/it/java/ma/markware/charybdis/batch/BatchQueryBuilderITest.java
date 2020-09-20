@@ -72,7 +72,7 @@ class BatchQueryBuilderITest extends AbstractIntegrationITest {
 
     @BeforeEach
     void setup() {
-      entity1 = TestEntity_INST1.entity1;
+      entity1 = new TestEntity(TestEntity_INST1.entity1);
       // Create instance with same partition key & different clustering key
       entity2 = new TestEntity(TestEntity_INST1.entity1);
       entity2.setDate(Instant.now().plus(10, ChronoUnit.DAYS));
@@ -195,7 +195,7 @@ class BatchQueryBuilderITest extends AbstractIntegrationITest {
 
     @BeforeEach
     void setup() {
-      entity = TestEntity_INST1.entity1;
+      entity = new TestEntity(TestEntity_INST1.entity1);
       entityByDate = new TestEntityByDate(Instant.now(), TestEntity_INST1.udt1, Arrays.asList("test1", "test2"), true);
 
       dsl.insertInto(TestEntity_Table.test_entity, TestEntity_Table.id, TestEntity_Table.date, TestEntity_Table.udt, TestEntity_Table.list,
@@ -307,7 +307,7 @@ class BatchQueryBuilderITest extends AbstractIntegrationITest {
 
     @BeforeEach
     void setup() {
-      entity = TestEntity_INST1.entity1;
+      entity = new TestEntity(TestEntity_INST1.entity1);
       entityByDate = new TestEntityByDate(Instant.now(), TestEntity_INST1.udt1, Arrays.asList("test1", "test2"), true);
 
       dsl.insertInto(TestEntity_Table.test_entity, TestEntity_Table.id, TestEntity_Table.date, TestEntity_Table.udt, TestEntity_Table.list,
