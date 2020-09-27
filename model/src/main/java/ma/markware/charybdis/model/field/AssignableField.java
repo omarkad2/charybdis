@@ -19,7 +19,7 @@
 package ma.markware.charybdis.model.field;
 
 /**
- * Field to which we can assign values
+ * Field to which we can assign values.
  *
  * @param <D> field's type after deserialization.
  * @param <S> field's type after serialization.

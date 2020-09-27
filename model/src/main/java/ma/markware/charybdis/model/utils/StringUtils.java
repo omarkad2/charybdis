@@ -25,6 +25,10 @@ package ma.markware.charybdis.model.utils;
  */
 public class StringUtils {
 
+  private StringUtils() {
+    //not called
+  }
+
   /**
    * @return input string enclosed in double quotes.
    */

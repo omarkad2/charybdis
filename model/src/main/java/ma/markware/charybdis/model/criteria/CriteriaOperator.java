@@ -19,7 +19,7 @@
 package ma.markware.charybdis.model.criteria;
 
 /**
- * Condition operators
+ * Condition operators.
  *
  * @author Oussama Markad
  */

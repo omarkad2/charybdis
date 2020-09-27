@@ -24,7 +24,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Annotation to indicate that a field is a column
+ * Annotation to indicate that a field is a column.
  *
  * Examples:
  *

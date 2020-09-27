@@ -36,7 +36,7 @@ import ma.markware.charybdis.model.option.SerialConsistencyLevel;
  * public class TableDefinition {
  *  ...<Column definitions>...
  * }
- * <code></pre>
+ * </code></pre>
  *
  * @author Oussama Markad
  */
@@ -69,7 +69,7 @@ public @interface Table {
   ConsistencyLevel readConsistency() default ConsistencyLevel.NOT_SPECIFIED;
 
   /**
-   * Default serial consistency (overridable at query level);
+   * Default serial consistency (overridable at query level).
    */
   SerialConsistencyLevel serialConsistency() default SerialConsistencyLevel.NOT_SPECIFIED;
 }

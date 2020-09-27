@@ -58,6 +58,10 @@ public class DataTypeMapper {
     dataTypeMap.put(LocalDate.class, DataTypes.DATE);
   }
 
+  private DataTypeMapper() {
+    //not called
+  }
+
   /**
    * Get Cassandra data type from java class.
    */

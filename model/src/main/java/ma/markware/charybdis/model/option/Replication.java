@@ -28,7 +28,7 @@ import java.util.Objects;
  */
 public class Replication {
 
-  public static Replication DEFAULT_REPLICATION = new Replication(ReplicationStrategyClass.SIMPLE_STRATEGY, 1);
+  public static final Replication DEFAULT_REPLICATION = new Replication(ReplicationStrategyClass.SIMPLE_STRATEGY, 1);
 
   private ReplicationStrategyClass replicationClass;
   private int replicationFactor;

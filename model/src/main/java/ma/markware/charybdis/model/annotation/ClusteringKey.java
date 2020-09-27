@@ -25,7 +25,7 @@ import java.lang.annotation.Target;
 import ma.markware.charybdis.model.option.ClusteringOrder;
 
 /**
- * Annotation to indicate that a field is a clustering key column
+ * Annotation to indicate that a field is a clustering key column.
  *
  * Examples:
  *
