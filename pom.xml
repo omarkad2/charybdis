@@ -28,9 +28,9 @@
   </developers>
 
   <scm>
-    <url>git@github.com:omarkad2/charybdis.git</url>
-    <connection>scm:git:git@github.com:omarkad2/charybdis.git</connection>
-    <developerConnection>scm:git:git@github.com:omarkad2/charybdis.git</developerConnection>
+    <url>https://github.com/omarkad2/charybdis.git</url>
+    <connection>scm:git:ssh://git@github.com:omarkad2/charybdis.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com:omarkad2/charybdis.git</developerConnection>
     <tag>HEAD</tag>
   </scm>
 
