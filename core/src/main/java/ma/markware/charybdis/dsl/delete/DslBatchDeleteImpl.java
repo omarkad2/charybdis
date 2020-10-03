@@ -16,45 +16,51 @@
  * limitations under the License.
  *
  */
+
 package ma.markware.charybdis.dsl.delete;
 
-import com.datastax.oss.driver.api.core.CqlSession;
-import com.datastax.oss.driver.api.core.cql.ResultSet;
 import java.time.Instant;
-import ma.markware.charybdis.ExecutionContext;
+import ma.markware.charybdis.batch.Batch;
+import ma.markware.charybdis.dsl.delete.batch.BatchDeleteExtraIfExpression;
+import ma.markware.charybdis.dsl.delete.batch.BatchDeleteExtraWhereExpression;
+import ma.markware.charybdis.dsl.delete.batch.BatchDeleteFinalExpression;
+import ma.markware.charybdis.dsl.delete.batch.BatchDeleteIfExpression;
+import ma.markware.charybdis.dsl.delete.batch.BatchDeleteInitExpression;
+import ma.markware.charybdis.dsl.delete.batch.BatchDeleteTimestampExpression;
+import ma.markware.charybdis.dsl.delete.batch.BatchDeleteWhereExpression;
 import ma.markware.charybdis.model.criteria.CriteriaExpression;
 import ma.markware.charybdis.model.field.DeletableField;
 import ma.markware.charybdis.model.field.metadata.TableMetadata;
 import ma.markware.charybdis.query.DeleteQuery;
 
 /**
- * Delete query builder.
+ * Delete in batch query builder.
  *
  * @author Oussama Markad
  */
-public class DslDeleteImpl
+public class DslBatchDeleteImpl
     extends AbstractDslDelete
-    implements DeleteInitExpression, DeleteTimestampExpression, DeleteWhereExpression, DeleteExtraWhereExpression, DeleteIfExpression, DeleteExtraIfExpression,
-    DeleteFinalExpression {
+    implements BatchDeleteInitExpression, BatchDeleteTimestampExpression, BatchDeleteWhereExpression, BatchDeleteExtraWhereExpression,
+    BatchDeleteIfExpression, BatchDeleteExtraIfExpression, BatchDeleteFinalExpression {
 
-  private final CqlSession session;
+  private final Batch batch;
 
-  public DslDeleteImpl(final CqlSession session, final ExecutionContext executionContext) {
-    super(new DeleteQuery(executionContext));
-    this.session = session;
+  public DslBatchDeleteImpl(final Batch batch) {
+    super(new DeleteQuery());
+    this.batch = batch;
   }
 
   /**
    * No-op method. (commodity)
    */
-  public DeleteInitExpression delete() {
+  public BatchDeleteInitExpression delete() {
     return this;
   }
 
   /**
    * Set fields to delete in query.
    */
-  public DeleteInitExpression delete(DeletableField... fields) {
+  public BatchDeleteInitExpression delete(DeletableField... fields) {
     deleteQuery.setSelectors(fields);
     return this;
   }
@@ -63,7 +69,7 @@ public class DslDeleteImpl
    * {@inheritDoc}
    */
   @Override
-  public DeleteTimestampExpression from(final TableMetadata table) {
+  public BatchDeleteTimestampExpression from(final TableMetadata table) {
     deleteQuery.setTable(table);
     return this;
   }
@@ -72,7 +78,7 @@ public class DslDeleteImpl
    * {@inheritDoc}
    */
   @Override
-  public DeleteWhereExpression usingTimestamp(final Instant timestamp) {
+  public BatchDeleteWhereExpression usingTimestamp(final Instant timestamp) {
     deleteQuery.setTimestamp(timestamp);
     return this;
   }
@@ -81,7 +87,7 @@ public class DslDeleteImpl
    * {@inheritDoc}
    */
   @Override
-  public DeleteWhereExpression usingTimestamp(final long timestamp) {
+  public BatchDeleteWhereExpression usingTimestamp(final long timestamp) {
     deleteQuery.setTimestamp(timestamp);
     return this;
   }
@@ -90,7 +96,7 @@ public class DslDeleteImpl
    * {@inheritDoc}
    */
   @Override
-  public DeleteExtraWhereExpression where(final CriteriaExpression criteria) {
+  public BatchDeleteExtraWhereExpression where(final CriteriaExpression criteria) {
     deleteQuery.setWhere(criteria);
     return this;
   }
@@ -99,7 +105,7 @@ public class DslDeleteImpl
    * {@inheritDoc}
    */
   @Override
-  public DeleteExtraWhereExpression and(final CriteriaExpression criteria) {
+  public BatchDeleteExtraWhereExpression and(final CriteriaExpression criteria) {
     deleteQuery.setWhere(criteria);
     return this;
   }
@@ -108,7 +114,7 @@ public class DslDeleteImpl
    * {@inheritDoc}
    */
   @Override
-  public DeleteExtraIfExpression if_(final CriteriaExpression condition) {
+  public BatchDeleteExtraIfExpression if_(final CriteriaExpression condition) {
     deleteQuery.setIf(condition);
     return this;
   }
@@ -117,17 +123,17 @@ public class DslDeleteImpl
    * {@inheritDoc}
    */
   @Override
-  public DeleteExtraIfExpression and_(final CriteriaExpression condition) {
+  public BatchDeleteExtraIfExpression and_(final CriteriaExpression condition) {
     deleteQuery.setIf(condition);
     return this;
   }
+
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public boolean execute() {
-    ResultSet resultSet = deleteQuery.execute(session);
-    return resultSet != null && resultSet.wasApplied();
+  public void execute() {
+    deleteQuery.addToBatch(batch);
   }
 }

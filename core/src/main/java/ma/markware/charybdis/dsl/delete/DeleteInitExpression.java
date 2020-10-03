@@ -28,7 +28,7 @@ import ma.markware.charybdis.model.field.metadata.TableMetadata;
  *
  * @author Oussama Markad
  */
-public interface DeleteInitExpression<RETURN_TYPE> {
+public interface DeleteInitExpression {
 
   /**
    * Set table to delete DSL query.
@@ -36,5 +36,5 @@ public interface DeleteInitExpression<RETURN_TYPE> {
    * @param table table to delete from.
    * @return updated delete DSL query expression.
    */
-  DeleteTimestampExpression<RETURN_TYPE> from(TableMetadata table);
+  DeleteTimestampExpression from(TableMetadata table);
 }

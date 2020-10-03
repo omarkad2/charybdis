@@ -16,19 +16,25 @@
  * limitations under the License.
  *
  */
+package ma.markware.charybdis.dsl.delete.batch;
 
-package ma.markware.charybdis.dsl.delete;
+import ma.markware.charybdis.model.criteria.CriteriaExpression;
 
-import ma.markware.charybdis.batch.Batch;
-import org.mockito.Mock;
+/**
+ * Delete DSL query expression.
+ *
+ * <p>
+ * It is not recommended to reference any object with type {@link BatchDeleteExtraIfExpression}.
+ *
+ * @author Oussama Markad
+ */
+public interface BatchDeleteExtraIfExpression extends BatchDeleteFinalExpression {
 
-class DslDeleteBatchImplTest extends AbstractDslDeleteTest<DslDeleteBatchImpl> {
-
-  @Mock
-  private Batch batch;
-
-  @Override
-  DslDeleteBatchImpl getInstance() {
-    return new DslDeleteBatchImpl(batch);
-  }
+  /**
+   * Add condition to {@code IF} clause in delete DSL query.
+   *
+   * @param condition additional condition
+   * @return updated delete DSL query expression.
+   */
+  BatchDeleteExtraIfExpression and_(CriteriaExpression condition);
 }

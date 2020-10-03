@@ -16,22 +16,21 @@
  * limitations under the License.
  *
  */
-package ma.markware.charybdis.dsl.delete;
+package ma.markware.charybdis.dsl.delete.batch;
 
 /**
  * Delete DSL query expression.
  *
  * <p>
- * It is not recommended to reference any object with type {@link DeleteFinalExpression}.
+ * It is not recommended to reference any object with type {@link BatchDeleteFinalExpression}.
  *
  * @author Oussama Markad
  */
-public interface DeleteFinalExpression {
+public interface BatchDeleteFinalExpression {
 
   /**
-   * Added to a batch query if enclosed in one, otherwise execute update DSL query.
+   * Add to a batch query
    *
-   * @return {@code true} or {@code false} to inform if changes are applied or not.
    */
-  boolean execute();
+  void execute();
 }

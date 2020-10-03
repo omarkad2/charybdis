@@ -23,7 +23,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 
 import com.datastax.oss.driver.api.core.CqlIdentifier;
-import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.internal.querybuilder.condition.DefaultCondition;
 import com.datastax.oss.driver.internal.querybuilder.lhs.ColumnLeftOperand;
 import com.datastax.oss.driver.internal.querybuilder.relation.DefaultRelation;
@@ -34,8 +33,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
-import ma.markware.charybdis.ExecutionContext;
-import ma.markware.charybdis.model.option.ConsistencyLevel;
+import ma.markware.charybdis.batch.Batch;
 import ma.markware.charybdis.query.DeleteQuery;
 import ma.markware.charybdis.query.clause.ConditionClause;
 import ma.markware.charybdis.query.clause.WhereClause;
@@ -44,14 +42,14 @@ import ma.markware.charybdis.test.metadata.TestEntity_Table;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 
-class DslDeleteImplTest extends AbstractDslDeleteTest<DslDeleteImpl> {
+class DslBatchDeleteImplTest extends AbstractDslDeleteTest<DslBatchDeleteImpl> {
 
   @Mock
-  private CqlSession session;
+  private Batch batch;
 
   @Override
-  DslDeleteImpl getInstance() {
-    return new DslDeleteImpl(session, new ExecutionContext());
+  DslBatchDeleteImpl getInstance() {
+    return new DslBatchDeleteImpl(batch);
   }
 
   @Test
@@ -182,13 +180,5 @@ class DslDeleteImplTest extends AbstractDslDeleteTest<DslDeleteImpl> {
             tuple(CqlIdentifier.fromCql(TestEntity_Table.enumMap.getName()), "=", new Object[] { ImmutableMap.of(0, TestEnum.TYPE_A.name(), 1, TestEnum.TYPE_B.name()) }),
             tuple(CqlIdentifier.fromCql(TestEntity_Table.udtList.getName()), "!=", new Object[] { Arrays.asList(TestEntity_Table.udt.serialize(udt1), TestEntity_Table.udt.serialize(udt2))})
         );
-  }
-
-  @Test
-  void delete_should_set_fallback_consistency() {
-    ExecutionContext executionContext = new ExecutionContext();
-    DslDeleteImpl dslDeleteImpl = new DslDeleteImpl(session, executionContext);
-    dslDeleteImpl.delete().from(TestEntity_Table.test_entity);
-    assertThat(executionContext.getDefaultConsistencyLevel()).isEqualTo(ConsistencyLevel.QUORUM);
   }
 }

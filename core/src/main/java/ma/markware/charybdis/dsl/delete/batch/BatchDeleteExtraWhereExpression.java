@@ -16,32 +16,25 @@
  * limitations under the License.
  *
  */
+package ma.markware.charybdis.dsl.delete.batch;
 
-package ma.markware.charybdis.dsl.delete;
-
-import ma.markware.charybdis.batch.Batch;
-import ma.markware.charybdis.query.DeleteQuery;
+import ma.markware.charybdis.model.criteria.CriteriaExpression;
 
 /**
- * Delete in batch query builder.
+ * Delete DSL query expression.
+ *
+ * <p>
+ * It is not recommended to reference any object with type {@link BatchDeleteExtraWhereExpression}.
  *
  * @author Oussama Markad
  */
-public class DslDeleteBatchImpl extends AbstractDslDelete<Void> {
-
-  private final Batch batch;
-
-  public DslDeleteBatchImpl(final Batch batch) {
-    super(new DeleteQuery());
-    this.batch = batch;
-  }
+public interface BatchDeleteExtraWhereExpression extends BatchDeleteIfExpression {
 
   /**
-   * {@inheritDoc}
+   * Add condition to {@code WHERE} clause in delete DSL query.
+   *
+   * @param condition additional condition
+   * @return updated delete DSL query expression.
    */
-  @Override
-  public Void execute() {
-    deleteQuery.addToBatch(batch);
-    return null;
-  }
+  BatchDeleteExtraWhereExpression and(CriteriaExpression condition);
 }
