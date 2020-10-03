@@ -511,22 +511,6 @@ class DslQueryBuilderITest extends AbstractIntegrationITest {
                  TestEntity_INST1.extraUdt, TestEntity_INST1.udtList, TestEntity_INST1.udtSet, TestEntity_INST1.udtMap, TestEntity_INST1.udtNestedList, TestEntity_INST1.flag)
          .executeAsync().thenAccept(applied -> {
         assertThat(applied).isTrue();
-
-        Record record = dsl.selectFrom(TestEntity_Table.test_entity)
-                           .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
-                           .fetchOne();
-
-        TestEntity actual = new TestEntity(record.get(TestEntity_Table.id),
-                                           record.get(TestEntity_Table.date), record.get(TestEntity_Table.udt),
-                                           record.get(TestEntity_Table.list), record.get(TestEntity_Table.se), record.get(TestEntity_Table.map),
-                                           record.get(TestEntity_Table.nestedList), record.get(TestEntity_Table.nestedSet),
-                                           record.get(TestEntity_Table.nestedMap), record.get(TestEntity_Table.enumValue),
-                                           record.get(TestEntity_Table.enumList), record.get(TestEntity_Table.enumMap),
-                                           record.get(TestEntity_Table.enumNestedList), record.get(TestEntity_Table.extraUdt),
-                                           record.get(TestEntity_Table.udtList), record.get(TestEntity_Table.udtSet),
-                                           record.get(TestEntity_Table.udtMap), record.get(TestEntity_Table.udtNestedList),
-                                           record.get(TestEntity_Table.flag));
-        assertThat(actual).isEqualTo(TestEntity_INST1.entity1);
       });
     }
   }
@@ -803,40 +787,6 @@ class DslQueryBuilderITest extends AbstractIntegrationITest {
          .executeAsync()
          .thenAccept(applied -> {
            assertThat(applied).isTrue();
-
-           Record record = dsl.selectFrom(TestEntity_Table.test_entity)
-                              .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
-                              .fetchOne();
-
-           assertThat(record).isNotNull();
-           assertThat(record.get(TestEntity_Table.id)).isEqualTo(TestEntity_INST1.id);
-           assertThat(record.get(TestEntity_Table.date).truncatedTo(ChronoUnit.MILLIS)).isEqualTo(TestEntity_INST1.date.truncatedTo(ChronoUnit.MILLIS));
-           assertThat(record.get(TestEntity_Table.udt)).isEqualTo(TestEntity_INST1.udt1);
-           assertThat(record.get(TestEntity_Table.list)).isEqualTo(TestEntity_INST1.list);
-           Set<Integer> newSe = new HashSet<>(TestEntity_INST1.se);
-           newSe.add(1000);
-           newSe.add(1100);
-           assertThat(record.get(TestEntity_Table.se)).isEqualTo(newSe);
-           Map<String, String> newMap = new HashMap<>(TestEntity_INST1.map);
-           newMap.put("appendKey", "appendValue");
-           assertThat(record.get(TestEntity_Table.map)).isEqualTo(newMap);
-           assertThat(record.get(TestEntity_Table.nestedList)).isNull();
-           assertThat(record.get(TestEntity_Table.nestedSet)).isNull();
-           Map<String, Map<Integer, String>> newNestedMap = new HashMap<>(TestEntity_INST1.nestedMap);
-           newNestedMap.remove("key0");
-           assertThat(record.get(TestEntity_Table.nestedMap)).isEqualTo(newNestedMap);
-           assertThat(record.get(TestEntity_Table.enumValue)).isEqualTo(TestEntity_INST1.enumValue);
-           assertThat(record.get(TestEntity_Table.enumList)).isEqualTo(TestEntity_INST1.enumList);
-           assertThat(record.get(TestEntity_Table.enumMap)).isEqualTo(TestEntity_INST1.enumMap);
-           List<Set<TestEnum>> newEnumNestedList = new ArrayList<>(TestEntity_INST1.enumNestedList);
-           newEnumNestedList.add(0, ImmutableSet.of(TestEnum.TYPE_B));
-           assertThat(record.get(TestEntity_Table.enumNestedList)).isEqualTo(newEnumNestedList);
-           assertThat(record.get(TestEntity_Table.extraUdt)).isEqualTo(TestEntity_INST1.extraUdt);
-           assertThat(record.get(TestEntity_Table.udtList)).isEqualTo(TestEntity_INST1.udtList);
-           assertThat(record.get(TestEntity_Table.udtSet)).isEqualTo(TestEntity_INST1.udtSet);
-           assertThat(record.get(TestEntity_Table.udtMap)).isEqualTo(TestEntity_INST1.udtMap);
-           assertThat(record.get(TestEntity_Table.udtNestedList)).isEqualTo(Collections.singletonList(Collections.singletonList(TestEntity_INST1.udt1)));
-           assertThat(record.get(TestEntity_Table.flag)).isEqualTo(TestEntity_INST1.flag);
          });
     }
   }
@@ -1055,14 +1005,7 @@ class DslQueryBuilderITest extends AbstractIntegrationITest {
          .and(TestEntity_Table.list.eq(TestEntity_INST1.list))
          .executeAsync()
          .thenAccept(applied -> {
-
-           Record record = dsl.selectFrom(TestEntity_Table.test_entity)
-                              .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
-                              .fetchOne();
-
-           // Then
            assertThat(applied).isTrue();
-           assertThat(record).isNull();
          });
     }
   }
