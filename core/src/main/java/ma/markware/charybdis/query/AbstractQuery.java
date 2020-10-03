@@ -105,7 +105,7 @@ public abstract class AbstractQuery implements Query {
     try {
       asyncResultSet = session.executeAsync(preparedStatement.bind(bindValueArray).setPageSize(fetchSize).setPagingState(pagingState));
     } catch (final Exception e) {
-      log.error("Error executing [{}] statement ({})", statement.getConsistencyLevel(), statement, e);
+      log.error("Error executing [{}] statement async ({})", statement.getConsistencyLevel(), statement, e);
     }
     return asyncResultSet;
   }

@@ -24,6 +24,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -36,6 +37,7 @@ import com.datastax.oss.driver.api.core.cql.SimpleStatement;
 import com.datastax.oss.driver.api.core.cql.Statement;
 import com.datastax.oss.driver.api.querybuilder.QueryBuilder;
 import com.datastax.oss.driver.api.querybuilder.relation.Relation;
+import java.util.concurrent.CompletableFuture;
 import ma.markware.charybdis.ExecutionContext;
 import ma.markware.charybdis.model.option.ConsistencyLevel;
 import ma.markware.charybdis.model.option.SerialConsistencyLevel;
@@ -69,7 +71,8 @@ class AbstractQueryTest {
     when(preparedStatement.bind(any())).thenReturn(boundStatement);
     when(boundStatement.setPageSize(anyInt())).thenReturn(boundStatement);
     when(boundStatement.setPagingState(eq(null))).thenReturn(boundStatement);
-    when(session.execute(any(Statement.class))).thenReturn(null);
+    lenient().when(session.execute(any(Statement.class))).thenReturn(null);
+    lenient().when(session.executeAsync(any(Statement.class))).thenReturn(CompletableFuture.completedFuture(null));
     when(abstractQuery.buildStatement()).thenReturn(new StatementTuple(simpleStatement, new Object[] {}));
     PreparedStatementFactory.CACHE_MANAGER.destroyCache(PreparedStatementFactory.CACHE_NAME);
   }
@@ -259,5 +262,28 @@ class AbstractQueryTest {
     assertThat(statementAc.getValue().getSerialConsistencyLevel()).isNull();
     assertThat(statementAc.getValue().getExecutionProfile()).isNull();
     assertThat(statementAc.getValue().getExecutionProfileName()).isEqualTo("olap");
+  }
+
+  @Test
+  void executeStatementAsync() {
+    // Given
+    ArgumentCaptor<SimpleStatement> statementAc = ArgumentCaptor.forClass(SimpleStatement.class);
+    when(abstractQuery.getExecutionContext()).thenReturn(new ExecutionContext(
+        ConsistencyLevel.EACH_QUORUM,
+        ConsistencyLevel.QUORUM,
+        null,
+        null,
+        null,
+        null));
+
+    // When
+    abstractQuery.executeAsync(session);
+
+    // Then
+    verify(abstractQuery).executeStatementAsync(eq(session), statementAc.capture(), eq(0), eq(null), eq(new Object[] {}));
+    assertThat(statementAc.getValue().getConsistencyLevel()).isEqualTo(com.datastax.oss.driver.api.core.ConsistencyLevel.EACH_QUORUM);
+    assertThat(statementAc.getValue().getSerialConsistencyLevel()).isNull();
+    assertThat(statementAc.getValue().getExecutionProfile()).isNull();
+    assertThat(statementAc.getValue().getExecutionProfileName()).isNull();
   }
 }
