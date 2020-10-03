@@ -16,23 +16,23 @@
  * limitations under the License.
  *
  */
-package ma.markware.charybdis.dsl.insert;
+package ma.markware.charybdis.dsl.insert.batch;
 
 /**
  * Insert DSL query expression.
  *
  * <p>
- * It is not recommended to reference any object with type {@link InsertValuesExpression}.
+ * It is not recommended to reference any object with type {@link BatchInsertOnExistExpression}.
  *
  * @author Oussama Markad
  */
-public interface InsertValuesExpression extends InsertOnExistExpression {
+public interface BatchInsertOnExistExpression extends BatchInsertTtlExpression,
+    BatchInsertTimestampExpression {
 
   /**
-   * Assign values in insert DSL query.
+   * Insert only if no other entity exists with the same primary key.
    *
-   * @param values assigned values.
    * @return updated insert DSL query expression.
    */
-  InsertValuesExpression values(Object... values);
+  <T extends BatchInsertTtlExpression & BatchInsertTimestampExpression> T ifNotExists();
 }

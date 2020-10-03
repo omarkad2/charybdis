@@ -168,7 +168,7 @@ public class DslQueryBuilder implements QueryBuilder, ConsistencyTunable<DslQuer
    * @param table table of insert query.
    * @return initialized insert expression.
    */
-  public InsertInitExpression<Boolean> insertInto(final TableMetadata table) {
+  public InsertInitExpression insertInto(final TableMetadata table) {
     return new DslInsertImpl(session, executionContext).insertInto(table);
   }
 
@@ -185,7 +185,7 @@ public class DslQueryBuilder implements QueryBuilder, ConsistencyTunable<DslQuer
    * @param columns columns to insert.
    * @return initialized insert expression.
    */
-  public InsertInitWithColumnsExpression<Boolean> insertInto(TableMetadata table, ColumnMetadata... columns) {
+  public InsertInitWithColumnsExpression insertInto(TableMetadata table, ColumnMetadata... columns) {
     return new DslInsertImpl(session, executionContext).insertInto(table, columns);
   }
 

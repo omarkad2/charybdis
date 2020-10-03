@@ -16,37 +16,44 @@
  * limitations under the License.
  *
  */
+
 package ma.markware.charybdis.dsl.insert;
 
-import com.datastax.oss.driver.api.core.CqlSession;
-import com.datastax.oss.driver.api.core.cql.ResultSet;
 import java.time.Instant;
-import ma.markware.charybdis.ExecutionContext;
+import ma.markware.charybdis.batch.Batch;
+import ma.markware.charybdis.dsl.insert.batch.BatchInsertFinalExpression;
+import ma.markware.charybdis.dsl.insert.batch.BatchInsertInitExpression;
+import ma.markware.charybdis.dsl.insert.batch.BatchInsertInitWithColumnsExpression;
+import ma.markware.charybdis.dsl.insert.batch.BatchInsertOnExistExpression;
+import ma.markware.charybdis.dsl.insert.batch.BatchInsertSetExpression;
+import ma.markware.charybdis.dsl.insert.batch.BatchInsertTimestampExpression;
+import ma.markware.charybdis.dsl.insert.batch.BatchInsertTtlExpression;
+import ma.markware.charybdis.dsl.insert.batch.BatchInsertValuesExpression;
 import ma.markware.charybdis.model.field.metadata.ColumnMetadata;
 import ma.markware.charybdis.model.field.metadata.TableMetadata;
 import ma.markware.charybdis.query.InsertQuery;
 
 /**
- * Insert query builder.
+ * Insert in batch query builder.
  *
  * @author Oussama Markad
  */
-public class DslInsertImpl
+public class DslBatchInsertImpl
     extends AbstractDslInsert
-    implements InsertInitExpression, InsertInitWithColumnsExpression, InsertValuesExpression, InsertSetExpression,
-    InsertOnExistExpression, InsertTtlExpression, InsertTimestampExpression, InsertFinalExpression {
+    implements BatchInsertInitExpression, BatchInsertInitWithColumnsExpression, BatchInsertValuesExpression, BatchInsertSetExpression,
+    BatchInsertOnExistExpression, BatchInsertTtlExpression, BatchInsertTimestampExpression, BatchInsertFinalExpression {
 
-  private final CqlSession session;
+  private final Batch batch;
 
-  public DslInsertImpl(final CqlSession session, final ExecutionContext executionContext) {
-    super(new InsertQuery(executionContext));
-    this.session = session;
+  public DslBatchInsertImpl(final Batch batch) {
+    super(new InsertQuery());
+    this.batch = batch;
   }
 
   /**
    * Set table to insert.
    */
-  public InsertInitExpression insertInto(TableMetadata tableMetadata) {
+  public BatchInsertInitExpression insertInto(TableMetadata tableMetadata) {
     insertQuery.setTable(tableMetadata);
     return this;
   }
@@ -54,7 +61,7 @@ public class DslInsertImpl
   /**
    * Set table and columns to insert.
    */
-  public InsertInitWithColumnsExpression insertInto(TableMetadata table, ColumnMetadata... columns) {
+  public BatchInsertInitWithColumnsExpression insertInto(TableMetadata table, ColumnMetadata... columns) {
     insertQuery.setTableAndColumns(table, columns);
     return this;
   }
@@ -63,7 +70,7 @@ public class DslInsertImpl
    * {@inheritDoc}
    */
   @Override
-  public InsertValuesExpression values(final Object... values) {
+  public BatchInsertValuesExpression values(final Object... values) {
     insertQuery.setValues(values);
     return this;
   }
@@ -72,7 +79,7 @@ public class DslInsertImpl
    * {@inheritDoc}
    */
   @Override
-  public <D, S> InsertSetExpression set(final ColumnMetadata<D, S> column, final D value) {
+  public <D, S> BatchInsertSetExpression set(final ColumnMetadata<D, S> column, final D value) {
     insertQuery.setSet(column, value);
     return this;
   }
@@ -81,8 +88,7 @@ public class DslInsertImpl
    * {@inheritDoc}
    */
   @Override
-  @SuppressWarnings("unchecked")
-  public <D extends InsertTtlExpression & InsertTimestampExpression> D ifNotExists() {
+  public <D extends BatchInsertTtlExpression & BatchInsertTimestampExpression> D ifNotExists() {
     insertQuery.enableIfNotExists();
     return (D) this;
   }
@@ -91,7 +97,7 @@ public class DslInsertImpl
    * {@inheritDoc}
    */
   @Override
-  public InsertFinalExpression usingTtl(final int ttl) {
+  public BatchInsertFinalExpression usingTtl(final int ttl) {
     insertQuery.setTtl(ttl);
     return this;
   }
@@ -100,7 +106,7 @@ public class DslInsertImpl
    * {@inheritDoc}
    */
   @Override
-  public InsertFinalExpression usingTimestamp(final Instant timestamp) {
+  public BatchInsertFinalExpression usingTimestamp(final Instant timestamp) {
     insertQuery.setTimestamp(timestamp);
     return this;
   }
@@ -109,7 +115,7 @@ public class DslInsertImpl
    * {@inheritDoc}
    */
   @Override
-  public InsertFinalExpression usingTimestamp(final long timestamp) {
+  public BatchInsertFinalExpression usingTimestamp(final long timestamp) {
     insertQuery.setTimestamp(timestamp);
     return this;
   }
@@ -118,8 +124,7 @@ public class DslInsertImpl
    * {@inheritDoc}
    */
   @Override
-  public boolean execute() {
-    ResultSet resultSet = insertQuery.execute(session);
-    return resultSet.wasApplied();
+  public void execute() {
+    insertQuery.addToBatch(batch);
   }
 }

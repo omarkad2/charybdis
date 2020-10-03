@@ -23,9 +23,9 @@ import ma.markware.charybdis.QueryBuilder;
 import ma.markware.charybdis.batch.Batch;
 import ma.markware.charybdis.dsl.delete.DslBatchDeleteImpl;
 import ma.markware.charybdis.dsl.delete.batch.BatchDeleteInitExpression;
-import ma.markware.charybdis.dsl.insert.DslInsertBatchImpl;
-import ma.markware.charybdis.dsl.insert.InsertInitExpression;
-import ma.markware.charybdis.dsl.insert.InsertInitWithColumnsExpression;
+import ma.markware.charybdis.dsl.insert.DslBatchInsertImpl;
+import ma.markware.charybdis.dsl.insert.batch.BatchInsertInitExpression;
+import ma.markware.charybdis.dsl.insert.batch.BatchInsertInitWithColumnsExpression;
 import ma.markware.charybdis.dsl.update.DslBatchUpdateImpl;
 import ma.markware.charybdis.dsl.update.batch.BatchUpdateInitExpression;
 import ma.markware.charybdis.model.field.DeletableField;
@@ -58,8 +58,8 @@ public class DslQueryBatchBuilder implements QueryBuilder {
    * @param table table of insert query.
    * @return initialized insert expression.
    */
-  public InsertInitExpression<Void> insertInto(final TableMetadata table) {
-    return new DslInsertBatchImpl(batch).insertInto(table);
+  public BatchInsertInitExpression insertInto(final TableMetadata table) {
+    return new DslBatchInsertImpl(batch).insertInto(table);
   }
 
   /**
@@ -75,8 +75,8 @@ public class DslQueryBatchBuilder implements QueryBuilder {
    * @param columns columns to insert.
    * @return initialized insert expression.
    */
-  public InsertInitWithColumnsExpression<Void> insertInto(TableMetadata table, ColumnMetadata... columns) {
-    return new DslInsertBatchImpl(batch).insertInto(table, columns);
+  public BatchInsertInitWithColumnsExpression insertInto(TableMetadata table, ColumnMetadata... columns) {
+    return new DslBatchInsertImpl(batch).insertInto(table, columns);
   }
 
   /**
