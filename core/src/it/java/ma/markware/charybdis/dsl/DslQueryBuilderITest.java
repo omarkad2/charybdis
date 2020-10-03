@@ -169,7 +169,17 @@ class DslQueryBuilderITest extends AbstractIntegrationITest {
                                            record.get(TestEntity_Table.flag));
         assertThat(actual).isEqualTo(TestEntity_INST1.entity1);
       });
+    }
 
+    @Test
+    void selectOneAsync_no_result(CqlSession session) {
+      CompletionStage<Record> recordFuture = dsl.selectFrom(TestEntity_Table.test_entity)
+                                                .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
+                                                .fetchOneAsync();
+
+      recordFuture.thenAccept(record -> {
+        assertThat(record).isNull();
+      });
     }
 
     @Test
@@ -312,6 +322,16 @@ class DslQueryBuilderITest extends AbstractIntegrationITest {
     }
 
     @Test
+    void selectFromAsync_no_result() {
+      CompletionStage<Collection<Record>> recordsFuture = dsl.selectFrom(TestEntity_Table.test_entity)
+                                                             .fetchAsync();
+
+      recordsFuture.thenAccept(records -> {
+        assertThat(records).isEmpty();
+      });
+    }
+
+    @Test
     void selectPaged(CqlSession session) {
       // Row1
       insertRow(session, TestEntity_Table.KEYSPACE_NAME, TestEntity_Table.TABLE_NAME, ImmutableMap.of(TestEntity_Table.id.getName(), QueryBuilder.literal(TestEntity_Table.id.serialize(UUID.randomUUID())),
@@ -392,6 +412,16 @@ class DslQueryBuilderITest extends AbstractIntegrationITest {
     }
 
     @Test
+    void selectPagedAsync_no_result(CqlSession session) {
+      // First page
+      dsl.selectFrom(TestEntity_Table.test_entity)
+         .fetchPageAsync(PageRequest.of(null, 2))
+         .thenAccept(pageResult1 -> {
+           assertThat(pageResult1.getPagingState()).isNull();
+         });
+    }
+
+    @Test
     void selectOptional(CqlSession session) {
       insertRow(session, TestEntity_Table.KEYSPACE_NAME, TestEntity_Table.TABLE_NAME, ImmutableMap.of(
           TestEntity_Table.id.getName(), QueryBuilder.literal(TestEntity_Table.id.serialize(TestEntity_INST1.id)),
@@ -423,11 +453,15 @@ class DslQueryBuilderITest extends AbstractIntegrationITest {
                                                            .fetchOptionalAsync();
 
       assertThat(presentRecordFuture.toCompletableFuture().get()).isPresent();
+    }
 
-      CompletionStage<Optional<Record>> absentRecordFuture = dsl.selectFrom(TestEntity_Table.test_entity)
-                                         .where(TestEntity_Table.id.eq(UUID.randomUUID()))
-                                         .fetchOptionalAsync();
-      assertThat(absentRecordFuture.toCompletableFuture().get()).isEmpty();
+    @Test
+    void selectOptionalAsync_no_result(CqlSession session) throws ExecutionException, InterruptedException {
+      CompletionStage<Optional<Record>> presentRecordFuture = dsl.selectFrom(TestEntity_Table.test_entity)
+                                                                 .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
+                                                                 .fetchOptionalAsync();
+
+      assertThat(presentRecordFuture.toCompletableFuture().get()).isEmpty();
     }
   }
 
