@@ -16,23 +16,21 @@
  * limitations under the License.
  *
  */
-package ma.markware.charybdis.dsl.update;
+package ma.markware.charybdis.dsl.update.batch;
 
 /**
  * Update DSL query expression.
  *
  * <p>
- * It is not recommended to reference any object with type {@link UpdateTtlExpression}.
+ * It is not recommended to reference any object with type {@link BatchUpdateFinalExpression}.
  *
  * @author Oussama Markad
  */
-public interface UpdateTtlExpression extends UpdateAssignmentExpression {
+public interface BatchUpdateFinalExpression {
 
   /**
-   * Set {@code TTL} in insert DSL query.
+   * Execute Update DSL query.
    *
-   * @param seconds ttl in seconds.
-   * @return updated insert DSL query expression.
    */
-  UpdateAssignmentExpression usingTtl(int seconds);
+  void execute();
 }

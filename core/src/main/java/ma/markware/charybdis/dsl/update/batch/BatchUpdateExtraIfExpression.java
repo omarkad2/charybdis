@@ -16,23 +16,25 @@
  * limitations under the License.
  *
  */
-package ma.markware.charybdis.dsl.update;
+package ma.markware.charybdis.dsl.update.batch;
+
+import ma.markware.charybdis.model.criteria.CriteriaExpression;
 
 /**
  * Update DSL query expression.
  *
  * <p>
- * It is not recommended to reference any object with type {@link UpdateTtlExpression}.
+ * It is not recommended to reference any object with type {@link BatchUpdateExtraIfExpression}.
  *
  * @author Oussama Markad
  */
-public interface UpdateTtlExpression extends UpdateAssignmentExpression {
+public interface BatchUpdateExtraIfExpression extends BatchUpdateFinalExpression {
 
   /**
-   * Set {@code TTL} in insert DSL query.
+   * Add condition to {@code IF} clause in update DSL query.
    *
-   * @param seconds ttl in seconds.
-   * @return updated insert DSL query expression.
+   * @param condition additional condition
+   * @return updated update DSL query expression.
    */
-  UpdateAssignmentExpression usingTtl(int seconds);
+  BatchUpdateExtraIfExpression and_(CriteriaExpression condition);
 }

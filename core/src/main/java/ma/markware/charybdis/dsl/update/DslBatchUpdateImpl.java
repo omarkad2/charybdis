@@ -16,12 +16,21 @@
  * limitations under the License.
  *
  */
+
 package ma.markware.charybdis.dsl.update;
 
-import com.datastax.oss.driver.api.core.CqlSession;
-import com.datastax.oss.driver.api.core.cql.ResultSet;
 import java.time.Instant;
-import ma.markware.charybdis.ExecutionContext;
+import ma.markware.charybdis.batch.Batch;
+import ma.markware.charybdis.dsl.update.batch.BatchUpdateAssignmentExpression;
+import ma.markware.charybdis.dsl.update.batch.BatchUpdateExtraAssignmentExpression;
+import ma.markware.charybdis.dsl.update.batch.BatchUpdateExtraIfExpression;
+import ma.markware.charybdis.dsl.update.batch.BatchUpdateExtraWhereExpression;
+import ma.markware.charybdis.dsl.update.batch.BatchUpdateFinalExpression;
+import ma.markware.charybdis.dsl.update.batch.BatchUpdateIfExpression;
+import ma.markware.charybdis.dsl.update.batch.BatchUpdateInitExpression;
+import ma.markware.charybdis.dsl.update.batch.BatchUpdateTimestampExpression;
+import ma.markware.charybdis.dsl.update.batch.BatchUpdateTtlExpression;
+import ma.markware.charybdis.dsl.update.batch.BatchUpdateWhereExpression;
 import ma.markware.charybdis.model.assignment.AssignmentListValue;
 import ma.markware.charybdis.model.assignment.AssignmentMapValue;
 import ma.markware.charybdis.model.assignment.AssignmentSetValue;
@@ -37,27 +46,27 @@ import ma.markware.charybdis.model.field.nested.UdtNestedField;
 import ma.markware.charybdis.query.UpdateQuery;
 
 /**
- * Update query builder.
+ * Update in batch query builder.
  *
  * @author Oussama Markad
  */
-public class DslUpdateImpl
+public class DslBatchUpdateImpl
     extends AbstractDslUpdate
-    implements UpdateInitExpression, UpdateTtlExpression, UpdateTimestampExpression, UpdateAssignmentExpression,
-    UpdateExtraAssignmentExpression, UpdateWhereExpression, UpdateExtraWhereExpression, UpdateIfExpression,
-    UpdateExtraIfExpression, UpdateFinalExpression {
+    implements BatchUpdateInitExpression, BatchUpdateTtlExpression, BatchUpdateTimestampExpression, BatchUpdateAssignmentExpression,
+    BatchUpdateExtraAssignmentExpression, BatchUpdateWhereExpression, BatchUpdateExtraWhereExpression, BatchUpdateIfExpression,
+    BatchUpdateExtraIfExpression, BatchUpdateFinalExpression {
 
-  private final CqlSession session;
+  private final Batch batch;
 
-  public DslUpdateImpl(final CqlSession session, final ExecutionContext executionContext) {
-    super(new UpdateQuery(executionContext));
-    this.session = session;
+  public DslBatchUpdateImpl(final Batch batch) {
+    super(new UpdateQuery());
+    this.batch = batch;
   }
 
   /**
    * Set table to update.
    */
-  public UpdateInitExpression update(TableMetadata table) {
+  public BatchUpdateInitExpression update(TableMetadata table) {
     updateQuery.setTable(table);
     return this;
   }
@@ -66,7 +75,7 @@ public class DslUpdateImpl
    * {@inheritDoc}
    */
   @Override
-  public UpdateAssignmentExpression usingTimestamp(final long timestamp) {
+  public BatchUpdateAssignmentExpression usingTimestamp(final long timestamp) {
     updateQuery.setTimestamp(timestamp);
     return this;
   }
@@ -75,7 +84,7 @@ public class DslUpdateImpl
    * {@inheritDoc}
    */
   @Override
-  public UpdateAssignmentExpression usingTimestamp(final Instant timestamp) {
+  public BatchUpdateAssignmentExpression usingTimestamp(final Instant timestamp) {
     updateQuery.setTimestamp(timestamp);
     return this;
   }
@@ -84,7 +93,7 @@ public class DslUpdateImpl
    * {@inheritDoc}
    */
   @Override
-  public UpdateAssignmentExpression usingTtl(final int seconds) {
+  public BatchUpdateAssignmentExpression usingTtl(final int seconds) {
     updateQuery.setTtl(seconds);
     return this;
   }
@@ -93,7 +102,7 @@ public class DslUpdateImpl
    * {@inheritDoc}
    */
   @Override
-  public <D, S> UpdateExtraAssignmentExpression set(ColumnMetadata<D, S> columnMetadata, D value) {
+  public <D, S> BatchUpdateExtraAssignmentExpression set(ColumnMetadata<D, S> columnMetadata, D value) {
     updateQuery.setAssignment(columnMetadata, value);
     return this;
   }
@@ -102,7 +111,7 @@ public class DslUpdateImpl
    * {@inheritDoc}
    */
   @Override
-  public <D, S> UpdateExtraAssignmentExpression set(final ListColumnMetadata<D, S> column, final AssignmentListValue<D, S> value) {
+  public <D, S> BatchUpdateExtraAssignmentExpression set(final ListColumnMetadata<D, S> column, final AssignmentListValue<D, S> value) {
     updateQuery.setAssignment(column, value);
     return this;
   }
@@ -111,7 +120,7 @@ public class DslUpdateImpl
    * {@inheritDoc}
    */
   @Override
-  public <D, S> UpdateExtraAssignmentExpression set(final SetColumnMetadata<D, S> column, final AssignmentSetValue<D, S> value) {
+  public <D, S> BatchUpdateExtraAssignmentExpression set(final SetColumnMetadata<D, S> column, final AssignmentSetValue<D, S> value) {
     updateQuery.setAssignment(column, value);
     return this;
   }
@@ -120,8 +129,8 @@ public class DslUpdateImpl
    * {@inheritDoc}
    */
   @Override
-  public <D_KEY, D_VALUE, S_KEY, S_VALUE> UpdateExtraAssignmentExpression set(final MapColumnMetadata<D_KEY, D_VALUE, S_KEY, S_VALUE> column,
-      final AssignmentMapValue<D_KEY, D_VALUE, S_KEY, S_VALUE> value) {
+  public <D_KEY, D_VALUE, S_KEY, S_VALUE> BatchUpdateExtraAssignmentExpression set(final MapColumnMetadata<D_KEY, D_VALUE, S_KEY, S_VALUE> column,
+  final AssignmentMapValue<D_KEY, D_VALUE, S_KEY, S_VALUE> value) {
     updateQuery.setAssignment(column, value);
     return this;
   }
@@ -130,7 +139,7 @@ public class DslUpdateImpl
    * {@inheritDoc}
    */
   @Override
-  public <D_KEY, D_VALUE, S_KEY, S_VALUE> UpdateExtraAssignmentExpression set(final MapNestedField<D_KEY, D_VALUE, S_KEY, S_VALUE> field, final D_VALUE value) {
+  public <D_KEY, D_VALUE, S_KEY, S_VALUE> BatchUpdateExtraAssignmentExpression set(final MapNestedField<D_KEY, D_VALUE, S_KEY, S_VALUE> field, final D_VALUE value) {
     updateQuery.setAssignment(field, value);
     return this;
   }
@@ -139,7 +148,7 @@ public class DslUpdateImpl
    * {@inheritDoc}
    */
   @Override
-  public <D, S> UpdateExtraAssignmentExpression set(final ListNestedField<D, S> field, final D value) {
+  public <D, S> BatchUpdateExtraAssignmentExpression set(final ListNestedField<D, S> field, final D value) {
     updateQuery.setAssignment(field, value);
     return this;
   }
@@ -148,7 +157,7 @@ public class DslUpdateImpl
    * {@inheritDoc}
    */
   @Override
-  public <D, S> UpdateExtraAssignmentExpression set(final UdtNestedField<D, S> field, final D value) {
+  public <D, S> BatchUpdateExtraAssignmentExpression set(final UdtNestedField<D, S> field, final D value) {
     updateQuery.setAssignment(field, value);
     return this;
   }
@@ -157,7 +166,7 @@ public class DslUpdateImpl
    * {@inheritDoc}
    */
   @Override
-  public UpdateExtraWhereExpression where(final CriteriaExpression condition) {
+  public BatchUpdateExtraWhereExpression where(final CriteriaExpression condition) {
     updateQuery.setWhere(condition);
     return this;
   }
@@ -166,7 +175,7 @@ public class DslUpdateImpl
    * {@inheritDoc}
    */
   @Override
-  public UpdateExtraWhereExpression and(final CriteriaExpression condition) {
+  public BatchUpdateExtraWhereExpression and(final CriteriaExpression condition) {
     updateQuery.setWhere(condition);
     return this;
   }
@@ -175,7 +184,7 @@ public class DslUpdateImpl
    * {@inheritDoc}
    */
   @Override
-  public UpdateExtraIfExpression if_(final CriteriaExpression condition) {
+  public BatchUpdateExtraIfExpression if_(final CriteriaExpression condition) {
     updateQuery.setIf(condition);
     return this;
   }
@@ -184,7 +193,7 @@ public class DslUpdateImpl
    * {@inheritDoc}
    */
   @Override
-  public UpdateExtraIfExpression and_(final CriteriaExpression condition) {
+  public BatchUpdateExtraIfExpression and_(final CriteriaExpression condition) {
     updateQuery.setIf(condition);
     return this;
   }
@@ -193,8 +202,7 @@ public class DslUpdateImpl
    * {@inheritDoc}
    */
   @Override
-  public boolean execute() {
-    ResultSet resultSet = updateQuery.execute(session);
-    return resultSet != null && resultSet.wasApplied();
+  public void execute() {
+    updateQuery.addToBatch(batch);
   }
 }

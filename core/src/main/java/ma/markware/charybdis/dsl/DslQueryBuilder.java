@@ -203,7 +203,7 @@ public class DslQueryBuilder implements QueryBuilder, ConsistencyTunable<DslQuer
    * @param table table of update query.
    * @return initialized update expression.
    */
-  public UpdateInitExpression<Boolean> update(TableMetadata table) {
+  public UpdateInitExpression update(TableMetadata table) {
     return new DslUpdateImpl(session, executionContext).update(table);
   }
 

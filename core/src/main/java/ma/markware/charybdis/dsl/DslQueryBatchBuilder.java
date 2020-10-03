@@ -26,8 +26,8 @@ import ma.markware.charybdis.dsl.delete.batch.BatchDeleteInitExpression;
 import ma.markware.charybdis.dsl.insert.DslInsertBatchImpl;
 import ma.markware.charybdis.dsl.insert.InsertInitExpression;
 import ma.markware.charybdis.dsl.insert.InsertInitWithColumnsExpression;
-import ma.markware.charybdis.dsl.update.DslUpdateBatchImpl;
-import ma.markware.charybdis.dsl.update.UpdateInitExpression;
+import ma.markware.charybdis.dsl.update.DslBatchUpdateImpl;
+import ma.markware.charybdis.dsl.update.batch.BatchUpdateInitExpression;
 import ma.markware.charybdis.model.field.DeletableField;
 import ma.markware.charybdis.model.field.metadata.ColumnMetadata;
 import ma.markware.charybdis.model.field.metadata.TableMetadata;
@@ -93,8 +93,8 @@ public class DslQueryBatchBuilder implements QueryBuilder {
    * @param table table of update query.
    * @return initialized update expression.
    */
-  public UpdateInitExpression<Void> update(TableMetadata table) {
-    return new DslUpdateBatchImpl(batch).update(table);
+  public BatchUpdateInitExpression update(TableMetadata table) {
+    return new DslBatchUpdateImpl(batch).update(table);
   }
 
   /**

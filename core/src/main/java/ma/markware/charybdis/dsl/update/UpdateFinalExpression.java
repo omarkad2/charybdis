@@ -24,16 +24,14 @@ package ma.markware.charybdis.dsl.update;
  * <p>
  * It is not recommended to reference any object with type {@link UpdateFinalExpression}.
  *
- * @param <RETURN_TYPE> query execution return type.
- *
  * @author Oussama Markad
  */
-public interface UpdateFinalExpression<RETURN_TYPE> {
+public interface UpdateFinalExpression {
 
   /**
    * Execute Update DSL query.
    *
    * @return {@code true} if query is executed, {@code false} otherwise.
    */
-  RETURN_TYPE execute();
+  boolean execute();
 }
