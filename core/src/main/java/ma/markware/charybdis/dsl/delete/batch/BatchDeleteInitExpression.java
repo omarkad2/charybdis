@@ -16,22 +16,25 @@
  * limitations under the License.
  *
  */
-package ma.markware.charybdis.dsl.delete;
+package ma.markware.charybdis.dsl.delete.batch;
+
+import ma.markware.charybdis.model.field.metadata.TableMetadata;
 
 /**
  * Delete DSL query expression.
  *
  * <p>
- * It is not recommended to reference any object with type {@link DeleteFinalExpression}.
+ * It is not recommended to reference any object with type {@link BatchDeleteInitExpression}.
  *
  * @author Oussama Markad
  */
-public interface DeleteFinalExpression {
+public interface BatchDeleteInitExpression {
 
   /**
-   * Added to a batch query if enclosed in one, otherwise execute update DSL query.
+   * Set table to delete DSL query.
    *
-   * @return {@code true} or {@code false} to inform if changes are applied or not.
+   * @param table table to delete from.
+   * @return updated delete DSL query expression.
    */
-  boolean execute();
+  BatchDeleteTimestampExpression from(TableMetadata table);
 }

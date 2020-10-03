@@ -220,7 +220,7 @@ public class DslQueryBuilder implements QueryBuilder, ConsistencyTunable<DslQuer
    *
    * @return initialized delete expression.
    */
-  public DeleteInitExpression<Boolean> delete() {
+  public DeleteInitExpression delete() {
     return new DslDeleteImpl(session, executionContext).delete();
   }
 
@@ -236,7 +236,7 @@ public class DslQueryBuilder implements QueryBuilder, ConsistencyTunable<DslQuer
    *
    * @return initialized delete expression.
    */
-  public DeleteInitExpression<Boolean> delete(final DeletableField... fields) {
+  public DeleteInitExpression delete(final DeletableField... fields) {
     return new DslDeleteImpl(session, executionContext).delete(fields);
   }
 }

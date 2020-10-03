@@ -19,20 +19,14 @@
 
 package ma.markware.charybdis.dsl.delete;
 
-import java.time.Instant;
-import ma.markware.charybdis.model.criteria.CriteriaExpression;
-import ma.markware.charybdis.model.field.DeletableField;
-import ma.markware.charybdis.model.field.metadata.TableMetadata;
 import ma.markware.charybdis.query.DeleteQuery;
 
 /**
  * Abstract delete query builder.
- * @param <T> query return type.
  *
  * @author Oussama Markad
  */
-abstract class AbstractDslDelete<T> implements DeleteInitExpression<T>, DeleteTimestampExpression<T>, DeleteWhereExpression<T>, DeleteExtraWhereExpression<T>,
-    DeleteIfExpression<T>, DeleteExtraIfExpression<T>, DeleteFinalExpression<T> {
+abstract class AbstractDslDelete {
 
   final DeleteQuery deleteQuery;
 
@@ -42,83 +36,5 @@ abstract class AbstractDslDelete<T> implements DeleteInitExpression<T>, DeleteTi
 
   DeleteQuery getDeleteQuery() {
     return deleteQuery;
-  }
-
-  /**
-   * No-op method. (commodity)
-   */
-  public DeleteInitExpression<T> delete() {
-    return this;
-  }
-
-  /**
-   * Set fields to delete in query.
-   */
-  public DeleteInitExpression<T> delete(DeletableField... fields) {
-    deleteQuery.setSelectors(fields);
-    return this;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public DeleteTimestampExpression<T> from(final TableMetadata table) {
-    deleteQuery.setTable(table);
-    return this;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public DeleteWhereExpression<T> usingTimestamp(final Instant timestamp) {
-    deleteQuery.setTimestamp(timestamp);
-    return this;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public DeleteWhereExpression<T> usingTimestamp(final long timestamp) {
-    deleteQuery.setTimestamp(timestamp);
-    return this;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public DeleteExtraWhereExpression<T> where(final CriteriaExpression criteria) {
-    deleteQuery.setWhere(criteria);
-    return this;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public DeleteExtraWhereExpression<T> and(final CriteriaExpression criteria) {
-    deleteQuery.setWhere(criteria);
-    return this;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public DeleteExtraIfExpression<T> if_(final CriteriaExpression condition) {
-    deleteQuery.setIf(condition);
-    return this;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public DeleteExtraIfExpression<T> and_(final CriteriaExpression condition) {
-    deleteQuery.setIf(condition);
-    return this;
   }
 }

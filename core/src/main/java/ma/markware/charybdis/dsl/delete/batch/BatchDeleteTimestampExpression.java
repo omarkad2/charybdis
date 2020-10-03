@@ -16,22 +16,33 @@
  * limitations under the License.
  *
  */
-package ma.markware.charybdis.dsl.delete;
+package ma.markware.charybdis.dsl.delete.batch;
+
+import java.time.Instant;
 
 /**
  * Delete DSL query expression.
  *
  * <p>
- * It is not recommended to reference any object with type {@link DeleteFinalExpression}.
+ * It is not recommended to reference any object with type {@link BatchDeleteTimestampExpression}.
  *
  * @author Oussama Markad
  */
-public interface DeleteFinalExpression {
+public interface BatchDeleteTimestampExpression extends BatchDeleteWhereExpression {
 
   /**
-   * Added to a batch query if enclosed in one, otherwise execute update DSL query.
+   * Set write time in delete DSL query.
    *
-   * @return {@code true} or {@code false} to inform if changes are applied or not.
+   * @param timestamp writetime as {@link Instant}.
+   * @return updated delete DSL query expression.
    */
-  boolean execute();
+  BatchDeleteWhereExpression usingTimestamp(Instant timestamp);
+
+  /**
+   * Set write time in the delete DSL query.
+   *
+   * @param timestamp writetime as millis.
+   * @return updated delete DSL query expression.
+   */
+  BatchDeleteWhereExpression usingTimestamp(long timestamp);
 }

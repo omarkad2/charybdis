@@ -28,7 +28,7 @@ import ma.markware.charybdis.model.criteria.CriteriaExpression;
  *
  * @author Oussama Markad
  */
-public interface DeleteExtraIfExpression<RETURN_TYPE> extends DeleteFinalExpression<RETURN_TYPE> {
+public interface DeleteExtraIfExpression extends DeleteFinalExpression {
 
   /**
    * Add condition to {@code IF} clause in delete DSL query.
@@ -36,5 +36,5 @@ public interface DeleteExtraIfExpression<RETURN_TYPE> extends DeleteFinalExpress
    * @param condition additional condition
    * @return updated delete DSL query expression.
    */
-  DeleteExtraIfExpression<RETURN_TYPE> and_(CriteriaExpression condition);
+  DeleteExtraIfExpression and_(CriteriaExpression condition);
 }

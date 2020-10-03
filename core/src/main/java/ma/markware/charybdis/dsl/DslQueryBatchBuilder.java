@@ -21,8 +21,8 @@ package ma.markware.charybdis.dsl;
 
 import ma.markware.charybdis.QueryBuilder;
 import ma.markware.charybdis.batch.Batch;
-import ma.markware.charybdis.dsl.delete.DeleteInitExpression;
-import ma.markware.charybdis.dsl.delete.DslDeleteBatchImpl;
+import ma.markware.charybdis.dsl.delete.DslBatchDeleteImpl;
+import ma.markware.charybdis.dsl.delete.batch.BatchDeleteInitExpression;
 import ma.markware.charybdis.dsl.insert.DslInsertBatchImpl;
 import ma.markware.charybdis.dsl.insert.InsertInitExpression;
 import ma.markware.charybdis.dsl.insert.InsertInitWithColumnsExpression;
@@ -110,8 +110,8 @@ public class DslQueryBatchBuilder implements QueryBuilder {
    *
    * @return initialized delete expression.
    */
-  public DeleteInitExpression<Void> delete() {
-    return new DslDeleteBatchImpl(batch).delete();
+  public BatchDeleteInitExpression delete() {
+    return new DslBatchDeleteImpl(batch).delete();
   }
 
   /**
@@ -126,7 +126,7 @@ public class DslQueryBatchBuilder implements QueryBuilder {
    *
    * @return initialized delete expression.
    */
-  public DeleteInitExpression<Void> delete(final DeletableField... fields) {
-    return new DslDeleteBatchImpl(batch).delete(fields);
+  public BatchDeleteInitExpression delete(final DeletableField... fields) {
+    return new DslBatchDeleteImpl(batch).delete(fields);
   }
 }

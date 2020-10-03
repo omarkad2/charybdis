@@ -16,22 +16,25 @@
  * limitations under the License.
  *
  */
-package ma.markware.charybdis.dsl.delete;
+package ma.markware.charybdis.dsl.delete.batch;
+
+import ma.markware.charybdis.model.criteria.CriteriaExpression;
 
 /**
  * Delete DSL query expression.
  *
  * <p>
- * It is not recommended to reference any object with type {@link DeleteFinalExpression}.
+ * It is not recommended to reference any object with type {@link BatchDeleteIfExpression}.
  *
  * @author Oussama Markad
  */
-public interface DeleteFinalExpression {
+public interface BatchDeleteIfExpression extends BatchDeleteFinalExpression {
 
   /**
-   * Added to a batch query if enclosed in one, otherwise execute update DSL query.
+   * Create {@code IF} clause in delete DSL query.
    *
-   * @return {@code true} or {@code false} to inform if changes are applied or not.
+   * @param condition initial condition.
+   * @return updated delete DSL query expression.
    */
-  boolean execute();
+  BatchDeleteExtraIfExpression if_(CriteriaExpression condition);
 }
