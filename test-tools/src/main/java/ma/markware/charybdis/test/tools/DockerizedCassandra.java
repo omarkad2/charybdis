@@ -71,7 +71,7 @@ public class DockerizedCassandra implements ExtensionContext.Store.CloseableReso
     this.backoffService = new BackoffService(10, 10000);
     this.port = findFreePort();
     this.isUp = false;
-    System.setProperty(REQUEST_TIMEOUT_PROPERTY, "10 minutes");
+    System.setProperty(REQUEST_TIMEOUT_PROPERTY, "1 minute");
     System.setProperty(CONTACT_POINT_PROPERTY, "127.0.0.1:" + port);
     System.setProperty(LOCAL_DATACENTER_PROPERTY, DEFAULT_DATACENTER);
     start();

@@ -385,21 +385,9 @@ class DslQueryBuilderITest extends AbstractIntegrationITest {
       // First page
       dsl.selectFrom(TestEntity_Table.test_entity)
          .fetchPageAsync(PageRequest.of(null, 2))
-      .thenApply(pageResult1 -> {
+      .thenAccept(pageResult1 -> {
         assertThat(pageResult1.getPagingState()).isNotNull();
         assertThat(pageResult1.getResults()).hasSize(2);
-        return dsl.selectFrom(TestEntity_Table.test_entity)
-                  .fetchPageAsync(PageRequest.of(pageResult1.getPagingState(), 2)).toCompletableFuture().join();
-        // Second page
-      }).thenApply(pageResult2 -> {
-          assertThat(pageResult2.getPagingState()).isNotNull();
-          assertThat(pageResult2.getResults()).hasSize(2);
-          return dsl.selectFrom(TestEntity_Table.test_entity)
-                    .fetchPageAsync(PageRequest.of(pageResult2.getPagingState(), 2)).toCompletableFuture().join();
-        // Third Page
-      }).thenAccept(pageResult3 -> {
-            assertThat(pageResult3.getPagingState()).isNull();
-            assertThat(pageResult3.getResults()).isEmpty();
       });
     }
 
