@@ -19,12 +19,14 @@
 package ma.markware.charybdis.query;
 
 import com.datastax.oss.driver.api.core.CqlSession;
+import com.datastax.oss.driver.api.core.cql.AsyncResultSet;
 import com.datastax.oss.driver.api.core.cql.BoundStatement;
 import com.datastax.oss.driver.api.core.cql.PreparedStatement;
 import com.datastax.oss.driver.api.core.cql.ResultSet;
 import com.datastax.oss.driver.api.core.cql.SimpleStatement;
 import com.google.common.annotations.VisibleForTesting;
 import java.nio.ByteBuffer;
+import java.util.concurrent.CompletionStage;
 import ma.markware.charybdis.ExecutionContext;
 import ma.markware.charybdis.batch.Batch;
 import ma.markware.charybdis.model.option.ConsistencyLevel;
@@ -65,6 +67,16 @@ public abstract class AbstractQuery implements Query {
    * {@inheritDoc}
    */
   @Override
+  public CompletionStage<AsyncResultSet> executeAsync(final CqlSession session) {
+    StatementTuple statementTuple = buildStatement();
+    SimpleStatement statement = resolveExecutionContext(statementTuple.getSimpleStatement());
+    return executeStatementAsync(session, statement, statementTuple.getFetchSize(), statementTuple.getPagingState(), statementTuple.getBindValues());
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
   public void addToBatch(final Batch batch) {
     StatementTuple statementTuple = buildStatement();
     addStatementToBatch(batch, statementTuple.getSimpleStatement(), statementTuple.getBindValues());
@@ -82,6 +94,20 @@ public abstract class AbstractQuery implements Query {
       log.error("Error executing [{}] statement ({})", statement.getConsistencyLevel(), statement, e);
     }
     return resultSet;
+  }
+
+  @VisibleForTesting
+  CompletionStage<AsyncResultSet> executeStatementAsync(final CqlSession session, final SimpleStatement statement, final int fetchSize, final ByteBuffer pagingState,
+      final Object[] bindValueArray) {
+    CompletionStage<AsyncResultSet> asyncResultSet = null;
+    log.debug("Statement query: {}", statement.getQuery());
+    final PreparedStatement preparedStatement = PreparedStatementFactory.createPreparedStatement(session, statement.getQuery());
+    try {
+      asyncResultSet = session.executeAsync(preparedStatement.bind(bindValueArray).setPageSize(fetchSize).setPagingState(pagingState));
+    } catch (final Exception e) {
+      log.error("Error executing [{}] statement ({})", statement.getConsistencyLevel(), statement, e);
+    }
+    return asyncResultSet;
   }
 
   private void addStatementToBatch(final Batch batch, final SimpleStatement statement, final Object[] bindValueArray) {

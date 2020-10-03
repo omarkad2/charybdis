@@ -185,6 +185,7 @@ public class InsertQuery extends AbstractQuery {
       columnNameValuePairs.put(index, Pair.of(columnName, null));
     }
 
+    @SuppressWarnings("unchecked")
     void setColumnValue(int index, Object value) {
       Pair<String, Object> columnNameValuePair = columnNameValuePairs.get(index);
       if (columnNameValuePair == null || StringUtils.isBlank(columnNameValuePair.getLeft())) {

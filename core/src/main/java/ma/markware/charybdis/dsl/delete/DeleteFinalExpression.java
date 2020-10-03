@@ -18,6 +18,8 @@
  */
 package ma.markware.charybdis.dsl.delete;
 
+import java.util.concurrent.CompletionStage;
+
 /**
  * Delete DSL query expression.
  *
@@ -29,9 +31,16 @@ package ma.markware.charybdis.dsl.delete;
 public interface DeleteFinalExpression {
 
   /**
-   * Added to a batch query if enclosed in one, otherwise execute update DSL query.
+   * Execute delete DSL query.
    *
    * @return {@code true} or {@code false} to inform if changes are applied or not.
    */
   boolean execute();
+
+  /**
+   * Execute delete DSL query asynchronously.
+   *
+   * @return a {@code CompletionStage} that, once complete, will produce a boolean to inform if changes are applied or not.
+   */
+  CompletionStage<Boolean> executeAsync();
 }

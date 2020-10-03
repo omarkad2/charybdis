@@ -18,6 +18,8 @@
  */
 package ma.markware.charybdis.dsl.update;
 
+import java.util.concurrent.CompletionStage;
+
 /**
  * Update DSL query expression.
  *
@@ -34,4 +36,11 @@ public interface UpdateFinalExpression {
    * @return {@code true} if query is executed, {@code false} otherwise.
    */
   boolean execute();
+
+  /**
+   * Execute update DSL query asynchronously.
+   *
+   * @return a {@code CompletionStage} that, once complete, will produce a boolean to inform if changes are applied or not.
+   */
+  CompletionStage<Boolean> executeAsync();
 }

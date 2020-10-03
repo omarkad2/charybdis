@@ -29,7 +29,7 @@ package ma.markware.charybdis.dsl.update.batch;
 public interface BatchUpdateFinalExpression {
 
   /**
-   * Execute Update DSL query.
+   * Add the Update DSL query to the enclosing batch query.
    *
    */
   void execute();

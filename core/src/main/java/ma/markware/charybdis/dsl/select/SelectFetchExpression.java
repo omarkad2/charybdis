@@ -20,6 +20,7 @@ package ma.markware.charybdis.dsl.select;
 
 import java.util.Collection;
 import java.util.Optional;
+import java.util.concurrent.CompletionStage;
 import ma.markware.charybdis.dsl.Record;
 import ma.markware.charybdis.query.PageRequest;
 import ma.markware.charybdis.query.PageResult;
@@ -43,12 +44,28 @@ public interface SelectFetchExpression {
   Record fetchOne();
 
   /**
+   * Execute Select DSL query asynchronously
+   * Fetch only one element.
+   *
+   * @return {@link Record} if selected item exists in DB, otherwise {@code null}.
+   */
+  CompletionStage<Record> fetchOneAsync();
+
+  /**
    * Execute Select DSL query.
    * Fetch one element wrapped in {@link Optional}.
    *
    * @return Optional {@link Record}.
    */
   Optional<Record> fetchOptional();
+
+  /**
+   * Execute Select DSL query asynchronously.
+   * Fetch one element wrapped in {@link Optional}.
+   *
+   * @return Optional {@link Record}.
+   */
+  CompletionStage<Optional<Record>> fetchOptionalAsync();
 
   /**
    * Execute Select DSL query.
@@ -59,6 +76,14 @@ public interface SelectFetchExpression {
   Collection<Record> fetch();
 
   /**
+   * Execute Select DSL query asynchronously.
+   * Fetch all elements.
+   *
+   * @return Collection of {@link Record}.
+   */
+  CompletionStage<Collection<Record>> fetchAsync();
+
+  /**
    * Execute Select DSL query.
    * Fetch a page of elements.
    *
@@ -66,4 +91,13 @@ public interface SelectFetchExpression {
    * @return Page of {@link Record}.
    */
   PageResult<Record> fetchPage(PageRequest pageRequest);
+
+  /**
+   * Execute Select DSL query asynchronously.
+   * Fetch a page of elements.
+   *
+   * @param pageRequest requested page (limit and offset)
+   * @return Page of {@link Record}.
+   */
+  CompletionStage<PageResult<Record>> fetchPageAsync(PageRequest pageRequest);
 }

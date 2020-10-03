@@ -19,8 +19,10 @@
 package ma.markware.charybdis.dsl.update;
 
 import com.datastax.oss.driver.api.core.CqlSession;
+import com.datastax.oss.driver.api.core.cql.AsyncResultSet;
 import com.datastax.oss.driver.api.core.cql.ResultSet;
 import java.time.Instant;
+import java.util.concurrent.CompletionStage;
 import ma.markware.charybdis.ExecutionContext;
 import ma.markware.charybdis.model.assignment.AssignmentListValue;
 import ma.markware.charybdis.model.assignment.AssignmentMapValue;
@@ -196,5 +198,13 @@ public class DslUpdateImpl
   public boolean execute() {
     ResultSet resultSet = updateQuery.execute(session);
     return resultSet != null && resultSet.wasApplied();
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public CompletionStage<Boolean> executeAsync() {
+    return updateQuery.executeAsync(session).thenApply(AsyncResultSet::wasApplied);
   }
 }

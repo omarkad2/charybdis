@@ -18,6 +18,8 @@
  */
 package ma.markware.charybdis.dsl.insert;
 
+import java.util.concurrent.CompletionStage;
+
 /**
  * Insert DSL query expression.
  *
@@ -29,9 +31,16 @@ package ma.markware.charybdis.dsl.insert;
 public interface InsertFinalExpression {
 
   /**
-   * Added to a batch query if enclosed in one, otherwise execute insert DSL query.
+   * Execute insert DSL query.
    *
-   * @return {@code true} or {@code false} to inform if changes are applied in case query is executed, otherwise void (if we are in a batch context).
+   * @return {@code true} or {@code false} to inform if changes are applied.
    */
   boolean execute();
+
+  /**
+   * Execute insert DSL query asynchronously.
+   *
+   * @return a {@code CompletionStage} that, once complete, will produce a boolean to inform if changes are applied or not.
+   */
+  CompletionStage<Boolean> executeAsync();
 }
