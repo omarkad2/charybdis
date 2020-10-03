@@ -16,23 +16,26 @@
  * limitations under the License.
  *
  */
-package ma.markware.charybdis.dsl.insert;
+package ma.markware.charybdis.dsl.insert.batch;
+
+import ma.markware.charybdis.model.field.metadata.ColumnMetadata;
 
 /**
  * Insert DSL query expression.
  *
  * <p>
- * It is not recommended to reference any object with type {@link InsertValuesExpression}.
+ * It is not recommended to reference any object with type {@link BatchInsertInitExpression}.
  *
  * @author Oussama Markad
  */
-public interface InsertValuesExpression extends InsertOnExistExpression {
+public interface BatchInsertInitExpression {
 
   /**
-   * Assign values in insert DSL query.
+   * Assign value to column in insert DSL query.
    *
-   * @param values assigned values.
+   * @param column assigned field.
+   * @param value assigned value.
    * @return updated insert DSL query expression.
    */
-  InsertValuesExpression values(Object... values);
+  <D, S> BatchInsertSetExpression set(ColumnMetadata<D, S> column, D value);
 }

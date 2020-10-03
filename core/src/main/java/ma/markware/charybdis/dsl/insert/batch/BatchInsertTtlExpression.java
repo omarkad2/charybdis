@@ -16,19 +16,23 @@
  * limitations under the License.
  *
  */
+package ma.markware.charybdis.dsl.insert.batch;
 
-package ma.markware.charybdis.dsl.insert;
+/**
+ * Insert DSL query expression.
+ *
+ * <p>
+ * It is not recommended to reference any object with type {@link BatchInsertTtlExpression}.
+ *
+ * @author Oussama Markad
+ */
+public interface BatchInsertTtlExpression extends BatchInsertFinalExpression {
 
-import ma.markware.charybdis.batch.Batch;
-import org.mockito.Mock;
-
-class DslInsertBatchImplTest extends AbstractDslInsertTest<DslInsertBatchImpl> {
-
-  @Mock
-  private Batch batch;
-
-  @Override
-  DslInsertBatchImpl getInstance() {
-    return new DslInsertBatchImpl(batch);
-  }
+  /**
+   * Set {@code TTL} in insert DSL query.
+   *
+   * @param seconds ttl in seconds.
+   * @return updated insert DSL query expression.
+   */
+  BatchInsertFinalExpression usingTtl(int seconds);
 }

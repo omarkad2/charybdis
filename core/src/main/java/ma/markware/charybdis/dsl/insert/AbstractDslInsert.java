@@ -19,19 +19,14 @@
 
 package ma.markware.charybdis.dsl.insert;
 
-import java.time.Instant;
-import ma.markware.charybdis.model.field.metadata.ColumnMetadata;
-import ma.markware.charybdis.model.field.metadata.TableMetadata;
 import ma.markware.charybdis.query.InsertQuery;
 
 /**
  * Abstract insert query builder.
- * @param <T> query return type.
  *
  * @author Oussama Markad
  */
-abstract class AbstractDslInsert<T> implements InsertInitExpression<T>, InsertInitWithColumnsExpression<T>, InsertValuesExpression<T>, InsertSetExpression<T>,
-    InsertOnExistExpression<T>, InsertTtlExpression<T>, InsertTimestampExpression<T>, InsertFinalExpression<T> {
+abstract class AbstractDslInsert {
 
   final InsertQuery insertQuery;
 
@@ -41,75 +36,5 @@ abstract class AbstractDslInsert<T> implements InsertInitExpression<T>, InsertIn
 
   InsertQuery getInsertQuery() {
     return insertQuery;
-  }
-
-  /**
-   * Set table to insert.
-   */
-  public InsertInitExpression<T> insertInto(TableMetadata tableMetadata) {
-    insertQuery.setTable(tableMetadata);
-    return this;
-  }
-
-  /**
-   * Set table and columns to insert.
-   */
-  public InsertInitWithColumnsExpression<T> insertInto(TableMetadata table, ColumnMetadata... columns) {
-    insertQuery.setTableAndColumns(table, columns);
-    return this;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public InsertValuesExpression<T> values(final Object... values) {
-    insertQuery.setValues(values);
-    return this;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public <D, S> InsertSetExpression<T> set(final ColumnMetadata<D, S> column, final D value) {
-    insertQuery.setSet(column, value);
-    return this;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public <D extends InsertTtlExpression<T> & InsertTimestampExpression<T>> D ifNotExists() {
-    insertQuery.enableIfNotExists();
-    return (D) this;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public InsertFinalExpression<T> usingTtl(final int ttl) {
-    insertQuery.setTtl(ttl);
-    return this;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public InsertFinalExpression<T> usingTimestamp(final Instant timestamp) {
-    insertQuery.setTimestamp(timestamp);
-    return this;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public InsertFinalExpression<T> usingTimestamp(final long timestamp) {
-    insertQuery.setTimestamp(timestamp);
-    return this;
   }
 }

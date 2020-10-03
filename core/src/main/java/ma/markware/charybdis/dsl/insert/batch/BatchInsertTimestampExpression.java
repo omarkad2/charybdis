@@ -16,23 +16,33 @@
  * limitations under the License.
  *
  */
-package ma.markware.charybdis.dsl.insert;
+package ma.markware.charybdis.dsl.insert.batch;
+
+import java.time.Instant;
 
 /**
  * Insert DSL query expression.
  *
  * <p>
- * It is not recommended to reference any object with type {@link InsertValuesExpression}.
+ * It is not recommended to reference any object with type {@link BatchInsertTimestampExpression}.
  *
  * @author Oussama Markad
  */
-public interface InsertValuesExpression extends InsertOnExistExpression {
+public interface BatchInsertTimestampExpression extends BatchInsertFinalExpression {
 
   /**
-   * Assign values in insert DSL query.
+   * Set write time in insert DSL query.
    *
-   * @param values assigned values.
+   * @param timestamp writetime as {@link Instant}.
    * @return updated insert DSL query expression.
    */
-  InsertValuesExpression values(Object... values);
+  BatchInsertFinalExpression usingTimestamp(Instant timestamp);
+
+  /**
+   * Set write time in insert DSL query.
+   *
+   * @param timestamp writetime as millis.
+   * @return updated insert DSL query expression.
+   */
+  BatchInsertFinalExpression usingTimestamp(long timestamp);
 }

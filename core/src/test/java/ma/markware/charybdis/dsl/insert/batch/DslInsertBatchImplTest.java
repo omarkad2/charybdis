@@ -21,7 +21,7 @@ package ma.markware.charybdis.dsl.insert.batch;
 
 import com.datastax.oss.driver.api.core.CqlSession;
 import ma.markware.charybdis.batch.Batch;
-import ma.markware.charybdis.dsl.insert.DslInsertBatchImpl;
+import ma.markware.charybdis.dsl.insert.DslBatchInsertImpl;
 import ma.markware.charybdis.test.entities.TestUdt;
 import org.mockito.Mock;
 
@@ -31,12 +31,12 @@ class DslInsertBatchImplTest {
   private Batch batch;
   @Mock
   private CqlSession session;
-  private DslInsertBatchImpl dslInsertBatchImpl;
+  private DslBatchInsertImpl dslBatchInsertImpl;
   private TestUdt udt1, udt2;
 
 //  @BeforeEach
 //  void setup() {
-//    dslInsertBatchImpl = new DslInsertBatchImpl(batch);
+//    dslBatchInsertImpl = new DslBatchInsertImpl(batch);
 //
 //    TestNestedUdt nestedUdt1 = new TestNestedUdt("nestedName1", "nestedValue1", Arrays.asList(12, 13));
 //    TestNestedUdt nestedUdt2 = new TestNestedUdt("nestedName2", "nestedValue2", Arrays.asList(14, 15, 16));
@@ -53,9 +53,9 @@ class DslInsertBatchImplTest {
 //
 //  @Test
 //  void insertInto_without_columns() {
-//    dslInsertBatchImpl.insertInto(TestEntity_Table.test_entity);
+//    dslBatchInsertImpl.insertInto(TestEntity_Table.test_entity);
 //
-//    InsertQuery insertQuery = dslInsertBatchImpl.getInsertQuery();
+//    InsertQuery insertQuery = dslBatchInsertImpl.getInsertQuery();
 //    assertThat(insertQuery.getKeyspace()).isEqualTo(TestEntity_Table.KEYSPACE_NAME);
 //    assertThat(insertQuery.getTable()).isEqualTo(TestEntity_Table.TABLE_NAME);
 //  }
@@ -63,9 +63,9 @@ class DslInsertBatchImplTest {
 //  @Test
 //  void insertInto_with_columns() {
 //    ReflectionUtils.
-//    dslInsertBatchImpl.insertInto(TestEntity_Table.test_entity, TestEntity_Table.id, TestEntity_Table.date, TestEntity_Table.list, TestEntity_Table.udt);
+//    dslBatchInsertImpl.insertInto(TestEntity_Table.test_entity, TestEntity_Table.id, TestEntity_Table.date, TestEntity_Table.list, TestEntity_Table.udt);
 //
-//    InsertQuery insertQuery = dslInsertBatchImpl.getInsertQuery();
+//    InsertQuery insertQuery = dslBatchInsertImpl.getInsertQuery();
 //
 //    assertThat(insertQuery.getKeyspace()).isEqualTo(TestEntity_Table.KEYSPACE_NAME);
 //    assertThat(insertQuery.getTable()).isEqualTo(TestEntity_Table.TABLE_NAME);
@@ -83,10 +83,10 @@ class DslInsertBatchImplTest {
 //    UUID uuid = UUID.randomUUID();
 //    Instant now = Instant.now();
 //    List<String> stringList = Arrays.asList("value1", "value2");
-//    dslInsertBatchImpl.insertInto(TestEntity_Table.test_entity, TestEntity_Table.id, TestEntity_Table.date, TestEntity_Table.list, TestEntity_Table.udt)
+//    dslBatchInsertImpl.insertInto(TestEntity_Table.test_entity, TestEntity_Table.id, TestEntity_Table.date, TestEntity_Table.list, TestEntity_Table.udt)
 //                      .values(uuid, now, stringList, udt1);
 //
-//    InsertQuery insertQuery = dslInsertBatchImpl.getInsertQuery();
+//    InsertQuery insertQuery = dslBatchInsertImpl.getInsertQuery();
 //    Map<Integer, Pair<String, Object>> columnNameValuePairs = insertQuery.getColumnNameValueMapping()
 //                                                                         .getColumnNameValuePairs();
 //    assertThat(columnNameValuePairs).hasSize(4);
@@ -101,13 +101,13 @@ class DslInsertBatchImplTest {
 //    UUID uuid = UUID.randomUUID();
 //    Instant now = Instant.now();
 //    List<String> stringList = Arrays.asList("value1", "value2");
-//    dslInsertBatchImpl.insertInto(TestEntity_Table.test_entity)
+//    dslBatchInsertImpl.insertInto(TestEntity_Table.test_entity)
 //                      .set(TestEntity_Table.id, uuid)
 //                      .set(TestEntity_Table.date, now)
 //                      .set(TestEntity_Table.list, stringList)
 //                      .set(TestEntity_Table.udt, udt2);
 //
-//    InsertQuery insertQuery = dslInsertBatchImpl.getInsertQuery();
+//    InsertQuery insertQuery = dslBatchInsertImpl.getInsertQuery();
 //    Map<Integer, Pair<String, Object>> columnNameValuePairs = insertQuery.getColumnNameValueMapping()
 //                                                                         .getColumnNameValuePairs();
 //    assertThat(columnNameValuePairs).hasSize(4);
@@ -122,11 +122,11 @@ class DslInsertBatchImplTest {
 //    UUID uuid = UUID.randomUUID();
 //    Instant now = Instant.now();
 //    List<String> stringList = Arrays.asList("value1", "value2");
-//    dslInsertBatchImpl.insertInto(TestEntity_Table.test_entity, TestEntity_Table.id, TestEntity_Table.date, TestEntity_Table.list, TestEntity_Table.udt)
+//    dslBatchInsertImpl.insertInto(TestEntity_Table.test_entity, TestEntity_Table.id, TestEntity_Table.date, TestEntity_Table.list, TestEntity_Table.udt)
 //                      .values(uuid, now, stringList, udt1)
 //                      .usingTtl(10000);
 //
-//    InsertQuery insertQuery = dslInsertBatchImpl.getInsertQuery();
+//    InsertQuery insertQuery = dslBatchInsertImpl.getInsertQuery();
 //
 //    assertThat(insertQuery.getTtl()).isEqualTo(10000);
 //  }
@@ -136,11 +136,11 @@ class DslInsertBatchImplTest {
 //    UUID uuid = UUID.randomUUID();
 //    Instant now = Instant.now();
 //    List<String> stringList = Arrays.asList("value1", "value2");
-//    dslInsertBatchImpl.insertInto(TestEntity_Table.test_entity, TestEntity_Table.id, TestEntity_Table.date, TestEntity_Table.list, TestEntity_Table.udt)
+//    dslBatchInsertImpl.insertInto(TestEntity_Table.test_entity, TestEntity_Table.id, TestEntity_Table.date, TestEntity_Table.list, TestEntity_Table.udt)
 //                      .values(uuid, now, stringList, udt1)
 //                      .usingTimestamp(now.plus(1, ChronoUnit.DAYS));
 //
-//    InsertQuery insertQuery = dslInsertBatchImpl.getInsertQuery();
+//    InsertQuery insertQuery = dslBatchInsertImpl.getInsertQuery();
 //
 //    assertThat(insertQuery.getTimestamp()).isEqualTo(now.plus(1, ChronoUnit.DAYS).toEpochMilli());
 //  }
@@ -150,11 +150,11 @@ class DslInsertBatchImplTest {
 //    UUID uuid = UUID.randomUUID();
 //    Instant now = Instant.now();
 //    List<String> stringList = Arrays.asList("value1", "value2");
-//    dslInsertBatchImpl.insertInto(TestEntity_Table.test_entity, TestEntity_Table.id, TestEntity_Table.date, TestEntity_Table.list, TestEntity_Table.udt)
+//    dslBatchInsertImpl.insertInto(TestEntity_Table.test_entity, TestEntity_Table.id, TestEntity_Table.date, TestEntity_Table.list, TestEntity_Table.udt)
 //                      .values(uuid, now, stringList, udt1)
 //                      .usingTimestamp(now.plus(1, ChronoUnit.DAYS).toEpochMilli());
 //
-//    InsertQuery insertQuery = dslInsertBatchImpl.getInsertQuery();
+//    InsertQuery insertQuery = dslBatchInsertImpl.getInsertQuery();
 //
 //    assertThat(insertQuery.getTimestamp()).isEqualTo(now.plus(1, ChronoUnit.DAYS).toEpochMilli());
 //  }
@@ -164,11 +164,11 @@ class DslInsertBatchImplTest {
 //    UUID uuid = UUID.randomUUID();
 //    Instant now = Instant.now();
 //    List<String> stringList = Arrays.asList("value1", "value2");
-//    dslInsertBatchImpl.insertInto(TestEntity_Table.test_entity, TestEntity_Table.id, TestEntity_Table.date, TestEntity_Table.list, TestEntity_Table.udt)
+//    dslBatchInsertImpl.insertInto(TestEntity_Table.test_entity, TestEntity_Table.id, TestEntity_Table.date, TestEntity_Table.list, TestEntity_Table.udt)
 //                      .values(uuid, now, stringList, udt1)
 //                      .ifNotExists();
 //
-//    InsertQuery insertQuery = dslInsertBatchImpl.getInsertQuery();
+//    InsertQuery insertQuery = dslBatchInsertImpl.getInsertQuery();
 //
 //    assertThat(insertQuery.isIfNotExists()).isTrue();
 //  }

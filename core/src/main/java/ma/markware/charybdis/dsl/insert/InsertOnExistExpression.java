@@ -26,12 +26,12 @@ package ma.markware.charybdis.dsl.insert;
  *
  * @author Oussama Markad
  */
-public interface InsertOnExistExpression<RETURN_TYPE> extends InsertTtlExpression<RETURN_TYPE>, InsertTimestampExpression<RETURN_TYPE> {
+public interface InsertOnExistExpression extends InsertTtlExpression, InsertTimestampExpression {
 
   /**
    * Insert only if no other entity exists with the same primary key.
    *
    * @return updated insert DSL query expression.
    */
-  <T extends InsertTtlExpression<RETURN_TYPE> & InsertTimestampExpression<RETURN_TYPE>> T ifNotExists();
+  <T extends InsertTtlExpression & InsertTimestampExpression> T ifNotExists();
 }

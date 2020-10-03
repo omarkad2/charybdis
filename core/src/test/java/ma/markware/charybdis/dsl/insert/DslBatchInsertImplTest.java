@@ -16,33 +16,32 @@
  * limitations under the License.
  *
  */
+
 package ma.markware.charybdis.dsl.insert;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.datastax.oss.driver.api.core.CqlSession;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import ma.markware.charybdis.ExecutionContext;
-import ma.markware.charybdis.model.option.ConsistencyLevel;
+import ma.markware.charybdis.batch.Batch;
 import ma.markware.charybdis.query.InsertQuery;
 import ma.markware.charybdis.test.metadata.TestEntity_Table;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 
-class DslInsertImplTest extends AbstractDslInsertTest<DslInsertImpl> {
+class DslBatchInsertImplTest extends AbstractDslInsertTest<DslBatchInsertImpl> {
 
   @Mock
-  private CqlSession session;
+  private Batch batch;
 
   @Override
-  DslInsertImpl getInstance() {
-    return new DslInsertImpl(session, new ExecutionContext());
+  DslBatchInsertImpl getInstance() {
+    return new DslBatchInsertImpl(batch);
   }
 
   @Test
@@ -164,13 +163,5 @@ class DslInsertImplTest extends AbstractDslInsertTest<DslInsertImpl> {
     InsertQuery insertQuery = instance.getInsertQuery();
 
     assertThat(insertQuery.isIfNotExists()).isTrue();
-  }
-
-  @Test
-  void insert_should_set_fallback_consistency() {
-    ExecutionContext executionContext = new ExecutionContext();
-    DslInsertImpl dslInsert = new DslInsertImpl(session, executionContext);
-    dslInsert.insertInto(TestEntity_Table.test_entity);
-    assertThat(executionContext.getDefaultConsistencyLevel()).isEqualTo(ConsistencyLevel.QUORUM);
   }
 }

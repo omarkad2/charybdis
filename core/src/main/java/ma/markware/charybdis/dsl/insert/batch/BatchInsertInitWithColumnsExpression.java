@@ -16,32 +16,23 @@
  * limitations under the License.
  *
  */
-
-package ma.markware.charybdis.dsl.insert;
-
-import ma.markware.charybdis.batch.Batch;
-import ma.markware.charybdis.query.InsertQuery;
+package ma.markware.charybdis.dsl.insert.batch;
 
 /**
- * Insert in batch query builder.
+ * Insert DSL query expression.
+ *
+ * <p>
+ * It is not recommended to reference any object with type {@link BatchInsertInitWithColumnsExpression}.
  *
  * @author Oussama Markad
  */
-public class DslInsertBatchImpl extends AbstractDslInsert<Void> {
-
-  private final Batch batch;
-
-  public DslInsertBatchImpl(final Batch batch) {
-    super(new InsertQuery());
-    this.batch = batch;
-  }
+public interface BatchInsertInitWithColumnsExpression {
 
   /**
-   * {@inheritDoc}
+   * Assign values in insert DSL query.
+   *
+   * @param values assigned values.
+   * @return updated insert DSL query expression.
    */
-  @Override
-  public Void execute() {
-    insertQuery.addToBatch(batch);
-    return null;
-  }
+  BatchInsertValuesExpression values(Object... values);
 }

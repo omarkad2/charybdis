@@ -26,7 +26,7 @@ package ma.markware.charybdis.dsl.insert;
  *
  * @author Oussama Markad
  */
-public interface InsertInitWithColumnsExpression<RETURN_TYPE> {
+public interface InsertInitWithColumnsExpression {
 
   /**
    * Assign values in insert DSL query.
@@ -34,5 +34,5 @@ public interface InsertInitWithColumnsExpression<RETURN_TYPE> {
    * @param values assigned values.
    * @return updated insert DSL query expression.
    */
-  InsertValuesExpression<RETURN_TYPE> values(Object... values);
+  InsertValuesExpression values(Object... values);
 }
