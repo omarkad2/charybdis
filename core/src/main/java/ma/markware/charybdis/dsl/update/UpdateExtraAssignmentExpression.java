@@ -26,6 +26,6 @@ package ma.markware.charybdis.dsl.update;
  *
  * @author Oussama Markad
  */
-public interface UpdateExtraAssignmentExpression<RETURN_TYPE> extends UpdateAssignmentExpression<RETURN_TYPE>, UpdateWhereExpression<RETURN_TYPE> {
+public interface UpdateExtraAssignmentExpression extends UpdateAssignmentExpression, UpdateWhereExpression {
 
 }

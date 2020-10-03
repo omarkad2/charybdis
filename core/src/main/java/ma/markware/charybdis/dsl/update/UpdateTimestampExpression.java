@@ -28,7 +28,7 @@ import java.time.Instant;
  *
  * @author Oussama Markad
  */
-public interface UpdateTimestampExpression<RETURN_TYPE> extends UpdateAssignmentExpression<RETURN_TYPE> {
+public interface UpdateTimestampExpression extends UpdateAssignmentExpression {
 
   /**
    * Set write time in update DSL query.
@@ -36,7 +36,7 @@ public interface UpdateTimestampExpression<RETURN_TYPE> extends UpdateAssignment
    * @param timestamp writetime as {@link Instant}.
    * @return updated update DSL query expression.
    */
-  UpdateAssignmentExpression<RETURN_TYPE> usingTimestamp(Instant timestamp);
+  UpdateAssignmentExpression usingTimestamp(Instant timestamp);
 
   /**
    * Set write time in update DSL query.
@@ -44,5 +44,5 @@ public interface UpdateTimestampExpression<RETURN_TYPE> extends UpdateAssignment
    * @param timestamp writetime as millis.
    * @return updated update DSL query expression.
    */
-  UpdateAssignmentExpression<RETURN_TYPE> usingTimestamp(long timestamp);
+  UpdateAssignmentExpression usingTimestamp(long timestamp);
 }

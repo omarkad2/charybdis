@@ -16,23 +16,33 @@
  * limitations under the License.
  *
  */
-package ma.markware.charybdis.dsl.update;
+package ma.markware.charybdis.dsl.update.batch;
+
+import java.time.Instant;
 
 /**
  * Update DSL query expression.
  *
  * <p>
- * It is not recommended to reference any object with type {@link UpdateTtlExpression}.
+ * It is not recommended to reference any object with type {@link BatchUpdateTimestampExpression}.
  *
  * @author Oussama Markad
  */
-public interface UpdateTtlExpression extends UpdateAssignmentExpression {
+public interface BatchUpdateTimestampExpression extends BatchUpdateAssignmentExpression {
 
   /**
-   * Set {@code TTL} in insert DSL query.
+   * Set write time in update DSL query.
    *
-   * @param seconds ttl in seconds.
-   * @return updated insert DSL query expression.
+   * @param timestamp writetime as {@link Instant}.
+   * @return updated update DSL query expression.
    */
-  UpdateAssignmentExpression usingTtl(int seconds);
+  BatchUpdateAssignmentExpression usingTimestamp(Instant timestamp);
+
+  /**
+   * Set write time in update DSL query.
+   *
+   * @param timestamp writetime as millis.
+   * @return updated update DSL query expression.
+   */
+  BatchUpdateAssignmentExpression usingTimestamp(long timestamp);
 }

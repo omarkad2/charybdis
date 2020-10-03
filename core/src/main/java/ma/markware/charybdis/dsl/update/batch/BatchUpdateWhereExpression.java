@@ -16,33 +16,25 @@
  * limitations under the License.
  *
  */
+package ma.markware.charybdis.dsl.update.batch;
 
-package ma.markware.charybdis.dsl.update;
-
-import ma.markware.charybdis.batch.Batch;
-import ma.markware.charybdis.query.UpdateQuery;
+import ma.markware.charybdis.model.criteria.CriteriaExpression;
 
 /**
- * Update in batch query builder.
+ * Update DSL query expression.
+ *
+ * <p>
+ * It is not recommended to reference any object with type {@link BatchUpdateWhereExpression}.
  *
  * @author Oussama Markad
  */
-public class DslUpdateBatchImpl extends AbstractDslUpdate<Void> {
-
-  private final Batch batch;
-
-  public DslUpdateBatchImpl(final Batch batch) {
-    super(new UpdateQuery());
-    this.batch = batch;
-  }
-
+public interface BatchUpdateWhereExpression {
 
   /**
-   * {@inheritDoc}
+   * Create {@code WHERE} clause in update DSL query.
+   *
+   * @param condition initial condition.
+   * @return updated update DSL query expression.
    */
-  @Override
-  public Void execute() {
-    updateQuery.addToBatch(batch);
-    return null;
-  }
+  BatchUpdateExtraWhereExpression where(CriteriaExpression condition);
 }

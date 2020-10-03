@@ -16,19 +16,23 @@
  * limitations under the License.
  *
  */
+package ma.markware.charybdis.dsl.update.batch;
 
-package ma.markware.charybdis.dsl.update;
+/**
+ * Update DSL query expression.
+ *
+ * <p>
+ * It is not recommended to reference any object with type {@link BatchUpdateTtlExpression}.
+ *
+ * @author Oussama Markad
+ */
+public interface BatchUpdateTtlExpression extends BatchUpdateAssignmentExpression {
 
-import ma.markware.charybdis.batch.Batch;
-import org.mockito.Mock;
-
-class DslUpdateBatchImplTest extends AbstractDslUpdateTest<DslUpdateBatchImpl> {
-
-  @Mock
-  private Batch batch;
-
-  @Override
-  DslUpdateBatchImpl getInstance() {
-    return new DslUpdateBatchImpl(batch);
-  }
+  /**
+   * Set {@code TTL} in insert DSL query.
+   *
+   * @param seconds ttl in seconds.
+   * @return updated insert DSL query expression.
+   */
+  BatchUpdateAssignmentExpression usingTtl(int seconds);
 }

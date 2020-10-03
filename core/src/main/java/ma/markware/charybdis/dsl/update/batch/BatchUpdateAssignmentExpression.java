@@ -16,7 +16,7 @@
  * limitations under the License.
  *
  */
-package ma.markware.charybdis.dsl.update;
+package ma.markware.charybdis.dsl.update.batch;
 
 import ma.markware.charybdis.model.assignment.AssignmentListValue;
 import ma.markware.charybdis.model.assignment.AssignmentMapValue;
@@ -33,11 +33,11 @@ import ma.markware.charybdis.model.field.nested.UdtNestedField;
  * Update DSL query expression.
  *
  * <p>
- * It is not recommended to reference any object with type {@link UpdateAssignmentExpression}.
+ * It is not recommended to reference any object with type {@link BatchUpdateAssignmentExpression}.
  *
  * @author Oussama Markad
  */
-public interface UpdateAssignmentExpression {
+public interface BatchUpdateAssignmentExpression {
 
   /**
    * Assign value to column in update DSL query.
@@ -46,7 +46,7 @@ public interface UpdateAssignmentExpression {
    * @param value assigned value.
    * @return updated update DSL query expression.
    */
-  <D, S> UpdateExtraAssignmentExpression set(ColumnMetadata<D, S> column, D value);
+  <D, S> BatchUpdateExtraAssignmentExpression set(ColumnMetadata<D, S> column, D value);
 
   /**
    * Assign value to list column in update DSL query.
@@ -55,7 +55,7 @@ public interface UpdateAssignmentExpression {
    * @param value assigned value.
    * @return updated update DSL query expression.
    */
-  <D, S> UpdateExtraAssignmentExpression set(ListColumnMetadata<D, S> column, AssignmentListValue<D, S> value);
+  <D, S> BatchUpdateExtraAssignmentExpression set(ListColumnMetadata<D, S> column, AssignmentListValue<D, S> value);
 
   /**
    * Assign value to set column in update DSL query.
@@ -64,7 +64,7 @@ public interface UpdateAssignmentExpression {
    * @param value assigned value.
    * @return updated update DSL query expression.
    */
-  <D, S> UpdateExtraAssignmentExpression set(SetColumnMetadata<D, S> column, AssignmentSetValue<D, S> value);
+  <D, S> BatchUpdateExtraAssignmentExpression set(SetColumnMetadata<D, S> column, AssignmentSetValue<D, S> value);
 
   /**
    * Assign value to map column in update DSL query.
@@ -73,7 +73,7 @@ public interface UpdateAssignmentExpression {
    * @param value assigned value.
    * @return updated update DSL query expression.
    */
-  <D_KEY, D_VALUE, S_KEY, S_VALUE> UpdateExtraAssignmentExpression set(MapColumnMetadata<D_KEY, D_VALUE, S_KEY, S_VALUE> column,
+  <D_KEY, D_VALUE, S_KEY, S_VALUE> BatchUpdateExtraAssignmentExpression set(MapColumnMetadata<D_KEY, D_VALUE, S_KEY, S_VALUE> column,
       AssignmentMapValue<D_KEY, D_VALUE, S_KEY, S_VALUE> value);
 
   /**
@@ -83,7 +83,8 @@ public interface UpdateAssignmentExpression {
    * @param value assigned value.
    * @return updated update DSL query expression.
    */
-  <D_KEY, D_VALUE, S_KEY, S_VALUE> UpdateExtraAssignmentExpression set(MapNestedField<D_KEY, D_VALUE, S_KEY, S_VALUE> field, D_VALUE value);
+  <D_KEY, D_VALUE, S_KEY, S_VALUE> BatchUpdateExtraAssignmentExpression set(MapNestedField<D_KEY, D_VALUE, S_KEY, S_VALUE> field,
+      D_VALUE value);
 
   /**
    * Assign value to list nested field in update DSL query.
@@ -92,7 +93,7 @@ public interface UpdateAssignmentExpression {
    * @param value assigned value.
    * @return updated update DSL query expression.
    */
-  <D, S> UpdateExtraAssignmentExpression set(ListNestedField<D, S> field, D value);
+  <D, S> BatchUpdateExtraAssignmentExpression set(ListNestedField<D, S> field, D value);
 
   /**
    * Assign value to udt nested field in update DSL query.
@@ -101,5 +102,5 @@ public interface UpdateAssignmentExpression {
    * @param value assigned value.
    * @return updated update DSL query expression.
    */
-  <D, S> UpdateExtraAssignmentExpression set(UdtNestedField<D, S> field, D value);
+  <D, S> BatchUpdateExtraAssignmentExpression set(UdtNestedField<D, S> field, D value);
 }

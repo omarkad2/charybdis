@@ -16,13 +16,13 @@
  * limitations under the License.
  *
  */
+
 package ma.markware.charybdis.dsl.update;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 
 import com.datastax.oss.driver.api.core.CqlIdentifier;
-import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.internal.querybuilder.condition.DefaultCondition;
 import com.datastax.oss.driver.internal.querybuilder.lhs.ColumnComponentLeftOperand;
 import com.datastax.oss.driver.internal.querybuilder.lhs.ColumnLeftOperand;
@@ -41,8 +41,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import ma.markware.charybdis.ExecutionContext;
-import ma.markware.charybdis.model.option.ConsistencyLevel;
+import ma.markware.charybdis.batch.Batch;
 import ma.markware.charybdis.query.UpdateQuery;
 import ma.markware.charybdis.query.clause.AssignmentClause;
 import ma.markware.charybdis.query.clause.ConditionClause;
@@ -54,14 +53,14 @@ import ma.markware.charybdis.test.metadata.TestExtraUdt_Udt;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 
-class DslUpdateImplTest extends AbstractDslUpdateTest<DslUpdateImpl> {
+class DslBatchUpdateImplTest extends AbstractDslUpdateTest<DslBatchUpdateImpl> {
 
   @Mock
-  private CqlSession session;
+  private Batch batch;
 
   @Override
-  DslUpdateImpl getInstance() {
-    return new DslUpdateImpl(session, new ExecutionContext());
+  DslBatchUpdateImpl getInstance() {
+    return new DslBatchUpdateImpl(batch);
   }
 
   @Test
@@ -326,13 +325,5 @@ class DslUpdateImplTest extends AbstractDslUpdateTest<DslUpdateImpl> {
             tuple(CqlIdentifier.fromCql(TestEntity_Table.enumMap.getName()), "=", new Object[] { ImmutableMap.of(0, TestEnum.TYPE_A.name(), 1, TestEnum.TYPE_B.name()) }),
             tuple(CqlIdentifier.fromCql(TestEntity_Table.udtList.getName()), "!=", new Object[] { Arrays.asList(TestEntity_Table.udt.serialize(udt1), TestEntity_Table.udt.serialize(udt2))})
         );
-  }
-
-  @Test
-  void update_should_set_fallback_consistency() {
-    ExecutionContext executionContext = new ExecutionContext();
-    DslUpdateImpl dslUpdate = new DslUpdateImpl(session, executionContext);
-    dslUpdate.update(TestEntity_Table.test_entity);
-    assertThat(executionContext.getDefaultConsistencyLevel()).isEqualTo(ConsistencyLevel.QUORUM);
   }
 }
