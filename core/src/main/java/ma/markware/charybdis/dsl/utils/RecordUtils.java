@@ -18,6 +18,7 @@
  */
 package ma.markware.charybdis.dsl.utils;
 
+import com.datastax.oss.driver.api.core.cql.AsyncResultSet;
 import com.datastax.oss.driver.api.core.cql.ResultSet;
 import com.datastax.oss.driver.api.core.cql.Row;
 import java.util.ArrayList;
@@ -54,6 +55,17 @@ public class RecordUtils {
     List<Record> records = new ArrayList<>();
     while (resultSet.getAvailableWithoutFetching() > 0) {
       records.add(rowToRecord(resultSet.one(), selectedFields));
+    }
+    return records;
+  }
+
+  /**
+   * Transform Cql result set to a list of database result records.
+   */
+  public static List<Record> resultSetToRecords(final AsyncResultSet asyncResultSet, final List<SelectableField> selectedFields) {
+    List<Record> records = new ArrayList<>();
+    while (asyncResultSet.remaining() > 0) {
+      records.add(rowToRecord(asyncResultSet.one(), selectedFields));
     }
     return records;
   }

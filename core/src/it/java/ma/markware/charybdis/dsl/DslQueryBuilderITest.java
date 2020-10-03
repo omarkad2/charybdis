@@ -39,6 +39,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.CompletionStage;
+import java.util.concurrent.ExecutionException;
 import ma.markware.charybdis.AbstractIntegrationITest;
 import ma.markware.charybdis.CqlTemplate;
 import ma.markware.charybdis.model.field.SelectableField;
@@ -80,7 +82,7 @@ class DslQueryBuilderITest extends AbstractIntegrationITest {
   class DslSelectQueryITest {
 
     @Test
-    void select(CqlSession session) {
+    void selectOne(CqlSession session) {
 
       // Given
       Map<String, Term> valuesToInsert = new HashMap<>();
@@ -121,6 +123,63 @@ class DslQueryBuilderITest extends AbstractIntegrationITest {
                                          record.get(TestEntity_Table.udtMap), record.get(TestEntity_Table.udtNestedList),
                                          record.get(TestEntity_Table.flag));
       assertThat(actual).isEqualTo(TestEntity_INST1.entity1);
+    }
+
+    @Test
+    void selectOneAsync(CqlSession session) {
+
+      // Given
+      Map<String, Term> valuesToInsert = new HashMap<>();
+      valuesToInsert.put(TestEntity_Table.id.getName(), QueryBuilder.literal(TestEntity_Table.id.serialize(TestEntity_INST1.id)));
+      valuesToInsert.put(TestEntity_Table.date.getName(), QueryBuilder.literal(TestEntity_Table.date.serialize(TestEntity_INST1.date)));
+      valuesToInsert.put(TestEntity_Table.udt.getName(), QueryBuilder.literal(TestEntity_Table.udt.serialize(TestEntity_INST1.udt1)));
+      valuesToInsert.put(TestEntity_Table.list.getName(), QueryBuilder.literal(TestEntity_Table.list.serialize(TestEntity_INST1.list)));
+      valuesToInsert.put(TestEntity_Table.se.getName(), QueryBuilder.literal(TestEntity_Table.se.serialize(TestEntity_INST1.se)));
+      valuesToInsert.put(TestEntity_Table.map.getName(), QueryBuilder.literal(TestEntity_Table.map.serialize(TestEntity_INST1.map)));
+      valuesToInsert.put(TestEntity_Table.nestedList.getName(), QueryBuilder.literal(TestEntity_Table.nestedList.serialize(TestEntity_INST1.nestedList)));
+      valuesToInsert.put(TestEntity_Table.nestedSet.getName(), QueryBuilder.literal(TestEntity_Table.nestedSet.serialize(TestEntity_INST1.nestedSet)));
+      valuesToInsert.put(TestEntity_Table.nestedMap.getName(), QueryBuilder.literal(TestEntity_Table.nestedMap.serialize(TestEntity_INST1.nestedMap)));
+      valuesToInsert.put(TestEntity_Table.enumValue.getName(), QueryBuilder.literal(TestEntity_Table.enumValue.serialize(TestEntity_INST1.enumValue)));
+      valuesToInsert.put(TestEntity_Table.enumList.getName(), QueryBuilder.literal(TestEntity_Table.enumList.serialize(TestEntity_INST1.enumList)));
+      valuesToInsert.put(TestEntity_Table.enumMap.getName(), QueryBuilder.literal(TestEntity_Table.enumMap.serialize(TestEntity_INST1.enumMap)));
+      valuesToInsert.put(TestEntity_Table.enumNestedList.getName(), QueryBuilder.literal(TestEntity_Table.enumNestedList.serialize(TestEntity_INST1.enumNestedList)));
+      valuesToInsert.put(TestEntity_Table.extraUdt.getName(), QueryBuilder.literal(TestEntity_Table.extraUdt.serialize(TestEntity_INST1.extraUdt)));
+      valuesToInsert.put(TestEntity_Table.udtList.getName(), QueryBuilder.literal(TestEntity_Table.udtList.serialize(TestEntity_INST1.udtList)));
+      valuesToInsert.put(TestEntity_Table.udtSet.getName(), QueryBuilder.literal(TestEntity_Table.udtSet.serialize(TestEntity_INST1.udtSet)));
+      valuesToInsert.put(TestEntity_Table.udtMap.getName(), QueryBuilder.literal(TestEntity_Table.udtMap.serialize(TestEntity_INST1.udtMap)));
+      valuesToInsert.put(TestEntity_Table.udtNestedList.getName(), QueryBuilder.literal(TestEntity_Table.udtNestedList.serialize(TestEntity_INST1.udtNestedList)));
+      valuesToInsert.put(TestEntity_Table.flag.getName(), QueryBuilder.literal(TestEntity_Table.flag.serialize(TestEntity_INST1.flag)));
+      insertRow(session, TestEntity_Table.KEYSPACE_NAME, TestEntity_Table.TABLE_NAME, valuesToInsert);
+
+      // When
+      CompletionStage<Record> recordFuture = dsl.selectFrom(TestEntity_Table.test_entity)
+                         .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
+                         .fetchOneAsync();
+
+      recordFuture.thenAccept(record -> {
+        // Then
+        TestEntity actual = new TestEntity(record.get(TestEntity_Table.id), record.get(TestEntity_Table.date), record.get(TestEntity_Table.udt),
+                                           record.get(TestEntity_Table.list), record.get(TestEntity_Table.se), record.get(TestEntity_Table.map),
+                                           record.get(TestEntity_Table.nestedList), record.get(TestEntity_Table.nestedSet),
+                                           record.get(TestEntity_Table.nestedMap), record.get(TestEntity_Table.enumValue),
+                                           record.get(TestEntity_Table.enumList), record.get(TestEntity_Table.enumMap),
+                                           record.get(TestEntity_Table.enumNestedList), record.get(TestEntity_Table.extraUdt),
+                                           record.get(TestEntity_Table.udtList), record.get(TestEntity_Table.udtSet),
+                                           record.get(TestEntity_Table.udtMap), record.get(TestEntity_Table.udtNestedList),
+                                           record.get(TestEntity_Table.flag));
+        assertThat(actual).isEqualTo(TestEntity_INST1.entity1);
+      });
+    }
+
+    @Test
+    void selectOneAsync_no_result(CqlSession session) {
+      CompletionStage<Record> recordFuture = dsl.selectFrom(TestEntity_Table.test_entity)
+                                                .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
+                                                .fetchOneAsync();
+
+      recordFuture.thenAccept(record -> {
+        assertThat(record).isNull();
+      });
     }
 
     @Test
@@ -216,6 +275,63 @@ class DslQueryBuilderITest extends AbstractIntegrationITest {
     }
 
     @Test
+    void selectFromAsync() {
+
+      // Given (Using my own API because datastax's querybuilder replaces null with empty collections)
+      dsl.insertInto(TestEntity_Table.test_entity)
+         .set(TestEntity_Table.id, TestEntity_INST2.id)
+         .set(TestEntity_Table.date, TestEntity_INST2.date)
+         .set(TestEntity_Table.udt, TestEntity_INST2.udt)
+         .set(TestEntity_Table.list, TestEntity_INST2.list)
+         .set(TestEntity_Table.se, TestEntity_INST2.se)
+         .set(TestEntity_Table.map, TestEntity_INST2.map)
+         .set(TestEntity_Table.nestedList, TestEntity_INST2.nestedList)
+         .set(TestEntity_Table.nestedSet, TestEntity_INST2.nestedSet)
+         .set(TestEntity_Table.nestedMap, TestEntity_INST2.nestedMap)
+         .set(TestEntity_Table.enumValue, TestEntity_INST2.enumValue)
+         .set(TestEntity_Table.enumList, TestEntity_INST2.enumList)
+         .set(TestEntity_Table.enumMap, TestEntity_INST2.enumMap)
+         .set(TestEntity_Table.enumNestedList, TestEntity_INST2.enumNestedList)
+         .set(TestEntity_Table.extraUdt, TestEntity_INST2.extraUdt)
+         .set(TestEntity_Table.udtList, TestEntity_INST2.udtList)
+         .set(TestEntity_Table.udtSet, TestEntity_INST2.udtSet)
+         .set(TestEntity_Table.udtMap, TestEntity_INST2.udtMap)
+         .set(TestEntity_Table.udtNestedList, TestEntity_INST2.udtNestedList)
+         .set(TestEntity_Table.flag, TestEntity_INST2.flag)
+         .execute();
+
+      // When
+      CompletionStage<Collection<Record>> recordsFuture = dsl.selectFrom(TestEntity_Table.test_entity)
+                                                       .fetchAsync();
+
+      // Then
+      recordsFuture.thenAccept(records -> {
+        assertThat(records).hasSize(1);
+        Record record = new ArrayList<>(records).get(0);
+        TestEntity actual = new TestEntity(record.get(TestEntity_Table.id), record.get(TestEntity_Table.date), record.get(TestEntity_Table.udt),
+                                           record.get(TestEntity_Table.list), record.get(TestEntity_Table.se), record.get(TestEntity_Table.map),
+                                           record.get(TestEntity_Table.nestedList), record.get(TestEntity_Table.nestedSet),
+                                           record.get(TestEntity_Table.nestedMap), record.get(TestEntity_Table.enumValue),
+                                           record.get(TestEntity_Table.enumList), record.get(TestEntity_Table.enumMap),
+                                           record.get(TestEntity_Table.enumNestedList), record.get(TestEntity_Table.extraUdt),
+                                           record.get(TestEntity_Table.udtList), record.get(TestEntity_Table.udtSet),
+                                           record.get(TestEntity_Table.udtMap), record.get(TestEntity_Table.udtNestedList),
+                                           record.get(TestEntity_Table.flag));
+        assertThat(actual).isEqualTo(TestEntity_INST2.entity2);
+      });
+    }
+
+    @Test
+    void selectFromAsync_no_result() {
+      CompletionStage<Collection<Record>> recordsFuture = dsl.selectFrom(TestEntity_Table.test_entity)
+                                                             .fetchAsync();
+
+      recordsFuture.thenAccept(records -> {
+        assertThat(records).isEmpty();
+      });
+    }
+
+    @Test
     void selectPaged(CqlSession session) {
       // Row1
       insertRow(session, TestEntity_Table.KEYSPACE_NAME, TestEntity_Table.TABLE_NAME, ImmutableMap.of(TestEntity_Table.id.getName(), QueryBuilder.literal(TestEntity_Table.id.serialize(UUID.randomUUID())),
@@ -261,6 +377,51 @@ class DslQueryBuilderITest extends AbstractIntegrationITest {
     }
 
     @Test
+    void selectPagedAsync(CqlSession session) {
+      // Row1
+      insertRow(session, TestEntity_Table.KEYSPACE_NAME, TestEntity_Table.TABLE_NAME, ImmutableMap.of(TestEntity_Table.id.getName(), QueryBuilder.literal(TestEntity_Table.id.serialize(UUID.randomUUID())),
+                                                                                                      TestEntity_Table.date.getName(), QueryBuilder.literal(TestEntity_Table.date.serialize(TestEntity_INST1.date)),
+                                                                                                      TestEntity_Table.udt.getName(), QueryBuilder.literal(TestEntity_Table.udt.serialize(TestEntity_INST1.udt1)),
+                                                                                                      TestEntity_Table.list.getName(), QueryBuilder.literal(TestEntity_Table.list.serialize(TestEntity_INST1.list))));
+
+      // Row2
+      insertRow(session, TestEntity_Table.KEYSPACE_NAME, TestEntity_Table.TABLE_NAME, ImmutableMap.of(TestEntity_Table.id.getName(), QueryBuilder.literal(TestEntity_Table.id.serialize(UUID.randomUUID())),
+                                                                                                      TestEntity_Table.date.getName(), QueryBuilder.literal(TestEntity_Table.date.serialize(TestEntity_INST1.date)),
+                                                                                                      TestEntity_Table.udt.getName(), QueryBuilder.literal(TestEntity_Table.udt.serialize(TestEntity_INST1.udt1)),
+                                                                                                      TestEntity_Table.list.getName(), QueryBuilder.literal(TestEntity_Table.list.serialize(TestEntity_INST1.list))));
+
+      // Row3
+      insertRow(session, TestEntity_Table.KEYSPACE_NAME, TestEntity_Table.TABLE_NAME, ImmutableMap.of(TestEntity_Table.id.getName(), QueryBuilder.literal(TestEntity_Table.id.serialize(UUID.randomUUID())),
+                                                                                                      TestEntity_Table.date.getName(), QueryBuilder.literal(TestEntity_Table.date.serialize(TestEntity_INST1.date)),
+                                                                                                      TestEntity_Table.udt.getName(), QueryBuilder.literal(TestEntity_Table.udt.serialize(TestEntity_INST1.udt1)),
+                                                                                                      TestEntity_Table.list.getName(), QueryBuilder.literal(TestEntity_Table.list.serialize(TestEntity_INST1.list))));
+
+      // Row4
+      insertRow(session, TestEntity_Table.KEYSPACE_NAME, TestEntity_Table.TABLE_NAME, ImmutableMap.of(TestEntity_Table.id.getName(), QueryBuilder.literal(TestEntity_Table.id.serialize(UUID.randomUUID())),
+                                                                                                      TestEntity_Table.date.getName(), QueryBuilder.literal(TestEntity_Table.date.serialize(TestEntity_INST1.date)),
+                                                                                                      TestEntity_Table.udt.getName(), QueryBuilder.literal(TestEntity_Table.udt.serialize(TestEntity_INST1.udt1)),
+                                                                                                      TestEntity_Table.list.getName(), QueryBuilder.literal(TestEntity_Table.list.serialize(TestEntity_INST1.list))));
+
+      // First page
+      dsl.selectFrom(TestEntity_Table.test_entity)
+         .fetchPageAsync(PageRequest.of(null, 2))
+      .thenAccept(pageResult1 -> {
+        assertThat(pageResult1.getPagingState()).isNotNull();
+        assertThat(pageResult1.getResults()).hasSize(2);
+      });
+    }
+
+    @Test
+    void selectPagedAsync_no_result(CqlSession session) {
+      // First page
+      dsl.selectFrom(TestEntity_Table.test_entity)
+         .fetchPageAsync(PageRequest.of(null, 2))
+         .thenAccept(pageResult1 -> {
+           assertThat(pageResult1.getPagingState()).isNull();
+         });
+    }
+
+    @Test
     void selectOptional(CqlSession session) {
       insertRow(session, TestEntity_Table.KEYSPACE_NAME, TestEntity_Table.TABLE_NAME, ImmutableMap.of(
           TestEntity_Table.id.getName(), QueryBuilder.literal(TestEntity_Table.id.serialize(TestEntity_INST1.id)),
@@ -277,6 +438,30 @@ class DslQueryBuilderITest extends AbstractIntegrationITest {
                                          .where(TestEntity_Table.id.eq(UUID.randomUUID()))
                                          .fetchOptional();
       assertThat(absentRecord).isEmpty();
+    }
+
+    @Test
+    void selectOptionalAsync(CqlSession session) throws ExecutionException, InterruptedException {
+      insertRow(session, TestEntity_Table.KEYSPACE_NAME, TestEntity_Table.TABLE_NAME, ImmutableMap.of(
+          TestEntity_Table.id.getName(), QueryBuilder.literal(TestEntity_Table.id.serialize(TestEntity_INST1.id)),
+          TestEntity_Table.date.getName(), QueryBuilder.literal(TestEntity_Table.date.serialize(TestEntity_INST1.date)),
+          TestEntity_Table.udt.getName(), QueryBuilder.literal(TestEntity_Table.udt.serialize(TestEntity_INST1.udt1)),
+          TestEntity_Table.list.getName(), QueryBuilder.literal(TestEntity_Table.list.serialize(TestEntity_INST1.list))));
+
+      CompletionStage<Optional<Record>> presentRecordFuture = dsl.selectFrom(TestEntity_Table.test_entity)
+                                                           .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
+                                                           .fetchOptionalAsync();
+
+      assertThat(presentRecordFuture.toCompletableFuture().get()).isPresent();
+    }
+
+    @Test
+    void selectOptionalAsync_no_result(CqlSession session) throws ExecutionException, InterruptedException {
+      CompletionStage<Optional<Record>> presentRecordFuture = dsl.selectFrom(TestEntity_Table.test_entity)
+                                                                 .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
+                                                                 .fetchOptionalAsync();
+
+      assertThat(presentRecordFuture.toCompletableFuture().get()).isEmpty();
     }
   }
 
@@ -335,6 +520,20 @@ class DslQueryBuilderITest extends AbstractIntegrationITest {
       // Then
       assertThat(records).hasSize(1);
       assertThat(new ArrayList<>(records).get(0).get(TestEntity_Table.flag)).isFalse();
+    }
+
+    @Test
+    void insertIntoAsync(CqlSession session) {
+      dsl.insertInto(TestEntity_Table.test_entity, TestEntity_Table.id, TestEntity_Table.date, TestEntity_Table.udt, TestEntity_Table.list, TestEntity_Table.se, TestEntity_Table.map,
+                     TestEntity_Table.nestedList, TestEntity_Table.nestedSet, TestEntity_Table.nestedMap, TestEntity_Table.enumValue, TestEntity_Table.enumList, TestEntity_Table.enumMap,
+                     TestEntity_Table.enumNestedList, TestEntity_Table.extraUdt, TestEntity_Table.udtList, TestEntity_Table.udtSet, TestEntity_Table.udtMap, TestEntity_Table.udtNestedList,
+                     TestEntity_Table.flag)
+         .values(TestEntity_INST1.id, TestEntity_INST1.date, TestEntity_INST1.udt1, TestEntity_INST1.list, TestEntity_INST1.se, TestEntity_INST1.map, TestEntity_INST1.nestedList,
+                 TestEntity_INST1.nestedSet, TestEntity_INST1.nestedMap, TestEntity_INST1.enumValue, TestEntity_INST1.enumList, TestEntity_INST1.enumMap, TestEntity_INST1.enumNestedList,
+                 TestEntity_INST1.extraUdt, TestEntity_INST1.udtList, TestEntity_INST1.udtSet, TestEntity_INST1.udtMap, TestEntity_INST1.udtNestedList, TestEntity_INST1.flag)
+         .executeAsync().thenAccept(applied -> {
+        assertThat(applied).isTrue();
+      });
     }
   }
 
@@ -588,6 +787,30 @@ class DslQueryBuilderITest extends AbstractIntegrationITest {
       assertThat(record).isNotNull();
       assertThat(record.get(ttl)).isLessThanOrEqualTo(ttlInSeconds);
     }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    void updateAsync() {
+
+      // When
+      dsl.update(TestEntity_Table.test_entity)
+         .set(TestEntity_Table.se, TestEntity_Table.se.append(1000, 1100))
+         .set(TestEntity_Table.map, TestEntity_Table.map.append(ImmutableMap.of("appendKey", "appendValue")))
+         .set(TestEntity_Table.nestedList, null)
+         .set(TestEntity_Table.nestedSet, TestEntity_Table.nestedSet.remove(TestEntity_INST1.nestedSet))
+         .set(TestEntity_Table.nestedMap, TestEntity_Table.nestedMap.remove(Collections.singleton("key0")))
+         .set(TestEntity_Table.enumNestedList, TestEntity_Table.enumNestedList.prepend(ImmutableSet.of(TestEnum.TYPE_B)))
+         .set(TestEntity_Table.udtNestedList, TestEntity_Table.udtNestedList.prepend(
+             Collections.singletonList(Collections.singletonList(TestEntity_INST1.udt1))))
+         .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
+         .and(TestEntity_Table.date.eq(TestEntity_INST1.date))
+         .and(TestEntity_Table.udt.eq(TestEntity_INST1.udt1))
+         .and(TestEntity_Table.list.eq(TestEntity_INST1.list))
+         .executeAsync()
+         .thenAccept(applied -> {
+           assertThat(applied).isTrue();
+         });
+    }
   }
 
   @Nested
@@ -790,6 +1013,22 @@ class DslQueryBuilderITest extends AbstractIntegrationITest {
       // Then
       assertThat(applied).isTrue();
       assertThat(record.get(TestEntity_Table.flag)).isNull();
+    }
+
+    @Test
+    void deleteAsync() {
+
+      // When
+      dsl.delete()
+         .from(TestEntity_Table.test_entity)
+         .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
+         .and(TestEntity_Table.date.eq(TestEntity_INST1.date))
+         .and(TestEntity_Table.udt.eq(TestEntity_INST1.udt1))
+         .and(TestEntity_Table.list.eq(TestEntity_INST1.list))
+         .executeAsync()
+         .thenAccept(applied -> {
+           assertThat(applied).isTrue();
+         });
     }
   }
 }

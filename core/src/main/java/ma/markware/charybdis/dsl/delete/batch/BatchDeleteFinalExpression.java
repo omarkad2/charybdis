@@ -29,7 +29,7 @@ package ma.markware.charybdis.dsl.delete.batch;
 public interface BatchDeleteFinalExpression {
 
   /**
-   * Add to a batch query
+   * Add the Delete DSL query to the enclosing batch query.
    *
    */
   void execute();

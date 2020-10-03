@@ -19,7 +19,9 @@
 package ma.markware.charybdis.query;
 
 import com.datastax.oss.driver.api.core.CqlSession;
+import com.datastax.oss.driver.api.core.cql.AsyncResultSet;
 import com.datastax.oss.driver.api.core.cql.ResultSet;
+import java.util.concurrent.CompletionStage;
 import ma.markware.charybdis.batch.Batch;
 
 /**
@@ -45,4 +47,9 @@ public interface Query {
    * Add query to batch.
    */
   void addToBatch(final Batch batch);
+
+  /**
+   * Execute query asynchronously and return a completable future
+   */
+  CompletionStage<AsyncResultSet> executeAsync(final CqlSession session);
 }

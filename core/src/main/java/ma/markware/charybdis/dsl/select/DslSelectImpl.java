@@ -23,9 +23,11 @@ import com.datastax.oss.driver.api.core.cql.ResultSet;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletionStage;
 import ma.markware.charybdis.ExecutionContext;
 import ma.markware.charybdis.dsl.Record;
 import ma.markware.charybdis.dsl.utils.RecordUtils;
@@ -186,5 +188,70 @@ public class DslSelectImpl implements SelectInitExpression, SelectWhereExpressio
     ByteBuffer nextPagingState = resultSet.getExecutionInfo().getPagingState();
     List<Record> records = RecordUtils.resultSetToRecords(resultSet, selectedFields);
     return new PageResult<>(records, nextPagingState);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public CompletionStage<Record> fetchOneAsync() {
+    selectQuery.setLimit(1);
+    return selectQuery.executeAsync(session).thenApply(
+        asyncResultSet -> {
+          if (asyncResultSet == null) {
+            return null;
+          }
+          return RecordUtils.rowToRecord(asyncResultSet.one(), selectedFields);
+        }
+    );
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public CompletionStage<Optional<Record>> fetchOptionalAsync() {
+    selectQuery.setLimit(1);
+    return selectQuery.executeAsync(session).thenApply(
+        asyncResultSet -> {
+          if (asyncResultSet == null) {
+            return Optional.empty();
+          }
+          return Optional.ofNullable(RecordUtils.rowToRecord(asyncResultSet.one(), selectedFields));
+        }
+    );
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public CompletionStage<Collection<Record>> fetchAsync() {
+    return selectQuery.executeAsync(session).thenApply(
+        asyncResultSet -> {
+          if (asyncResultSet == null) {
+            return Collections.emptyList();
+          }
+          return RecordUtils.resultSetToRecords(asyncResultSet, selectedFields);
+        }
+    );
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public CompletionStage<PageResult<Record>> fetchPageAsync(final PageRequest pageRequest) {
+    selectQuery.setPageRequest(pageRequest);
+    return selectQuery.executeAsync(session).thenApply(
+        asyncResultSet -> {
+          if (asyncResultSet == null) {
+            return null;
+          }
+          ByteBuffer nextPagingState = asyncResultSet.getExecutionInfo().getPagingState();
+          List<Record> records = RecordUtils.resultSetToRecords(asyncResultSet, selectedFields);
+          return new PageResult<>(records, nextPagingState);
+        }
+    );
   }
 }

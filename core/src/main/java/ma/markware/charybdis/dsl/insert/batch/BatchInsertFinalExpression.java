@@ -30,7 +30,7 @@ package ma.markware.charybdis.dsl.insert.batch;
 public interface BatchInsertFinalExpression {
 
   /**
-   * Added to a batch query.
+   * Add the Insert DSL query to the enclosing batch query.
    *
    */
   void execute();
