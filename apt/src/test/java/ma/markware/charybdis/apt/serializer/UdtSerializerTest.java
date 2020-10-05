@@ -28,6 +28,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Stream;
 import javax.annotation.processing.Filer;
+import javax.annotation.processing.Messager;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.Elements;
@@ -63,6 +64,8 @@ class UdtSerializerTest {
   private RoundEnvironment roundEnvironment;
   @Mock
   private Filer filer;
+  @Mock
+  private Messager messager;
 
   private AptConfiguration configuration;
   private UdtMetaType testNestedUdtMetaType;
@@ -81,7 +84,7 @@ class UdtSerializerTest {
     when(roundEnvironment.getElementsAnnotatedWith(Udt.class)).thenReturn(elementsAnnotatedWithUdt);
 
     AptContext aptContext = new AptContext();
-    configuration = AptDefaultConfiguration.initConfig(aptContext, types, elements, filer);
+    configuration = AptDefaultConfiguration.initConfig(aptContext, types, elements, filer, messager);
     aptContext.init(roundEnvironment, configuration);
 
     configuration.getKeyspaceParser()

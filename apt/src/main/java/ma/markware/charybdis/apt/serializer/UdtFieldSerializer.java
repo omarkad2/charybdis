@@ -32,6 +32,7 @@ import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeSpec;
 import java.util.Arrays;
 import java.util.List;
+import javax.annotation.processing.Messager;
 import javax.lang.model.element.Modifier;
 import ma.markware.charybdis.apt.AptContext;
 import ma.markware.charybdis.apt.AptContext.UdtContext;
@@ -42,8 +43,8 @@ import ma.markware.charybdis.model.field.metadata.UdtFieldMetadata;
 
 public class UdtFieldSerializer extends AbstractFieldSerializer<UdtFieldMetaType> {
 
-  public UdtFieldSerializer(final AptContext aptContext) {
-    super(aptContext);
+  public UdtFieldSerializer(final AptContext aptContext, final Messager messager) {
+    super(aptContext, messager);
   }
 
   @Override

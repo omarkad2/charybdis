@@ -19,16 +19,17 @@
 package ma.markware.charybdis.apt.parser;
 
 import static java.lang.String.format;
+import static ma.markware.charybdis.apt.utils.ExceptionMessagerWrapper.throwParsingException;
 
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import javax.annotation.processing.Messager;
 import javax.lang.model.element.Element;
 import javax.lang.model.util.Types;
 import ma.markware.charybdis.apt.AptContext;
-import ma.markware.charybdis.apt.exception.CharybdisParsingException;
 import ma.markware.charybdis.apt.metatype.AbstractEntityMetaType;
 import ma.markware.charybdis.apt.metatype.ColumnFieldMetaType;
 import ma.markware.charybdis.apt.metatype.TableMetaType;
@@ -48,7 +49,8 @@ public class TableParser extends AbstractEntityParser<TableMetaType> {
   private final AptContext aptContext;
   private final Types types;
 
-  public TableParser(FieldParser<ColumnFieldMetaType> columnFieldParser, AptContext aptContext, Types types) {
+  public TableParser(final FieldParser<ColumnFieldMetaType> columnFieldParser, final AptContext aptContext, final Types types, final Messager messager) {
+    super(messager);
     this.columnFieldParser = columnFieldParser;
     this.aptContext = aptContext;
     this.types = types;
@@ -59,7 +61,7 @@ public class TableParser extends AbstractEntityParser<TableMetaType> {
    */
   @Override
   public TableMetaType parse(final Element annotatedClass) {
-    validateMandatoryConstructors(annotatedClass);
+    validateMandatoryConstructors(annotatedClass, messager);
 
     final Table table = annotatedClass.getAnnotation(Table.class);
 
@@ -67,7 +69,7 @@ public class TableParser extends AbstractEntityParser<TableMetaType> {
     final TableMetaType tableMetaType = new TableMetaType(abstractEntityMetaType);
 
     String tableName = resolveName(annotatedClass);
-    validateName(tableName);
+    validateName(tableName, messager);
     tableMetaType.setTableName(tableName);
 
     tableMetaType.setDefaultReadConsistency(table.readConsistency());
@@ -93,7 +95,7 @@ public class TableParser extends AbstractEntityParser<TableMetaType> {
                                                  .collect(Collectors.toList()));
 
     if (CollectionUtils.isEmpty(tableMetaType.getPartitionKeyColumns())) {
-      throw new CharybdisParsingException(format("There should be at least one partition key defined for the table '%s'", tableMetaType.getTableName()));
+      throwParsingException(messager, format("There should be at least one partition key defined for the table '%s'", tableMetaType.getTableName()));
     }
 
     return tableMetaType;

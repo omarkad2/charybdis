@@ -290,6 +290,19 @@ public class CrudQueryBuilder implements QueryBuilder, ConsistencyTunable<CrudQu
   }
 
   /**
+   * Fetch entities from DB fulfilling given conditions while specifying if filtering is enabled or not.
+   *
+   * @param table table in which we want to fetch the entities.
+   * @param conditions conditions to be fulfilled by entities.
+   * @param <T> type of entities.
+   * @return entities from DB.
+   */
+  public <T> List<T> find(final TableMetadata<T> table, final ExtendedCriteriaExpression conditions, final boolean allowFiltering) {
+    return new ReadEntityManager<T>(executionContext).withTableMetadata(table).withConditions(conditions).withFiltering(allowFiltering)
+                                                     .fetch(session);
+  }
+
+  /**
    * Fetch entities from DB fulfilling a given condition.
    *
    * @param table table in which we want to fetch the entities.
@@ -300,6 +313,19 @@ public class CrudQueryBuilder implements QueryBuilder, ConsistencyTunable<CrudQu
   public <T> List<T> find(final TableMetadata<T> table, final CriteriaExpression condition) {
     return new ReadEntityManager<T>(executionContext).withTableMetadata(table).withCondition(condition)
                                      .fetch(session);
+  }
+
+  /**
+   * Fetch entities from DB fulfilling a given condition while specifying if filtering is enabled or not.
+   *
+   * @param table table in which we want to fetch the entities.
+   * @param condition condition to be fulfilled by entities.
+   * @param <T> type of entities.
+   * @return entities from DB.
+   */
+  public <T> List<T> find(final TableMetadata<T> table, final CriteriaExpression condition, final boolean allowFiltering) {
+    return new ReadEntityManager<T>(executionContext).withTableMetadata(table).withCondition(condition).withFiltering(allowFiltering)
+                                                     .fetch(session);
   }
 
   /**

@@ -26,7 +26,7 @@ import com.datastax.oss.driver.api.core.cql.ResultSet;
 import com.datastax.oss.driver.api.core.cql.SimpleStatement;
 import com.google.common.annotations.VisibleForTesting;
 import java.nio.ByteBuffer;
-import java.util.concurrent.CompletionStage;
+import java.util.concurrent.CompletableFuture;
 import ma.markware.charybdis.ExecutionContext;
 import ma.markware.charybdis.batch.Batch;
 import ma.markware.charybdis.model.option.ConsistencyLevel;
@@ -67,7 +67,7 @@ public abstract class AbstractQuery implements Query {
    * {@inheritDoc}
    */
   @Override
-  public CompletionStage<AsyncResultSet> executeAsync(final CqlSession session) {
+  public CompletableFuture<AsyncResultSet> executeAsync(final CqlSession session) {
     StatementTuple statementTuple = buildStatement();
     SimpleStatement statement = resolveExecutionContext(statementTuple.getSimpleStatement());
     return executeStatementAsync(session, statement, statementTuple.getFetchSize(), statementTuple.getPagingState(), statementTuple.getBindValues());
@@ -97,13 +97,14 @@ public abstract class AbstractQuery implements Query {
   }
 
   @VisibleForTesting
-  CompletionStage<AsyncResultSet> executeStatementAsync(final CqlSession session, final SimpleStatement statement, final int fetchSize, final ByteBuffer pagingState,
+  CompletableFuture<AsyncResultSet> executeStatementAsync(final CqlSession session, final SimpleStatement statement, final int fetchSize, final ByteBuffer pagingState,
       final Object[] bindValueArray) {
-    CompletionStage<AsyncResultSet> asyncResultSet = null;
+    CompletableFuture<AsyncResultSet> asyncResultSet = null;
     log.debug("Statement query: {}", statement.getQuery());
     final PreparedStatement preparedStatement = PreparedStatementFactory.createPreparedStatement(session, statement.getQuery());
     try {
-      asyncResultSet = session.executeAsync(preparedStatement.bind(bindValueArray).setPageSize(fetchSize).setPagingState(pagingState));
+      asyncResultSet = session.executeAsync(preparedStatement.bind(bindValueArray).setPageSize(fetchSize).setPagingState(pagingState))
+                              .toCompletableFuture();
     } catch (final Exception e) {
       log.error("Error executing [{}] statement async ({})", statement.getConsistencyLevel(), statement, e);
     }

@@ -296,6 +296,67 @@ class CrudQueryBuilderITest extends AbstractIntegrationITest {
     }
 
     @Test
+    void find_with_filtering(CqlSession session) {
+      // Given
+      insertRow(session, TestEntity_Table.KEYSPACE_NAME, TestEntity_Table.TABLE_NAME,
+                ImmutableMap.of(TestEntity_Table.id.getName(), QueryBuilder.literal(TestEntity_Table.id.serialize(TestEntity_INST1.id)),
+                                TestEntity_Table.date.getName(), QueryBuilder.literal(TestEntity_Table.date.serialize(TestEntity_INST1.date)),
+                                TestEntity_Table.udt.getName(), QueryBuilder.literal(TestEntity_Table.udt.serialize(TestEntity_INST1.udt1)),
+                                TestEntity_Table.list.getName(), QueryBuilder.literal(TestEntity_Table.list.serialize(TestEntity_INST1.list))));
+
+      // When
+      List<TestEntity> entities= crud.find(TestEntity_Table.test_entity, TestEntity_Table.id.eq(TestEntity_INST1.id), true);
+
+      // Then
+      assertThat(entities).containsExactlyInAnyOrder(
+          new TestEntity(TestEntity_INST1.id, TestEntity_INST1.date, TestEntity_INST1.udt1, TestEntity_INST1.list, null, null, null, null, null, null,
+                         null, null, null, null, null, null, null, null, null));
+    }
+
+    @Test
+    void find_with_no_filtering(CqlSession session) {
+      // Given
+      insertRow(session, TestEntity_Table.KEYSPACE_NAME, TestEntity_Table.TABLE_NAME,
+                ImmutableMap.of(TestEntity_Table.id.getName(), QueryBuilder.literal(TestEntity_Table.id.serialize(TestEntity_INST1.id)),
+                                TestEntity_Table.date.getName(), QueryBuilder.literal(TestEntity_Table.date.serialize(TestEntity_INST1.date)),
+                                TestEntity_Table.udt.getName(), QueryBuilder.literal(TestEntity_Table.udt.serialize(TestEntity_INST1.udt1)),
+                                TestEntity_Table.list.getName(), QueryBuilder.literal(TestEntity_Table.list.serialize(TestEntity_INST1.list))));
+
+      // When
+      List<TestEntity> entities= crud.find(TestEntity_Table.test_entity, TestEntity_Table.id.eq(TestEntity_INST1.id)
+                                                                                            .and(TestEntity_Table.date.eq(
+                                                                                                TestEntity_INST1.date))
+                                                                                            .and(TestEntity_Table.udt.eq(
+                                                                                                TestEntity_INST1.udt1))
+                                                                                            .and(TestEntity_Table.list.eq(
+                                                                                                TestEntity_INST1.list)), false);
+
+      // Then
+      assertThat(entities).containsExactlyInAnyOrder(
+          new TestEntity(TestEntity_INST1.id, TestEntity_INST1.date, TestEntity_INST1.udt1, TestEntity_INST1.list, null, null, null, null, null, null,
+                         null, null, null, null, null, null, null, null, null));
+    }
+
+    @Test
+    void find_extended_criteria_with_filtering(CqlSession session) {
+      // Given
+      insertRow(session, TestEntity_Table.KEYSPACE_NAME, TestEntity_Table.TABLE_NAME,
+                ImmutableMap.of(TestEntity_Table.id.getName(), QueryBuilder.literal(TestEntity_Table.id.serialize(TestEntity_INST1.id)),
+                                TestEntity_Table.date.getName(), QueryBuilder.literal(TestEntity_Table.date.serialize(TestEntity_INST1.date)),
+                                TestEntity_Table.udt.getName(), QueryBuilder.literal(TestEntity_Table.udt.serialize(TestEntity_INST1.udt1)),
+                                TestEntity_Table.list.getName(), QueryBuilder.literal(TestEntity_Table.list.serialize(TestEntity_INST1.list))));
+
+      // When
+      List<TestEntity> entities= crud.find(TestEntity_Table.test_entity, TestEntity_Table.id.eq(TestEntity_INST1.id)
+                                                                                            .and(TestEntity_Table.date.eq(TestEntity_INST1.date)), true);
+
+      // Then
+      assertThat(entities).containsExactlyInAnyOrder(
+          new TestEntity(TestEntity_INST1.id, TestEntity_INST1.date, TestEntity_INST1.udt1, TestEntity_INST1.list, null, null, null, null, null, null,
+                         null, null, null, null, null, null, null, null, null));
+    }
+
+    @Test
     void find_should_return_entity_when_exists(CqlSession session) {
       Map<String, Term> valuesToInsert = new HashMap<>();
       valuesToInsert.put(TestEntity_Table.id.getName(), QueryBuilder.literal(TestEntity_Table.id.serialize(TestEntity_INST1.id)));
@@ -384,7 +445,7 @@ class CrudQueryBuilderITest extends AbstractIntegrationITest {
 
     @Test
     void find_paged_should_return_empty_page_result_when_no_entity() {
-      PageResult pageResult = crud.find(TestEntity_Table.test_entity, PageRequest.of(null, 2));
+      PageResult pageResult = crud.find(TestEntity_Table.test_entity, PageRequest.fromString(null, 2));
       assertThat(pageResult.getPagingState()).isNull();
       assertThat(pageResult.getResults()).isEmpty();
     }

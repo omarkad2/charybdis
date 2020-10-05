@@ -39,7 +39,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.CompletionStage;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import ma.markware.charybdis.AbstractIntegrationITest;
 import ma.markware.charybdis.CqlTemplate;
@@ -152,9 +152,9 @@ class DslQueryBuilderITest extends AbstractIntegrationITest {
       insertRow(session, TestEntity_Table.KEYSPACE_NAME, TestEntity_Table.TABLE_NAME, valuesToInsert);
 
       // When
-      CompletionStage<Record> recordFuture = dsl.selectFrom(TestEntity_Table.test_entity)
-                         .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
-                         .fetchOneAsync();
+      CompletableFuture<Record> recordFuture = dsl.selectFrom(TestEntity_Table.test_entity)
+                                                  .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
+                                                  .fetchOneAsync();
 
       recordFuture.thenAccept(record -> {
         // Then
@@ -173,7 +173,7 @@ class DslQueryBuilderITest extends AbstractIntegrationITest {
 
     @Test
     void selectOneAsync_no_result(CqlSession session) {
-      CompletionStage<Record> recordFuture = dsl.selectFrom(TestEntity_Table.test_entity)
+      CompletableFuture<Record> recordFuture = dsl.selectFrom(TestEntity_Table.test_entity)
                                                 .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
                                                 .fetchOneAsync();
 
@@ -301,7 +301,7 @@ class DslQueryBuilderITest extends AbstractIntegrationITest {
          .execute();
 
       // When
-      CompletionStage<Collection<Record>> recordsFuture = dsl.selectFrom(TestEntity_Table.test_entity)
+      CompletableFuture<Collection<Record>> recordsFuture = dsl.selectFrom(TestEntity_Table.test_entity)
                                                        .fetchAsync();
 
       // Then
@@ -323,7 +323,7 @@ class DslQueryBuilderITest extends AbstractIntegrationITest {
 
     @Test
     void selectFromAsync_no_result() {
-      CompletionStage<Collection<Record>> recordsFuture = dsl.selectFrom(TestEntity_Table.test_entity)
+      CompletableFuture<Collection<Record>> recordsFuture = dsl.selectFrom(TestEntity_Table.test_entity)
                                                              .fetchAsync();
 
       recordsFuture.thenAccept(records -> {
@@ -448,7 +448,7 @@ class DslQueryBuilderITest extends AbstractIntegrationITest {
           TestEntity_Table.udt.getName(), QueryBuilder.literal(TestEntity_Table.udt.serialize(TestEntity_INST1.udt1)),
           TestEntity_Table.list.getName(), QueryBuilder.literal(TestEntity_Table.list.serialize(TestEntity_INST1.list))));
 
-      CompletionStage<Optional<Record>> presentRecordFuture = dsl.selectFrom(TestEntity_Table.test_entity)
+      CompletableFuture<Optional<Record>> presentRecordFuture = dsl.selectFrom(TestEntity_Table.test_entity)
                                                            .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
                                                            .fetchOptionalAsync();
 
@@ -457,7 +457,7 @@ class DslQueryBuilderITest extends AbstractIntegrationITest {
 
     @Test
     void selectOptionalAsync_no_result(CqlSession session) throws ExecutionException, InterruptedException {
-      CompletionStage<Optional<Record>> presentRecordFuture = dsl.selectFrom(TestEntity_Table.test_entity)
+      CompletableFuture<Optional<Record>> presentRecordFuture = dsl.selectFrom(TestEntity_Table.test_entity)
                                                                  .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
                                                                  .fetchOptionalAsync();
 

@@ -21,7 +21,7 @@ package ma.markware.charybdis.query;
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.cql.AsyncResultSet;
 import com.datastax.oss.driver.api.core.cql.ResultSet;
-import java.util.concurrent.CompletionStage;
+import java.util.concurrent.CompletableFuture;
 import ma.markware.charybdis.batch.Batch;
 
 /**
@@ -51,5 +51,5 @@ public interface Query {
   /**
    * Execute query asynchronously and return a completable future
    */
-  CompletionStage<AsyncResultSet> executeAsync(final CqlSession session);
+  CompletableFuture<AsyncResultSet> executeAsync(final CqlSession session);
 }

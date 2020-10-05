@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.util.Collections;
 import javax.annotation.processing.Filer;
+import javax.annotation.processing.Messager;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
@@ -52,6 +53,8 @@ class KeyspaceSerializerTest {
   private RoundEnvironment roundEnvironment;
   @Mock
   private Filer filer;
+  @Mock
+  private Messager messager;
 
   private AptConfiguration configuration;
   private KeyspaceMetaType keyspaceMetaType;
@@ -62,7 +65,7 @@ class KeyspaceSerializerTest {
     when(roundEnvironment.getElementsAnnotatedWith(Udt.class)).thenReturn(Collections.emptySet());
     AptContext aptContext = new AptContext();
     aptContext.init(roundEnvironment, configuration);
-    configuration = AptDefaultConfiguration.initConfig(aptContext, types, elements, filer);
+    configuration = AptDefaultConfiguration.initConfig(aptContext, types, elements, filer, messager);
     keyspaceMetaType = configuration.getKeyspaceParser()
                                           .parse(elements.getTypeElement(TestKeyspaceDefinition.class.getCanonicalName()));
   }

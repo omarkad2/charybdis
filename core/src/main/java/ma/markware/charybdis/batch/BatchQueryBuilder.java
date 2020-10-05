@@ -22,16 +22,19 @@ package ma.markware.charybdis.batch;
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.config.DriverExecutionProfile;
 import com.google.common.annotations.VisibleForTesting;
+import ma.markware.charybdis.ConsistencyTunable;
 import ma.markware.charybdis.ExecutionContext;
 import ma.markware.charybdis.ExecutionProfileTunable;
 import ma.markware.charybdis.QueryBuilder;
+import ma.markware.charybdis.model.option.ConsistencyLevel;
+import ma.markware.charybdis.model.option.SerialConsistencyLevel;
 
 /**
  * Implementation of {@link QueryBuilder}, used to handle Batch queries.
  *
  * @author Oussama Markad
  */
-public class BatchQueryBuilder implements QueryBuilder, ExecutionProfileTunable<BatchQueryBuilder> {
+public class BatchQueryBuilder implements QueryBuilder, ConsistencyTunable<BatchQueryBuilder>, ExecutionProfileTunable<BatchQueryBuilder> {
 
   private final CqlSession session;
 
@@ -68,6 +71,20 @@ public class BatchQueryBuilder implements QueryBuilder, ExecutionProfileTunable<
   public BatchQueryBuilder withExecutionProfile(final String executionProfile) {
     ExecutionContext executionContext = new ExecutionContext(this.executionContext);
     executionContext.setExecutionProfileName(executionProfile);
+    return new BatchQueryBuilder(session, executionContext);
+  }
+
+  @Override
+  public BatchQueryBuilder withConsistency(final ConsistencyLevel consistencyLevel) {
+    ExecutionContext executionContext = new ExecutionContext(this.executionContext);
+    executionContext.setConsistencyLevel(consistencyLevel);
+    return new BatchQueryBuilder(session, executionContext);
+  }
+
+  @Override
+  public BatchQueryBuilder withSerialConsistency(final SerialConsistencyLevel serialConsistencyLevel) {
+    ExecutionContext executionContext = new ExecutionContext(this.executionContext);
+    executionContext.setSerialConsistencyLevel(serialConsistencyLevel);
     return new BatchQueryBuilder(session, executionContext);
   }
 

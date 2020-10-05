@@ -20,7 +20,7 @@ package ma.markware.charybdis.dsl.select;
 
 import java.util.Collection;
 import java.util.Optional;
-import java.util.concurrent.CompletionStage;
+import java.util.concurrent.CompletableFuture;
 import ma.markware.charybdis.dsl.Record;
 import ma.markware.charybdis.query.PageRequest;
 import ma.markware.charybdis.query.PageResult;
@@ -49,7 +49,7 @@ public interface SelectFetchExpression {
    *
    * @return {@link Record} if selected item exists in DB, otherwise {@code null}.
    */
-  CompletionStage<Record> fetchOneAsync();
+  CompletableFuture<Record> fetchOneAsync();
 
   /**
    * Execute Select DSL query.
@@ -65,7 +65,7 @@ public interface SelectFetchExpression {
    *
    * @return Optional {@link Record}.
    */
-  CompletionStage<Optional<Record>> fetchOptionalAsync();
+  CompletableFuture<Optional<Record>> fetchOptionalAsync();
 
   /**
    * Execute Select DSL query.
@@ -81,7 +81,7 @@ public interface SelectFetchExpression {
    *
    * @return Collection of {@link Record}.
    */
-  CompletionStage<Collection<Record>> fetchAsync();
+  CompletableFuture<Collection<Record>> fetchAsync();
 
   /**
    * Execute Select DSL query.
@@ -99,5 +99,5 @@ public interface SelectFetchExpression {
    * @param pageRequest requested page (limit and offset)
    * @return Page of {@link Record}.
    */
-  CompletionStage<PageResult<Record>> fetchPageAsync(PageRequest pageRequest);
+  CompletableFuture<PageResult<Record>> fetchPageAsync(PageRequest pageRequest);
 }

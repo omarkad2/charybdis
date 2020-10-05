@@ -29,6 +29,7 @@ import com.squareup.javapoet.TypeSpec;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import javax.annotation.processing.Messager;
 import javax.lang.model.element.Modifier;
 import ma.markware.charybdis.apt.AptContext;
 import ma.markware.charybdis.apt.metatype.ColumnFieldMetaType;
@@ -50,8 +51,8 @@ import ma.markware.charybdis.model.option.ClusteringOrder;
  */
 public class ColumnFieldSerializer extends AbstractFieldSerializer<ColumnFieldMetaType> {
 
-  public ColumnFieldSerializer(final AptContext aptContext) {
-    super(aptContext);
+  public ColumnFieldSerializer(final AptContext aptContext, final Messager messager) {
+    super(aptContext, messager);
   }
 
   @Override

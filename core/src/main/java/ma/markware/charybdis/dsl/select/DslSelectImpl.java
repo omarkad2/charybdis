@@ -27,7 +27,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.CompletionStage;
+import java.util.concurrent.CompletableFuture;
 import ma.markware.charybdis.ExecutionContext;
 import ma.markware.charybdis.dsl.Record;
 import ma.markware.charybdis.dsl.utils.RecordUtils;
@@ -194,7 +194,7 @@ public class DslSelectImpl implements SelectInitExpression, SelectWhereExpressio
    * {@inheritDoc}
    */
   @Override
-  public CompletionStage<Record> fetchOneAsync() {
+  public CompletableFuture<Record> fetchOneAsync() {
     selectQuery.setLimit(1);
     return selectQuery.executeAsync(session).thenApply(
         asyncResultSet -> {
@@ -210,7 +210,7 @@ public class DslSelectImpl implements SelectInitExpression, SelectWhereExpressio
    * {@inheritDoc}
    */
   @Override
-  public CompletionStage<Optional<Record>> fetchOptionalAsync() {
+  public CompletableFuture<Optional<Record>> fetchOptionalAsync() {
     selectQuery.setLimit(1);
     return selectQuery.executeAsync(session).thenApply(
         asyncResultSet -> {
@@ -226,7 +226,7 @@ public class DslSelectImpl implements SelectInitExpression, SelectWhereExpressio
    * {@inheritDoc}
    */
   @Override
-  public CompletionStage<Collection<Record>> fetchAsync() {
+  public CompletableFuture<Collection<Record>> fetchAsync() {
     return selectQuery.executeAsync(session).thenApply(
         asyncResultSet -> {
           if (asyncResultSet == null) {
@@ -241,7 +241,7 @@ public class DslSelectImpl implements SelectInitExpression, SelectWhereExpressio
    * {@inheritDoc}
    */
   @Override
-  public CompletionStage<PageResult<Record>> fetchPageAsync(final PageRequest pageRequest) {
+  public CompletableFuture<PageResult<Record>> fetchPageAsync(final PageRequest pageRequest) {
     selectQuery.setPageRequest(pageRequest);
     return selectQuery.executeAsync(session).thenApply(
         asyncResultSet -> {
@@ -249,7 +249,7 @@ public class DslSelectImpl implements SelectInitExpression, SelectWhereExpressio
             return null;
           }
           ByteBuffer nextPagingState = asyncResultSet.getExecutionInfo().getPagingState();
-          List<Record> records = RecordUtils.resultSetToRecords(asyncResultSet, selectedFields);
+          List<Record> records = RecordUtils.resultSetToRecords(asyncResultSet.currentPage(), selectedFields);
           return new PageResult<>(records, nextPagingState);
         }
     );

@@ -19,6 +19,7 @@
 package ma.markware.charybdis.apt.parser;
 
 import com.squareup.javapoet.TypeName;
+import javax.annotation.processing.Messager;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.type.TypeMirror;
@@ -32,6 +33,12 @@ import ma.markware.charybdis.apt.metatype.AbstractEntityMetaType;
  * @author Oussama Markad
  */
 abstract class AbstractEntityParser<ENTITY_META_TYPE> implements EntityParser<ENTITY_META_TYPE> {
+
+  final Messager messager;
+
+  AbstractEntityParser(final Messager messager) {
+    this.messager = messager;
+  }
 
   /**
    * Parses generic attributes from Class
@@ -48,8 +55,8 @@ abstract class AbstractEntityParser<ENTITY_META_TYPE> implements EntityParser<EN
     entityMetaType.setDeserializationName(className);
 
     String keyspaceName = resolveName(annotationKeyspaceName, annotatedClass.getSimpleName());
-    validateName(keyspaceName);
-    validateKeyspaceName(annotatedClass.getSimpleName().toString(), keyspaceName, aptContext);
+    validateName(keyspaceName, messager);
+    validateKeyspaceName(annotatedClass.getSimpleName().toString(), keyspaceName, aptContext, messager);
     entityMetaType.setKeyspaceName(keyspaceName);
 
     return entityMetaType;

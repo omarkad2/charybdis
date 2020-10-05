@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.annotation.processing.Filer;
+import javax.annotation.processing.Messager;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.Elements;
@@ -71,6 +72,8 @@ class UdtParserTest {
 
   @Mock
   private RoundEnvironment roundEnvironment;
+  @Mock
+  private Messager messager;
 
   private AptConfiguration configuration;
   private TypeElement testNestedUdtElement;
@@ -89,7 +92,7 @@ class UdtParserTest {
   @BeforeEach
   void initProcessorContext(Types types, Elements elements, Filer filer) {
     AptContext aptContext = new AptContext();
-    this.configuration = AptDefaultConfiguration.initConfig(aptContext, types, elements, filer);
+    this.configuration = AptDefaultConfiguration.initConfig(aptContext, types, elements, filer, messager);
     aptContext.init(roundEnvironment, configuration);
     // Define keyspace
     configuration.getKeyspaceParser().parse(elements.getTypeElement(TestKeyspaceDefinition.class.getCanonicalName()));

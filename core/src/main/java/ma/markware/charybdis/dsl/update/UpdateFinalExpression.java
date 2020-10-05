@@ -18,7 +18,7 @@
  */
 package ma.markware.charybdis.dsl.update;
 
-import java.util.concurrent.CompletionStage;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Update DSL query expression.
@@ -40,7 +40,7 @@ public interface UpdateFinalExpression {
   /**
    * Execute update DSL query asynchronously.
    *
-   * @return a {@code CompletionStage} that, once complete, will produce a boolean to inform if changes are applied or not.
+   * @return a {@code CompletableFuture} that, once complete, will produce a boolean to inform if changes are applied or not.
    */
-  CompletionStage<Boolean> executeAsync();
+  CompletableFuture<Boolean> executeAsync();
 }
