@@ -22,7 +22,7 @@ import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.cql.AsyncResultSet;
 import com.datastax.oss.driver.api.core.cql.ResultSet;
 import java.time.Instant;
-import java.util.concurrent.CompletionStage;
+import java.util.concurrent.CompletableFuture;
 import ma.markware.charybdis.ExecutionContext;
 import ma.markware.charybdis.model.field.metadata.ColumnMetadata;
 import ma.markware.charybdis.model.field.metadata.TableMetadata;
@@ -129,7 +129,7 @@ public class DslInsertImpl
    * {@inheritDoc}
    */
   @Override
-  public CompletionStage<Boolean> executeAsync() {
+  public CompletableFuture<Boolean> executeAsync() {
     return insertQuery.executeAsync(session).thenApply(AsyncResultSet::wasApplied);
   }
 }

@@ -60,7 +60,18 @@ public class RecordUtils {
   }
 
   /**
-   * Transform Cql result set to a list of database result records.
+   * Transform iterable rows to a list of database result records.
+   */
+  public static List<Record> resultSetToRecords(final Iterable<Row> rows, final List<SelectableField> selectedFields) {
+    List<Record> records = new ArrayList<>();
+    for (final Row row : rows) {
+      records.add(rowToRecord(row, selectedFields));
+    }
+    return records;
+  }
+
+  /**
+   * Transform async Cql result set to a list of database result records.
    */
   public static List<Record> resultSetToRecords(final AsyncResultSet asyncResultSet, final List<SelectableField> selectedFields) {
     List<Record> records = new ArrayList<>();

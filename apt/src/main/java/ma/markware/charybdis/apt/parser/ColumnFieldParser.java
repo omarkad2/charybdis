@@ -19,11 +19,12 @@
 package ma.markware.charybdis.apt.parser;
 
 import static java.lang.String.format;
+import static ma.markware.charybdis.apt.utils.ExceptionMessagerWrapper.throwParsingException;
 
 import java.util.EnumSet;
+import javax.annotation.processing.Messager;
 import javax.lang.model.element.Element;
 import javax.lang.model.util.Types;
-import ma.markware.charybdis.apt.exception.CharybdisParsingException;
 import ma.markware.charybdis.apt.metatype.AbstractFieldMetaType;
 import ma.markware.charybdis.apt.metatype.ColumnFieldMetaType;
 import ma.markware.charybdis.apt.metatype.FieldTypeMetaType;
@@ -47,8 +48,8 @@ import org.apache.commons.lang.StringUtils;
  */
 public class ColumnFieldParser extends AbstractFieldParser<ColumnFieldMetaType> {
 
-  public ColumnFieldParser(final FieldTypeParser fieldTypeParser, final Types types) {
-    super(fieldTypeParser, types);
+  public ColumnFieldParser(final FieldTypeParser fieldTypeParser, final Types types, final Messager messager) {
+    super(fieldTypeParser, types, messager);
   }
 
   /**
@@ -78,7 +79,7 @@ public class ColumnFieldParser extends AbstractFieldParser<ColumnFieldMetaType> 
     final ClusteringKey clusteringKey = FieldUtils.getAnnotation(classElement, fieldElement, ClusteringKey.class, types);
     if (clusteringKey != null) {
       if (partitionKey != null) {
-        throw new CharybdisParsingException("Column can either be a partition key or a clustering key not both");
+        throwParsingException(messager, "Column can either be a partition key or a clustering key not both");
       }
       columnMetaType.setClusteringKeyIndex(clusteringKey.index());
       columnMetaType.setClusteringKey(true);
@@ -99,12 +100,12 @@ public class ColumnFieldParser extends AbstractFieldParser<ColumnFieldMetaType> 
         if (sequenceModel != null) {
           columnMetaType.setSequenceModel(sequenceModel);
         } else {
-          throw new CharybdisParsingException(format("Type %s of column '%s' is not supported for automatic value generation",
-                                                     columnMetaType.getFieldType(), columnMetaType.getSerializationName()));
+          throwParsingException(messager, format("Type %s of column '%s' is not supported for automatic value generation", columnMetaType.getFieldType(),
+                                 columnMetaType.getSerializationName()));
         }
       } catch (final ClassNotFoundException e) {
-        throw new CharybdisParsingException(format("Class not found %s values for column '%s' will not be automatically generated",
-                                                   columnMetaType.getFieldType(), columnMetaType.getSerializationName()), e);
+        throwParsingException(messager, format("Class not found %s values for column '%s' will not be automatically generated", columnMetaType.getFieldType(),
+                               columnMetaType.getSerializationName()), e);
       }
     }
 
@@ -121,9 +122,8 @@ public class ColumnFieldParser extends AbstractFieldParser<ColumnFieldMetaType> 
   private void validatePrimaryKeyTypes(final ColumnFieldMetaType columnFieldMetaType) {
     FieldTypeMetaType columnFieldType = columnFieldMetaType.getFieldType();
     if (!EnumSet.of(FieldTypeKind.NORMAL, FieldTypeKind.ENUM).contains(columnFieldType.getFieldTypeKind()) && !columnFieldType.isFrozen()) {
-      throw new CharybdisParsingException(format(
-          "Invalid non-frozen Collection/Udt type for primary key '%s', column type should be annotated with @Frozen",
-          columnFieldMetaType.getDeserializationName()));
+      throwParsingException(messager, format("Invalid non-frozen Collection/Udt type for primary key '%s', column type should be annotated with @Frozen",
+                             columnFieldMetaType.getDeserializationName()));
     }
   }
 }

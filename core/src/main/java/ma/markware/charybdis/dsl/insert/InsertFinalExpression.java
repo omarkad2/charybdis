@@ -18,7 +18,7 @@
  */
 package ma.markware.charybdis.dsl.insert;
 
-import java.util.concurrent.CompletionStage;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Insert DSL query expression.
@@ -40,7 +40,7 @@ public interface InsertFinalExpression {
   /**
    * Execute insert DSL query asynchronously.
    *
-   * @return a {@code CompletionStage} that, once complete, will produce a boolean to inform if changes are applied or not.
+   * @return a {@code CompletableFuture} that, once complete, will produce a boolean to inform if changes are applied or not.
    */
-  CompletionStage<Boolean> executeAsync();
+  CompletableFuture<Boolean> executeAsync();
 }

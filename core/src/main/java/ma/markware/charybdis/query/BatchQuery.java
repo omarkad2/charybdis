@@ -27,7 +27,10 @@ import com.datastax.oss.driver.api.core.cql.BatchableStatement;
 import com.datastax.oss.driver.api.core.cql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import ma.markware.charybdis.ExecutionContext;
+import ma.markware.charybdis.model.option.ConsistencyLevel;
+import ma.markware.charybdis.model.option.SerialConsistencyLevel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -71,6 +74,59 @@ public class BatchQuery {
   }
 
   public void execute(final CqlSession session) {
+    BatchStatement batchStatement = buildStatement();
+    executeBatchStatement(session, batchStatement);
+  }
+
+  public CompletableFuture<Void> executeAsync(final CqlSession session) {
+    BatchStatement batchStatement = buildStatement();
+    return executeBatchStatementAsync(session, batchStatement);
+  }
+
+  private void executeBatchStatement(final CqlSession session, BatchStatement batchStatement) {
+    try {
+      batchStatement = resolveExecutionContext(batchStatement);
+      ResultSet resultSet = session.execute(batchStatement);
+      log.debug("Batch applied => {}", resultSet.wasApplied());
+    } catch (final Exception e) {
+      log.error("Error executing batch query", e);
+    }
+  }
+
+  private CompletableFuture<Void> executeBatchStatementAsync(final CqlSession session, BatchStatement batchStatement) {
+    CompletableFuture<Void> asyncResultSet = null;
+    try {
+      batchStatement = resolveExecutionContext(batchStatement);
+      asyncResultSet = session.executeAsync(batchStatement).toCompletableFuture().thenAccept(asyncResultSet1 -> {});
+    } catch (final Exception e) {
+      log.error("Error executing batch query asynchronously", e);
+    }
+    return asyncResultSet;
+  }
+
+  private BatchStatement resolveExecutionContext(BatchStatement statement) {
+    if (executionContext.getConsistencyLevel() != null && executionContext.getConsistencyLevel() != ConsistencyLevel.NOT_SPECIFIED) {
+      statement = statement.setConsistencyLevel(executionContext.getConsistencyLevel().getDatastaxConsistencyLevel());
+    } else if (executionContext.getDefaultConsistencyLevel() != null && executionContext.getDefaultConsistencyLevel() != ConsistencyLevel.NOT_SPECIFIED) {
+      statement = statement.setConsistencyLevel(executionContext.getDefaultConsistencyLevel().getDatastaxConsistencyLevel());
+    }
+
+    if (executionContext.getSerialConsistencyLevel() != null && executionContext.getSerialConsistencyLevel() != SerialConsistencyLevel.NOT_SPECIFIED) {
+      statement = statement.setSerialConsistencyLevel(executionContext.getSerialConsistencyLevel().getDatastaxSerialConsistencyLevel());
+    } else if (executionContext.getDefaultSerialConsistencyLevel() != null && executionContext.getDefaultSerialConsistencyLevel() != SerialConsistencyLevel.NOT_SPECIFIED) {
+      statement = statement.setSerialConsistencyLevel(executionContext.getDefaultSerialConsistencyLevel().getDatastaxSerialConsistencyLevel());
+    }
+    if (executionContext.getDriverExecutionProfile() != null) {
+      statement = statement.setExecutionProfile(executionContext.getDriverExecutionProfile());
+    }
+
+    if (executionContext.getExecutionProfileName() != null) {
+      statement = statement.setExecutionProfileName(executionContext.getExecutionProfileName());
+    }
+    return statement;
+  }
+
+  private BatchStatement buildStatement() {
     BatchStatementBuilder builder;
     if (isLogged) {
       builder = BatchStatement.builder(BatchType.LOGGED);
@@ -86,29 +142,7 @@ public class BatchQuery {
 
     BatchStatement batchStatement = builder.build();
 
-    executeBatchStatement(session, batchStatement);
-
     clearStatements();
-  }
-
-  private void executeBatchStatement(final CqlSession session, BatchStatement batchStatement) {
-    try {
-      batchStatement = resolveExecutionContext(batchStatement);
-      ResultSet resultSet = session.execute(batchStatement);
-      log.debug("Batch applied => {}", resultSet.wasApplied());
-    } catch (final Exception e) {
-      log.error("Error executing batch query", e);
-    }
-  }
-
-  private BatchStatement resolveExecutionContext(BatchStatement statement) {
-    if (executionContext.getDriverExecutionProfile() != null) {
-      statement = statement.setExecutionProfile(executionContext.getDriverExecutionProfile());
-    }
-
-    if (executionContext.getExecutionProfileName() != null) {
-      statement = statement.setExecutionProfileName(executionContext.getExecutionProfileName());
-    }
-    return statement;
+    return batchStatement;
   }
 }

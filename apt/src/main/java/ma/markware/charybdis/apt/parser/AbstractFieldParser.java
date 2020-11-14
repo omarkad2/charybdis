@@ -19,16 +19,18 @@
 package ma.markware.charybdis.apt.parser;
 
 import static java.lang.String.format;
+import static ma.markware.charybdis.apt.utils.ExceptionMessagerWrapper.getParsingException;
+import static ma.markware.charybdis.apt.utils.ExceptionMessagerWrapper.throwParsingException;
 
 import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.SymbolMetadata;
 import java.util.HashSet;
 import java.util.Set;
+import javax.annotation.processing.Messager;
 import javax.lang.model.element.Element;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Types;
 import ma.markware.charybdis.apt.exception.CharybdisFieldTypeParsingException;
-import ma.markware.charybdis.apt.exception.CharybdisParsingException;
 import ma.markware.charybdis.apt.metatype.AbstractFieldMetaType;
 import ma.markware.charybdis.apt.metatype.FieldTypeMetaType;
 import ma.markware.charybdis.apt.utils.FieldUtils;
@@ -45,10 +47,12 @@ abstract class AbstractFieldParser<FIELD_META_TYPE extends AbstractFieldMetaType
 
   private final FieldTypeParser fieldTypeParser;
   final Types types;
+  final Messager messager;
 
-  AbstractFieldParser(FieldTypeParser fieldTypeParser, Types types) {
+  AbstractFieldParser(FieldTypeParser fieldTypeParser, Types types, Messager messager) {
     this.fieldTypeParser = fieldTypeParser;
     this.types = types;
+    this.messager = messager;
   }
 
   /**
@@ -71,7 +75,7 @@ abstract class AbstractFieldParser<FIELD_META_TYPE extends AbstractFieldMetaType
       fieldMetaType.setSetterName(FieldUtils.resolveSetterName(rawFieldName));
 
     } catch (CharybdisFieldTypeParsingException e) {
-      throw new CharybdisParsingException(format("Error while parsing field '%s'", rawFieldName), e);
+      throwParsingException(messager, format("Error while parsing field '%s'", rawFieldName), e);
     }
 
     validateMandatoryMethods(annotatedField, fieldMetaType, types);
@@ -84,15 +88,19 @@ abstract class AbstractFieldParser<FIELD_META_TYPE extends AbstractFieldMetaType
 
     // Field must have a public getter
     FieldUtils.getGetterMethodFromField(annotatedField, types)
-              .orElseThrow(() -> new CharybdisParsingException(
-                  format("A public getter [name: '%s', parameter type: <empty>, return type: '%s'] is mandatory for field '%s' in class '%s'", fieldMetaType.getGetterName(),
-                         fieldMetaType.getFieldType().getDeserializationTypeCanonicalName(), fieldMetaType.getDeserializationName(), enclosingClass.getSimpleName())));
+              .orElseThrow(() -> getParsingException(messager, format(
+                  "A public getter [name: '%s', parameter type: <empty>, return type: '%s'] is mandatory for field '%s' in class '%s'",
+                  fieldMetaType.getGetterName(), fieldMetaType.getFieldType()
+                                                              .getDeserializationTypeCanonicalName(), fieldMetaType.getDeserializationName(),
+                  enclosingClass.getSimpleName())));
 
     // Field must have a public setter
     FieldUtils.getSetterMethodFromField(annotatedField, types)
-              .orElseThrow(() -> new CharybdisParsingException(
-                  format("A public setter [name: '%s', parameter type: '%s', return type: void] is mandatory for field '%s' in class '%s'", fieldMetaType.getSetterName(),
-                         fieldMetaType.getFieldType().getDeserializationTypeCanonicalName(), fieldMetaType.getDeserializationName(), enclosingClass.getSimpleName())));
+              .orElseThrow(() -> getParsingException(messager, format(
+                  "A public setter [name: '%s', parameter type: '%s', return type: void] is mandatory for field '%s' in class '%s'",
+                  fieldMetaType.getSetterName(), fieldMetaType.getFieldType()
+                                                              .getDeserializationTypeCanonicalName(), fieldMetaType.getDeserializationName(),
+                  enclosingClass.getSimpleName())));
   }
 
   private Set<TypePosition> getFrozenAnnotationPositions(Element el) {

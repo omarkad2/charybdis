@@ -37,6 +37,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import javax.annotation.processing.Filer;
+import javax.annotation.processing.Messager;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.Elements;
@@ -61,6 +62,7 @@ import ma.markware.charybdis.test.entities.TestNestedUdt;
 import ma.markware.charybdis.test.entities.TestUdt;
 import ma.markware.charybdis.test.entities.invalid.TestEntityWithNonFrozenNestedCollectionField;
 import ma.markware.charybdis.test.entities.invalid.TestEntityWithNonFrozenNestedUdtField;
+import ma.markware.charybdis.test.entities.invalid.TestEntityWithUnsupportedType;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -77,6 +79,8 @@ class TableParserTest {
 
   @Mock
   private RoundEnvironment roundEnvironment;
+  @Mock
+  private Messager messager;
 
   private AptConfiguration configuration;
   private TypeElement testNestedUdtElement;
@@ -99,7 +103,7 @@ class TableParserTest {
   @BeforeEach
   void initProcessorContext(Types types, Elements elements, Filer filer) {
     AptContext aptContext = new AptContext();
-    this.configuration = AptDefaultConfiguration.initConfig(aptContext, types, elements, filer);
+    this.configuration = AptDefaultConfiguration.initConfig(aptContext, types, elements, filer, messager);
     aptContext.init(roundEnvironment, configuration);
     // Define keyspace
     configuration.getKeyspaceParser().parse(elements.getTypeElement(TestKeyspaceDefinition.class.getCanonicalName()));
@@ -252,5 +256,14 @@ class TableParserTest {
         .isThrownBy(() -> configuration.getTableParser()
                                        .parse(elements.getTypeElement(TestEntityWithNonFrozenNestedUdtField.class.getCanonicalName())))
         .withMessage("Error while parsing field 'shouldBeFrozenField'");
+  }
+
+  @Test
+  @DisplayName("Compilation should fail if column type not supported")
+  void should_throw_exception_when_column_has_unsupported_type(Elements elements) {
+    assertThatExceptionOfType(CharybdisParsingException.class)
+        .isThrownBy(() -> configuration.getTableParser()
+                                       .parse(elements.getTypeElement(TestEntityWithUnsupportedType.class.getCanonicalName())))
+        .withMessage("type 'ArrayList' is not supported. Parameter types are supported only on list, set and map");
   }
 }

@@ -39,6 +39,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import javax.annotation.processing.Filer;
+import javax.annotation.processing.Messager;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.Elements;
@@ -74,6 +75,8 @@ class DdlScriptSerializerTest {
   private RoundEnvironment roundEnvironment;
   @Mock
   private Filer filer;
+  @Mock
+  private Messager messager;
 
   private AptConfiguration configuration;
   private List<KeyspaceMetaType> keyspaceMetaTypes;
@@ -91,7 +94,7 @@ class DdlScriptSerializerTest {
     when(roundEnvironment.getElementsAnnotatedWith(Udt.class)).thenReturn(elementsAnnotatedWithUdt);
 
     final AptContext aptContext = new AptContext();
-    configuration = AptDefaultConfiguration.initConfig(aptContext, types, elements, filer);
+    configuration = AptDefaultConfiguration.initConfig(aptContext, types, elements, filer, messager);
     aptContext.init(roundEnvironment, configuration);
 
     keyspaceMetaTypes = Collections.singletonList(configuration.getKeyspaceParser()

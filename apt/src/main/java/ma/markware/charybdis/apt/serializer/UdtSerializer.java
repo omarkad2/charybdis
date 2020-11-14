@@ -19,6 +19,7 @@
 package ma.markware.charybdis.apt.serializer;
 
 import static java.lang.String.format;
+import static ma.markware.charybdis.apt.utils.ExceptionMessagerWrapper.throwSerializationException;
 
 import com.datastax.oss.driver.api.core.data.UdtValue;
 import com.datastax.oss.driver.api.core.type.UserDefinedType;
@@ -34,10 +35,10 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import javax.annotation.processing.Filer;
+import javax.annotation.processing.Messager;
 import javax.lang.model.element.Modifier;
 import ma.markware.charybdis.apt.AptContext;
 import ma.markware.charybdis.apt.AptContext.UdtContext;
-import ma.markware.charybdis.apt.exception.CharybdisSerializationException;
 import ma.markware.charybdis.apt.metatype.FieldTypeMetaType;
 import ma.markware.charybdis.apt.metatype.UdtFieldMetaType;
 import ma.markware.charybdis.apt.metatype.UdtMetaType;
@@ -59,11 +60,13 @@ public class UdtSerializer implements EntitySerializer<UdtMetaType> {
   private final UdtFieldSerializer udtFieldSerializer;
   private final AptContext aptContext;
   private final Filer filer;
+  private final Messager messager;
 
-  public UdtSerializer(final UdtFieldSerializer udtFieldSerializer, final AptContext aptContext, final Filer filer) {
+  public UdtSerializer(final UdtFieldSerializer udtFieldSerializer, final AptContext aptContext, final Filer filer, final Messager messager) {
     this.udtFieldSerializer = udtFieldSerializer;
     this.aptContext = aptContext;
     this.filer = filer;
+    this.messager = messager;
   }
 
   /**
@@ -98,7 +101,7 @@ public class UdtSerializer implements EntitySerializer<UdtMetaType> {
                                                     buildDeserializeMethod(udtMetaType)))
                                                 .build();
 
-    writeSerialization(packageName, className, udtMetadataSerialization, filer);
+    writeSerialization(packageName, className, udtMetadataSerialization, filer, messager);
   }
 
   private FieldSpec buildUdtField(UdtMetaType udtMetaType, boolean frozen) {
@@ -118,7 +121,7 @@ public class UdtSerializer implements EntitySerializer<UdtMetaType> {
       if (udtField.isUdt()) {
         UdtContext udtContext = aptContext.getUdtContext(udtFieldType.getDeserializationTypeCanonicalName());
         if (udtContext == null) {
-          throw new CharybdisSerializationException(format("The UDT metadata is not found for type '%s'", udtFieldType.getDeserializationTypeCanonicalName()));
+          throwSerializationException(messager, format("The UDT metadata is not found for type '%s'", udtFieldType.getDeserializationTypeCanonicalName()));
         }
         initializerBuilder.add(".withField($S, $L.$L.udt)", udtFieldName, udtContext.getUdtMetadataClassName(), udtContext.getUdtName());
       } else {

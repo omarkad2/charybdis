@@ -19,6 +19,7 @@
 package ma.markware.charybdis.apt.parser;
 
 import static java.lang.String.format;
+import static ma.markware.charybdis.apt.utils.ExceptionMessagerWrapper.throwParsingException;
 
 import com.datastax.oss.driver.api.core.data.UdtValue;
 import com.squareup.javapoet.ClassName;
@@ -31,6 +32,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
+import javax.annotation.processing.Messager;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.TypeElement;
@@ -40,7 +42,6 @@ import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 import ma.markware.charybdis.apt.AptContext;
 import ma.markware.charybdis.apt.exception.CharybdisFieldTypeParsingException;
-import ma.markware.charybdis.apt.exception.CharybdisParsingException;
 import ma.markware.charybdis.apt.metatype.FieldTypeMetaType;
 import ma.markware.charybdis.apt.metatype.FieldTypeMetaType.FieldTypeKind;
 import ma.markware.charybdis.apt.metatype.FieldTypeMetaType.TypeDetail;
@@ -61,12 +62,14 @@ public class FieldTypeParser {
   private final AptContext aptContext;
   private final Types types;
   private final Elements elements;
+  private final Messager messager;
   private Set<TypePosition> frozenAnnotationPositions;
 
-  public FieldTypeParser(final AptContext aptContext, final Types types, final Elements elements) {
+  public FieldTypeParser(final AptContext aptContext, final Types types, final Elements elements, final Messager messager) {
     this.aptContext = aptContext;
     this.types = types;
     this.elements = elements;
+    this.messager = messager;
   }
 
   void setFrozenAnnotationPositions(final Set<TypePosition> frozenAnnotationPositions) {
@@ -179,15 +182,14 @@ public class FieldTypeParser {
     if (supportedTypes.stream()
                       .map(supportedType -> elements.getTypeElement(supportedType.getCanonicalName()))
                       .noneMatch(sourceTypeElement::equals)) {
-      throw new CharybdisParsingException(format("Type '%s' is not supported, try using ['%s'] instead", sourceType,
-                                                 StringUtils.join(supportedTypes, ",")));
+      throwParsingException(messager, format("Type '%s' is not supported, try using ['%s'] instead", sourceType, StringUtils.join(supportedTypes, ",")));
     }
   }
 
   private void genericTypesNotSupported(final DeclaredType sourceType) {
     if (sourceType.getTypeArguments().size() > 0) {
-      throw new CharybdisParsingException(format("type '%s' is not supported. Parameter types are supported only on list, set and map",
-                                                 sourceType.asElement().getSimpleName()));
+
+      throwParsingException(messager, format("type '%s' is not supported. Parameter types are supported only on list, set and map", sourceType.asElement().getSimpleName()));
     }
   }
 

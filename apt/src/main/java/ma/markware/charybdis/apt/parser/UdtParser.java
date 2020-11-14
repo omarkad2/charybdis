@@ -18,14 +18,16 @@
  */
 package ma.markware.charybdis.apt.parser;
 
+import static ma.markware.charybdis.apt.utils.ExceptionMessagerWrapper.throwParsingException;
+
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import javax.annotation.processing.Messager;
 import javax.lang.model.element.Element;
 import javax.lang.model.util.Types;
 import ma.markware.charybdis.apt.AptContext;
-import ma.markware.charybdis.apt.exception.CharybdisParsingException;
 import ma.markware.charybdis.apt.metatype.AbstractEntityMetaType;
 import ma.markware.charybdis.apt.metatype.FieldTypeMetaType.FieldTypeKind;
 import ma.markware.charybdis.apt.metatype.UdtFieldMetaType;
@@ -45,7 +47,8 @@ public class UdtParser extends AbstractEntityParser<UdtMetaType> {
   private final AptContext aptContext;
   private final Types types;
 
-  public UdtParser(FieldParser<UdtFieldMetaType> udtFieldParser, AptContext aptContext, Types types) {
+  public UdtParser(final FieldParser<UdtFieldMetaType> udtFieldParser, final AptContext aptContext, final Types types, final Messager messager) {
+    super(messager);
     this.udtFieldParser = udtFieldParser;
     this.aptContext = aptContext;
     this.types = types;
@@ -56,7 +59,7 @@ public class UdtParser extends AbstractEntityParser<UdtMetaType> {
    */
   @Override
   public UdtMetaType parse(final Element annotatedClass) {
-    validateMandatoryConstructors(annotatedClass);
+    validateMandatoryConstructors(annotatedClass, messager);
 
     final Udt udt = annotatedClass.getAnnotation(Udt.class);
 
@@ -64,7 +67,7 @@ public class UdtParser extends AbstractEntityParser<UdtMetaType> {
     final UdtMetaType udtMetaType = new UdtMetaType(abstractEntityMetaType);
 
     String udtName = resolveName(annotatedClass);
-    validateName(udtName);
+    validateName(udtName, messager);
     udtMetaType.setUdtName(udtName);
 
     Stream<? extends Element> fields = ParserUtils.extractFields(annotatedClass, types);
@@ -91,8 +94,9 @@ public class UdtParser extends AbstractEntityParser<UdtMetaType> {
   private void validateNestedUdtFields(final List<UdtFieldMetaType> udtFields) {
     udtFields.stream()
              .filter(udtField -> udtField.getFieldType().getFieldTypeKind() == FieldTypeKind.UDT && !udtField.getFieldType().isFrozen())
-             .findAny().ifPresent(invalidUdt -> {
-        throw new CharybdisParsingException(String.format("Nested UDT Field '%s' should be annotated with @Frozen", invalidUdt.getDeserializationName()));
-    });
+             .findAny().ifPresent(invalidUdt ->
+                                      throwParsingException(messager, String.format("Nested UDT Field '%s' should be annotated with @Frozen",
+                                                                                    invalidUdt.getDeserializationName()))
+    );
   }
 }

@@ -21,6 +21,7 @@ package ma.markware.charybdis.apt.serializer;
 import com.squareup.javapoet.TypeSpec;
 import java.util.Arrays;
 import javax.annotation.processing.Filer;
+import javax.annotation.processing.Messager;
 import javax.lang.model.element.Modifier;
 import ma.markware.charybdis.apt.metatype.KeyspaceMetaType;
 import ma.markware.charybdis.model.field.metadata.KeyspaceMetadata;
@@ -34,9 +35,11 @@ import ma.markware.charybdis.model.field.metadata.KeyspaceMetadata;
 public class KeyspaceSerializer implements EntitySerializer<KeyspaceMetaType> {
 
   private final Filer filer;
+  private final Messager messager;
 
-  public KeyspaceSerializer(final Filer filer) {
+  public KeyspaceSerializer(final Filer filer, final Messager messager) {
     this.filer = filer;
+    this.messager = messager;
   }
 
   /**
@@ -59,7 +62,7 @@ public class KeyspaceSerializer implements EntitySerializer<KeyspaceMetaType> {
                                                  buildGetEntityNameMethod(SerializationConstants.GET_KEYSPACE_NAME_METHOD, SerializationConstants.KEYSPACE_NAME_ATTRIBUTE)))
                                              .build();
 
-    writeSerialization(packageName, className, keyspaceMetadataSerialization, filer);
+    writeSerialization(packageName, className, keyspaceMetadataSerialization, filer, messager);
   }
 
   /**

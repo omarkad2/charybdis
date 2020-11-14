@@ -141,7 +141,7 @@ public class InsertQuery extends AbstractQuery {
     for (Pair<String, Object> columnNameValuePair : columnNameValueMapping.values()) {
       String columnName = columnNameValuePair.getLeft();
       bindValueArray[bindIndex] = columnNameValuePair.getRight();
-      regularInsert = regularInsert.value(columnName, QueryBuilder.bindMarker());
+      regularInsert = regularInsert.value(ma.markware.charybdis.model.utils.StringUtils.quoteString(columnName), QueryBuilder.bindMarker());
       bindIndex++;
     }
 

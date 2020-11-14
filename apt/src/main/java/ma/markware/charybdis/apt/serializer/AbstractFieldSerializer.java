@@ -19,6 +19,7 @@
 package ma.markware.charybdis.apt.serializer;
 
 import static java.lang.String.format;
+import static ma.markware.charybdis.apt.utils.ExceptionMessagerWrapper.throwSerializationException;
 
 import com.datastax.oss.driver.api.core.type.reflect.GenericType;
 import com.squareup.javapoet.ClassName;
@@ -34,10 +35,10 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
+import javax.annotation.processing.Messager;
 import javax.lang.model.element.Modifier;
 import ma.markware.charybdis.apt.AptContext;
 import ma.markware.charybdis.apt.AptContext.UdtContext;
-import ma.markware.charybdis.apt.exception.CharybdisSerializationException;
 import ma.markware.charybdis.apt.metatype.AbstractFieldMetaType;
 import ma.markware.charybdis.apt.metatype.FieldTypeMetaType;
 import ma.markware.charybdis.apt.utils.NameUtils;
@@ -52,9 +53,11 @@ import ma.markware.charybdis.model.utils.StringUtils;
 abstract class AbstractFieldSerializer<FIELD_META_TYPE extends AbstractFieldMetaType> implements FieldSerializer<FIELD_META_TYPE> {
 
   private final AptContext aptContext;
+  private final Messager messager;
 
-  AbstractFieldSerializer(final AptContext aptContext) {
+  AbstractFieldSerializer(final AptContext aptContext, final Messager messager) {
     this.aptContext = aptContext;
+    this.messager = messager;
   }
 
   public AptContext getAptContext() {
@@ -93,7 +96,7 @@ abstract class AbstractFieldSerializer<FIELD_META_TYPE extends AbstractFieldMeta
           codeBlockBuilder.addStatement("if ($N == null) return null", parameterName);
           UdtContext udtContext = aptContext.getUdtContext(fieldType.getDeserializationTypeCanonicalName());
           if (udtContext == null) {
-            throw new CharybdisSerializationException(format("The UDT metadata is not found for type '%s'", fieldType.getDeserializationTypeCanonicalName()));
+            throwSerializationException(messager, format("The UDT metadata is not found for type '%s'", fieldType.getDeserializationTypeCanonicalName()));
           }
           codeBlockBuilder.addStatement("return $L.$L.$L($N)", udtContext.getUdtMetadataClassName(), udtContext.getUdtName(), SerializationConstants.SERIALIZE_METHOD, parameterName);
           break;
@@ -155,7 +158,7 @@ abstract class AbstractFieldSerializer<FIELD_META_TYPE extends AbstractFieldMeta
         case UDT:
           UdtContext udtContext = aptContext.getUdtContext(fieldType.getDeserializationTypeCanonicalName());
           if (udtContext == null) {
-            throw new CharybdisSerializationException(format("The UDT metadata is not found for type '%s'", fieldType.getDeserializationTypeCanonicalName()));
+            throwSerializationException(messager, format("The UDT metadata is not found for type '%s'", fieldType.getDeserializationTypeCanonicalName()));
           }
           codeBlockBuilder.addStatement("return $L.$L.$L($N.getUdtValue($L))", udtContext.getUdtMetadataClassName(), udtContext.getUdtName(),
                                         SerializationConstants.DESERIALIZE_METHOD, storageParameterName, pathParameterName);
@@ -236,7 +239,7 @@ abstract class AbstractFieldSerializer<FIELD_META_TYPE extends AbstractFieldMeta
       case UDT:
         UdtContext udtContext = aptContext.getUdtContext(fieldType.getDeserializationTypeCanonicalName());
         if (udtContext == null) {
-          throw new CharybdisSerializationException(format("The UDT metadata is not found for type '%s'", fieldType.getDeserializationTypeCanonicalName()));
+          throwSerializationException(messager, format("The UDT metadata is not found for type '%s'", fieldType.getDeserializationTypeCanonicalName()));
         }
         codeBlockBuilder.addStatement("$L $L = $L.$L.$L($N)", fieldType.getDeserializationTypeCanonicalName(), destinationElement, udtContext.getUdtMetadataClassName(),
                                      udtContext.getUdtName(), SerializationConstants.DESERIALIZE_METHOD, sourceElement);
@@ -308,7 +311,7 @@ abstract class AbstractFieldSerializer<FIELD_META_TYPE extends AbstractFieldMeta
       case UDT:
         UdtContext udtContext = aptContext.getUdtContext(fieldType.getDeserializationTypeCanonicalName());
         if (udtContext == null) {
-          throw new CharybdisSerializationException(format("The UDT metadata is not found for type '%s'", fieldType.getDeserializationTypeCanonicalName()));
+          throwSerializationException(messager, format("The UDT metadata is not found for type '%s'", fieldType.getDeserializationTypeCanonicalName()));
         }
         codeBlockBuilder.addStatement("$L $L = $L.$L.$L($N)", fieldType.getSerializationTypeCanonicalName(), destinationElement, udtContext.getUdtMetadataClassName(),
                                      udtContext.getUdtName(), SerializationConstants.SERIALIZE_METHOD, sourceElement);

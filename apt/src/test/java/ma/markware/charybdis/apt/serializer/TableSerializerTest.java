@@ -21,6 +21,9 @@ package ma.markware.charybdis.apt.serializer;
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
@@ -29,10 +32,12 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Stream;
 import javax.annotation.processing.Filer;
+import javax.annotation.processing.Messager;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
+import javax.tools.Diagnostic.Kind;
 import ma.markware.charybdis.apt.AptConfiguration;
 import ma.markware.charybdis.apt.AptContext;
 import ma.markware.charybdis.apt.AptDefaultConfiguration;
@@ -72,6 +77,8 @@ class TableSerializerTest {
   private RoundEnvironment roundEnvironment;
   @Mock
   private Filer filer;
+  @Mock
+  private Messager messager;
 
   private AptConfiguration configuration;
   private Elements elements;
@@ -89,7 +96,7 @@ class TableSerializerTest {
     when(roundEnvironment.getElementsAnnotatedWith(Udt.class)).thenReturn(elementsAnnotatedWithUdt);
 
     final AptContext aptContext = new AptContext();
-    configuration = AptDefaultConfiguration.initConfig(aptContext, types, elementUtils, filer);
+    configuration = AptDefaultConfiguration.initConfig(aptContext, types, elementUtils, filer, messager);
     aptContext.init(roundEnvironment, configuration);
 
     configuration.getKeyspaceParser()
@@ -126,6 +133,7 @@ class TableSerializerTest {
     assertThatExceptionOfType(CharybdisSerializationException.class)
         .isThrownBy(() -> configuration.getTableSerializer().serialize(tableWithUnknownUdtMetaType))
         .withMessage("The UDT metadata is not found for type '" + TestUnknownUdt.class.getCanonicalName() + "'");
+    verify(messager).printMessage(eq(Kind.ERROR), anyString());
   }
 
   private Stream<Arguments> getTableArguments() {

@@ -19,16 +19,18 @@
 package ma.markware.charybdis.apt.parser;
 
 import static java.lang.String.format;
+import static ma.markware.charybdis.apt.utils.ExceptionMessagerWrapper.getParsingException;
+import static ma.markware.charybdis.apt.utils.ExceptionMessagerWrapper.throwParsingException;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.annotation.processing.Messager;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.Name;
 import ma.markware.charybdis.apt.AptContext;
-import ma.markware.charybdis.apt.exception.CharybdisParsingException;
 import ma.markware.charybdis.model.annotation.Keyspace;
 import ma.markware.charybdis.model.annotation.Table;
 import ma.markware.charybdis.model.annotation.Udt;
@@ -47,17 +49,17 @@ public interface EntityParser<ENTITY_META_TYPE> {
   /**
    * Checks if resolved Cql entity name is valid
    */
-  default void validateName(String name) {
+  default void validateName(String name, Messager messager) {
     Matcher matcher = pattern.matcher(name);
     if (!matcher.matches()) {
-      throw new CharybdisParsingException(format("Name '%s' should match regexp '[a-zA-Z$_][a-zA-Z0-9$_]*'", name));
+      throwParsingException(messager, format("Name '%s' should match regexp '[a-zA-Z$_][a-zA-Z0-9$_]*'", name));
     }
   }
 
   /**
    * Checks if Class has no-arg public constructor
    */
-  default void validateMandatoryConstructors(Element annotatedClass) {
+  default void validateMandatoryConstructors(Element annotatedClass, Messager messager) {
     annotatedClass.getEnclosedElements()
                   .stream()
                   .filter(element -> element.getKind() == ElementKind.CONSTRUCTOR
@@ -65,19 +67,21 @@ public interface EntityParser<ENTITY_META_TYPE> {
                       && ((ExecutableElement) element).getParameters().size() == 0
                       && element.getModifiers().contains(Modifier.PUBLIC))
                   .findAny()
-                  .orElseThrow(() -> new CharybdisParsingException(format("Public no-arg constructor is mandatory in class '%s'", annotatedClass.getSimpleName().toString())));
+                  .orElseThrow(() ->
+                    getParsingException(messager, format("Public no-arg constructor is mandatory in class '%s'", annotatedClass.getSimpleName()))
+                  );
   }
 
   /**
    * Checks if keyspace name is present and is linked to a Class annotated with {@link ma.markware.charybdis.model.annotation.Keyspace}
    */
-  default void validateKeyspaceName(String className, String keyspaceName, AptContext aptContext) {
+  default void validateKeyspaceName(String className, String keyspaceName, AptContext aptContext, Messager messager) {
     if (StringUtils.isBlank(keyspaceName)) {
-      throw new CharybdisParsingException(format("Entity '%s' must be linked to a keyspace", className));
+      throwParsingException(messager, format("Entity '%s' must be linked to a keyspace", className));
     }
-    if (!aptContext.isKeyspaceExist(keyspaceName)) {
-      throw new CharybdisParsingException(format("Keyspace '%s' does not exist", keyspaceName));
-    }
+//    if (!aptContext.isKeyspaceExist(keyspaceName)) {
+//      throwParsingException(messager, format("Keyspace '%s' does not exist", keyspaceName));
+//    }
   }
 
   /**

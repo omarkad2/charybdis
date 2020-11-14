@@ -25,6 +25,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.Filer;
+import javax.annotation.processing.Messager;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.SourceVersion;
@@ -32,6 +33,7 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
+import javax.tools.Diagnostic.Kind;
 import ma.markware.charybdis.apt.metatype.KeyspaceMetaType;
 import ma.markware.charybdis.apt.metatype.TableMetaType;
 import ma.markware.charybdis.apt.metatype.UdtMetaType;
@@ -71,8 +73,10 @@ public class CharybdisProcessor extends AbstractProcessor {
     final Filer filer = processingEnv.getFiler();
     final Types types = processingEnv.getTypeUtils();
     final Elements elements = processingEnv.getElementUtils();
+    final Messager messager = processingEnv.getMessager();
     aptContext = new AptContext();
-    aptConfiguration = AptDefaultConfiguration.initConfig(aptContext, types, elements, filer);
+    aptConfiguration = AptDefaultConfiguration.initConfig(aptContext, types, elements, filer, messager);
+    messager.printMessage(Kind.NOTE, "Initialize Charybdis processor. Starting work ...");
   }
 
   /**

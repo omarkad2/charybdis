@@ -67,7 +67,7 @@ public interface ListColumnMetadata<D, S> extends CollectionColumnMetadata<List<
    * Append values to column.
    */
   default AssignmentListValue<D, S> append(List<D> values) {
-    return new AssignmentListValue<D, S>(this, AssignmentOperation.APPEND, serialize(values));
+    return new AssignmentListValue<>(this, AssignmentOperation.APPEND, serialize(values));
   }
 
   /**

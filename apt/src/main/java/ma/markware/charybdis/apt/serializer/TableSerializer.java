@@ -32,6 +32,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import javax.annotation.processing.Filer;
+import javax.annotation.processing.Messager;
 import javax.lang.model.element.Modifier;
 import ma.markware.charybdis.apt.metatype.ColumnFieldMetaType;
 import ma.markware.charybdis.apt.metatype.TableMetaType;
@@ -53,10 +54,12 @@ public class TableSerializer implements EntitySerializer<TableMetaType> {
 
   private final FieldSerializer<ColumnFieldMetaType> columnFieldSerializer;
   private final Filer filer;
+  private final Messager messager;
 
-  public TableSerializer(final FieldSerializer<ColumnFieldMetaType> columnFieldSerializer, final Filer filer) {
+  public TableSerializer(final FieldSerializer<ColumnFieldMetaType> columnFieldSerializer, final Filer filer, final Messager messager) {
     this.columnFieldSerializer = columnFieldSerializer;
     this.filer = filer;
+    this.messager = messager;
   }
 
   /**
@@ -104,7 +107,7 @@ public class TableSerializer implements EntitySerializer<TableMetaType> {
                                                       buildDeserializeMethod(tableMetaType)))
                                                   .build();
 
-    writeSerialization(packageName, className, tableMetadataSerialization, filer);
+    writeSerialization(packageName, className, tableMetadataSerialization, filer, messager);
   }
 
   private MethodSpec buildGetDefaultReadConsistencyMethod(ConsistencyLevel defaultReadConsistency) {

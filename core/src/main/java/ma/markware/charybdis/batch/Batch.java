@@ -21,6 +21,7 @@ package ma.markware.charybdis.batch;
 
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.cql.BatchableStatement;
+import java.util.concurrent.CompletableFuture;
 import ma.markware.charybdis.ExecutionContext;
 import ma.markware.charybdis.query.BatchQuery;
 
@@ -78,6 +79,13 @@ public class Batch {
    */
   public void execute() {
     batchQuery.execute(session);
+  }
+
+  /**
+   * Execute batch query asynchronously.
+   */
+  public CompletableFuture<Void> executeAsync() {
+    return batchQuery.executeAsync(session);
   }
 
   /**

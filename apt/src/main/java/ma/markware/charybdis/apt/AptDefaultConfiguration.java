@@ -19,6 +19,7 @@
 package ma.markware.charybdis.apt;
 
 import javax.annotation.processing.Filer;
+import javax.annotation.processing.Messager;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 import ma.markware.charybdis.apt.parser.ColumnFieldParser;
@@ -69,20 +70,20 @@ public class AptDefaultConfiguration implements AptConfiguration {
    * @param filer allows serializers to create new java files
    * @return Annotation processor global configuration
    */
-  public static AptConfiguration initConfig(AptContext aptContext, Types types, Elements elements, Filer filer) {
-    FieldTypeParser fieldTypeParser = new FieldTypeParser(aptContext, types, elements);
-    ColumnFieldParser columnFieldParser = new ColumnFieldParser(fieldTypeParser, types);
-    UdtFieldParser udtFieldParser = new UdtFieldParser(fieldTypeParser, types);
-    ColumnFieldSerializer columnFieldSerializer = new ColumnFieldSerializer(aptContext);
-    UdtFieldSerializer udtFieldSerializer = new UdtFieldSerializer(aptContext);
+  public static AptConfiguration initConfig(AptContext aptContext, Types types, Elements elements, Filer filer, Messager messager) {
+    FieldTypeParser fieldTypeParser = new FieldTypeParser(aptContext, types, elements, messager);
+    ColumnFieldParser columnFieldParser = new ColumnFieldParser(fieldTypeParser, types, messager);
+    UdtFieldParser udtFieldParser = new UdtFieldParser(fieldTypeParser, types, messager);
+    ColumnFieldSerializer columnFieldSerializer = new ColumnFieldSerializer(aptContext, messager);
+    UdtFieldSerializer udtFieldSerializer = new UdtFieldSerializer(aptContext, messager);
     return new AptDefaultConfiguration(
-        new KeyspaceParser(aptContext),
-        new UdtParser(udtFieldParser, aptContext, types),
-        new TableParser(columnFieldParser, aptContext, types),
-        new KeyspaceSerializer(filer),
-        new UdtSerializer(udtFieldSerializer, aptContext, filer),
-        new TableSerializer(columnFieldSerializer, filer),
-        new DdlScriptSerializer(aptContext, filer));
+        new KeyspaceParser(aptContext, messager),
+        new UdtParser(udtFieldParser, aptContext, types, messager),
+        new TableParser(columnFieldParser, aptContext, types, messager),
+        new KeyspaceSerializer(filer, messager),
+        new UdtSerializer(udtFieldSerializer, aptContext, filer, messager),
+        new TableSerializer(columnFieldSerializer, filer, messager),
+        new DdlScriptSerializer(aptContext, filer, messager));
   }
 
   /**

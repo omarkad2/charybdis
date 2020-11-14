@@ -78,6 +78,16 @@ class ReadEntityManager<T> {
   }
 
   /**
+   * Specify condition in select query.
+   */
+  ReadEntityManager<T> withFiltering(boolean allowFiltering) {
+    if (allowFiltering) {
+      selectQuery.enableFiltering();
+    }
+    return this;
+  }
+
+  /**
    * Add paging capability to select query.
    */
   ReadEntityManager<T> withPaging(PageRequest pageRequest) {

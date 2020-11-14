@@ -19,6 +19,7 @@
 package ma.markware.charybdis.query;
 
 import java.nio.ByteBuffer;
+import org.apache.commons.lang.StringUtils;
 
 /**
  * A pagination expression.
@@ -58,6 +59,20 @@ public class PageRequest {
    */
   public static PageRequest of(final ByteBuffer pagingState, final int fetchSize) {
     return new PageRequest(pagingState, fetchSize);
+  }
+
+  /**
+   * Create a page request.
+   *
+   * @param pagingState offset as string.
+   * @param fetchSize limit of elements to fetch.
+   * @return pageRequest from given parameters.
+   */
+  public static PageRequest fromString(final String pagingState, final int fetchSize) {
+    if (StringUtils.isEmpty(pagingState)) {
+      return new PageRequest(null, fetchSize);
+    }
+    return new PageRequest(ByteBuffer.wrap(pagingState.getBytes()), fetchSize);
   }
 
   ByteBuffer getPagingState() {

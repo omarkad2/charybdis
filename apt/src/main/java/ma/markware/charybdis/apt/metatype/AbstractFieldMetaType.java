@@ -19,6 +19,7 @@
 package ma.markware.charybdis.apt.metatype;
 
 import ma.markware.charybdis.apt.metatype.FieldTypeMetaType.FieldTypeKind;
+import ma.markware.charybdis.model.utils.StringUtils;
 
 /**
  * A generic field meta-type.
@@ -54,6 +55,10 @@ public class AbstractFieldMetaType {
 
   public String getSerializationName() {
     return serializationName;
+  }
+
+  public String getSerializationNameWithQuotes() {
+    return StringUtils.quoteString(serializationName);
   }
 
   public void setSerializationName(final String serializationName) {

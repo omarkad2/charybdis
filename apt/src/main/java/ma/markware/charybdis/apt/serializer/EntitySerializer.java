@@ -19,6 +19,7 @@
 package ma.markware.charybdis.apt.serializer;
 
 import static java.lang.String.format;
+import static ma.markware.charybdis.apt.utils.ExceptionMessagerWrapper.throwSerializationException;
 
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.FieldSpec;
@@ -27,8 +28,8 @@ import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeSpec;
 import java.io.IOException;
 import javax.annotation.processing.Filer;
+import javax.annotation.processing.Messager;
 import javax.lang.model.element.Modifier;
-import ma.markware.charybdis.apt.exception.CharybdisSerializationException;
 
 /**
  * Entity serializer.
@@ -82,13 +83,13 @@ public interface EntitySerializer<ENTITY_META_TYPE> {
   /**
    * Writes methods and fields in a java file.
    */
-  default void writeSerialization(String packageName, String className, TypeSpec typeSpec, Filer filer) {
+  default void writeSerialization(String packageName, String className, TypeSpec typeSpec, Filer filer, Messager messager) {
     try {
       JavaFile.builder(packageName, typeSpec)
               .build()
               .writeTo(filer);
     } catch (IOException e) {
-      throw new CharybdisSerializationException(format("Serialization of class '%s' failed", className), e);
+      throwSerializationException(messager, format("Serialization of class '%s' failed", className), e);
     }
   }
 

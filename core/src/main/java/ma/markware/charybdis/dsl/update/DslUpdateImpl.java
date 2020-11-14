@@ -22,7 +22,7 @@ import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.cql.AsyncResultSet;
 import com.datastax.oss.driver.api.core.cql.ResultSet;
 import java.time.Instant;
-import java.util.concurrent.CompletionStage;
+import java.util.concurrent.CompletableFuture;
 import ma.markware.charybdis.ExecutionContext;
 import ma.markware.charybdis.model.assignment.AssignmentListValue;
 import ma.markware.charybdis.model.assignment.AssignmentMapValue;
@@ -204,7 +204,7 @@ public class DslUpdateImpl
    * {@inheritDoc}
    */
   @Override
-  public CompletionStage<Boolean> executeAsync() {
+  public CompletableFuture<Boolean> executeAsync() {
     return updateQuery.executeAsync(session).thenApply(AsyncResultSet::wasApplied);
   }
 }

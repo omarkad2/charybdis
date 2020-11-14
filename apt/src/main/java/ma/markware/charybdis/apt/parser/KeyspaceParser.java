@@ -19,10 +19,11 @@
 package ma.markware.charybdis.apt.parser;
 
 import static java.lang.String.format;
+import static ma.markware.charybdis.apt.utils.ExceptionMessagerWrapper.throwParsingException;
 
+import javax.annotation.processing.Messager;
 import javax.lang.model.element.Element;
 import ma.markware.charybdis.apt.AptContext;
-import ma.markware.charybdis.apt.exception.CharybdisParsingException;
 import ma.markware.charybdis.apt.metatype.AbstractEntityMetaType;
 import ma.markware.charybdis.apt.metatype.KeyspaceMetaType;
 import ma.markware.charybdis.model.annotation.Keyspace;
@@ -40,7 +41,8 @@ public class KeyspaceParser extends AbstractEntityParser<KeyspaceMetaType> {
 
   private final AptContext aptContext;
 
-  public KeyspaceParser(AptContext aptContext) {
+  public KeyspaceParser(final AptContext aptContext, final Messager messager) {
+    super(messager);
     this.aptContext = aptContext;
   }
 
@@ -66,12 +68,12 @@ public class KeyspaceParser extends AbstractEntityParser<KeyspaceMetaType> {
    * {@inheritDoc}
    */
   @Override
-  public void validateKeyspaceName(String className, String keyspaceName, AptContext aptContext) {
+  public void validateKeyspaceName(String className, String keyspaceName, AptContext aptContext, Messager messager) {
     if (StringUtils.isBlank(keyspaceName)) {
       keyspaceName = className;
     }
     if (aptContext.isKeyspaceExist(keyspaceName)) {
-      throw new CharybdisParsingException(format("keyspace '%s' already exist", keyspaceName));
+      throwParsingException(messager, format("keyspace '%s' already exist", keyspaceName));
     }
   }
 
@@ -94,7 +96,7 @@ public class KeyspaceParser extends AbstractEntityParser<KeyspaceMetaType> {
         replication.setReplicationFactor(replicationFactor);
       }
     } else if (replicationStrategy == ReplicationStrategyClass.NETWORK_TOPOLOGY_STRATEGY) {
-      throw new CharybdisParsingException("Replication 'NetworkTopologyStrategy' not yet supported on a particular keyspace");
+      throwParsingException(messager, "Replication 'NetworkTopologyStrategy' not yet supported on a particular keyspace");
     }
     return replication;
   }

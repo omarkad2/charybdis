@@ -22,9 +22,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.Mockito.when;
 
-import java.io.IOException;
 import java.util.Collections;
 import javax.annotation.processing.Filer;
+import javax.annotation.processing.Messager;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.Elements;
@@ -39,6 +39,7 @@ import ma.markware.charybdis.model.annotation.Udt;
 import ma.markware.charybdis.model.option.Replication;
 import ma.markware.charybdis.test.entities.TestKeyspaceDefinition;
 import ma.markware.charybdis.test.entities.invalid.DuplicateKeyspaceDefinition;
+import ma.markware.charybdis.test.entities.invalid.KeyspaceNetworkTopology;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -55,6 +56,8 @@ class KeyspaceParserTest {
 
   @Mock
   private RoundEnvironment roundEnvironment;
+  @Mock
+  private Messager messager;
 
   private AptConfiguration configuration;
   private TypeElement keyspaceTypeElement;
@@ -70,7 +73,7 @@ class KeyspaceParserTest {
   void initProcessorContext(Types types, Elements elements, Filer filer) {
     AptContext aptContext = new AptContext();
     aptContext.init(roundEnvironment, configuration);
-    this.configuration = AptDefaultConfiguration.initConfig(aptContext, types, elements, filer);
+    this.configuration = AptDefaultConfiguration.initConfig(aptContext, types, elements, filer, messager);
   }
 
   @Test
@@ -82,11 +85,21 @@ class KeyspaceParserTest {
 
   @Test
   @DisplayName("Compilation should fail if two keyspaces have the same name")
-  void should_throw_exception_when_duplicate_keyspace_name(Elements elements) throws IOException {
+  void should_throw_exception_when_duplicate_keyspace_name(Elements elements) {
     configuration.getKeyspaceParser().parse(keyspaceTypeElement);
     assertThatExceptionOfType(CharybdisParsingException.class)
         .isThrownBy(() -> configuration.getKeyspaceParser()
                                     .parse(elements.getTypeElement(DuplicateKeyspaceDefinition.class.getCanonicalName())))
         .withMessage("keyspace 'test_keyspace' already exist");
+  }
+
+  @Test
+  @DisplayName("Compilation should fail if keyspace has a network topology strategy")
+  void should_throw_exception_when_network_topology_strategy(Elements elements) {
+    configuration.getKeyspaceParser().parse(keyspaceTypeElement);
+    assertThatExceptionOfType(CharybdisParsingException.class)
+        .isThrownBy(() -> configuration.getKeyspaceParser()
+                                       .parse(elements.getTypeElement(KeyspaceNetworkTopology.class.getCanonicalName())))
+        .withMessage("Replication 'NetworkTopologyStrategy' not yet supported on a particular keyspace");
   }
 }

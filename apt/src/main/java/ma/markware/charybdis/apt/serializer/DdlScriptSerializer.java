@@ -20,21 +20,21 @@
 package ma.markware.charybdis.apt.serializer;
 
 import static java.lang.String.format;
+import static ma.markware.charybdis.apt.utils.ExceptionMessagerWrapper.throwSerializationException;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.Reader;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 import javax.annotation.processing.Filer;
+import javax.annotation.processing.Messager;
 import javax.tools.FileObject;
 import javax.tools.StandardLocation;
 import ma.markware.charybdis.apt.AptContext;
 import ma.markware.charybdis.apt.AptContext.UdtContext;
-import ma.markware.charybdis.apt.exception.CharybdisSerializationException;
 import ma.markware.charybdis.apt.metatype.ColumnFieldMetaType;
 import ma.markware.charybdis.apt.metatype.FieldTypeMetaType;
 import ma.markware.charybdis.apt.metatype.KeyspaceMetaType;
@@ -46,24 +46,22 @@ import ma.markware.charybdis.model.datatype.DataTypeMapper;
 import ma.markware.charybdis.model.option.Replication;
 import ma.markware.charybdis.model.option.ReplicationStrategyClass;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
- *
+ * Create DDL script file
  *
  * @author Oussama Markad
  */
 public class DdlScriptSerializer {
 
-  private static final Logger log = LoggerFactory.getLogger(DdlScriptSerializer.class);
-
   private final AptContext aptContext;
   private final Filer filer;
+  private final Messager messager;
 
-  public DdlScriptSerializer(final AptContext aptContext, final Filer filer) {
+  public DdlScriptSerializer(final AptContext aptContext, final Filer filer, final Messager messager) {
     this.aptContext = aptContext;
     this.filer = filer;
+    this.messager = messager;
   }
 
   public void serialize(List<KeyspaceMetaType> keyspaceMetaTypes, List<UdtMetaType> sortedUdtMetaTypes, List<TableMetaType> tableMetaTypes) {
@@ -94,29 +92,17 @@ public class DdlScriptSerializer {
         br.newLine();
       }
     } catch (IOException e) {
-      throw new CharybdisSerializationException("Serialization of 'ddl_*.cql' files failed", e);
+      throwSerializationException(messager, "Serialization of 'ddl_*.cql' files failed", e);
     }
-  }
-
-  private String readerToString(Reader reader)
-      throws IOException {
-    char[] arr = new char[8 * 1024];
-    StringBuilder buffer = new StringBuilder();
-    int numCharsRead;
-    while ((numCharsRead = reader.read(arr, 0, arr.length)) != -1) {
-      buffer.append(arr, 0, numCharsRead);
-    }
-    reader.close();
-    return buffer.toString();
   }
 
   private String createKeyspaceCqlStatement(final KeyspaceMetaType keyspaceMetaType) {
-    return "CREATE KEYSPACE IF NOT EXISTS " + keyspaceMetaType.getKeyspaceName() + " WITH REPLICATION={" + replicationToCql(
+    return "CREATE KEYSPACE IF NOT EXISTS \"" + keyspaceMetaType.getKeyspaceName() + "\" WITH REPLICATION={" + replicationToCql(
         keyspaceMetaType.getReplication()) + "}" + ";";
   }
 
   private String dropKeyspaceCqlStatement(final KeyspaceMetaType keyspaceMetaType) {
-    return "DROP KEYSPACE IF EXISTS " + keyspaceMetaType.getKeyspaceName() + ";";
+    return "DROP KEYSPACE IF EXISTS \"" + keyspaceMetaType.getKeyspaceName() + "\";";
   }
 
   private String createUdtCqlStatement(final UdtMetaType udtMetaType) {
@@ -124,15 +110,15 @@ public class DdlScriptSerializer {
     String udtName = udtMetaType.getUdtName();
     List<UdtFieldMetaType> udtFieldMetaTypes = udtMetaType.getUdtFields();
 
-    return "CREATE TYPE IF NOT EXISTS " + keyspaceName + "." + udtName + "("
+    return "CREATE TYPE IF NOT EXISTS \"" + keyspaceName + "\".\"" + udtName + "\"("
         + udtFieldMetaTypes.stream()
-                           .map(udtFieldMetaType -> udtFieldMetaType.getSerializationName() + " " + fieldTypeToCql(udtFieldMetaType.getFieldType()))
+                           .map(udtFieldMetaType -> udtFieldMetaType.getSerializationNameWithQuotes() + " " + fieldTypeToCql(udtFieldMetaType.getFieldType()))
                            .collect(Collectors.joining(","))
         + ");";
   }
 
   private String dropUdtCqlStatement(final UdtMetaType udtMetaType) {
-    return "DROP TYPE IF EXISTS " + udtMetaType.getKeyspaceName() + "." + udtMetaType.getUdtName() + ";";
+    return "DROP TYPE IF EXISTS \"" + udtMetaType.getKeyspaceName() + "\".\"" + udtMetaType.getUdtName() + "\";";
   }
 
   private String createTableCqlStatement(final TableMetaType tableMetaType) {
@@ -144,24 +130,26 @@ public class DdlScriptSerializer {
 
     StringBuilder statementBuilder = new StringBuilder("CREATE TABLE IF NOT EXISTS ");
     if (StringUtils.isNotBlank(keyspaceName)) {
-      statementBuilder.append(keyspaceName).append(".");
+      statementBuilder.append(ma.markware.charybdis.model.utils.StringUtils.quoteString(keyspaceName)).append(".");
     }
-    statementBuilder.append(tableName);
+    statementBuilder.append(ma.markware.charybdis.model.utils.StringUtils.quoteString(tableName));
 
-    String partitionKeyPart = partitionColumns.size() == 1 ? partitionColumns.get(0).getSerializationName()
-        : "(" + partitionColumns.stream().sorted(Comparator.comparingInt(ColumnFieldMetaType::getPartitionKeyIndex)).map(ColumnFieldMetaType::getSerializationName)
+    String partitionKeyPart = partitionColumns.size() == 1 ? partitionColumns.get(0).getSerializationNameWithQuotes()
+        : "(" + partitionColumns.stream().sorted(Comparator.comparingInt(ColumnFieldMetaType::getPartitionKeyIndex))
+                                .map(ColumnFieldMetaType::getSerializationNameWithQuotes)
                                 .collect(Collectors.joining(",")) + ")";
 
     String primaryKeyPart = clusteringColumns.size() == 0 ? partitionKeyPart
         : partitionKeyPart + ", " + clusteringColumns.stream().sorted(Comparator.comparingInt(ColumnFieldMetaType::getClusteringKeyIndex))
-                                                     .map(ColumnFieldMetaType::getSerializationName).collect(Collectors.joining(","));
+                                                     .map(ColumnFieldMetaType::getSerializationNameWithQuotes)
+                                                     .collect(Collectors.joining(","));
 
     String clusteringOrderPart = clusteringColumns.size() == 0 ? ""
         : clusteringColumns.stream().sorted(Comparator.comparingInt(ColumnFieldMetaType::getClusteringKeyIndex))
-                           .map(clusteringKey -> clusteringKey.getSerializationName() + " " + clusteringKey.getClusteringOrder().name()).collect(Collectors.joining(","));
+                           .map(clusteringKey -> clusteringKey.getSerializationNameWithQuotes() + " " + clusteringKey.getClusteringOrder().name()).collect(Collectors.joining(","));
 
     statementBuilder.append("(");
-    statementBuilder.append(allColumns.stream().map(columnMetaType -> columnMetaType.getSerializationName() + " " + fieldTypeToCql(columnMetaType.getFieldType()))
+    statementBuilder.append(allColumns.stream().map(columnMetaType -> columnMetaType.getSerializationNameWithQuotes() + " " + fieldTypeToCql(columnMetaType.getFieldType()))
                                       .collect(Collectors.joining(",")));
     statementBuilder.append(",").append("PRIMARY KEY");
     statementBuilder.append("(").append(primaryKeyPart).append(")");
@@ -174,12 +162,12 @@ public class DdlScriptSerializer {
   }
 
   private String dropTableCqlStatement(final TableMetaType tableMetaType) {
-    return "DROP TABLE IF EXISTS " + tableMetaType.getKeyspaceName() + "." + tableMetaType.getTableName() + ";";
+    return "DROP TABLE IF EXISTS \"" + tableMetaType.getKeyspaceName() + "\".\"" + tableMetaType.getTableName() + "\";";
   }
 
   private String fieldTypeToCql(FieldTypeMetaType fieldType) {
     List<FieldTypeMetaType> fieldSubTypes = fieldType.getSubTypes();
-    String fieldCqlType;
+    String fieldCqlType = null;
     switch (fieldType.getFieldTypeKind()) {
       case LIST:
         fieldCqlType = "list<" + fieldTypeToCql(fieldSubTypes.get(0)) + ">";
@@ -193,7 +181,7 @@ public class DdlScriptSerializer {
       case UDT:
         UdtContext udtContext = aptContext.getUdtContext(fieldType.getDeserializationTypeCanonicalName());
         if (udtContext == null) {
-          throw new CharybdisSerializationException(format("The UDT metadata is not found for type '%s'", fieldType.getDeserializationTypeCanonicalName()));
+          throwSerializationException(messager, format("The UDT metadata is not found for type '%s'", fieldType.getDeserializationTypeCanonicalName()));
         }
         fieldCqlType = udtContext.getUdtName();
         break;
@@ -201,7 +189,7 @@ public class DdlScriptSerializer {
         try {
           fieldCqlType = DataTypeMapper.getDataType(Class.forName(fieldType.getSerializationTypeCanonicalName())).asCql(false, false);
         } catch (ClassNotFoundException e) {
-          throw new CharybdisSerializationException(format("Class with name '%s' was not found", fieldType.getSerializationTypeCanonicalName()));
+          throwSerializationException(messager, format("Class with name '%s' was not found", fieldType.getSerializationTypeCanonicalName()), e);
         }
         break;
     }
@@ -211,8 +199,8 @@ public class DdlScriptSerializer {
   private String createIndexCqlStatement(final TableMetaType tableMetaType) {
     return tableMetaType.getColumns().stream()
                         .filter(ColumnFieldMetaType::isIndexed)
-                        .map(indexedColumn -> "CREATE INDEX IF NOT EXISTS " + indexedColumn.getIndexName() + " ON " + tableMetaType.getKeyspaceName() + "." + tableMetaType.getTableName()
-                            + "(" + indexedColumn.getSerializationName() + ");")
+                        .map(indexedColumn -> "CREATE INDEX IF NOT EXISTS " + indexedColumn.getIndexName() + " ON \"" + tableMetaType.getKeyspaceName() + "\".\"" + tableMetaType.getTableName()
+                            + "\"(" + indexedColumn.getSerializationNameWithQuotes() + ");")
                         .collect(Collectors.joining("\n"));
 
   }
@@ -220,7 +208,7 @@ public class DdlScriptSerializer {
   private String dropIndexCqlStatement(final TableMetaType tableMetaType) {
     return tableMetaType.getColumns().stream()
                         .filter(ColumnFieldMetaType::isIndexed)
-                        .map(indexedColumn -> "DROP INDEX IF EXISTS " + tableMetaType.getKeyspaceName() + "." + indexedColumn.getIndexName() + ";")
+                        .map(indexedColumn -> "DROP INDEX IF EXISTS \"" + tableMetaType.getKeyspaceName() + "\".\"" + indexedColumn.getIndexName() + "\";")
                         .collect(Collectors.joining("\n"));
   }
 

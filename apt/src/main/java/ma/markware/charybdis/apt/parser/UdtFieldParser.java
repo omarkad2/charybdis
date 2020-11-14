@@ -18,6 +18,7 @@
  */
 package ma.markware.charybdis.apt.parser;
 
+import javax.annotation.processing.Messager;
 import javax.lang.model.element.Element;
 import javax.lang.model.util.Types;
 import ma.markware.charybdis.apt.metatype.AbstractFieldMetaType;
@@ -33,8 +34,8 @@ import ma.markware.charybdis.model.annotation.UdtField;
  */
 public class UdtFieldParser extends AbstractFieldParser<UdtFieldMetaType> {
 
-  public UdtFieldParser(final FieldTypeParser fieldTypeParser, final Types types) {
-    super(fieldTypeParser, types);
+  public UdtFieldParser(final FieldTypeParser fieldTypeParser, final Types types, final Messager messager) {
+    super(fieldTypeParser, types, messager);
   }
 
   /**

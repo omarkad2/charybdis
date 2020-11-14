@@ -152,6 +152,23 @@ class BatchQueryBuilderITest extends AbstractIntegrationITest {
       asserThatBatchExecuted();
     }
 
+    @Test
+    void batch_unlogged_insert_rows_in_the_same_partition_using_crud_and_dsl(CqlSession session) {
+      cqlTemplate.dsl(batchUnlogged).insertInto(TestEntity_Table.test_entity, TestEntity_Table.id, TestEntity_Table.date, TestEntity_Table.udt, TestEntity_Table.list,
+                                                TestEntity_Table.se, TestEntity_Table.map, TestEntity_Table.nestedList, TestEntity_Table.nestedSet, TestEntity_Table.nestedMap,
+                                                TestEntity_Table.enumValue, TestEntity_Table.enumList, TestEntity_Table.enumMap, TestEntity_Table.enumNestedList,
+                                                TestEntity_Table.extraUdt, TestEntity_Table.udtList, TestEntity_Table.udtSet, TestEntity_Table.udtMap, TestEntity_Table.udtNestedList,
+                                                TestEntity_Table.flag)
+                 .values(entity1.getId(), entity1.getDate(), entity1.getUdt(), entity1.getList(), entity1.getSe(), entity1.getMap(), entity1.getNestedList(),
+                         entity1.getNestedSet(), entity1.getNestedMap(), entity1.getEnumValue(), entity1.getEnumList(), entity1.getEnumMap(), entity1.getEnumNestedList(),
+                         entity1.getExtraUdt(), entity1.getUdtList(), entity1.getUdtSet(), entity1.getUdtMap(), entity1.getUdtNestedList(), entity1.isFlag())
+                 .execute();
+      cqlTemplate.crud(batchUnlogged).create(TestEntity_Table.test_entity, entity2);
+
+      // When
+      batchUnlogged.executeAsync().whenComplete((result, error) ->asserThatBatchExecuted());
+    }
+
     private void asserThatBatchExecuted() {
       Record record1 = dsl.selectFrom(TestEntity_Table.test_entity)
                           .where(TestEntity_Table.id.eq(entity1.getId()))
