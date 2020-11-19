@@ -334,6 +334,34 @@ This can be done at runtime:
             .execute();
     ```
 
+### Asynchronous Capabilities
+All queries can be executed in an asynchronous manner, using datastax asynchronous API. Asynchronous methods return instances of *java.util.concurrent.CompletableFuture*. 
+
+Here are some examples:
+- In Dsl API:
+    ```java
+    CompletableFuture<Boolean> futureInstance = 
+                cqlTemplate.dsl().insertInto(User_Table.user, User_Table.id, User_Table.joiningDate, User_Table.addresses)
+                                               .values(UUID.randomUUID(), Instant.now(), addresses)
+                                               .ifNotExists()
+                                               .executeAsync();
+    ```
+
+- In Batch API:
+    ```java
+    Batch batch = cqlTemplate.batch().unlogged();
+
+    cqlTemplate.dsl(batch).insertInto(Person_Table.person, Person_Table.id, Person_Table.ssn, Person_Table.name)
+               .values(1, "999-00-1111", "Franklin Roosevelt")
+               .execute();
+    new Person newPerson = new Person(1, "999-00-2222", "Theodore Roosevelt"); 
+    cqlTemplate.crud(batch).create(Person_Table.person, newPerson);
+    
+    // Execute batch query asynchronously
+    CompletableFuture<Void> futureInstance = batch.executeAsync();
+    ```
+Check documentation for more details: [Datastax Asynchronous API Doc](https://docs.datastax.com/en/developer/java-driver/4.2/manual/core/async/)
+
 ## Licensing
 Charybdis is licensed under the Apache License, Version 2.0 (the "License"); 
 you may not use this project except in compliance with the License. 
