@@ -1,5 +1,5 @@
 # Charybdis
-
+### Demo spring boot application using Charybdis: [charybdis-demo](https://github.com/omarkad2/charybdis-demo)
 [![Build Status](https://travis-ci.org/omarkad2/charybdis.svg?branch=master)](https://travis-ci.org/omarkad2/charybdis)
 [![codecov](https://codecov.io/gh/omarkad2/charybdis/branch/master/graph/badge.svg)](https://codecov.io/gh/omarkad2/charybdis)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/ma.markware.charybdis/charybdis-core/badge.svg)](https://maven-badges.herokuapp.com/maven-central/ma.markware.charybdis/charybdis-core)
