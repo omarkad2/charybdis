@@ -54,7 +54,7 @@ import ma.markware.charybdis.apt.metatype.TableMetaType;
 import ma.markware.charybdis.model.annotation.Udt;
 import ma.markware.charybdis.model.option.ClusteringOrder;
 import ma.markware.charybdis.test.entities.TestEntity;
-import ma.markware.charybdis.test.entities.TestEntityWithNoPartitionKey;
+import ma.markware.charybdis.test.entities.TestEntityWithNoPrimaryKey;
 import ma.markware.charybdis.test.entities.TestEnum;
 import ma.markware.charybdis.test.entities.TestExtraUdt;
 import ma.markware.charybdis.test.entities.TestKeyspaceDefinition;
@@ -232,12 +232,12 @@ class TableParserTest {
   }
 
   @Test
-  @DisplayName("Compilation should fail if table has no partition key")
-  void should_throw_exception_when_table_has_no_partition_key(Elements elements) {
+  @DisplayName("Compilation should fail if table has no primary key")
+  void should_throw_exception_when_table_has_no_primary_key(Elements elements) {
     assertThatExceptionOfType(CharybdisParsingException.class)
         .isThrownBy(() -> configuration.getTableParser()
-                                    .parse(elements.getTypeElement(TestEntityWithNoPartitionKey.class.getCanonicalName())))
-        .withMessage("There should be at least one partition key defined for the table 'test_entity_no_partition_key'");
+                                    .parse(elements.getTypeElement(TestEntityWithNoPrimaryKey.class.getCanonicalName())))
+        .withMessage("There should be at least one primary key defined for the table 'test_entity_no_primary_key'");
   }
 
   @Test

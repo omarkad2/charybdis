@@ -1,19 +1,18 @@
 package ma.markware.charybdis.test.entities;
 
-import ma.markware.charybdis.model.annotation.ClusteringKey;
 import ma.markware.charybdis.model.annotation.Column;
 import ma.markware.charybdis.model.annotation.Table;
 
-@Table(keyspace = "test_keyspace", name = "test_entity_no_partition_key")
-public class TestEntityWithNoPartitionKey {
+@Table(keyspace = "test_keyspace", name = "test_entity_no_primary_key")
+public class TestEntityWithNoPrimaryKey {
 
-  @ClusteringKey
+  @Column
   private int data;
 
   @Column
   private String name;
 
-  public TestEntityWithNoPartitionKey() {
+  public TestEntityWithNoPrimaryKey() {
   }
 
   public int getData() {
