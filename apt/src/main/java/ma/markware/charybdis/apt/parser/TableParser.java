@@ -21,6 +21,7 @@ package ma.markware.charybdis.apt.parser;
 import static java.lang.String.format;
 import static ma.markware.charybdis.apt.utils.ExceptionMessagerWrapper.throwParsingException;
 
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
@@ -85,18 +86,23 @@ public class TableParser extends AbstractEntityParser<TableMetaType> {
 
     tableMetaType.setColumns(columns);
 
-    tableMetaType.setPartitionKeyColumns(columns.stream()
-                                                .filter(ColumnFieldMetaType::isPartitionKey)
-                                                .sorted(Comparator.comparingInt(ColumnFieldMetaType::getPartitionKeyIndex))
-                                                .collect(Collectors.toList()));
-    tableMetaType.setClusteringKeyColumns(columns.stream()
-                                                 .filter(ColumnFieldMetaType::isClusteringKey)
-                                                 .sorted(Comparator.comparingInt(ColumnFieldMetaType::getClusteringKeyIndex))
-                                                 .collect(Collectors.toList()));
+    List<ColumnFieldMetaType> partitionKeyColumns = columns.stream()
+                                               .filter(ColumnFieldMetaType::isPartitionKey)
+                                               .sorted(Comparator.comparingInt(ColumnFieldMetaType::getPartitionKeyIndex))
+                                               .collect(Collectors.toList());
+    List<ColumnFieldMetaType> clusteringKeyColumns = columns.stream()
+                                               .filter(ColumnFieldMetaType::isClusteringKey)
+                                               .sorted(Comparator.comparingInt(ColumnFieldMetaType::getClusteringKeyIndex))
+                                               .collect(Collectors.toList());
 
-    if (CollectionUtils.isEmpty(tableMetaType.getPartitionKeyColumns())) {
-      throwParsingException(messager, format("There should be at least one partition key defined for the table '%s'", tableMetaType.getTableName()));
+    if (CollectionUtils.isEmpty(partitionKeyColumns) && CollectionUtils.isEmpty(clusteringKeyColumns)) {
+      throwParsingException(messager, format("There should be at least one primary key defined for the table '%s'", tableMetaType.getTableName()));
+    } else if (CollectionUtils.isEmpty(partitionKeyColumns) && clusteringKeyColumns.size() == 1) { // hackish: when no partition key replace first clustering key with partition key
+       partitionKeyColumns = Collections.singletonList(clusteringKeyColumns.remove(0));
     }
+
+    tableMetaType.setPartitionKeyColumns(partitionKeyColumns);
+    tableMetaType.setClusteringKeyColumns(clusteringKeyColumns);
 
     return tableMetaType;
   }
