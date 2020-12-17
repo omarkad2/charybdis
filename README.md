@@ -31,7 +31,7 @@ Add the following dependency to your **pom.xml**
 <dependency>
     <groupId>ma.markware.charybdis</groupId>
     <artifactId>charybdis-core</artifactId>
-    <version>1.0.2</version>
+    <version>2.3.0</version>
 </dependency>
 ```
 
