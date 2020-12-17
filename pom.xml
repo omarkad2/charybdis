@@ -5,7 +5,7 @@
   <groupId>ma.markware.charybdis</groupId>
   <artifactId>charybdis-parent</artifactId>
   <packaging>pom</packaging>
-  <version>2.2.2-SNAPSHOT</version>
+  <version>2.3.0</version>
 
   <name>Charybdis</name>
   <description>Cassandra ORM framework</description>
@@ -31,7 +31,7 @@
     <url>https://github.com/omarkad2/charybdis.git</url>
     <connection>scm:git:ssh://git@github.com:omarkad2/charybdis.git</connection>
     <developerConnection>scm:git:ssh://git@github.com:omarkad2/charybdis.git</developerConnection>
-    <tag>HEAD</tag>
+    <tag>charybdis-parent-2.3.0</tag>
   </scm>
 
   <properties>
