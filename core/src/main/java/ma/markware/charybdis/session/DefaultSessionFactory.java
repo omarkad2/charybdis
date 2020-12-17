@@ -37,8 +37,22 @@ public class DefaultSessionFactory implements SessionFactory {
     driverConfigLoader = new DefaultDriverConfigLoader();
   }
 
+  /**
+   * Load custom configuration from classpath
+   *
+   * @param customConfiguration custom configuration
+   */
   public DefaultSessionFactory(final String customConfiguration) {
     driverConfigLoader = DriverConfigLoader.fromClasspath(customConfiguration);
+  }
+
+  /**
+   * Create session factory with a driver configuration loader (created programmatically)
+   *
+   * @param driverConfigLoader custom driver configuration loader
+   */
+  public DefaultSessionFactory(final DriverConfigLoader driverConfigLoader) {
+    this.driverConfigLoader = driverConfigLoader;
   }
 
   /**
