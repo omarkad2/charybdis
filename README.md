@@ -6,7 +6,7 @@
 [![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/omarkad2/charybdis/issues)
 [![License](https://img.shields.io/github/license/fridujo/spring-automocker.svg)](https://opensource.org/licenses/Apache-2.0)
 
-*Charybdis* is an Object/Relational Mapping (ORM) framework for Cassandra database.
+*Charybdis* is an Object Mapping framework for Cassandra database.
  
 It provides an abstraction over the Datastax driver, and adds a set of tools in order 
 to offer a seamless Model-Transformation between *POJOs* and database entities 
