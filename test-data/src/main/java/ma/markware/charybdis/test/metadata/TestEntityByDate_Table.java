@@ -294,12 +294,12 @@ public class TestEntityByDate_Table implements TableMetadata<TestEntityByDate> {
   public Map<String, Object> serialize(TestEntityByDate entity) {
     if (entity == null) return null;
     Map<String, Object> columnValueMap = new HashMap<>();
-    columnValueMap.put("date", date.serialize(entity.getDate()));
-    columnValueMap.put("udt", udt.serialize(entity.getUdt()));
-    columnValueMap.put("list", list.serialize(entity.getList()));
-    columnValueMap.put("flag", flag.serialize(entity.isFlag()));
-    columnValueMap.put("creation_date", creationDate.serialize(entity.getCreationDate()));
-    columnValueMap.put("last_updated_date", lastUpdatedDate.serialize(entity.getLastUpdatedDate()));
+    columnValueMap.computeIfAbsent("date", val -> date.serialize(entity.getDate()));
+    columnValueMap.computeIfAbsent("udt", val -> udt.serialize(entity.getUdt()));
+    columnValueMap.computeIfAbsent("list", val -> list.serialize(entity.getList()));
+    columnValueMap.computeIfAbsent("flag", val -> flag.serialize(entity.isFlag()));
+    columnValueMap.computeIfAbsent("creation_date", val -> creationDate.serialize(entity.getCreationDate()));
+    columnValueMap.computeIfAbsent("last_updated_date", val -> lastUpdatedDate.serialize(entity.getLastUpdatedDate()));
     return columnValueMap;
   }
 

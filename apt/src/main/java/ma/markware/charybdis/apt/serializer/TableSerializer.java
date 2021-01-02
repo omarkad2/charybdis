@@ -266,7 +266,7 @@ public class TableSerializer implements EntitySerializer<TableMetaType> {
     for (ColumnFieldMetaType columnField : tableMetaType.getColumns()) {
       String columnName = columnField.getSerializationName();
       String columnGetterName = columnField.getGetterName();
-      codeBlockBuilder.addStatement("columnValueMap.put($S, $L.$L($N.$L()))", columnName, columnField.getDeserializationName(), SerializationConstants.SERIALIZE_FIELD_METHOD,
+      codeBlockBuilder.addStatement("columnValueMap.computeIfAbsent($S, val -> $L.$L($N.$L()))", columnName, columnField.getDeserializationName(), SerializationConstants.SERIALIZE_FIELD_METHOD,
                                     parameterName, columnGetterName);
     }
     codeBlockBuilder.addStatement("return columnValueMap");
