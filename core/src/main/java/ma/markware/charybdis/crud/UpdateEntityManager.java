@@ -134,7 +134,7 @@ class UpdateEntityManager<T> {
       String columnName = columnEntry.getKey();
       ColumnMetadata columnMetadata = tableMetadata.getColumnMetadata(columnName);
       Object value = columnEntry.getValue();
-      if (value != null && tableMetadata.isPrimaryKey(columnName)) {
+      if (tableMetadata.isPrimaryKey(columnName)) {
         updateQuery.setWhere(new CriteriaExpression(columnMetadata, CriteriaOperator.EQ, value));
       } else {
         updateQuery.setSerializedAssignment(columnMetadata, value);

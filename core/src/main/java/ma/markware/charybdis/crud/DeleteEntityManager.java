@@ -114,7 +114,7 @@ public class DeleteEntityManager<T> {
     for (Entry<String, Object> columnEntry : columnValueMap.entrySet()) {
       String columnName = columnEntry.getKey();
       Object value = columnEntry.getValue();
-      if (value != null && tableMetadata.isPrimaryKey(columnName)) {
+      if (tableMetadata.isPrimaryKey(columnName)) {
         deleteQuery.setWhere(new CriteriaExpression(tableMetadata.getColumnMetadata(columnName), CriteriaOperator.EQ, value));
       }
     }

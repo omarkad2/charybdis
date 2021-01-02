@@ -942,27 +942,27 @@ public class TestEntity_Table implements TableMetadata<TestEntity> {
   public Map<String, Object> serialize(TestEntity entity) {
     if (entity == null) return null;
     Map<String, Object> columnValueMap = new HashMap<>();
-    columnValueMap.put("id", id.serialize(entity.getId()));
-    columnValueMap.put("se", se.serialize(entity.getSe()));
-    columnValueMap.put("map", map.serialize(entity.getMap()));
-    columnValueMap.put("nestedlist", nestedList.serialize(entity.getNestedList()));
-    columnValueMap.put("nestedset", nestedSet.serialize(entity.getNestedSet()));
-    columnValueMap.put("nestedmap", nestedMap.serialize(entity.getNestedMap()));
-    columnValueMap.put("enumvalue", enumValue.serialize(entity.getEnumValue()));
-    columnValueMap.put("enumlist", enumList.serialize(entity.getEnumList()));
-    columnValueMap.put("enummap", enumMap.serialize(entity.getEnumMap()));
-    columnValueMap.put("enumnestedlist", enumNestedList.serialize(entity.getEnumNestedList()));
-    columnValueMap.put("extraudt", extraUdt.serialize(entity.getExtraUdt()));
-    columnValueMap.put("udtlist", udtList.serialize(entity.getUdtList()));
-    columnValueMap.put("udtset", udtSet.serialize(entity.getUdtSet()));
-    columnValueMap.put("udtmap", udtMap.serialize(entity.getUdtMap()));
-    columnValueMap.put("udtnestedlist", udtNestedList.serialize(entity.getUdtNestedList()));
-    columnValueMap.put("date", date.serialize(entity.getDate()));
-    columnValueMap.put("udt", udt.serialize(entity.getUdt()));
-    columnValueMap.put("list", list.serialize(entity.getList()));
-    columnValueMap.put("flag", flag.serialize(entity.isFlag()));
-    columnValueMap.put("creation_date", creationDate.serialize(entity.getCreationDate()));
-    columnValueMap.put("last_updated_date", lastUpdatedDate.serialize(entity.getLastUpdatedDate()));
+    columnValueMap.computeIfAbsent("id", val -> id.serialize(entity.getId()));
+    columnValueMap.computeIfAbsent("se", val -> se.serialize(entity.getSe()));
+    columnValueMap.computeIfAbsent("map", val -> map.serialize(entity.getMap()));
+    columnValueMap.computeIfAbsent("nestedlist", val -> nestedList.serialize(entity.getNestedList()));
+    columnValueMap.computeIfAbsent("nestedset", val -> nestedSet.serialize(entity.getNestedSet()));
+    columnValueMap.computeIfAbsent("nestedmap", val -> nestedMap.serialize(entity.getNestedMap()));
+    columnValueMap.computeIfAbsent("enumvalue", val -> enumValue.serialize(entity.getEnumValue()));
+    columnValueMap.computeIfAbsent("enumlist", val -> enumList.serialize(entity.getEnumList()));
+    columnValueMap.computeIfAbsent("enummap", val -> enumMap.serialize(entity.getEnumMap()));
+    columnValueMap.computeIfAbsent("enumnestedlist", val -> enumNestedList.serialize(entity.getEnumNestedList()));
+    columnValueMap.computeIfAbsent("extraudt", val -> extraUdt.serialize(entity.getExtraUdt()));
+    columnValueMap.computeIfAbsent("udtlist", val -> udtList.serialize(entity.getUdtList()));
+    columnValueMap.computeIfAbsent("udtset", val -> udtSet.serialize(entity.getUdtSet()));
+    columnValueMap.computeIfAbsent("udtmap", val -> udtMap.serialize(entity.getUdtMap()));
+    columnValueMap.computeIfAbsent("udtnestedlist", val -> udtNestedList.serialize(entity.getUdtNestedList()));
+    columnValueMap.computeIfAbsent("date", val -> date.serialize(entity.getDate()));
+    columnValueMap.computeIfAbsent("udt", val -> udt.serialize(entity.getUdt()));
+    columnValueMap.computeIfAbsent("list", val -> list.serialize(entity.getList()));
+    columnValueMap.computeIfAbsent("flag", val -> flag.serialize(entity.isFlag()));
+    columnValueMap.computeIfAbsent("creation_date", val -> creationDate.serialize(entity.getCreationDate()));
+    columnValueMap.computeIfAbsent("last_updated_date", val -> lastUpdatedDate.serialize(entity.getLastUpdatedDate()));
     return columnValueMap;
   }
 
