@@ -47,7 +47,7 @@ public class DockerizedCassandra implements ExtensionContext.Store.CloseableReso
   private static final Logger logger = LoggerFactory.getLogger(DockerizedCassandra.class);
 
   // Docker image
-  private static final String DOCKER_IMAGE_NAME = "cassandra:3.11.7";
+  private static final String DOCKER_IMAGE_NAME = "cassandra:3.11.9";
 //  private static final String DOCKER_IMAGE_NAME = "scylladb/scylla";
 
   // Datastax properties
