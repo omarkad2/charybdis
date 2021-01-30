@@ -36,7 +36,7 @@ import ma.markware.charybdis.apt.metatype.ColumnFieldMetaType;
 import ma.markware.charybdis.apt.metatype.TableMetaType;
 import ma.markware.charybdis.apt.utils.ParserUtils;
 import ma.markware.charybdis.model.annotation.Table;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 
 /**
  * A specific Class parser.

@@ -56,6 +56,7 @@
     <mockito.version>3.3.3</mockito.version>
     <jcache.version>1.1.1</jcache.version>
     <concurrentlinkedhashmap-lru.version>1.4.2</concurrentlinkedhashmap-lru.version>
+    <org.apache.commons.collections.version>4.4</org.apache.commons.collections.version>
     <!--<ehcache.version>3.9.0</ehcache.version>-->
 
     <!-- maven plugins -->
@@ -163,6 +164,13 @@
         <groupId>com.github.docker-java</groupId>
         <artifactId>docker-java</artifactId>
         <version>${docker-client.version}</version>
+      </dependency>
+
+      <!-- Utils -->
+      <dependency>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-collections4</artifactId>
+        <version>${org.apache.commons.collections.version}</version>
       </dependency>
 
       <!--Tests-->
