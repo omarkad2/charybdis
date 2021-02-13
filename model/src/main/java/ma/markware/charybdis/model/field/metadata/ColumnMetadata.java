@@ -31,7 +31,7 @@ import ma.markware.charybdis.model.field.SelectableField;
 import ma.markware.charybdis.model.field.SerializableField;
 import ma.markware.charybdis.model.field.criteria.CriteriaField;
 import ma.markware.charybdis.model.order.OrderExpression;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 
 /**
  * Column metadata.
