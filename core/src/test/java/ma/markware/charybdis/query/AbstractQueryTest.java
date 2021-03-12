@@ -31,10 +31,7 @@ import static org.mockito.Mockito.when;
 
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.config.DriverExecutionProfile;
-import com.datastax.oss.driver.api.core.cql.BoundStatement;
-import com.datastax.oss.driver.api.core.cql.PreparedStatement;
-import com.datastax.oss.driver.api.core.cql.SimpleStatement;
-import com.datastax.oss.driver.api.core.cql.Statement;
+import com.datastax.oss.driver.api.core.cql.*;
 import com.datastax.oss.driver.api.querybuilder.QueryBuilder;
 import com.datastax.oss.driver.api.querybuilder.relation.Relation;
 import java.util.concurrent.CompletableFuture;
@@ -70,7 +67,7 @@ class AbstractQueryTest {
     BoundStatement boundStatement = mock(BoundStatement.class);
     when(preparedStatement.bind(any())).thenReturn(boundStatement);
     when(boundStatement.setPageSize(anyInt())).thenReturn(boundStatement);
-    when(boundStatement.setPagingState(eq(null))).thenReturn(boundStatement);
+    when(boundStatement.setPagingState((PagingState) eq(null))).thenReturn(boundStatement);
     lenient().when(session.execute(any(Statement.class))).thenReturn(null);
     lenient().when(session.executeAsync(any(Statement.class))).thenReturn(CompletableFuture.completedFuture(null));
     when(abstractQuery.buildStatement()).thenReturn(new StatementTuple(simpleStatement, new Object[] {}));

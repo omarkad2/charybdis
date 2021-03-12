@@ -19,6 +19,8 @@
 package ma.markware.charybdis.query;
 
 import java.nio.ByteBuffer;
+
+import com.datastax.oss.driver.api.core.cql.PagingState;
 import org.apache.commons.lang.StringUtils;
 
 /**
@@ -41,11 +43,11 @@ import org.apache.commons.lang.StringUtils;
  */
 public class PageRequest {
 
-  private ByteBuffer pagingState;
+  private PagingState pagingState;
 
   private int fetchSize;
 
-  private PageRequest(final ByteBuffer pagingState, final int fetchSize) {
+  private PageRequest(final PagingState pagingState, final int fetchSize) {
     this.pagingState = pagingState;
     this.fetchSize = fetchSize;
   }
@@ -57,7 +59,7 @@ public class PageRequest {
    * @param fetchSize limit of elements to fetch.
    * @return pageRequest from given parameters.
    */
-  public static PageRequest of(final ByteBuffer pagingState, final int fetchSize) {
+  public static PageRequest of(final PagingState pagingState, final int fetchSize) {
     return new PageRequest(pagingState, fetchSize);
   }
 
@@ -72,10 +74,10 @@ public class PageRequest {
     if (StringUtils.isEmpty(pagingState)) {
       return new PageRequest(null, fetchSize);
     }
-    return new PageRequest(ByteBuffer.wrap(pagingState.getBytes()), fetchSize);
+    return new PageRequest(PagingState.fromString(pagingState), fetchSize);
   }
 
-  ByteBuffer getPagingState() {
+  PagingState getPagingState() {
     return pagingState;
   }
 

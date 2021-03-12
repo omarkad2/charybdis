@@ -19,11 +19,7 @@
 package ma.markware.charybdis.query;
 
 import com.datastax.oss.driver.api.core.CqlSession;
-import com.datastax.oss.driver.api.core.cql.AsyncResultSet;
-import com.datastax.oss.driver.api.core.cql.BoundStatement;
-import com.datastax.oss.driver.api.core.cql.PreparedStatement;
-import com.datastax.oss.driver.api.core.cql.ResultSet;
-import com.datastax.oss.driver.api.core.cql.SimpleStatement;
+import com.datastax.oss.driver.api.core.cql.*;
 import com.google.common.annotations.VisibleForTesting;
 import java.nio.ByteBuffer;
 import java.util.concurrent.CompletableFuture;
@@ -83,7 +79,7 @@ public abstract class AbstractQuery implements Query {
   }
 
   @VisibleForTesting
-  ResultSet executeStatement(final CqlSession session, final SimpleStatement statement, final int fetchSize, final ByteBuffer pagingState,
+  ResultSet executeStatement(final CqlSession session, final SimpleStatement statement, final int fetchSize, final PagingState pagingState,
       final Object[] bindValueArray) {
     ResultSet resultSet = null;
     log.debug("Statement query: {}", statement.getQuery());
@@ -97,7 +93,7 @@ public abstract class AbstractQuery implements Query {
   }
 
   @VisibleForTesting
-  CompletableFuture<AsyncResultSet> executeStatementAsync(final CqlSession session, final SimpleStatement statement, final int fetchSize, final ByteBuffer pagingState,
+  CompletableFuture<AsyncResultSet> executeStatementAsync(final CqlSession session, final SimpleStatement statement, final int fetchSize, final PagingState pagingState,
       final Object[] bindValueArray) {
     CompletableFuture<AsyncResultSet> asyncResultSet = null;
     log.debug("Statement query: {}", statement.getQuery());

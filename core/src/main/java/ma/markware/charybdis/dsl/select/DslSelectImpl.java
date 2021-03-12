@@ -19,6 +19,7 @@
 package ma.markware.charybdis.dsl.select;
 
 import com.datastax.oss.driver.api.core.CqlSession;
+import com.datastax.oss.driver.api.core.cql.PagingState;
 import com.datastax.oss.driver.api.core.cql.ResultSet;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -185,7 +186,7 @@ public class DslSelectImpl implements SelectInitExpression, SelectWhereExpressio
     if (resultSet == null) {
       return null;
     }
-    ByteBuffer nextPagingState = resultSet.getExecutionInfo().getPagingState();
+    PagingState nextPagingState = resultSet.getExecutionInfo().getSafePagingState();
     List<Record> records = RecordUtils.resultSetToRecords(resultSet, selectedFields);
     return new PageResult<>(records, nextPagingState);
   }
@@ -248,7 +249,7 @@ public class DslSelectImpl implements SelectInitExpression, SelectWhereExpressio
           if (asyncResultSet == null) {
             return null;
           }
-          ByteBuffer nextPagingState = asyncResultSet.getExecutionInfo().getPagingState();
+          PagingState nextPagingState = asyncResultSet.getExecutionInfo().getSafePagingState();
           List<Record> records = RecordUtils.resultSetToRecords(asyncResultSet.currentPage(), selectedFields);
           return new PageResult<>(records, nextPagingState);
         }
