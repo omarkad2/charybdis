@@ -19,6 +19,7 @@
 package ma.markware.charybdis.crud;
 
 import com.datastax.oss.driver.api.core.CqlSession;
+import com.datastax.oss.driver.api.core.cql.PagingState;
 import com.datastax.oss.driver.api.core.cql.ResultSet;
 import com.datastax.oss.driver.api.core.cql.Row;
 import java.nio.ByteBuffer;
@@ -132,7 +133,7 @@ class ReadEntityManager<T> {
     if (resultSet == null) {
       return PageResult.EMPTY_PAGE;
     }
-    ByteBuffer pagingState = resultSet.getExecutionInfo().getPagingState();
+    PagingState pagingState = resultSet.getExecutionInfo().getSafePagingState();
     return new PageResult<>(getEntities(resultSet), pagingState);
   }
 

@@ -22,6 +22,8 @@ package ma.markware.charybdis.apt.utils;
 import static java.lang.String.format;
 
 import com.squareup.javapoet.TypeName;
+import org.apache.commons.lang3.text.WordUtils;
+
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -34,7 +36,6 @@ import javax.lang.model.element.Modifier;
 import javax.lang.model.type.ExecutableType;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Types;
-import org.apache.commons.lang.WordUtils;
 
 /**
  * Field Utils methods

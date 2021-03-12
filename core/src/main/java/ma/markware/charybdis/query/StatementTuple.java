@@ -19,6 +19,7 @@
 
 package ma.markware.charybdis.query;
 
+import com.datastax.oss.driver.api.core.cql.PagingState;
 import com.datastax.oss.driver.api.core.cql.SimpleStatement;
 import java.nio.ByteBuffer;
 
@@ -31,10 +32,10 @@ public class StatementTuple {
 
   private final SimpleStatement simpleStatement;
   private final int fetchSize;
-  private final ByteBuffer pagingState;
+  private final PagingState pagingState;
   private final Object[] bindValues;
 
-  StatementTuple(final SimpleStatement simpleStatement, final int fetchSize, final ByteBuffer pagingState, final Object[] bindValues) {
+  StatementTuple(final SimpleStatement simpleStatement, final int fetchSize, final PagingState pagingState, final Object[] bindValues) {
     this.simpleStatement = simpleStatement;
     this.bindValues = bindValues;
     this.fetchSize = fetchSize;
@@ -57,7 +58,7 @@ public class StatementTuple {
     return fetchSize;
   }
 
-  public ByteBuffer getPagingState() {
+  public PagingState getPagingState() {
     return pagingState;
   }
 }

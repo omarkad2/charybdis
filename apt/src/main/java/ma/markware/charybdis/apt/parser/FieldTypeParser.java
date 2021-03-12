@@ -46,7 +46,7 @@ import ma.markware.charybdis.apt.metatype.FieldTypeMetaType;
 import ma.markware.charybdis.apt.metatype.FieldTypeMetaType.FieldTypeKind;
 import ma.markware.charybdis.apt.metatype.FieldTypeMetaType.TypeDetail;
 import ma.markware.charybdis.apt.utils.TypeUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Field type parser

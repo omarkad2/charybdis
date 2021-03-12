@@ -38,7 +38,7 @@ import ma.markware.charybdis.model.annotation.Index;
 import ma.markware.charybdis.model.annotation.LastUpdatedDate;
 import ma.markware.charybdis.model.annotation.PartitionKey;
 import ma.markware.charybdis.model.option.SequenceModel;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * A specific Field parser.

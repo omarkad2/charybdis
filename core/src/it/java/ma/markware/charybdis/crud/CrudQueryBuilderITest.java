@@ -433,7 +433,7 @@ class CrudQueryBuilderITest extends AbstractIntegrationITest {
       assertThat(pageResult1.getResults()).hasSize(2);
 
       // Second page
-      PageResult pageResult2 = crud.find(TestEntity_Table.test_entity, PageRequest.of(pageResult1.getPagingState(), 2));
+      PageResult pageResult2 = crud.find(TestEntity_Table.test_entity, PageRequest.fromString(pageResult1.getPagingState().toString(), 2));
       assertThat(pageResult2.getPagingState()).isNotNull();
       assertThat(pageResult2.getResults()).hasSize(2);
 

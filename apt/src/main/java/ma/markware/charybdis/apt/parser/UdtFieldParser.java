@@ -25,6 +25,7 @@ import ma.markware.charybdis.apt.metatype.AbstractFieldMetaType;
 import ma.markware.charybdis.apt.metatype.UdtFieldMetaType;
 import ma.markware.charybdis.apt.utils.FieldUtils;
 import ma.markware.charybdis.model.annotation.UdtField;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * A specific Field parser.
@@ -51,7 +52,7 @@ public class UdtFieldParser extends AbstractFieldParser<UdtFieldMetaType> {
     UdtFieldMetaType udtFieldMetaType = new UdtFieldMetaType(abstractFieldMetaType);
 
     String udtFieldName = udtField.name();
-    if (org.apache.commons.lang.StringUtils.isBlank(udtFieldName)) {
+    if (StringUtils.isBlank(udtFieldName)) {
       udtFieldName = udtFieldMetaType.getDeserializationName();
     }
     udtFieldMetaType.setSerializationName(udtFieldName.toLowerCase());

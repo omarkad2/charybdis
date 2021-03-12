@@ -90,7 +90,7 @@ public interface EntityParser<ENTITY_META_TYPE> {
    */
   default String resolveName(final String annotationName, final Name className) {
     String tableName = annotationName;
-    if (org.apache.commons.lang.StringUtils.isBlank(tableName)) {
+    if (StringUtils.isBlank(tableName)) {
       tableName = className.toString();
     }
     return tableName.toLowerCase();
