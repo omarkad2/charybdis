@@ -25,19 +25,16 @@ import com.datastax.oss.driver.api.querybuilder.select.Select;
 import com.datastax.oss.driver.api.querybuilder.select.SelectFrom;
 import com.datastax.oss.driver.api.querybuilder.select.Selector;
 import com.datastax.oss.driver.internal.querybuilder.select.AllSelector;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 import ma.markware.charybdis.ExecutionContext;
 import ma.markware.charybdis.model.criteria.CriteriaExpression;
 import ma.markware.charybdis.model.field.SelectableField;
 import ma.markware.charybdis.model.field.metadata.PartitionKeyColumnMetadata;
-import ma.markware.charybdis.model.field.metadata.TableMetadata;
+import ma.markware.charybdis.model.field.metadata.ReadableTableMetadata;
 import ma.markware.charybdis.model.order.OrderExpression;
 import ma.markware.charybdis.query.clause.WhereClause;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Select query.
@@ -52,8 +49,8 @@ public class SelectQuery extends AbstractQuery {
   private String table;
   private boolean isDistinct;
   private List<Selector> selectors = new ArrayList<>();
-  private List<WhereClause> whereClauses = new ArrayList<>();
-  private Map<String, ClusteringOrder> orderings = new HashMap<>();
+  private final List<WhereClause> whereClauses = new ArrayList<>();
+  private final Map<String, ClusteringOrder> orderings = new HashMap<>();
   private Integer limit;
   private boolean allowFiltering;
   private PageRequest pageRequest;
@@ -98,26 +95,26 @@ public class SelectQuery extends AbstractQuery {
     return pageRequest;
   }
 
-  public void setTable(TableMetadata tableMetadata) {
+  public void setTable(ReadableTableMetadata<?> tableMetadata) {
     keyspace = tableMetadata.getKeyspaceName();
     table = tableMetadata.getTableName();
     executionContext.setDefaultConsistencyLevel(tableMetadata.getDefaultReadConsistency());
   }
 
-  public void setTableAndSelectors(TableMetadata tableMetadata) {
+  public void setTableAndSelectors(ReadableTableMetadata<?> tableMetadata) {
     setTable(tableMetadata);
     this.selectors = SELECT_ALL;
   }
 
-  public void setSelectDistinct(PartitionKeyColumnMetadata... fields) {
+  public void setSelectDistinct(PartitionKeyColumnMetadata<?, ?>... fields) {
     this.isDistinct = true;
-    for(SelectableField field : fields) {
+    for(SelectableField<?> field : fields) {
       this.selectors.add(field.toSelector());
     }
   }
 
-  public void setSelectors(SelectableField... fields) {
-    for(SelectableField field : fields) {
+  public void setSelectors(SelectableField<?>... fields) {
+    for(SelectableField<?> field : fields) {
       this.selectors.add(field.toSelector());
     }
   }

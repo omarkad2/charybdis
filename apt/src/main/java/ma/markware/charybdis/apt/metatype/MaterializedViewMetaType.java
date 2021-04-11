@@ -1,7 +1,6 @@
 package ma.markware.charybdis.apt.metatype;
 
 import ma.markware.charybdis.model.option.ConsistencyLevel;
-import ma.markware.charybdis.model.option.SerialConsistencyLevel;
 
 import java.util.List;
 
@@ -9,6 +8,7 @@ public class MaterializedViewMetaType extends AbstractEntityMetaType {
 
   private String viewName;
   private String baseTableName;
+  private ConsistencyLevel defaultReadConsistency;
 
   private List<ColumnFieldMetaType> columns;
   private List<ColumnFieldMetaType> partitionKeyColumns;
@@ -32,6 +32,14 @@ public class MaterializedViewMetaType extends AbstractEntityMetaType {
 
   public void setBaseTableName(String baseTableName) {
     this.baseTableName = baseTableName;
+  }
+
+  public ConsistencyLevel getDefaultReadConsistency() {
+    return defaultReadConsistency;
+  }
+
+  public void setDefaultReadConsistency(ConsistencyLevel defaultReadConsistency) {
+    this.defaultReadConsistency = defaultReadConsistency;
   }
 
   public List<ColumnFieldMetaType> getColumns() {

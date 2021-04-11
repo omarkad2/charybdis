@@ -1,7 +1,5 @@
 package ma.markware.charybdis.model.field.metadata;
 
-import com.datastax.oss.driver.api.core.cql.Row;
-
 import java.util.Map;
 
 /**
@@ -11,27 +9,7 @@ import java.util.Map;
  *
  * @author Oussama Markad
  */
-public interface MaterializedViewMetadata<ENTITY> {
-
-  /**
-   * @return table keyspace name.
-   */
-  String getKeyspaceName();
-
-  /**
-   * @return table name.
-   */
-  String getTableName();
-
-  /**
-   * @return metadata of a given column.
-   */
-  ColumnMetadata getColumnMetadata(String columnName);
-
-  /**
-   * @return column metadata by column name mapping.
-   */
-  Map<String, ColumnMetadata> getColumnsMetadata();
+public interface MaterializedViewMetadata<ENTITY> extends ReadableTableMetadata<ENTITY> {
 
   /**
    * @return partition key column metadata by column name mapping.
@@ -62,9 +40,4 @@ public interface MaterializedViewMetadata<ENTITY> {
    * @return number of columns.
    */
   int getColumnsSize();
-
-  /**
-   * @return deserialized java entity from Cql row.
-   */
-  ENTITY deserialize(Row row);
 }

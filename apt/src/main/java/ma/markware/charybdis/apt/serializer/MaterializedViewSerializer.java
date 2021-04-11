@@ -6,7 +6,7 @@ import ma.markware.charybdis.apt.metatype.ColumnFieldMetaType;
 import ma.markware.charybdis.apt.metatype.MaterializedViewMetaType;
 import ma.markware.charybdis.apt.utils.ClassUtils;
 import ma.markware.charybdis.apt.utils.CollectionUtils;
-import ma.markware.charybdis.model.field.metadata.TableMetadata;
+import ma.markware.charybdis.model.field.metadata.MaterializedViewMetadata;
 
 import javax.annotation.processing.Filer;
 import javax.annotation.processing.Messager;
@@ -15,7 +15,7 @@ import java.util.Arrays;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public class MaterializedViewSerializer implements EntitySerializer<MaterializedViewMetaType>, HasColumnSerializer {
+public class MaterializedViewSerializer implements EntitySerializer<MaterializedViewMetaType>, ReadableTableSerializer {
 
   private final FieldSerializer<ColumnFieldMetaType> columnFieldSerializer;
   private final Filer filer;
@@ -38,20 +38,23 @@ public class MaterializedViewSerializer implements EntitySerializer<Materialized
 
     TypeSpec tableMetadataSerialization = TypeSpec.classBuilder(generatedClassName)
         .addModifiers(Modifier.PUBLIC)
-        .addSuperinterface(ParameterizedTypeName.get(ClassName.get(TableMetadata.class),
+        .addSuperinterface(ParameterizedTypeName.get(ClassName.get(MaterializedViewMetadata.class),
             ClassUtils.primitiveToWrapper(
-                materializedViewMetaType.getTypeName())))
+                materializedViewMetaType.getTypeName()))
+        )
         .addFields(CollectionUtils.addAll(
             materializedViewMetaType.getColumns().stream().map(columnFieldSerializer::serializeFieldGenericType).filter(
                 Objects::nonNull).collect(Collectors.toList()),
             materializedViewMetaType.getColumns().stream().map(columnFieldSerializer::serializeField).collect(Collectors.toList()),
             buildStaticInstance(packageName, generatedClassName, viewName),
             buildEntityNameField(SerializationConstants.KEYSPACE_NAME_ATTRIBUTE, keyspaceName),
-            buildEntityNameField(SerializationConstants.VIEW_NAME_ATTRIBUTE, viewName)))
+            buildEntityNameField(SerializationConstants.VIEW_NAME_ATTRIBUTE, viewName)
+        ))
         .addMethods(Arrays.asList(
             buildPrivateConstructor(),
             buildGetEntityNameMethod(SerializationConstants.GET_KEYSPACE_NAME_METHOD, SerializationConstants.KEYSPACE_NAME_ATTRIBUTE),
-            buildGetEntityNameMethod(SerializationConstants.GET_TABLE_NAME_METHOD, SerializationConstants.TABLE_NAME_ATTRIBUTE),
+            buildGetEntityNameMethod(SerializationConstants.GET_TABLE_NAME_METHOD, SerializationConstants.VIEW_NAME_ATTRIBUTE),
+            buildGetDefaultReadConsistencyMethod(materializedViewMetaType.getDefaultReadConsistency()),
             buildColumnsGetterMethod(SerializationConstants.GET_COLUMNS_METADATA_METHOD, materializedViewMetaType.getColumns()),
             buildColumnsGetterMethod(SerializationConstants.GET_PARTITION_KEY_COLUMNS_METHOD, materializedViewMetaType.getPartitionKeyColumns()),
             buildColumnsGetterMethod(SerializationConstants.GET_CLUSTERING_KEY_COLUMNS_METHOD, materializedViewMetaType.getClusteringKeyColumns()),

@@ -18,26 +18,6 @@
  */
 package ma.markware.charybdis.apt.serializer;
 
-import static java.util.Arrays.asList;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import java.io.IOException;
-import java.io.StringWriter;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.stream.Stream;
-import javax.annotation.processing.Filer;
-import javax.annotation.processing.Messager;
-import javax.annotation.processing.RoundEnvironment;
-import javax.lang.model.element.TypeElement;
-import javax.lang.model.util.Elements;
-import javax.lang.model.util.Types;
-import javax.tools.Diagnostic.Kind;
 import ma.markware.charybdis.apt.AptConfiguration;
 import ma.markware.charybdis.apt.AptContext;
 import ma.markware.charybdis.apt.AptDefaultConfiguration;
@@ -48,12 +28,7 @@ import ma.markware.charybdis.apt.metatype.FieldTypeMetaType;
 import ma.markware.charybdis.apt.metatype.FieldTypeMetaType.FieldTypeKind;
 import ma.markware.charybdis.apt.metatype.TableMetaType;
 import ma.markware.charybdis.model.annotation.Udt;
-import ma.markware.charybdis.test.entities.TestEntity;
-import ma.markware.charybdis.test.entities.TestEntityByDate;
-import ma.markware.charybdis.test.entities.TestExtraUdt;
-import ma.markware.charybdis.test.entities.TestKeyspaceDefinition;
-import ma.markware.charybdis.test.entities.TestNestedUdt;
-import ma.markware.charybdis.test.entities.TestUdt;
+import ma.markware.charybdis.test.entities.*;
 import ma.markware.charybdis.test.entities.invalid.TestEntityWithUnknownUdt;
 import ma.markware.charybdis.test.entities.invalid.TestUnknownUdt;
 import ma.markware.charybdis.test.metadata.TestEntityByDate_Table;
@@ -68,6 +43,25 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+
+import javax.annotation.processing.Filer;
+import javax.annotation.processing.Messager;
+import javax.annotation.processing.RoundEnvironment;
+import javax.lang.model.element.TypeElement;
+import javax.lang.model.util.Elements;
+import javax.lang.model.util.Types;
+import javax.tools.Diagnostic.Kind;
+import java.io.IOException;
+import java.io.StringWriter;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Stream;
+
+import static java.util.Arrays.asList;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @TestInstance(Lifecycle.PER_CLASS)
 @ExtendWith({CompilationExtension.class})
@@ -112,8 +106,7 @@ class TableSerializerTest {
 
 
     // When
-    configuration.getTableSerializer()
-                 .serialize(tableMetaType);
+    configuration.getTableSerializer().serialize(tableMetaType);
 
     // Then
     SerializerTestHelper.assertThatFileIsGeneratedAsExpected(tableClazz, generatedFileWriter.toString());

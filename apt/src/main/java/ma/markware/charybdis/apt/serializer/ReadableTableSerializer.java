@@ -6,13 +6,22 @@ import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterizedTypeName;
 import ma.markware.charybdis.apt.metatype.ColumnFieldMetaType;
 import ma.markware.charybdis.model.field.metadata.ColumnMetadata;
+import ma.markware.charybdis.model.option.ConsistencyLevel;
 
 import javax.lang.model.element.Modifier;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public interface HasColumnSerializer {
+public interface ReadableTableSerializer {
+
+  default MethodSpec buildGetDefaultReadConsistencyMethod(ConsistencyLevel defaultReadConsistency) {
+    return MethodSpec.methodBuilder(SerializationConstants.GET_DEFAULT_READ_CONSISTENCY_METHOD)
+        .addModifiers(Modifier.PUBLIC)
+        .returns(ConsistencyLevel.class)
+        .addStatement("return $T.$L", ConsistencyLevel.class, defaultReadConsistency)
+        .build();
+  }
 
   default MethodSpec buildColumnsGetterMethod(final String methodName, final List<ColumnFieldMetaType> columnFieldMetaTypes) {
     ParameterizedTypeName methodReturnType = ParameterizedTypeName.get(ClassName.get(Map.class), ClassName.get(String.class),

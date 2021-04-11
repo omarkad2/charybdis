@@ -65,6 +65,8 @@ public class MaterializedViewParser extends AbstractEntityParser<MaterializedVie
     String baseTableName = baseTableMetaType.getTableName();
     materializedViewMetaType.setBaseTableName(baseTableName);
 
+    materializedViewMetaType.setDefaultReadConsistency(baseTableMetaType.getDefaultReadConsistency());
+
     List<ColumnFieldMetaType> partitionKeyColumns = columns.stream()
         .filter(ColumnFieldMetaType::isPartitionKey)
         .sorted(Comparator.comparingInt(ColumnFieldMetaType::getPartitionKeyIndex))
@@ -117,10 +119,10 @@ public class MaterializedViewParser extends AbstractEntityParser<MaterializedVie
         .filter(item -> !viewPrimaryKeys.contains(item))
         .collect(Collectors.joining(", "));
 
-//    if (StringUtils.isNotBlank(missingPrimaryKeys)) {
-//      throwParsingException(messager, String.format("Primary keys ['%s'] from base table '%s' are missing in view '%s'",
-//          missingPrimaryKeys, baseTableName, viewName));
-//    }
+    if (StringUtils.isNotBlank(missingPrimaryKeys)) {
+      throwParsingException(messager, String.format("Primary keys ['%s'] from base table '%s' are missing in view '%s'",
+          missingPrimaryKeys, baseTableName, viewName));
+    }
   }
 
   private String getBaseTableClassName(MaterializedView materializedView) {
