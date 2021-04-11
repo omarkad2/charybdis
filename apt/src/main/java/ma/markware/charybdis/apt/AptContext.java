@@ -27,6 +27,7 @@ import java.util.Set;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.element.Element;
 import ma.markware.charybdis.apt.metatype.KeyspaceMetaType;
+import ma.markware.charybdis.apt.metatype.MaterializedViewMetaType;
 import ma.markware.charybdis.apt.metatype.TableMetaType;
 import ma.markware.charybdis.apt.metatype.UdtMetaType;
 import ma.markware.charybdis.model.annotation.Udt;
@@ -41,9 +42,12 @@ public class AptContext {
 
   Set<String> keyspaceNames;
   Map<String, UdtContext> udtContexts;
+  Map<String, TableMetaType> tableMetaTypeByClassName;
+
   List<KeyspaceMetaType> keyspaceMetaTypes;
   List<UdtMetaType> udtMetaTypes;
   List<TableMetaType> tableMetaTypes;
+  List<MaterializedViewMetaType> materializedViewMetaTypes;
 
   /**
    * Used to initialize charybdis' annotation processor.
@@ -57,10 +61,12 @@ public class AptContext {
   public void init(final RoundEnvironment roundEnv, final AptConfiguration configuration) {
     keyspaceNames = new HashSet<>();
     udtContexts = new HashMap<>();
+    tableMetaTypeByClassName = new HashMap<>();
 
     keyspaceMetaTypes = new ArrayList<>();
     udtMetaTypes = new ArrayList<>();
     tableMetaTypes = new ArrayList<>();
+    materializedViewMetaTypes = new ArrayList<>();
 
     for (final Element element : roundEnv.getElementsAnnotatedWith(Udt.class)) {
       String udtName = configuration.getUdtParser().resolveName(element);
@@ -96,6 +102,20 @@ public class AptContext {
    */
   public UdtContext getUdtContext(final String udtClassName) {
     return udtContexts.get(udtClassName);
+  }
+
+  /**
+   * Stores table meta type by entity class's name in charybdis' annotation processor context.
+   */
+  public void addTableMetaTypeByClassName(final String className, final TableMetaType tableMetaType) {
+    tableMetaTypeByClassName.put(className, tableMetaType);
+  }
+
+  /**
+   * Gets table meta type by class entity's name.
+   */
+  public TableMetaType getTableNameByClassName(final String className) {
+    return tableMetaTypeByClassName.get(className);
   }
 
   /**

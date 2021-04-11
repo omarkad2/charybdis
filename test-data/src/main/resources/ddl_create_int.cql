@@ -6,3 +6,4 @@ CREATE TABLE IF NOT EXISTS "test_keyspace"."test_entity"("id" uuid,"se" set<int>
 CREATE TABLE IF NOT EXISTS "test_keyspace"."test_entity_by_date"("date" timestamp,"udt" frozen<test_udt>,"list" frozen<list<text>>,"flag" boolean,"creation_date" timestamp,"last_updated_date" timestamp,PRIMARY KEY("date", "udt","list"))WITH CLUSTERING ORDER BY("udt" ASC,"list" ASC);
 CREATE INDEX IF NOT EXISTS test_entity_flag_idx ON "test_keyspace"."test_entity"("flag");
 
+

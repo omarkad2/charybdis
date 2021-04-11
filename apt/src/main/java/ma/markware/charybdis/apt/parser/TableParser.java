@@ -95,14 +95,12 @@ public class TableParser extends AbstractEntityParser<TableMetaType> {
                                                .sorted(Comparator.comparingInt(ColumnFieldMetaType::getClusteringKeyIndex))
                                                .collect(Collectors.toList());
 
-    if (CollectionUtils.isEmpty(partitionKeyColumns) && CollectionUtils.isEmpty(clusteringKeyColumns)) {
-      throwParsingException(messager, format("There should be at least one primary key defined for the table '%s'", tableMetaType.getTableName()));
-    } else if (CollectionUtils.isEmpty(partitionKeyColumns) && clusteringKeyColumns.size() == 1) { // hackish: when no partition key replace first clustering key with partition key
-       partitionKeyColumns = Collections.singletonList(clusteringKeyColumns.remove(0));
-    }
+    partitionKeyColumns = resolvePartitionKeyColumns(tableMetaType.getTableName(), partitionKeyColumns, clusteringKeyColumns);
 
     tableMetaType.setPartitionKeyColumns(partitionKeyColumns);
     tableMetaType.setClusteringKeyColumns(clusteringKeyColumns);
+
+    aptContext.addTableMetaTypeByClassName(annotatedClass.getSimpleName().toString(), tableMetaType);
 
     return tableMetaType;
   }

@@ -22,18 +22,10 @@ import javax.annotation.processing.Filer;
 import javax.annotation.processing.Messager;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
-import ma.markware.charybdis.apt.parser.ColumnFieldParser;
-import ma.markware.charybdis.apt.parser.FieldTypeParser;
-import ma.markware.charybdis.apt.parser.KeyspaceParser;
-import ma.markware.charybdis.apt.parser.TableParser;
-import ma.markware.charybdis.apt.parser.UdtFieldParser;
-import ma.markware.charybdis.apt.parser.UdtParser;
-import ma.markware.charybdis.apt.serializer.ColumnFieldSerializer;
-import ma.markware.charybdis.apt.serializer.DdlScriptSerializer;
-import ma.markware.charybdis.apt.serializer.KeyspaceSerializer;
-import ma.markware.charybdis.apt.serializer.TableSerializer;
-import ma.markware.charybdis.apt.serializer.UdtFieldSerializer;
-import ma.markware.charybdis.apt.serializer.UdtSerializer;
+
+import ma.markware.charybdis.apt.metatype.MaterializedViewMetaType;
+import ma.markware.charybdis.apt.parser.*;
+import ma.markware.charybdis.apt.serializer.*;
 
 /**
  * The default implementation of {@link AptConfiguration}
@@ -45,20 +37,26 @@ public class AptDefaultConfiguration implements AptConfiguration {
   private final KeyspaceParser keyspaceParser;
   private final UdtParser udtParser;
   private final TableParser tableParser;
+  private final MaterializedViewParser materializedViewParser;
   private final KeyspaceSerializer keyspaceSerializer;
   private final UdtSerializer udtSerializer;
   private final TableSerializer tableSerializer;
+  private final MaterializedViewSerializer materializedViewSerializer;
   private final DdlScriptSerializer ddlScriptSerializer;
 
   private AptDefaultConfiguration(final KeyspaceParser keyspaceParser, final UdtParser udtParser,
-      final TableParser tableParser, final KeyspaceSerializer keyspaceSerializer, final UdtSerializer udtSerializer,
-      final TableSerializer tableSerializer, final DdlScriptSerializer ddlScriptSerializer) {
+                                  final TableParser tableParser, MaterializedViewParser materializedViewParser,
+                                  final KeyspaceSerializer keyspaceSerializer, final UdtSerializer udtSerializer,
+                                  final TableSerializer tableSerializer, final MaterializedViewSerializer materializedViewSerializer,
+                                  final DdlScriptSerializer ddlScriptSerializer) {
     this.keyspaceParser = keyspaceParser;
     this.udtParser = udtParser;
     this.tableParser = tableParser;
+    this.materializedViewParser = materializedViewParser;
     this.keyspaceSerializer = keyspaceSerializer;
     this.udtSerializer = udtSerializer;
     this.tableSerializer = tableSerializer;
+    this.materializedViewSerializer = materializedViewSerializer;
     this.ddlScriptSerializer = ddlScriptSerializer;
   }
 
@@ -80,9 +78,11 @@ public class AptDefaultConfiguration implements AptConfiguration {
         new KeyspaceParser(aptContext, messager),
         new UdtParser(udtFieldParser, aptContext, types, messager),
         new TableParser(columnFieldParser, aptContext, types, messager),
+        new MaterializedViewParser(columnFieldParser, aptContext, types, messager),
         new KeyspaceSerializer(filer, messager),
         new UdtSerializer(udtFieldSerializer, aptContext, filer, messager),
         new TableSerializer(columnFieldSerializer, filer, messager),
+        new MaterializedViewSerializer(columnFieldSerializer, filer, messager),
         new DdlScriptSerializer(aptContext, filer, messager));
   }
 
@@ -114,6 +114,14 @@ public class AptDefaultConfiguration implements AptConfiguration {
    * {@inheritDoc}
    */
   @Override
+  public MaterializedViewParser getMaterializedViewParser() {
+    return materializedViewParser;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
   public KeyspaceSerializer getKeyspaceSerializer() {
     return keyspaceSerializer;
   }
@@ -132,6 +140,14 @@ public class AptDefaultConfiguration implements AptConfiguration {
   @Override
   public TableSerializer getTableSerializer() {
     return tableSerializer;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public MaterializedViewSerializer getMaterializedViewSerializer() {
+    return materializedViewSerializer;
   }
 
   /**

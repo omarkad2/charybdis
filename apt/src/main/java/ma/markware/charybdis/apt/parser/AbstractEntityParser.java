@@ -25,6 +25,15 @@ import javax.lang.model.element.ElementKind;
 import javax.lang.model.type.TypeMirror;
 import ma.markware.charybdis.apt.AptContext;
 import ma.markware.charybdis.apt.metatype.AbstractEntityMetaType;
+import ma.markware.charybdis.apt.metatype.ColumnFieldMetaType;
+import ma.markware.charybdis.apt.metatype.MaterializedViewMetaType;
+import org.apache.commons.collections4.CollectionUtils;
+
+import java.util.Collections;
+import java.util.List;
+
+import static java.lang.String.format;
+import static ma.markware.charybdis.apt.utils.ExceptionMessagerWrapper.throwParsingException;
 
 /**
  * A generic Class parser.
@@ -60,6 +69,15 @@ abstract class AbstractEntityParser<ENTITY_META_TYPE> implements EntityParser<EN
     entityMetaType.setKeyspaceName(keyspaceName);
 
     return entityMetaType;
+  }
+
+  List<ColumnFieldMetaType> resolvePartitionKeyColumns(String tableName, List<ColumnFieldMetaType> partitionKeyColumns, List<ColumnFieldMetaType> clusteringKeyColumns) {
+    if (CollectionUtils.isEmpty(partitionKeyColumns) && CollectionUtils.isEmpty(clusteringKeyColumns)) {
+      throwParsingException(messager, format("There should be at least one primary key defined for the table '%s'", tableName));
+    } else if (CollectionUtils.isEmpty(partitionKeyColumns) && clusteringKeyColumns.size() == 1) { // hackish: when no partition key replace first clustering key with partition key
+      partitionKeyColumns = Collections.singletonList(clusteringKeyColumns.remove(0));
+    }
+    return partitionKeyColumns;
   }
 
   /**

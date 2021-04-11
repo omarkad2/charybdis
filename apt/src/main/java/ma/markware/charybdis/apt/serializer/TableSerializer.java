@@ -50,7 +50,7 @@ import ma.markware.charybdis.model.option.SerialConsistencyLevel;
  *
  * @author Oussama Markad
  */
-public class TableSerializer implements EntitySerializer<TableMetaType> {
+public class TableSerializer implements EntitySerializer<TableMetaType>, HasColumnSerializer {
 
   private final FieldSerializer<ColumnFieldMetaType> columnFieldSerializer;
   private final Filer filer;
@@ -140,73 +140,6 @@ public class TableSerializer implements EntitySerializer<TableMetaType> {
   @Override
   public String resolveClassName(final String metaTypeClassName) {
     return metaTypeClassName + SerializationConstants.TABLE_SERIALIZATION_SUFFIX;
-  }
-
-  private MethodSpec buildColumnsGetterMethod(final String methodName, final List<ColumnFieldMetaType> columnFieldMetaTypes) {
-    ParameterizedTypeName methodReturnType = ParameterizedTypeName.get(ClassName.get(Map.class), ClassName.get(String.class),
-                                                                       ClassName.get(ColumnMetadata.class));
-    CodeBlock.Builder codeBlockBuilder = CodeBlock.builder().addStatement("$T results = new $T<>()", methodReturnType, HashMap.class);
-    for (ColumnFieldMetaType columnFieldMetaType : columnFieldMetaTypes) {
-      codeBlockBuilder.addStatement("results.put($S, $N)", columnFieldMetaType.getSerializationName(), columnFieldMetaType.getDeserializationName());
-    }
-    codeBlockBuilder.addStatement("return results");
-    return MethodSpec.methodBuilder(methodName)
-                     .addModifiers(Modifier.PUBLIC)
-                     .returns(methodReturnType)
-                     .addCode(codeBlockBuilder.build())
-                     .build();
-  }
-
-  private MethodSpec buildGetColumnMetadata() {
-    String parameterName = "columnName";
-    return MethodSpec.methodBuilder(SerializationConstants.GET_COLUMN_METADATA_METHOD)
-                     .addModifiers(Modifier.PUBLIC)
-                     .addParameter(String.class, parameterName)
-                     .returns(ColumnMetadata.class)
-                     .addStatement("return $L().get($N)", SerializationConstants.GET_COLUMNS_METADATA_METHOD, parameterName)
-                     .build();
-  }
-
-  private MethodSpec buildIsPrimaryKeyMethod() {
-    final String parameterName = "columnName";
-    return MethodSpec.methodBuilder(SerializationConstants.IS_PRIMARY_KEY_COLUMN_METHOD)
-                     .addModifiers(Modifier.PUBLIC)
-                     .addParameter(String.class, parameterName)
-                     .returns(boolean.class)
-                     .addStatement("return $L().containsKey($N) || $L().containsKey($N)",
-                                   SerializationConstants.GET_PARTITION_KEY_COLUMNS_METHOD, parameterName,
-                                   SerializationConstants.GET_CLUSTERING_KEY_COLUMNS_METHOD, parameterName)
-                     .build();
-  }
-
-  private MethodSpec buildGetPrimaryKeysMethod() {
-    ParameterizedTypeName returnType = ParameterizedTypeName.get(ClassName.get(Map.class), ClassName.get(String.class),
-                                                                 ClassName.get(ColumnMetadata.class));
-    return MethodSpec.methodBuilder(SerializationConstants.GET_PRIMARY_KEYS_METHOD)
-                     .addModifiers(Modifier.PUBLIC)
-                     .returns(returnType)
-                     .addStatement("$T result = new $T<>()", returnType, HashMap.class)
-                     .addStatement("result.putAll($L())", SerializationConstants.GET_PARTITION_KEY_COLUMNS_METHOD)
-                     .addStatement("result.putAll($L())", SerializationConstants.GET_CLUSTERING_KEY_COLUMNS_METHOD)
-                     .addStatement("return result")
-                     .build();
-  }
-
-  private MethodSpec buildGetPrimaryKeySizeMethod() {
-    return MethodSpec.methodBuilder(SerializationConstants.GET_PRIMARY_KEY_SIZE_METHOD)
-                     .addModifiers(Modifier.PUBLIC)
-                     .returns(int.class)
-                     .addStatement("return $L().size() + $L().size()",
-                                   SerializationConstants.GET_PARTITION_KEY_COLUMNS_METHOD, SerializationConstants.GET_CLUSTERING_KEY_COLUMNS_METHOD)
-                     .build();
-  }
-
-  private MethodSpec buildGetColumnsSizeMethod() {
-    return MethodSpec.methodBuilder(SerializationConstants.GET_COLUMNS_SIZE_METHOD)
-                     .addModifiers(Modifier.PUBLIC)
-                     .returns(int.class)
-                     .addStatement("return $L().size()", SerializationConstants.GET_COLUMNS_METADATA_METHOD)
-                     .build();
   }
 
   private MethodSpec buildSetGeneratedValuesMethod(final TableMetaType tableMetaType) {

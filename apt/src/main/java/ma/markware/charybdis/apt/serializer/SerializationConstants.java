@@ -25,9 +25,11 @@ final class SerializationConstants {
   static final String KEYSPACE_SERIALIZATION_SUFFIX = "_Keyspace";
   static final String UDT_SERIALIZATION_SUFFIX = "_Udt";
   static final String TABLE_SERIALIZATION_SUFFIX = "_Table";
+  static final String MATERIALIZED_VIEW_SERIALIZATION_SUFFIX = "_View";
   static final String KEYSPACE_NAME_ATTRIBUTE = "KEYSPACE_NAME";
   static final String UDT_NAME_ATTRIBUTE = "UDT_NAME";
   static final String TABLE_NAME_ATTRIBUTE = "TABLE_NAME";
+  static final String VIEW_NAME_ATTRIBUTE = "VIEW_NAME";
   static final String UDT_FIELD = "udt";
   static final String GET_KEYSPACE_NAME_METHOD = "getKeyspaceName";
   static final String GET_UDT_NAME_METHOD = "getUdtName";
