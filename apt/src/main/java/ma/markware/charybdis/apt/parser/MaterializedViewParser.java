@@ -23,6 +23,12 @@ import java.util.stream.Stream;
 
 import static ma.markware.charybdis.apt.utils.ExceptionMessagerWrapper.throwParsingException;
 
+/**
+ * A specific Class parser.
+ * Parses classes annotated with {@link ma.markware.charybdis.model.annotation.MaterializedView}.
+ *
+ * @author Oussama Markad
+ */
 public class MaterializedViewParser extends AbstractEntityParser<MaterializedViewMetaType> {
 
   private final FieldParser<ColumnFieldMetaType> columnFieldParser;
@@ -37,6 +43,9 @@ public class MaterializedViewParser extends AbstractEntityParser<MaterializedVie
     this.types = types;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public MaterializedViewMetaType parse(Element annotatedClass) {
     validateMandatoryConstructors(annotatedClass, messager);
@@ -87,6 +96,9 @@ public class MaterializedViewParser extends AbstractEntityParser<MaterializedVie
     return materializedViewMetaType;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public String resolveName(Element annotatedClass) {
     final MaterializedView materializedView = annotatedClass.getAnnotation(MaterializedView.class);

@@ -15,6 +15,12 @@ import java.util.Arrays;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+/**
+ * A specific Class serializer.
+ * Serializes Materialized View metadata {@link ma.markware.charybdis.apt.metatype.MaterializedViewMetaType} into java methods and fields.
+ *
+ * @author Oussama Markad
+ */
 public class MaterializedViewSerializer implements EntitySerializer<MaterializedViewMetaType>, ReadableTableSerializer {
 
   private final FieldSerializer<ColumnFieldMetaType> columnFieldSerializer;
@@ -28,6 +34,9 @@ public class MaterializedViewSerializer implements EntitySerializer<Materialized
     this.messager = messager;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public void serialize(MaterializedViewMetaType materializedViewMetaType) {
     String className = materializedViewMetaType.getDeserializationName();
@@ -69,6 +78,9 @@ public class MaterializedViewSerializer implements EntitySerializer<Materialized
     writeSerialization(packageName, className, tableMetadataSerialization, filer, messager);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public String resolveClassName(String metaTypeClassName) {
     return metaTypeClassName + SerializationConstants.MATERIALIZED_VIEW_SERIALIZATION_SUFFIX;

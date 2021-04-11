@@ -5,7 +5,7 @@ import java.util.Map;
 /**
  * Materialized view metadata.
  *
- * @param <ENTITY> java class representation of a Cql view.
+ * @param <ENTITY> java class representation of a Cql Materialized View.
  *
  * @author Oussama Markad
  */

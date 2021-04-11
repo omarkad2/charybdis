@@ -4,6 +4,12 @@ import ma.markware.charybdis.model.option.ConsistencyLevel;
 
 import java.util.List;
 
+/**
+ * A specific Class meta-type.
+ * Holds metadata found on classes annotated with {@link ma.markware.charybdis.model.annotation.MaterializedView}.
+ *
+ * @author Oussama Markad
+ */
 public class MaterializedViewMetaType extends AbstractEntityMetaType {
 
   private String viewName;
