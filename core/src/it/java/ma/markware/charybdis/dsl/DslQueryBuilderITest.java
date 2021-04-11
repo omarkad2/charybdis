@@ -19,28 +19,11 @@
 
 package ma.markware.charybdis.dsl;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.querybuilder.QueryBuilder;
 import com.datastax.oss.driver.api.querybuilder.term.Term;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 import ma.markware.charybdis.AbstractIntegrationITest;
 import ma.markware.charybdis.CqlTemplate;
 import ma.markware.charybdis.model.field.SelectableField;
@@ -51,15 +34,19 @@ import ma.markware.charybdis.test.entities.TestEnum;
 import ma.markware.charybdis.test.entities.TestUdt;
 import ma.markware.charybdis.test.instances.TestEntity_INST1;
 import ma.markware.charybdis.test.instances.TestEntity_INST2;
+import ma.markware.charybdis.test.metadata.TestEntityByValue_View;
 import ma.markware.charybdis.test.metadata.TestEntity_Table;
 import ma.markware.charybdis.test.metadata.TestExtraUdt_Udt;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
+
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @TestInstance(Lifecycle.PER_CLASS)
 class DslQueryBuilderITest extends AbstractIntegrationITest {
@@ -358,19 +345,19 @@ class DslQueryBuilderITest extends AbstractIntegrationITest {
                                                                                                       TestEntity_Table.list.getName(), QueryBuilder.literal(TestEntity_Table.list.serialize(TestEntity_INST1.list))));
 
       // First page
-      PageResult pageResult1 = dsl.selectFrom(TestEntity_Table.test_entity)
+      PageResult<Record> pageResult1 = dsl.selectFrom(TestEntity_Table.test_entity)
                                   .fetchPage(PageRequest.of(null, 2));
       assertThat(pageResult1.getPagingState()).isNotNull();
       assertThat(pageResult1.getResults()).hasSize(2);
 
       // Second page
-      PageResult pageResult2 = dsl.selectFrom(TestEntity_Table.test_entity)
+      PageResult<Record> pageResult2 = dsl.selectFrom(TestEntity_Table.test_entity)
                                   .fetchPage(PageRequest.of(pageResult1.getPagingState(), 2));
       assertThat(pageResult2.getPagingState()).isNotNull();
       assertThat(pageResult2.getResults()).hasSize(2);
 
       // Third page
-      PageResult pageResult3 = dsl.selectFrom(TestEntity_Table.test_entity)
+      PageResult<Record> pageResult3 = dsl.selectFrom(TestEntity_Table.test_entity)
                                   .fetchPage(PageRequest.of(pageResult2.getPagingState(), 2));
       assertThat(pageResult3.getPagingState()).isNull();
       assertThat(pageResult3.getResults()).isEmpty();
@@ -462,6 +449,56 @@ class DslQueryBuilderITest extends AbstractIntegrationITest {
                                                                  .fetchOptionalAsync();
 
       assertThat(presentRecordFuture.toCompletableFuture().get()).isEmpty();
+    }
+
+    @Test
+    void selectFrom_materialized_view() {
+
+      // Given (Using my own API because datastax's querybuilder replaces null with empty collections)
+      dsl.insertInto(TestEntity_Table.test_entity)
+          .set(TestEntity_Table.enumValue, TestEnum.TYPE_B)
+          .set(TestEntity_Table.id, TestEntity_INST2.id)
+          .set(TestEntity_Table.date, TestEntity_INST2.date)
+          .set(TestEntity_Table.udt, TestEntity_INST2.udt)
+          .set(TestEntity_Table.list, TestEntity_INST2.list)
+          .execute();
+
+      // When
+      Collection<Record> records = dsl.selectFrom(TestEntityByValue_View.test_entity_by_value)
+          .where(TestEntityByValue_View.enumValue.eq(TestEnum.TYPE_B))
+          .and(TestEntityByValue_View.id.eq(TestEntity_INST2.id))
+          .and(TestEntityByValue_View.date.eq(TestEntity_INST2.date))
+          .and(TestEntityByValue_View.udt.eq(TestEntity_INST2.udt))
+          .and(TestEntityByValue_View.list.eq(TestEntity_INST2.list))
+          .fetch();
+
+      // Then
+      assertThat(records).hasSize(1);
+      Record record = new ArrayList<>(records).get(0);
+      assertThat(record.get(TestEntity_Table.enumValue)).isEqualTo(TestEnum.TYPE_B);
+      assertThat(record.get(TestEntity_Table.id)).isEqualTo(TestEntity_INST2.id);
+      assertThat(record.get(TestEntity_Table.date)).isEqualTo(TestEntity_INST2.date);
+      assertThat(record.get(TestEntity_Table.udt)).isEqualTo(TestEntity_INST2.udt);
+      assertThat(record.get(TestEntity_Table.list)).isEqualTo(TestEntity_INST2.list);
+    }
+
+    @Test
+    void select_should_be_empty_when_materialized_view_primary_key_null() {
+
+      // Given (Using my own API because datastax's querybuilder replaces null with empty collections)
+      dsl.insertInto(TestEntity_Table.test_entity)
+          .set(TestEntity_Table.enumValue, null)
+          .set(TestEntity_Table.id, TestEntity_INST2.id)
+          .set(TestEntity_Table.date, TestEntity_INST2.date)
+          .set(TestEntity_Table.udt, TestEntity_INST2.udt)
+          .set(TestEntity_Table.list, TestEntity_INST2.list)
+          .execute();
+
+      // When
+      Collection<Record> records = dsl.selectFrom(TestEntityByValue_View.test_entity_by_value).fetch();
+
+      // Then
+      assertThat(records).isEmpty();
     }
   }
 

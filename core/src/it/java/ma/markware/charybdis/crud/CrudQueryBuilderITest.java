@@ -104,7 +104,7 @@ class CrudQueryBuilderITest extends AbstractIntegrationITest {
     }
 
     @Test
-    void create_should_not_overwrite_when_ifNotExists(CqlSession session) {
+    void create_should_not_overwrite_when_ifNotExists() {
       TestEntity entity1 = new TestEntity(TestEntity_INST1.entity1);
       crud.create(TestEntity_Table.test_entity, entity1);
 
@@ -423,24 +423,24 @@ class CrudQueryBuilderITest extends AbstractIntegrationITest {
                                 TestEntity_Table.list.getName(), QueryBuilder.literal(TestEntity_Table.list.serialize(TestEntity_INST1.list))));
 
       // First page
-      PageResult pageResult1 = crud.find(TestEntity_Table.test_entity, PageRequest.of(null, 2));
+      PageResult<?> pageResult1 = crud.find(TestEntity_Table.test_entity, PageRequest.of(null, 2));
       assertThat(pageResult1.getPagingState()).isNotNull();
       assertThat(pageResult1.getResults()).hasSize(2);
 
       // Second page
-      PageResult pageResult2 = crud.find(TestEntity_Table.test_entity, PageRequest.fromString(pageResult1.getPagingState().toString(), 2));
+      PageResult<?> pageResult2 = crud.find(TestEntity_Table.test_entity, PageRequest.fromString(pageResult1.getPagingState().toString(), 2));
       assertThat(pageResult2.getPagingState()).isNotNull();
       assertThat(pageResult2.getResults()).hasSize(2);
 
       // Third page
-      PageResult pageResult3 = crud.find(TestEntity_Table.test_entity, PageRequest.of(pageResult2.getPagingState(), 2));
+      PageResult<?> pageResult3 = crud.find(TestEntity_Table.test_entity, PageRequest.of(pageResult2.getPagingState(), 2));
       assertThat(pageResult3.getPagingState()).isNull();
       assertThat(pageResult3.getResults()).isEmpty();
     }
 
     @Test
     void find_paged_should_return_empty_page_result_when_no_entity() {
-      PageResult pageResult = crud.find(TestEntity_Table.test_entity, PageRequest.fromString(null, 2));
+      PageResult<?> pageResult = crud.find(TestEntity_Table.test_entity, PageRequest.fromString(null, 2));
       assertThat(pageResult.getPagingState()).isNull();
       assertThat(pageResult.getResults()).isEmpty();
     }
@@ -479,7 +479,7 @@ class CrudQueryBuilderITest extends AbstractIntegrationITest {
   class CrudQueryBuilderUpdateITest {
 
     @BeforeEach
-    void setup(CqlSession session) {
+    void setup() {
       // Insert TestEntity_INST1 to DB
       dsl.insertInto(TestEntity_Table.test_entity, TestEntity_Table.id, TestEntity_Table.date, TestEntity_Table.udt, TestEntity_Table.list, TestEntity_Table.se, TestEntity_Table.map,
                           TestEntity_Table.nestedList, TestEntity_Table.nestedSet, TestEntity_Table.nestedMap, TestEntity_Table.enumValue, TestEntity_Table.enumList, TestEntity_Table.enumMap,
@@ -530,7 +530,7 @@ class CrudQueryBuilderITest extends AbstractIntegrationITest {
   class CrudQueryBuilderDeleteITest {
 
     @BeforeEach
-    void setup(CqlSession session) {
+    void setup() {
       // Insert TestEntity_INST1 to DB
       dsl.insertInto(TestEntity_Table.test_entity, TestEntity_Table.id, TestEntity_Table.date, TestEntity_Table.udt, TestEntity_Table.list, TestEntity_Table.se, TestEntity_Table.map,
                           TestEntity_Table.nestedList, TestEntity_Table.nestedSet, TestEntity_Table.nestedMap, TestEntity_Table.enumValue, TestEntity_Table.enumList, TestEntity_Table.enumMap,
