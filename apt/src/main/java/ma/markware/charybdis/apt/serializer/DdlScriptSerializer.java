@@ -201,10 +201,10 @@ public class DdlScriptSerializer {
   private String createIndexCqlStatement(final TableMetaType tableMetaType) {
     return tableMetaType.getColumns().stream()
                         .filter(ColumnFieldMetaType::isIndexed)
-                        .map(indexedColumn -> "CREATE INDEX IF NOT EXISTS " + indexedColumn.getIndexName() + " ON \"" + tableMetaType.getKeyspaceName() + "\".\"" + tableMetaType.getTableName()
+                        .map(indexedColumn -> "CREATE INDEX IF NOT EXISTS " + indexedColumn.getIndexName() + " ON \""
+                            + tableMetaType.getKeyspaceName() + "\".\"" + tableMetaType.getTableName()
                             + "\"(" + indexedColumn.getSerializationNameWithQuotes() + ");")
                         .collect(Collectors.joining("\n"));
-
   }
 
   private String dropIndexCqlStatement(final TableMetaType tableMetaType) {
@@ -231,19 +231,19 @@ public class DdlScriptSerializer {
 
     // AS SELECT column_list
     String selectedColumns = allColumns.stream().map(ColumnFieldMetaType::getSerializationName).collect(Collectors.joining(", "));
-    statementBuilder.append("AS SELECT ").append(selectedColumns);
+    statementBuilder.append(" AS SELECT ").append(selectedColumns);
 
     // FROM [keyspace_name.] base_table_name
-    statementBuilder.append("FROM ");
+    statementBuilder.append(" FROM ");
     if (StringUtils.isNotBlank(keyspaceName)) {
       statementBuilder.append(ma.markware.charybdis.model.utils.StringUtils.quoteString(keyspaceName)).append(".");
     }
     statementBuilder.append(ma.markware.charybdis.model.utils.StringUtils.quoteString(baseTableName));
 
     // WHERE column_name IS NOT NULL [AND column_name IS NOT NULL ...]
-    statementBuilder.append("WHERE ").append(Stream.concat(partitionColumns.stream(), clusteringColumns.stream())
+    statementBuilder.append(" WHERE ").append(Stream.concat(partitionColumns.stream(), clusteringColumns.stream())
         .map(AbstractFieldMetaType::getSerializationNameWithQuotes).collect(Collectors.joining(" IS NOT NULL AND ")));
-    statementBuilder.append(" IS NOT NULL");
+    statementBuilder.append(" IS NOT NULL ");
 
     // PRIMARY KEY ( column_list )
     String partitionKeyPart = partitionColumns.size() == 1 ? partitionColumns.get(0).getSerializationNameWithQuotes()
@@ -257,14 +257,13 @@ public class DdlScriptSerializer {
         .collect(Collectors.joining(","));
     statementBuilder.append("PRIMARY KEY");
     statementBuilder.append("(").append(primaryKeyPart).append(")");
-    statementBuilder.append(")");
 
     // [WITH [CLUSTERING ORDER BY (cluster_column_name order_option )]]
     String clusteringOrderPart = clusteringColumns.size() == 0 ? ""
         : clusteringColumns.stream().sorted(Comparator.comparingInt(ColumnFieldMetaType::getClusteringKeyIndex))
         .map(clusteringKey -> clusteringKey.getSerializationNameWithQuotes() + " " + clusteringKey.getClusteringOrder().name()).collect(Collectors.joining(","));
     if (StringUtils.isNotBlank(clusteringOrderPart)) {
-      statementBuilder.append("WITH CLUSTERING ORDER BY").append("(").append(clusteringOrderPart).append(")");
+      statementBuilder.append(" WITH CLUSTERING ORDER BY").append("(").append(clusteringOrderPart).append(")");
     }
     statementBuilder.append(";");
 

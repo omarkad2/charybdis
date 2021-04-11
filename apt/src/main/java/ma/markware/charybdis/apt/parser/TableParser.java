@@ -18,25 +18,21 @@
  */
 package ma.markware.charybdis.apt.parser;
 
-import static java.lang.String.format;
-import static ma.markware.charybdis.apt.utils.ExceptionMessagerWrapper.throwParsingException;
-
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import javax.annotation.processing.Messager;
-import javax.lang.model.element.Element;
-import javax.lang.model.util.Types;
 import ma.markware.charybdis.apt.AptContext;
 import ma.markware.charybdis.apt.metatype.AbstractEntityMetaType;
 import ma.markware.charybdis.apt.metatype.ColumnFieldMetaType;
 import ma.markware.charybdis.apt.metatype.TableMetaType;
 import ma.markware.charybdis.apt.utils.ParserUtils;
 import ma.markware.charybdis.model.annotation.Table;
-import org.apache.commons.collections4.CollectionUtils;
+
+import javax.annotation.processing.Messager;
+import javax.lang.model.element.Element;
+import javax.lang.model.util.Types;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * A specific Class parser.
@@ -100,7 +96,7 @@ public class TableParser extends AbstractEntityParser<TableMetaType> {
     tableMetaType.setPartitionKeyColumns(partitionKeyColumns);
     tableMetaType.setClusteringKeyColumns(clusteringKeyColumns);
 
-    aptContext.addTableMetaTypeByClassName(annotatedClass.getSimpleName().toString(), tableMetaType);
+    aptContext.addTableMetaTypeByClassName(annotatedClass.toString(), tableMetaType);
 
     return tableMetaType;
   }

@@ -11,6 +11,8 @@ import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.processing.Messager;
 import javax.lang.model.element.Element;
+import javax.lang.model.type.MirroredTypeException;
+import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Types;
 import java.util.Comparator;
 import java.util.List;
@@ -58,7 +60,8 @@ public class MaterializedViewParser extends AbstractEntityParser<MaterializedVie
 
     materializedViewMetaType.setColumns(columns);
 
-    TableMetaType baseTableMetaType = aptContext.getTableNameByClassName(materializedView.baseTable().getSimpleName());
+    String baseTableClassName = getBaseTableClassName(materializedView);
+    TableMetaType baseTableMetaType = aptContext.getTableNameByClassName(baseTableClassName);
     String baseTableName = baseTableMetaType.getTableName();
     materializedViewMetaType.setBaseTableName(baseTableName);
 
@@ -82,6 +85,12 @@ public class MaterializedViewParser extends AbstractEntityParser<MaterializedVie
     return materializedViewMetaType;
   }
 
+  @Override
+  public String resolveName(Element annotatedClass) {
+    final MaterializedView materializedView = annotatedClass.getAnnotation(MaterializedView.class);
+    return resolveName(materializedView.name(), annotatedClass.getSimpleName());
+  }
+
   private void validateMaterializedViewColumns(final String materializedViewName, final String baseTableName,
                                                final List<ColumnFieldMetaType> materializedViewColumns,
                                                final List<ColumnFieldMetaType> baseTableColumns) {
@@ -96,9 +105,12 @@ public class MaterializedViewParser extends AbstractEntityParser<MaterializedVie
     }
   }
 
-  @Override
-  public String resolveName(Element annotatedClass) {
-    final MaterializedView materializedView = annotatedClass.getAnnotation(MaterializedView.class);
-    return resolveName(materializedView.name(), annotatedClass.getSimpleName());
+  private String getBaseTableClassName(MaterializedView materializedView) {
+    try {
+      return materializedView.baseTable().getCanonicalName();
+    } catch (MirroredTypeException e) {
+      TypeMirror typeMirror = e.getTypeMirror();
+      return typeMirror.toString();
+    }
   }
 }

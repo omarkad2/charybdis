@@ -24,6 +24,7 @@ import ma.markware.charybdis.apt.AptContext;
 import ma.markware.charybdis.apt.AptDefaultConfiguration;
 import ma.markware.charybdis.apt.CompilationExtension;
 import ma.markware.charybdis.apt.metatype.KeyspaceMetaType;
+import ma.markware.charybdis.apt.metatype.MaterializedViewMetaType;
 import ma.markware.charybdis.apt.metatype.TableMetaType;
 import ma.markware.charybdis.apt.metatype.UdtMetaType;
 import ma.markware.charybdis.apt.utils.TypeUtils;
@@ -69,6 +70,7 @@ class DdlScriptSerializerTest {
   private List<KeyspaceMetaType> keyspaceMetaTypes;
   private List<UdtMetaType> udtMetaTypes;
   private List<TableMetaType> tableMetaTypes;
+  private List<MaterializedViewMetaType> materializedViewMetaTypes;
 
   @BeforeAll
   void setup(Types types, Elements elements) {
@@ -90,6 +92,9 @@ class DdlScriptSerializerTest {
                                  configuration.getUdtParser().parse(testExtraUdtElement));
     tableMetaTypes = Arrays.asList(configuration.getTableParser().parse(elements.getTypeElement(TestEntity.class.getCanonicalName())),
                                    configuration.getTableParser().parse(elements.getTypeElement(TestEntityByDate.class.getCanonicalName())));
+
+    materializedViewMetaTypes = Collections.singletonList((configuration.getMaterializedViewParser())
+        .parse(elements.getTypeElement(TestEntityByValue.class.getCanonicalName())));
   }
 
   @Test
@@ -101,7 +106,7 @@ class DdlScriptSerializerTest {
     when(filer.createResource(any(), any(), eq("ddl_drop.cql"))).thenReturn(SerializerTestHelper.createJavaFileObject(ddlDropCqlWriter));
 
     // When
-    configuration.getDdlScriptSerializer().serialize(keyspaceMetaTypes, TypeUtils.sortUdtMetaTypes(udtMetaTypes), tableMetaTypes, Collections.emptyList());
+    configuration.getDdlScriptSerializer().serialize(keyspaceMetaTypes, TypeUtils.sortUdtMetaTypes(udtMetaTypes), tableMetaTypes, materializedViewMetaTypes);
 
     // Then
     InputStream ddlCreateInputStream = getClass().getClassLoader().getResourceAsStream("ddl_create_int.cql");
