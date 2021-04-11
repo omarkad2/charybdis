@@ -31,8 +31,11 @@ import ma.markware.charybdis.model.field.SelectableField;
 import ma.markware.charybdis.query.PageRequest;
 import ma.markware.charybdis.query.PageResult;
 import ma.markware.charybdis.test.entities.TestEntity;
+import ma.markware.charybdis.test.entities.TestEntityByValue;
+import ma.markware.charybdis.test.entities.TestEnum;
 import ma.markware.charybdis.test.instances.TestEntity_INST1;
 import ma.markware.charybdis.test.instances.TestEntity_INST2;
+import ma.markware.charybdis.test.metadata.TestEntityByValue_View;
 import ma.markware.charybdis.test.metadata.TestEntity_Table;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
@@ -446,19 +449,28 @@ class CrudQueryBuilderITest extends AbstractIntegrationITest {
     void find_materialized_view(CqlSession session) {
       // Given
       insertRow(session, TestEntity_Table.KEYSPACE_NAME, TestEntity_Table.TABLE_NAME,
-          ImmutableMap.of(TestEntity_Table.id.getName(), QueryBuilder.literal(TestEntity_Table.id.serialize(TestEntity_INST1.id)),
+          ImmutableMap.of(
+              TestEntity_Table.enumValue.getName(), QueryBuilder.literal(TestEntity_Table.enumValue.serialize(TestEnum.TYPE_A)),
+              TestEntity_Table.id.getName(), QueryBuilder.literal(TestEntity_Table.id.serialize(TestEntity_INST1.id)),
               TestEntity_Table.date.getName(), QueryBuilder.literal(TestEntity_Table.date.serialize(TestEntity_INST1.date)),
               TestEntity_Table.udt.getName(), QueryBuilder.literal(TestEntity_Table.udt.serialize(TestEntity_INST1.udt1)),
-              TestEntity_Table.list.getName(), QueryBuilder.literal(TestEntity_Table.list.serialize(TestEntity_INST1.list))));
+              TestEntity_Table.list.getName(), QueryBuilder.literal(TestEntity_Table.list.serialize(TestEntity_INST1.list)))
+      );
 
       // When
-      List<TestEntity> entities= crud.find(TestEntity_Table.test_entity, TestEntity_Table.id.eq(TestEntity_INST1.id)
-          .and(TestEntity_Table.date.eq(TestEntity_INST1.date)), true);
+      List<TestEntityByValue> entities= crud.find(TestEntityByValue_View.test_entity_by_value,
+          TestEntityByValue_View.enumValue.eq(TestEnum.TYPE_A)
+              .and(TestEntityByValue_View.id.eq(TestEntity_INST1.id))
+              .and(TestEntityByValue_View.date.eq(TestEntity_INST1.date))
+              .and(TestEntityByValue_View.udt.eq(TestEntity_INST1.udt1))
+              .and(TestEntityByValue_View.list.eq(TestEntity_INST1.list))
+      );
 
       // Then
       assertThat(entities).containsExactlyInAnyOrder(
-          new TestEntity(TestEntity_INST1.id, TestEntity_INST1.date, TestEntity_INST1.udt1, TestEntity_INST1.list, null, null, null, null, null, null,
-              null, null, null, null, null, null, null, null, null));
+          new TestEntityByValue(TestEnum.TYPE_A, TestEntity_INST1.id, TestEntity_INST1.date, TestEntity_INST1.udt1, TestEntity_INST1.list, null, null, null, null, null, null,
+              null, null, null, null, null, null, null, null)
+      );
     }
   }
 
