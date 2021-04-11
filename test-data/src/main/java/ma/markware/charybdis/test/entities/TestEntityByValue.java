@@ -1,7 +1,9 @@
 package ma.markware.charybdis.test.entities;
 
 import ma.markware.charybdis.model.annotation.*;
+import ma.markware.charybdis.model.option.ClusteringOrder;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -58,6 +60,24 @@ public class TestEntityByValue extends TestSuperEntity {
   private List<@Frozen List<TestUdt>> udtNestedList;
 
   public TestEntityByValue() {
+  }
+
+  @Override
+  @ClusteringKey(order = ClusteringOrder.DESC)
+  public Instant getDate() {
+    return date;
+  }
+
+  @Override
+  @ClusteringKey(index = 1)
+  public TestUdt getUdt() {
+    return udt;
+  }
+
+  @Override
+  @ClusteringKey(index = 2)
+  public List<String> getList() {
+    return list;
   }
 
   public UUID getId() {

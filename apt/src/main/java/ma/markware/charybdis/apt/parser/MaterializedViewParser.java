@@ -65,9 +65,6 @@ public class MaterializedViewParser extends AbstractEntityParser<MaterializedVie
     String baseTableName = baseTableMetaType.getTableName();
     materializedViewMetaType.setBaseTableName(baseTableName);
 
-    // Check columns in materialized view exist in base table
-    validateMaterializedViewColumns(viewName, baseTableName, materializedViewMetaType.getColumns(), baseTableMetaType.getColumns());
-
     List<ColumnFieldMetaType> partitionKeyColumns = columns.stream()
         .filter(ColumnFieldMetaType::isPartitionKey)
         .sorted(Comparator.comparingInt(ColumnFieldMetaType::getPartitionKeyIndex))
@@ -82,6 +79,9 @@ public class MaterializedViewParser extends AbstractEntityParser<MaterializedVie
     materializedViewMetaType.setPartitionKeyColumns(partitionKeyColumns);
     materializedViewMetaType.setClusteringKeyColumns(clusteringKeyColumns);
 
+    // Check columns in materialized view exist in base table
+    validateMaterializedViewColumns(materializedViewMetaType, baseTableMetaType);
+
     return materializedViewMetaType;
   }
 
@@ -91,18 +91,36 @@ public class MaterializedViewParser extends AbstractEntityParser<MaterializedVie
     return resolveName(materializedView.name(), annotatedClass.getSimpleName());
   }
 
-  private void validateMaterializedViewColumns(final String materializedViewName, final String baseTableName,
-                                               final List<ColumnFieldMetaType> materializedViewColumns,
-                                               final List<ColumnFieldMetaType> baseTableColumns) {
-    Set<String> baseTableColumnNames = baseTableColumns.stream().map(ColumnFieldMetaType::getSerializationName).collect(Collectors.toSet());
-    String unknownColumnNames = materializedViewColumns.stream()
+  private void validateMaterializedViewColumns(final MaterializedViewMetaType materializedViewMetaType,
+                                               final TableMetaType baseTableMetaType) {
+
+    String viewName = materializedViewMetaType.getViewName();
+    String baseTableName = baseTableMetaType.getTableName();
+    // Check that columns in materialized view exist in base table
+    Set<String> baseTableColumnNames = baseTableMetaType.getColumns().stream().map(ColumnFieldMetaType::getSerializationName).collect(Collectors.toSet());
+    String unknownColumns = materializedViewMetaType.getColumns().stream()
         .map(ColumnFieldMetaType::getSerializationName)
         .filter(item -> !baseTableColumnNames.contains(item))
         .collect(Collectors.joining(", "));
-    if (StringUtils.isNotBlank(unknownColumnNames)) {
+
+    if (StringUtils.isNotBlank(unknownColumns)) {
       throwParsingException(messager, String.format("Columns '%s' found in materialized view '%s' don't exist in base table '%s'",
-          unknownColumnNames, materializedViewName, baseTableName));
+          unknownColumns, viewName, baseTableName));
     }
+
+    // Check that primary keys in base table are still primary keys in the view
+    Set<String> baseTablePrimaryKeys = Stream.concat(baseTableMetaType.getPartitionKeyColumns().stream(), baseTableMetaType.getClusteringKeyColumns().stream())
+        .map(ColumnFieldMetaType::getSerializationName).collect(Collectors.toSet());
+    Set<String> viewPrimaryKeys = Stream.concat(materializedViewMetaType.getPartitionKeyColumns().stream(), materializedViewMetaType.getClusteringKeyColumns().stream())
+        .map(ColumnFieldMetaType::getSerializationName).collect(Collectors.toSet());
+    String missingPrimaryKeys = baseTablePrimaryKeys.stream()
+        .filter(item -> !viewPrimaryKeys.contains(item))
+        .collect(Collectors.joining(", "));
+
+//    if (StringUtils.isNotBlank(missingPrimaryKeys)) {
+//      throwParsingException(messager, String.format("Primary keys ['%s'] from base table '%s' are missing in view '%s'",
+//          missingPrimaryKeys, baseTableName, viewName));
+//    }
   }
 
   private String getBaseTableClassName(MaterializedView materializedView) {
