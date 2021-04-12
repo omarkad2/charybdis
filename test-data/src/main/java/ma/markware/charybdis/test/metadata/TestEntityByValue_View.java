@@ -580,7 +580,7 @@ public class TestEntityByValue_View implements MaterializedViewMetadata<TestEnti
     }
 
     public int getClusteringKeyIndex() {
-      return 0;
+      return 1;
     }
 
     public ClusteringOrder getClusteringOrder() {
@@ -608,7 +608,7 @@ public class TestEntityByValue_View implements MaterializedViewMetadata<TestEnti
     }
 
     public int getClusteringKeyIndex() {
-      return 1;
+      return 2;
     }
 
     public ClusteringOrder getClusteringOrder() {
@@ -635,7 +635,7 @@ public class TestEntityByValue_View implements MaterializedViewMetadata<TestEnti
     }
 
     public int getClusteringKeyIndex() {
-      return 2;
+      return 3;
     }
 
     public ClusteringOrder getClusteringOrder() {
