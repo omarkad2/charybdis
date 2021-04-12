@@ -88,19 +88,19 @@ public class TestEntityByValue extends TestSuperEntity {
   }
 
   @Override
-  @ClusteringKey(order = ClusteringOrder.DESC)
+  @ClusteringKey(index = 1, order = ClusteringOrder.DESC)
   public Instant getDate() {
     return date;
   }
 
   @Override
-  @ClusteringKey(index = 1)
+  @ClusteringKey(index = 2)
   public TestUdt getUdt() {
     return udt;
   }
 
   @Override
-  @ClusteringKey(index = 2)
+  @ClusteringKey(index = 3)
   public List<String> getList() {
     return list;
   }
