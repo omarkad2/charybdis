@@ -197,7 +197,7 @@ It is the main class in Charybdis core package. It can be instantiated by provid
 if none provided we fallback on [DefaultSessionFactory](https://github.com/omarkad2/charybdis/blob/master/core/src/main/java/ma/markware/charybdis/session/DefaultSessionFactory.java).
 ```java
 CqlTemplate cqlTemplate = new CqlTemplate();
-// or with a specific implementation of SessionFactory
+// Or with a specific implementation of SessionFactory
 CqlTemplate cqlTemplate = new CqlTemplate(customSessionFactory);
 ```
 This class gives us access to different APIs **Dsl API** or **Crud API** in order to manage our Cql queries. 
