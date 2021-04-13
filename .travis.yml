@@ -13,7 +13,7 @@ cache:
     - "$HOME/.m2"
 
 before_install:
-  - docker pull cassandra:3.11.9
+  - docker pull cassandra:latest
   - docker pull scylladb/scylla
 
 script: "mvn clean verify"

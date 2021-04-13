@@ -19,22 +19,8 @@
 package ma.markware.charybdis.apt;
 
 import com.google.auto.service.AutoService;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-import javax.annotation.processing.AbstractProcessor;
-import javax.annotation.processing.Filer;
-import javax.annotation.processing.Messager;
-import javax.annotation.processing.ProcessingEnvironment;
-import javax.annotation.processing.RoundEnvironment;
-import javax.lang.model.SourceVersion;
-import javax.lang.model.element.Element;
-import javax.lang.model.element.TypeElement;
-import javax.lang.model.util.Elements;
-import javax.lang.model.util.Types;
-import javax.tools.Diagnostic.Kind;
 import ma.markware.charybdis.apt.metatype.KeyspaceMetaType;
+import ma.markware.charybdis.apt.metatype.MaterializedViewMetaType;
 import ma.markware.charybdis.apt.metatype.TableMetaType;
 import ma.markware.charybdis.apt.metatype.UdtMetaType;
 import ma.markware.charybdis.apt.parser.EntityParser;
@@ -42,8 +28,21 @@ import ma.markware.charybdis.apt.serializer.DdlScriptSerializer;
 import ma.markware.charybdis.apt.serializer.EntitySerializer;
 import ma.markware.charybdis.apt.utils.TypeUtils;
 import ma.markware.charybdis.model.annotation.Keyspace;
+import ma.markware.charybdis.model.annotation.MaterializedView;
 import ma.markware.charybdis.model.annotation.Table;
 import ma.markware.charybdis.model.annotation.Udt;
+
+import javax.annotation.processing.*;
+import javax.lang.model.SourceVersion;
+import javax.lang.model.element.Element;
+import javax.lang.model.element.TypeElement;
+import javax.lang.model.util.Elements;
+import javax.lang.model.util.Types;
+import javax.tools.Diagnostic.Kind;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Annotation processor main class.
@@ -88,6 +87,7 @@ public class CharybdisProcessor extends AbstractProcessor {
     supportedAnnotationTypes.add(Keyspace.class.getCanonicalName());
     supportedAnnotationTypes.add(Table.class.getCanonicalName());
     supportedAnnotationTypes.add(Udt.class.getCanonicalName());
+    supportedAnnotationTypes.add(MaterializedView.class.getCanonicalName());
     return supportedAnnotationTypes;
   }
 
@@ -126,6 +126,10 @@ public class CharybdisProcessor extends AbstractProcessor {
     aptContext.udtMetaTypes.addAll(parseUdtClasses(roundEnv.getElementsAnnotatedWith(Udt.class), aptConfiguration.getUdtParser()));
 
     aptContext.tableMetaTypes.addAll(parseTableClasses(roundEnv.getElementsAnnotatedWith(Table.class), aptConfiguration.getTableParser()));
+
+    aptContext.materializedViewMetaTypes.addAll(
+        parseMaterializedViewClasses(roundEnv.getElementsAnnotatedWith(MaterializedView.class), aptConfiguration.getMaterializedViewParser())
+    );
   }
 
   private List<KeyspaceMetaType> parseKeyspaceClasses(Set<? extends Element> annotatedClasses, EntityParser<KeyspaceMetaType> keyspaceParser) {
@@ -146,6 +150,11 @@ public class CharybdisProcessor extends AbstractProcessor {
                            .collect(Collectors.toList());
   }
 
+  private List<MaterializedViewMetaType> parseMaterializedViewClasses(final Set<? extends Element> annotatedClasses,
+                                                                      final EntityParser<MaterializedViewMetaType> materializedViewParser) {
+    return annotatedClasses.stream().map(materializedViewParser::parse).collect(Collectors.toList());
+  }
+
   private void serialize() {
 
     serializeKeyspaceMetadata(aptContext.keyspaceMetaTypes, aptConfiguration.getKeyspaceSerializer());
@@ -154,7 +163,10 @@ public class CharybdisProcessor extends AbstractProcessor {
 
     serializeTableMetadata(aptContext.tableMetaTypes, aptConfiguration.getTableSerializer());
 
-    serializeDdlScriptFiles(aptContext.keyspaceMetaTypes, aptContext.udtMetaTypes, aptContext.tableMetaTypes, aptConfiguration.getDdlScriptSerializer());
+    serializeMaterializedViewMetadata(aptContext.materializedViewMetaTypes, aptConfiguration.getMaterializedViewSerializer());
+
+    serializeDdlScriptFiles(aptContext.keyspaceMetaTypes, aptContext.udtMetaTypes, aptContext.tableMetaTypes, aptContext.materializedViewMetaTypes,
+        aptConfiguration.getDdlScriptSerializer());
   }
 
   private void serializeKeyspaceMetadata(final List<KeyspaceMetaType> keyspaceMetaTypes, final EntitySerializer<KeyspaceMetaType> keyspaceSerializer) {
@@ -169,10 +181,16 @@ public class CharybdisProcessor extends AbstractProcessor {
     tableMetaTypes.forEach(tableSerializer::serialize);
   }
 
+  private void serializeMaterializedViewMetadata(final List<MaterializedViewMetaType> materializedViewMetaTypes,
+                                      final EntitySerializer<MaterializedViewMetaType> materializedViewSerializer) {
+    materializedViewMetaTypes.forEach(materializedViewSerializer::serialize);
+  }
+
   private void serializeDdlScriptFiles(final List<KeyspaceMetaType> keyspaceMetaTypes, final List<UdtMetaType> udtMetaTypes,
-      final List<TableMetaType> tableMetaTypes, final DdlScriptSerializer ddlScriptSerializer) {
+                                       final List<TableMetaType> tableMetaTypes, final List<MaterializedViewMetaType> materializedViewMetaTypes,
+                                       final DdlScriptSerializer ddlScriptSerializer) {
     if (!keyspaceMetaTypes.isEmpty() || !udtMetaTypes.isEmpty() || !tableMetaTypes.isEmpty()) {
-      ddlScriptSerializer.serialize(keyspaceMetaTypes, TypeUtils.sortUdtMetaTypes(udtMetaTypes), tableMetaTypes);
+      ddlScriptSerializer.serialize(keyspaceMetaTypes, TypeUtils.sortUdtMetaTypes(udtMetaTypes), tableMetaTypes, materializedViewMetaTypes);
     }
   }
 }

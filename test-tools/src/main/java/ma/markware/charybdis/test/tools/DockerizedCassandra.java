@@ -27,15 +27,16 @@ import com.github.dockerjava.api.model.ExposedPort;
 import com.github.dockerjava.api.model.HostConfig;
 import com.github.dockerjava.api.model.Ports;
 import com.github.dockerjava.core.DockerClientBuilder;
+import org.junit.jupiter.api.extension.ExtensionContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import org.junit.jupiter.api.extension.ExtensionContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A Cassandra docker container.
@@ -47,7 +48,7 @@ public class DockerizedCassandra implements ExtensionContext.Store.CloseableReso
   private static final Logger logger = LoggerFactory.getLogger(DockerizedCassandra.class);
 
   // Docker image
-  private static final String DOCKER_IMAGE_NAME = "cassandra:3.11.9";
+  private static final String DOCKER_IMAGE_NAME = "cassandra:latest";
 //  private static final String DOCKER_IMAGE_NAME = "scylladb/scylla";
 
   // Datastax properties

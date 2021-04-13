@@ -21,25 +21,21 @@ package ma.markware.charybdis.dsl.select;
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.cql.PagingState;
 import com.datastax.oss.driver.api.core.cql.ResultSet;
-import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
 import ma.markware.charybdis.ExecutionContext;
 import ma.markware.charybdis.dsl.Record;
 import ma.markware.charybdis.dsl.utils.RecordUtils;
 import ma.markware.charybdis.model.criteria.CriteriaExpression;
 import ma.markware.charybdis.model.field.SelectableField;
 import ma.markware.charybdis.model.field.metadata.PartitionKeyColumnMetadata;
+import ma.markware.charybdis.model.field.metadata.ReadableTableMetadata;
 import ma.markware.charybdis.model.field.metadata.TableMetadata;
 import ma.markware.charybdis.model.order.OrderExpression;
 import ma.markware.charybdis.query.PageRequest;
 import ma.markware.charybdis.query.PageResult;
 import ma.markware.charybdis.query.SelectQuery;
+
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Select query builder.
@@ -83,7 +79,7 @@ public class DslSelectImpl implements SelectInitExpression, SelectWhereExpressio
   /**
    * Set table to select.
    */
-  public SelectWhereExpression selectFrom(final TableMetadata<?> tableMetadata) {
+  public SelectWhereExpression selectFrom(final ReadableTableMetadata<?> tableMetadata) {
     this.selectedFields = new ArrayList<>(tableMetadata.getColumnsMetadata().values());
     selectQuery.setTableAndSelectors(tableMetadata);
     return this;

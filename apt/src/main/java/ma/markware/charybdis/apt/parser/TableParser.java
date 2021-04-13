@@ -18,25 +18,21 @@
  */
 package ma.markware.charybdis.apt.parser;
 
-import static java.lang.String.format;
-import static ma.markware.charybdis.apt.utils.ExceptionMessagerWrapper.throwParsingException;
-
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import javax.annotation.processing.Messager;
-import javax.lang.model.element.Element;
-import javax.lang.model.util.Types;
 import ma.markware.charybdis.apt.AptContext;
 import ma.markware.charybdis.apt.metatype.AbstractEntityMetaType;
 import ma.markware.charybdis.apt.metatype.ColumnFieldMetaType;
 import ma.markware.charybdis.apt.metatype.TableMetaType;
 import ma.markware.charybdis.apt.utils.ParserUtils;
 import ma.markware.charybdis.model.annotation.Table;
-import org.apache.commons.collections4.CollectionUtils;
+
+import javax.annotation.processing.Messager;
+import javax.lang.model.element.Element;
+import javax.lang.model.util.Types;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * A specific Class parser.
@@ -95,14 +91,12 @@ public class TableParser extends AbstractEntityParser<TableMetaType> {
                                                .sorted(Comparator.comparingInt(ColumnFieldMetaType::getClusteringKeyIndex))
                                                .collect(Collectors.toList());
 
-    if (CollectionUtils.isEmpty(partitionKeyColumns) && CollectionUtils.isEmpty(clusteringKeyColumns)) {
-      throwParsingException(messager, format("There should be at least one primary key defined for the table '%s'", tableMetaType.getTableName()));
-    } else if (CollectionUtils.isEmpty(partitionKeyColumns) && clusteringKeyColumns.size() == 1) { // hackish: when no partition key replace first clustering key with partition key
-       partitionKeyColumns = Collections.singletonList(clusteringKeyColumns.remove(0));
-    }
+    partitionKeyColumns = resolvePartitionKeyColumns(tableMetaType.getTableName(), partitionKeyColumns, clusteringKeyColumns);
 
     tableMetaType.setPartitionKeyColumns(partitionKeyColumns);
     tableMetaType.setClusteringKeyColumns(clusteringKeyColumns);
+
+    aptContext.addTableMetaTypeByClassName(annotatedClass.toString(), tableMetaType);
 
     return tableMetaType;
   }

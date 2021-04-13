@@ -18,18 +18,10 @@
  */
 package ma.markware.charybdis.crud;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.querybuilder.QueryBuilder;
 import com.datastax.oss.driver.api.querybuilder.term.Term;
 import com.google.common.collect.ImmutableMap;
-import java.time.Instant;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
 import ma.markware.charybdis.AbstractIntegrationITest;
 import ma.markware.charybdis.CqlTemplate;
 import ma.markware.charybdis.dsl.DslFunctions;
@@ -39,16 +31,19 @@ import ma.markware.charybdis.model.field.SelectableField;
 import ma.markware.charybdis.query.PageRequest;
 import ma.markware.charybdis.query.PageResult;
 import ma.markware.charybdis.test.entities.TestEntity;
+import ma.markware.charybdis.test.entities.TestEntityByValue;
+import ma.markware.charybdis.test.entities.TestEnum;
 import ma.markware.charybdis.test.instances.TestEntity_INST1;
 import ma.markware.charybdis.test.instances.TestEntity_INST2;
+import ma.markware.charybdis.test.metadata.TestEntityByValue_View;
 import ma.markware.charybdis.test.metadata.TestEntity_Table;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
+
+import java.time.Instant;
+import java.util.*;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @TestInstance(Lifecycle.PER_CLASS)
 class CrudQueryBuilderITest extends AbstractIntegrationITest {
@@ -109,7 +104,7 @@ class CrudQueryBuilderITest extends AbstractIntegrationITest {
     }
 
     @Test
-    void create_should_not_overwrite_when_ifNotExists(CqlSession session) {
+    void create_should_not_overwrite_when_ifNotExists() {
       TestEntity entity1 = new TestEntity(TestEntity_INST1.entity1);
       crud.create(TestEntity_Table.test_entity, entity1);
 
@@ -428,26 +423,54 @@ class CrudQueryBuilderITest extends AbstractIntegrationITest {
                                 TestEntity_Table.list.getName(), QueryBuilder.literal(TestEntity_Table.list.serialize(TestEntity_INST1.list))));
 
       // First page
-      PageResult pageResult1 = crud.find(TestEntity_Table.test_entity, PageRequest.of(null, 2));
+      PageResult<?> pageResult1 = crud.find(TestEntity_Table.test_entity, PageRequest.of(null, 2));
       assertThat(pageResult1.getPagingState()).isNotNull();
       assertThat(pageResult1.getResults()).hasSize(2);
 
       // Second page
-      PageResult pageResult2 = crud.find(TestEntity_Table.test_entity, PageRequest.fromString(pageResult1.getPagingState().toString(), 2));
+      PageResult<?> pageResult2 = crud.find(TestEntity_Table.test_entity, PageRequest.fromString(pageResult1.getPagingState().toString(), 2));
       assertThat(pageResult2.getPagingState()).isNotNull();
       assertThat(pageResult2.getResults()).hasSize(2);
 
       // Third page
-      PageResult pageResult3 = crud.find(TestEntity_Table.test_entity, PageRequest.of(pageResult2.getPagingState(), 2));
+      PageResult<?> pageResult3 = crud.find(TestEntity_Table.test_entity, PageRequest.of(pageResult2.getPagingState(), 2));
       assertThat(pageResult3.getPagingState()).isNull();
       assertThat(pageResult3.getResults()).isEmpty();
     }
 
     @Test
     void find_paged_should_return_empty_page_result_when_no_entity() {
-      PageResult pageResult = crud.find(TestEntity_Table.test_entity, PageRequest.fromString(null, 2));
+      PageResult<?> pageResult = crud.find(TestEntity_Table.test_entity, PageRequest.fromString(null, 2));
       assertThat(pageResult.getPagingState()).isNull();
       assertThat(pageResult.getResults()).isEmpty();
+    }
+
+    @Test
+    void find_materialized_view(CqlSession session) {
+      // Given
+      insertRow(session, TestEntity_Table.KEYSPACE_NAME, TestEntity_Table.TABLE_NAME,
+          ImmutableMap.of(
+              TestEntity_Table.enumValue.getName(), QueryBuilder.literal(TestEntity_Table.enumValue.serialize(TestEnum.TYPE_A)),
+              TestEntity_Table.id.getName(), QueryBuilder.literal(TestEntity_Table.id.serialize(TestEntity_INST1.id)),
+              TestEntity_Table.date.getName(), QueryBuilder.literal(TestEntity_Table.date.serialize(TestEntity_INST1.date)),
+              TestEntity_Table.udt.getName(), QueryBuilder.literal(TestEntity_Table.udt.serialize(TestEntity_INST1.udt1)),
+              TestEntity_Table.list.getName(), QueryBuilder.literal(TestEntity_Table.list.serialize(TestEntity_INST1.list)))
+      );
+
+      // When
+      List<TestEntityByValue> entities= crud.find(TestEntityByValue_View.test_entity_by_value,
+          TestEntityByValue_View.enumValue.eq(TestEnum.TYPE_A)
+              .and(TestEntityByValue_View.id.eq(TestEntity_INST1.id))
+              .and(TestEntityByValue_View.date.eq(TestEntity_INST1.date))
+              .and(TestEntityByValue_View.udt.eq(TestEntity_INST1.udt1))
+              .and(TestEntityByValue_View.list.eq(TestEntity_INST1.list))
+      );
+
+      // Then
+      assertThat(entities).containsExactlyInAnyOrder(
+          new TestEntityByValue(TestEnum.TYPE_A, TestEntity_INST1.id, TestEntity_INST1.date, TestEntity_INST1.udt1, TestEntity_INST1.list, null, null, null, null, null, null,
+              null, null, null, null, null, null, null, null)
+      );
     }
   }
 
@@ -456,7 +479,7 @@ class CrudQueryBuilderITest extends AbstractIntegrationITest {
   class CrudQueryBuilderUpdateITest {
 
     @BeforeEach
-    void setup(CqlSession session) {
+    void setup() {
       // Insert TestEntity_INST1 to DB
       dsl.insertInto(TestEntity_Table.test_entity, TestEntity_Table.id, TestEntity_Table.date, TestEntity_Table.udt, TestEntity_Table.list, TestEntity_Table.se, TestEntity_Table.map,
                           TestEntity_Table.nestedList, TestEntity_Table.nestedSet, TestEntity_Table.nestedMap, TestEntity_Table.enumValue, TestEntity_Table.enumList, TestEntity_Table.enumMap,
@@ -507,7 +530,7 @@ class CrudQueryBuilderITest extends AbstractIntegrationITest {
   class CrudQueryBuilderDeleteITest {
 
     @BeforeEach
-    void setup(CqlSession session) {
+    void setup() {
       // Insert TestEntity_INST1 to DB
       dsl.insertInto(TestEntity_Table.test_entity, TestEntity_Table.id, TestEntity_Table.date, TestEntity_Table.udt, TestEntity_Table.list, TestEntity_Table.se, TestEntity_Table.map,
                           TestEntity_Table.nestedList, TestEntity_Table.nestedSet, TestEntity_Table.nestedMap, TestEntity_Table.enumValue, TestEntity_Table.enumList, TestEntity_Table.enumMap,

@@ -19,46 +19,17 @@
 
 package ma.markware.charybdis.apt.serializer;
 
-import static java.util.Arrays.asList;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.StringWriter;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import javax.annotation.processing.Filer;
-import javax.annotation.processing.Messager;
-import javax.annotation.processing.RoundEnvironment;
-import javax.lang.model.element.TypeElement;
-import javax.lang.model.util.Elements;
-import javax.lang.model.util.Types;
 import ma.markware.charybdis.apt.AptConfiguration;
 import ma.markware.charybdis.apt.AptContext;
 import ma.markware.charybdis.apt.AptDefaultConfiguration;
 import ma.markware.charybdis.apt.CompilationExtension;
 import ma.markware.charybdis.apt.metatype.KeyspaceMetaType;
+import ma.markware.charybdis.apt.metatype.MaterializedViewMetaType;
 import ma.markware.charybdis.apt.metatype.TableMetaType;
 import ma.markware.charybdis.apt.metatype.UdtMetaType;
 import ma.markware.charybdis.apt.utils.TypeUtils;
 import ma.markware.charybdis.model.annotation.Udt;
-import ma.markware.charybdis.test.entities.TestEntity;
-import ma.markware.charybdis.test.entities.TestEntityByDate;
-import ma.markware.charybdis.test.entities.TestExtraUdt;
-import ma.markware.charybdis.test.entities.TestKeyspaceDefinition;
-import ma.markware.charybdis.test.entities.TestNestedUdt;
-import ma.markware.charybdis.test.entities.TestUdt;
+import ma.markware.charybdis.test.entities.*;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -66,6 +37,23 @@ import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+
+import javax.annotation.processing.Filer;
+import javax.annotation.processing.Messager;
+import javax.annotation.processing.RoundEnvironment;
+import javax.lang.model.element.TypeElement;
+import javax.lang.model.util.Elements;
+import javax.lang.model.util.Types;
+import java.io.*;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
+
+import static java.util.Arrays.asList;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
 
 @TestInstance(Lifecycle.PER_CLASS)
 @ExtendWith({CompilationExtension.class})
@@ -82,6 +70,7 @@ class DdlScriptSerializerTest {
   private List<KeyspaceMetaType> keyspaceMetaTypes;
   private List<UdtMetaType> udtMetaTypes;
   private List<TableMetaType> tableMetaTypes;
+  private List<MaterializedViewMetaType> materializedViewMetaTypes;
 
   @BeforeAll
   void setup(Types types, Elements elements) {
@@ -103,6 +92,9 @@ class DdlScriptSerializerTest {
                                  configuration.getUdtParser().parse(testExtraUdtElement));
     tableMetaTypes = Arrays.asList(configuration.getTableParser().parse(elements.getTypeElement(TestEntity.class.getCanonicalName())),
                                    configuration.getTableParser().parse(elements.getTypeElement(TestEntityByDate.class.getCanonicalName())));
+
+    materializedViewMetaTypes = Collections.singletonList((configuration.getMaterializedViewParser())
+        .parse(elements.getTypeElement(TestEntityByValue.class.getCanonicalName())));
   }
 
   @Test
@@ -114,7 +106,7 @@ class DdlScriptSerializerTest {
     when(filer.createResource(any(), any(), eq("ddl_drop.cql"))).thenReturn(SerializerTestHelper.createJavaFileObject(ddlDropCqlWriter));
 
     // When
-    configuration.getDdlScriptSerializer().serialize(keyspaceMetaTypes, TypeUtils.sortUdtMetaTypes(udtMetaTypes), tableMetaTypes);
+    configuration.getDdlScriptSerializer().serialize(keyspaceMetaTypes, TypeUtils.sortUdtMetaTypes(udtMetaTypes), tableMetaTypes, materializedViewMetaTypes);
 
     // Then
     InputStream ddlCreateInputStream = getClass().getClassLoader().getResourceAsStream("ddl_create_int.cql");

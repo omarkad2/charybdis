@@ -19,30 +19,25 @@
 package ma.markware.charybdis.apt.serializer;
 
 import com.datastax.oss.driver.api.core.cql.Row;
-import com.squareup.javapoet.ClassName;
-import com.squareup.javapoet.CodeBlock;
-import com.squareup.javapoet.MethodSpec;
-import com.squareup.javapoet.ParameterizedTypeName;
-import com.squareup.javapoet.TypeSpec;
-import java.time.Instant;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.stream.Collectors;
-import javax.annotation.processing.Filer;
-import javax.annotation.processing.Messager;
-import javax.lang.model.element.Modifier;
+import com.squareup.javapoet.*;
 import ma.markware.charybdis.apt.metatype.ColumnFieldMetaType;
 import ma.markware.charybdis.apt.metatype.TableMetaType;
 import ma.markware.charybdis.apt.utils.ClassUtils;
 import ma.markware.charybdis.apt.utils.CollectionUtils;
-import ma.markware.charybdis.model.field.metadata.ColumnMetadata;
 import ma.markware.charybdis.model.field.metadata.TableMetadata;
 import ma.markware.charybdis.model.option.ConsistencyLevel;
 import ma.markware.charybdis.model.option.SequenceModel;
 import ma.markware.charybdis.model.option.SerialConsistencyLevel;
+
+import javax.annotation.processing.Filer;
+import javax.annotation.processing.Messager;
+import javax.lang.model.element.Modifier;
+import java.time.Instant;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * A specific Class serializer.
@@ -50,7 +45,7 @@ import ma.markware.charybdis.model.option.SerialConsistencyLevel;
  *
  * @author Oussama Markad
  */
-public class TableSerializer implements EntitySerializer<TableMetaType> {
+public class TableSerializer implements EntitySerializer<TableMetaType>, ReadableTableSerializer {
 
   private final FieldSerializer<ColumnFieldMetaType> columnFieldSerializer;
   private final Filer filer;
@@ -74,48 +69,40 @@ public class TableSerializer implements EntitySerializer<TableMetaType> {
     String tableName = tableMetaType.getTableName();
 
     TypeSpec tableMetadataSerialization = TypeSpec.classBuilder(generatedClassName)
-                                                  .addModifiers(Modifier.PUBLIC)
-                                                  .addSuperinterface(ParameterizedTypeName.get(ClassName.get(TableMetadata.class),
-                                                                                               ClassUtils.primitiveToWrapper(
-                                                                                                   tableMetaType.getTypeName())))
-                                                  .addFields(CollectionUtils.addAll(
-                                                      tableMetaType.getColumns().stream().map(columnFieldSerializer::serializeFieldGenericType).filter(
-                                                          Objects::nonNull).collect(Collectors.toList()),
-                                                      tableMetaType.getColumns().stream().map(columnFieldSerializer::serializeField).collect(Collectors.toList()),
-                                                      buildStaticInstance(packageName, generatedClassName, tableName),
-                                                      buildEntityNameField(SerializationConstants.KEYSPACE_NAME_ATTRIBUTE, keyspaceName),
-                                                      buildEntityNameField(SerializationConstants.TABLE_NAME_ATTRIBUTE, tableName)))
-                                                  .addMethods(Arrays.asList(
-                                                      buildPrivateConstructor(),
-                                                      buildGetEntityNameMethod(SerializationConstants.GET_KEYSPACE_NAME_METHOD, SerializationConstants.KEYSPACE_NAME_ATTRIBUTE),
-                                                      buildGetEntityNameMethod(SerializationConstants.GET_TABLE_NAME_METHOD, SerializationConstants.TABLE_NAME_ATTRIBUTE),
-                                                      buildGetDefaultReadConsistencyMethod(tableMetaType.getDefaultReadConsistency()),
-                                                      buildGetDefaultWriteConsistencyMethod(tableMetaType.getDefaultWriteConsistency()),
-                                                      buildGetDefaultSerialConsistencyMethod(tableMetaType.getDefaultSerialConsistency()),
-                                                      buildColumnsGetterMethod(SerializationConstants.GET_COLUMNS_METADATA_METHOD, tableMetaType.getColumns()),
-                                                      buildColumnsGetterMethod(SerializationConstants.GET_PARTITION_KEY_COLUMNS_METHOD, tableMetaType.getPartitionKeyColumns()),
-                                                      buildColumnsGetterMethod(SerializationConstants.GET_CLUSTERING_KEY_COLUMNS_METHOD, tableMetaType.getClusteringKeyColumns()),
-                                                      buildGetPrimaryKeysMethod(),
-                                                      buildGetColumnMetadata(),
-                                                      buildIsPrimaryKeyMethod(),
-                                                      buildGetPrimaryKeySizeMethod(),
-                                                      buildGetColumnsSizeMethod(),
-                                                      buildSetGeneratedValuesMethod(tableMetaType),
-                                                      buildSetCreationDateMethod(tableMetaType),
-                                                      buildSetLastUpdatedDateMethod(tableMetaType),
-                                                      buildSerializeMethod(tableMetaType),
-                                                      buildDeserializeMethod(tableMetaType)))
-                                                  .build();
+        .addModifiers(Modifier.PUBLIC)
+        .addSuperinterface(ParameterizedTypeName.get(ClassName.get(TableMetadata.class),
+                                                     ClassUtils.primitiveToWrapper(
+                                                         tableMetaType.getTypeName())))
+        .addFields(CollectionUtils.addAll(
+            tableMetaType.getColumns().stream().map(columnFieldSerializer::serializeFieldGenericType).filter(
+                Objects::nonNull).collect(Collectors.toList()),
+            tableMetaType.getColumns().stream().map(columnFieldSerializer::serializeField).collect(Collectors.toList()),
+            buildStaticInstance(packageName, generatedClassName, tableName),
+            buildEntityNameField(SerializationConstants.KEYSPACE_NAME_ATTRIBUTE, keyspaceName),
+            buildEntityNameField(SerializationConstants.TABLE_NAME_ATTRIBUTE, tableName)))
+        .addMethods(Arrays.asList(
+            buildPrivateConstructor(),
+            buildGetEntityNameMethod(SerializationConstants.GET_KEYSPACE_NAME_METHOD, SerializationConstants.KEYSPACE_NAME_ATTRIBUTE),
+            buildGetEntityNameMethod(SerializationConstants.GET_TABLE_NAME_METHOD, SerializationConstants.TABLE_NAME_ATTRIBUTE),
+            buildGetDefaultReadConsistencyMethod(tableMetaType.getDefaultReadConsistency()),
+            buildGetDefaultWriteConsistencyMethod(tableMetaType.getDefaultWriteConsistency()),
+            buildGetDefaultSerialConsistencyMethod(tableMetaType.getDefaultSerialConsistency()),
+            buildColumnsGetterMethod(SerializationConstants.GET_COLUMNS_METADATA_METHOD, tableMetaType.getColumns()),
+            buildColumnsGetterMethod(SerializationConstants.GET_PARTITION_KEY_COLUMNS_METHOD, tableMetaType.getPartitionKeyColumns()),
+            buildColumnsGetterMethod(SerializationConstants.GET_CLUSTERING_KEY_COLUMNS_METHOD, tableMetaType.getClusteringKeyColumns()),
+            buildGetPrimaryKeysMethod(),
+            buildGetColumnMetadata(),
+            buildIsPrimaryKeyMethod(),
+            buildGetPrimaryKeySizeMethod(),
+            buildGetColumnsSizeMethod(),
+            buildSetGeneratedValuesMethod(tableMetaType),
+            buildSetCreationDateMethod(tableMetaType),
+            buildSetLastUpdatedDateMethod(tableMetaType),
+            buildSerializeMethod(tableMetaType),
+            buildDeserializeMethod(tableMetaType)))
+        .build();
 
     writeSerialization(packageName, className, tableMetadataSerialization, filer, messager);
-  }
-
-  private MethodSpec buildGetDefaultReadConsistencyMethod(ConsistencyLevel defaultReadConsistency) {
-    return MethodSpec.methodBuilder(SerializationConstants.GET_DEFAULT_READ_CONSISTENCY_METHOD)
-            .addModifiers(Modifier.PUBLIC)
-            .returns(ConsistencyLevel.class)
-            .addStatement("return $T.$L", ConsistencyLevel.class, defaultReadConsistency)
-            .build();
   }
 
   private MethodSpec buildGetDefaultWriteConsistencyMethod(ConsistencyLevel defaultWriteConsistency) {
@@ -140,73 +127,6 @@ public class TableSerializer implements EntitySerializer<TableMetaType> {
   @Override
   public String resolveClassName(final String metaTypeClassName) {
     return metaTypeClassName + SerializationConstants.TABLE_SERIALIZATION_SUFFIX;
-  }
-
-  private MethodSpec buildColumnsGetterMethod(final String methodName, final List<ColumnFieldMetaType> columnFieldMetaTypes) {
-    ParameterizedTypeName methodReturnType = ParameterizedTypeName.get(ClassName.get(Map.class), ClassName.get(String.class),
-                                                                       ClassName.get(ColumnMetadata.class));
-    CodeBlock.Builder codeBlockBuilder = CodeBlock.builder().addStatement("$T results = new $T<>()", methodReturnType, HashMap.class);
-    for (ColumnFieldMetaType columnFieldMetaType : columnFieldMetaTypes) {
-      codeBlockBuilder.addStatement("results.put($S, $N)", columnFieldMetaType.getSerializationName(), columnFieldMetaType.getDeserializationName());
-    }
-    codeBlockBuilder.addStatement("return results");
-    return MethodSpec.methodBuilder(methodName)
-                     .addModifiers(Modifier.PUBLIC)
-                     .returns(methodReturnType)
-                     .addCode(codeBlockBuilder.build())
-                     .build();
-  }
-
-  private MethodSpec buildGetColumnMetadata() {
-    String parameterName = "columnName";
-    return MethodSpec.methodBuilder(SerializationConstants.GET_COLUMN_METADATA_METHOD)
-                     .addModifiers(Modifier.PUBLIC)
-                     .addParameter(String.class, parameterName)
-                     .returns(ColumnMetadata.class)
-                     .addStatement("return $L().get($N)", SerializationConstants.GET_COLUMNS_METADATA_METHOD, parameterName)
-                     .build();
-  }
-
-  private MethodSpec buildIsPrimaryKeyMethod() {
-    final String parameterName = "columnName";
-    return MethodSpec.methodBuilder(SerializationConstants.IS_PRIMARY_KEY_COLUMN_METHOD)
-                     .addModifiers(Modifier.PUBLIC)
-                     .addParameter(String.class, parameterName)
-                     .returns(boolean.class)
-                     .addStatement("return $L().containsKey($N) || $L().containsKey($N)",
-                                   SerializationConstants.GET_PARTITION_KEY_COLUMNS_METHOD, parameterName,
-                                   SerializationConstants.GET_CLUSTERING_KEY_COLUMNS_METHOD, parameterName)
-                     .build();
-  }
-
-  private MethodSpec buildGetPrimaryKeysMethod() {
-    ParameterizedTypeName returnType = ParameterizedTypeName.get(ClassName.get(Map.class), ClassName.get(String.class),
-                                                                 ClassName.get(ColumnMetadata.class));
-    return MethodSpec.methodBuilder(SerializationConstants.GET_PRIMARY_KEYS_METHOD)
-                     .addModifiers(Modifier.PUBLIC)
-                     .returns(returnType)
-                     .addStatement("$T result = new $T<>()", returnType, HashMap.class)
-                     .addStatement("result.putAll($L())", SerializationConstants.GET_PARTITION_KEY_COLUMNS_METHOD)
-                     .addStatement("result.putAll($L())", SerializationConstants.GET_CLUSTERING_KEY_COLUMNS_METHOD)
-                     .addStatement("return result")
-                     .build();
-  }
-
-  private MethodSpec buildGetPrimaryKeySizeMethod() {
-    return MethodSpec.methodBuilder(SerializationConstants.GET_PRIMARY_KEY_SIZE_METHOD)
-                     .addModifiers(Modifier.PUBLIC)
-                     .returns(int.class)
-                     .addStatement("return $L().size() + $L().size()",
-                                   SerializationConstants.GET_PARTITION_KEY_COLUMNS_METHOD, SerializationConstants.GET_CLUSTERING_KEY_COLUMNS_METHOD)
-                     .build();
-  }
-
-  private MethodSpec buildGetColumnsSizeMethod() {
-    return MethodSpec.methodBuilder(SerializationConstants.GET_COLUMNS_SIZE_METHOD)
-                     .addModifiers(Modifier.PUBLIC)
-                     .returns(int.class)
-                     .addStatement("return $L().size()", SerializationConstants.GET_COLUMNS_METADATA_METHOD)
-                     .build();
   }
 
   private MethodSpec buildSetGeneratedValuesMethod(final TableMetaType tableMetaType) {

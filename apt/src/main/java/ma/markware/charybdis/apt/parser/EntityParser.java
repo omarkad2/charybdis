@@ -32,6 +32,7 @@ import javax.lang.model.element.Modifier;
 import javax.lang.model.element.Name;
 import ma.markware.charybdis.apt.AptContext;
 import ma.markware.charybdis.model.annotation.Keyspace;
+import ma.markware.charybdis.model.annotation.MaterializedView;
 import ma.markware.charybdis.model.annotation.Table;
 import ma.markware.charybdis.model.annotation.Udt;
 import org.apache.commons.lang3.StringUtils;
@@ -86,14 +87,14 @@ public interface EntityParser<ENTITY_META_TYPE> {
 
   /**
    * Resolves Cql entity name from annotation attribute and Class name.
-   * See {@link Keyspace#name()}, {@link Udt#name()} and {@link Table#name()}
+   * See {@link Keyspace#name()}, {@link Udt#name()}, {@link Table#name()} and {@link MaterializedView#name()}
    */
   default String resolveName(final String annotationName, final Name className) {
-    String tableName = annotationName;
-    if (StringUtils.isBlank(tableName)) {
-      tableName = className.toString();
+    String name = annotationName;
+    if (StringUtils.isBlank(name)) {
+      name = className.toString();
     }
-    return tableName.toLowerCase();
+    return name.toLowerCase();
   }
 
   /**

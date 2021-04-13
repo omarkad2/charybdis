@@ -22,17 +22,17 @@ import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.cql.PagingState;
 import com.datastax.oss.driver.api.core.cql.ResultSet;
 import com.datastax.oss.driver.api.core.cql.Row;
-import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import ma.markware.charybdis.ExecutionContext;
 import ma.markware.charybdis.model.criteria.CriteriaExpression;
 import ma.markware.charybdis.model.criteria.ExtendedCriteriaExpression;
-import ma.markware.charybdis.model.field.metadata.TableMetadata;
+import ma.markware.charybdis.model.field.metadata.ReadableTableMetadata;
 import ma.markware.charybdis.query.PageRequest;
 import ma.markware.charybdis.query.PageResult;
 import ma.markware.charybdis.query.SelectQuery;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Responsible of entity reading in DB <b>(Internal use only)</b>.
@@ -45,7 +45,7 @@ import ma.markware.charybdis.query.SelectQuery;
 class ReadEntityManager<T> {
 
   private final SelectQuery selectQuery;
-  private TableMetadata<T> tableMetadata;
+  private ReadableTableMetadata<T> tableMetadata;
 
   ReadEntityManager(ExecutionContext executionContext) {
     this.selectQuery = new SelectQuery(executionContext);
@@ -54,7 +54,7 @@ class ReadEntityManager<T> {
   /**
    * Specify table in select query.
    */
-  ReadEntityManager<T> withTableMetadata(TableMetadata<T> table) {
+  ReadEntityManager<T> withTableMetadata(ReadableTableMetadata<T> table) {
     this.tableMetadata = table;
     selectQuery.setTableAndSelectors(table);
     return this;

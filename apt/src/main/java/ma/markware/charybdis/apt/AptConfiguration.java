@@ -19,6 +19,7 @@
 package ma.markware.charybdis.apt;
 
 import ma.markware.charybdis.apt.metatype.KeyspaceMetaType;
+import ma.markware.charybdis.apt.metatype.MaterializedViewMetaType;
 import ma.markware.charybdis.apt.metatype.TableMetaType;
 import ma.markware.charybdis.apt.metatype.UdtMetaType;
 import ma.markware.charybdis.apt.parser.EntityParser;
@@ -56,6 +57,13 @@ public interface AptConfiguration {
   EntityParser<TableMetaType> getTableParser();
 
   /**
+   * Extracts parser of classes annotated with {@link ma.markware.charybdis.model.annotation.MaterializedView}
+   *
+   * @return File parser of @MaterializedView annotated classes
+   */
+  EntityParser<MaterializedViewMetaType> getMaterializedViewParser();
+
+  /**
    * Extracts serializer used to write {@link ma.markware.charybdis.model.field.metadata.KeyspaceMetadata} custom implementation
    *
    * @return {@link KeyspaceMetaType} serializer to generate {@link ma.markware.charybdis.model.field.metadata.KeyspaceMetadata}
@@ -78,6 +86,14 @@ public interface AptConfiguration {
    * implementations
    */
   EntitySerializer<TableMetaType> getTableSerializer();
+
+  /**
+   * Extracts serializer used to write {@link ma.markware.charybdis.model.field.metadata.MaterializedViewMetadata} custom implementation
+   *
+   * @return {@link MaterializedViewMetaType} serializer to generate {@link ma.markware.charybdis.model.field.metadata.MaterializedViewMetadata}
+   * implementations
+   */
+  EntitySerializer<MaterializedViewMetaType> getMaterializedViewSerializer();
 
   /**
    * Extracts serializer used to write ddl cql scripts

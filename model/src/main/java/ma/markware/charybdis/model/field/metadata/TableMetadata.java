@@ -18,11 +18,11 @@
  */
 package ma.markware.charybdis.model.field.metadata;
 
-import com.datastax.oss.driver.api.core.cql.Row;
-import java.time.Instant;
-import java.util.Map;
 import ma.markware.charybdis.model.option.ConsistencyLevel;
 import ma.markware.charybdis.model.option.SerialConsistencyLevel;
+
+import java.time.Instant;
+import java.util.Map;
 
 /**
  * Table metadata.
@@ -31,17 +31,7 @@ import ma.markware.charybdis.model.option.SerialConsistencyLevel;
  *
  * @author Oussama Markad
  */
-public interface TableMetadata<ENTITY> {
-
-  /**
-   * @return table keyspace name.
-   */
-  String getKeyspaceName();
-
-  /**
-   * @return table name.
-   */
-  String getTableName();
+public interface TableMetadata<ENTITY> extends ReadableTableMetadata<ENTITY> {
 
   /**
    * @return Table default write consistency.
@@ -49,24 +39,9 @@ public interface TableMetadata<ENTITY> {
   ConsistencyLevel getDefaultWriteConsistency();
 
   /**
-   * @return Table default read consistency.
-   */
-  ConsistencyLevel getDefaultReadConsistency();
-
-  /**
    * @return Table default serial consistency for LWT queries.
    */
   SerialConsistencyLevel getDefaultSerialConsistency();
-
-  /**
-   * @return metadata of a given column.
-   */
-  ColumnMetadata getColumnMetadata(String columnName);
-
-  /**
-   * @return column metadata by column name mapping.
-   */
-  Map<String, ColumnMetadata> getColumnsMetadata();
 
   /**
    * @return partition key column metadata by column name mapping.
@@ -117,9 +92,4 @@ public interface TableMetadata<ENTITY> {
    * @return serialized entity as a column-value map.
    */
   Map<String, Object> serialize(ENTITY entity);
-
-  /**
-   * @return deserialized java entity from Cql row.
-   */
-  ENTITY deserialize(Row row);
 }

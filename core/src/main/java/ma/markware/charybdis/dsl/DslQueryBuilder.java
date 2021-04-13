@@ -39,6 +39,7 @@ import ma.markware.charybdis.model.field.DeletableField;
 import ma.markware.charybdis.model.field.SelectableField;
 import ma.markware.charybdis.model.field.metadata.ColumnMetadata;
 import ma.markware.charybdis.model.field.metadata.PartitionKeyColumnMetadata;
+import ma.markware.charybdis.model.field.metadata.ReadableTableMetadata;
 import ma.markware.charybdis.model.field.metadata.TableMetadata;
 import ma.markware.charybdis.model.option.ConsistencyLevel;
 import ma.markware.charybdis.model.option.SerialConsistencyLevel;
@@ -151,7 +152,7 @@ public class DslQueryBuilder implements QueryBuilder, ConsistencyTunable<DslQuer
    * @param table table of select query.
    * @return initialized select expression.
    */
-  public SelectWhereExpression selectFrom(final TableMetadata table) {
+  public SelectWhereExpression selectFrom(final ReadableTableMetadata table) {
     return new DslSelectImpl(session, executionContext).selectFrom(table);
   }
 

@@ -21,20 +21,22 @@ package ma.markware.charybdis.crud;
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.config.DriverExecutionProfile;
 import com.google.common.annotations.VisibleForTesting;
-import java.time.Instant;
-import java.util.List;
-import java.util.Optional;
 import ma.markware.charybdis.ConsistencyTunable;
 import ma.markware.charybdis.ExecutionContext;
 import ma.markware.charybdis.ExecutionProfileTunable;
 import ma.markware.charybdis.QueryBuilder;
 import ma.markware.charybdis.model.criteria.CriteriaExpression;
 import ma.markware.charybdis.model.criteria.ExtendedCriteriaExpression;
+import ma.markware.charybdis.model.field.metadata.ReadableTableMetadata;
 import ma.markware.charybdis.model.field.metadata.TableMetadata;
 import ma.markware.charybdis.model.option.ConsistencyLevel;
 import ma.markware.charybdis.model.option.SerialConsistencyLevel;
 import ma.markware.charybdis.query.PageRequest;
 import ma.markware.charybdis.query.PageResult;
+
+import java.time.Instant;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * Implementation of {@link QueryBuilder}, handle cql entities using crud semantics.
@@ -222,7 +224,7 @@ public class CrudQueryBuilder implements QueryBuilder, ConsistencyTunable<CrudQu
    * @param <T> type of entity.
    * @return the entity if found otherwise {@code null}.
    */
-  public <T> T findOne(final TableMetadata<T> table, final ExtendedCriteriaExpression conditions) {
+  public <T> T findOne(final ReadableTableMetadata<T> table, final ExtendedCriteriaExpression conditions) {
     return new ReadEntityManager<T>(executionContext).withTableMetadata(table).withConditions(conditions)
                                      .fetchOne(session);
   }
@@ -235,7 +237,7 @@ public class CrudQueryBuilder implements QueryBuilder, ConsistencyTunable<CrudQu
    * @param <T> type of entity.
    * @return the entity if found otherwise {@code null}.
    */
-  public <T> T findOne(final TableMetadata<T> table, final CriteriaExpression condition) {
+  public <T> T findOne(final ReadableTableMetadata<T> table, final CriteriaExpression condition) {
     return new ReadEntityManager<T>(executionContext).withTableMetadata(table).withCondition(condition)
                                      .fetchOne(session);
   }
@@ -248,7 +250,7 @@ public class CrudQueryBuilder implements QueryBuilder, ConsistencyTunable<CrudQu
    * @param <T> type of entity.
    * @return the entity wrapped in {@code Optional} if found otherwise {@code Optional.empty()}.
    */
-  public <T> Optional<T> findOptional(final TableMetadata<T> table, final ExtendedCriteriaExpression conditions) {
+  public <T> Optional<T> findOptional(final ReadableTableMetadata<T> table, final ExtendedCriteriaExpression conditions) {
     return Optional.ofNullable(findOne(table, conditions));
   }
 
@@ -260,7 +262,7 @@ public class CrudQueryBuilder implements QueryBuilder, ConsistencyTunable<CrudQu
    * @param <T> type of entity.
    * @return the entity wrapped in {@code Optional} if found otherwise {@code Optional.empty()}.
    */
-  public <T> Optional<T> findOptional(final TableMetadata<T> table, final CriteriaExpression condition) {
+  public <T> Optional<T> findOptional(final ReadableTableMetadata<T> table, final CriteriaExpression condition) {
     return Optional.ofNullable(findOne(table, condition));
   }
 
@@ -271,7 +273,7 @@ public class CrudQueryBuilder implements QueryBuilder, ConsistencyTunable<CrudQu
    * @param <T> type of entities.
    * @return entities from DB.
    */
-  public <T> List<T> find(final TableMetadata<T> table) {
+  public <T> List<T> find(final ReadableTableMetadata<T> table) {
     return new ReadEntityManager<T>(executionContext).withTableMetadata(table)
                                      .fetch(session);
   }
@@ -284,7 +286,7 @@ public class CrudQueryBuilder implements QueryBuilder, ConsistencyTunable<CrudQu
    * @param <T> type of entities.
    * @return entities from DB.
    */
-  public <T> List<T> find(final TableMetadata<T> table, final ExtendedCriteriaExpression conditions) {
+  public <T> List<T> find(final ReadableTableMetadata<T> table, final ExtendedCriteriaExpression conditions) {
     return new ReadEntityManager<T>(executionContext).withTableMetadata(table).withConditions(conditions)
                                      .fetch(session);
   }
@@ -297,7 +299,7 @@ public class CrudQueryBuilder implements QueryBuilder, ConsistencyTunable<CrudQu
    * @param <T> type of entities.
    * @return entities from DB.
    */
-  public <T> List<T> find(final TableMetadata<T> table, final ExtendedCriteriaExpression conditions, final boolean allowFiltering) {
+  public <T> List<T> find(final ReadableTableMetadata<T> table, final ExtendedCriteriaExpression conditions, final boolean allowFiltering) {
     return new ReadEntityManager<T>(executionContext).withTableMetadata(table).withConditions(conditions).withFiltering(allowFiltering)
                                                      .fetch(session);
   }
@@ -310,7 +312,7 @@ public class CrudQueryBuilder implements QueryBuilder, ConsistencyTunable<CrudQu
    * @param <T> type of entities.
    * @return entities from DB.
    */
-  public <T> List<T> find(final TableMetadata<T> table, final CriteriaExpression condition) {
+  public <T> List<T> find(final ReadableTableMetadata<T> table, final CriteriaExpression condition) {
     return new ReadEntityManager<T>(executionContext).withTableMetadata(table).withCondition(condition)
                                      .fetch(session);
   }
@@ -323,7 +325,7 @@ public class CrudQueryBuilder implements QueryBuilder, ConsistencyTunable<CrudQu
    * @param <T> type of entities.
    * @return entities from DB.
    */
-  public <T> List<T> find(final TableMetadata<T> table, final CriteriaExpression condition, final boolean allowFiltering) {
+  public <T> List<T> find(final ReadableTableMetadata<T> table, final CriteriaExpression condition, final boolean allowFiltering) {
     return new ReadEntityManager<T>(executionContext).withTableMetadata(table).withCondition(condition).withFiltering(allowFiltering)
                                                      .fetch(session);
   }
@@ -337,7 +339,7 @@ public class CrudQueryBuilder implements QueryBuilder, ConsistencyTunable<CrudQu
    * @param <T> type of entities.
    * @return page result of entities from DB and updated paging state {@link PageResult}.
    */
-  public <T> PageResult<T> find(final TableMetadata<T> table, final PageRequest pageRequest) {
+  public <T> PageResult<T> find(final ReadableTableMetadata<T> table, final PageRequest pageRequest) {
     return new ReadEntityManager<T>(executionContext).withTableMetadata(table)
                                      .withPaging(pageRequest)
                                      .fetchPage(session);
@@ -353,7 +355,7 @@ public class CrudQueryBuilder implements QueryBuilder, ConsistencyTunable<CrudQu
    * @param <T> type of entities.
    * @return page result of entities from DB and updated paging state {@link PageResult}.
    */
-  public <T> PageResult<T> find(final TableMetadata<T> table, final ExtendedCriteriaExpression conditions, final PageRequest pageRequest) {
+  public <T> PageResult<T> find(final ReadableTableMetadata<T> table, final ExtendedCriteriaExpression conditions, final PageRequest pageRequest) {
     return new ReadEntityManager<T>(executionContext).withTableMetadata(table).withConditions(conditions)
                                      .withPaging(pageRequest)
                                      .fetchPage(session);
@@ -369,7 +371,7 @@ public class CrudQueryBuilder implements QueryBuilder, ConsistencyTunable<CrudQu
    * @param <T> type of entities.
    * @return page result of entities from DB and updated paging state {@link PageResult}.
    */
-  public <T> PageResult<T> find(final TableMetadata<T> table, final CriteriaExpression condition, final PageRequest pageRequest) {
+  public <T> PageResult<T> find(final ReadableTableMetadata<T> table, final CriteriaExpression condition, final PageRequest pageRequest) {
     return new ReadEntityManager<T>(executionContext).withTableMetadata(table).withCondition(condition)
                                      .withPaging(pageRequest)
                                      .fetchPage(session);
