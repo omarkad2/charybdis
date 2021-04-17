@@ -54,7 +54,7 @@ public class DslQueryBuilder implements QueryBuilder, ConsistencyTunable<DslQuer
 
   private final CqlSession session;
   private final ExecutionContext executionContext;
-  private Batch batch;
+  private final Batch batch;
 
   private DslQueryBuilder(CqlSession session, ExecutionContext executionContext, Batch batch) {
     this.session = session;

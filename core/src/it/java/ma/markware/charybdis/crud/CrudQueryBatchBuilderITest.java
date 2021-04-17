@@ -19,10 +19,7 @@
 
 package ma.markware.charybdis.crud;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import com.datastax.oss.driver.api.core.CqlSession;
-import java.time.Instant;
 import ma.markware.charybdis.AbstractIntegrationITest;
 import ma.markware.charybdis.CqlTemplate;
 import ma.markware.charybdis.batch.Batch;
@@ -33,20 +30,19 @@ import ma.markware.charybdis.model.field.SelectableField;
 import ma.markware.charybdis.test.entities.TestEntity;
 import ma.markware.charybdis.test.instances.TestEntity_INST1;
 import ma.markware.charybdis.test.metadata.TestEntity_Table;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
+
+import java.time.Instant;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @TestInstance(Lifecycle.PER_CLASS)
 class CrudQueryBatchBuilderITest extends AbstractIntegrationITest {
 
   private DslQueryBuilder dsl;
   private Batch batch;
-  private CrudQueryBatchBuilder crudBatch;
+  private CrudQueryBuilder crudBatch;
 
   @BeforeAll
   void setup (CqlSession session){

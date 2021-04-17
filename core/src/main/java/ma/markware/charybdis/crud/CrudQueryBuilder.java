@@ -25,6 +25,7 @@ import ma.markware.charybdis.ConsistencyTunable;
 import ma.markware.charybdis.ExecutionContext;
 import ma.markware.charybdis.ExecutionProfileTunable;
 import ma.markware.charybdis.QueryBuilder;
+import ma.markware.charybdis.batch.Batch;
 import ma.markware.charybdis.model.criteria.CriteriaExpression;
 import ma.markware.charybdis.model.criteria.ExtendedCriteriaExpression;
 import ma.markware.charybdis.model.field.metadata.ReadableTableMetadata;
@@ -47,14 +48,20 @@ public class CrudQueryBuilder implements QueryBuilder, ConsistencyTunable<CrudQu
 
   private final CqlSession session;
   private final ExecutionContext executionContext;
+  private final Batch batch;
 
-  private CrudQueryBuilder(CqlSession session, ExecutionContext executionContext) {
+  private CrudQueryBuilder(CqlSession session, ExecutionContext executionContext, Batch batch) {
     this.session = session;
     this.executionContext = executionContext;
+    this.batch = batch;
+  }
+
+  public CrudQueryBuilder(CqlSession session, Batch batch) {
+    this(session, new ExecutionContext(), batch);
   }
 
   public CrudQueryBuilder(CqlSession session) {
-    this(session, new ExecutionContext());
+    this(session, new ExecutionContext(), null);
   }
 
   @VisibleForTesting
@@ -69,7 +76,7 @@ public class CrudQueryBuilder implements QueryBuilder, ConsistencyTunable<CrudQu
   public CrudQueryBuilder withConsistency(ConsistencyLevel consistencyLevel) {
     ExecutionContext executionContext = new ExecutionContext(this.executionContext);
     executionContext.setConsistencyLevel(consistencyLevel);
-    return new CrudQueryBuilder(session, executionContext);
+    return new CrudQueryBuilder(session, executionContext, batch);
   }
 
   /**
@@ -79,7 +86,7 @@ public class CrudQueryBuilder implements QueryBuilder, ConsistencyTunable<CrudQu
   public CrudQueryBuilder withSerialConsistency(SerialConsistencyLevel serialConsistencyLevel) {
     ExecutionContext executionContext = new ExecutionContext(this.executionContext);
     executionContext.setSerialConsistencyLevel(serialConsistencyLevel);
-    return new CrudQueryBuilder(session, executionContext);
+    return new CrudQueryBuilder(session, executionContext, batch);
   }
 
   /**
@@ -89,7 +96,7 @@ public class CrudQueryBuilder implements QueryBuilder, ConsistencyTunable<CrudQu
   public CrudQueryBuilder withExecutionProfile(DriverExecutionProfile executionProfile) {
     ExecutionContext executionContext = new ExecutionContext(this.executionContext);
     executionContext.setDriverExecutionProfile(executionProfile);
-    return new CrudQueryBuilder(session, executionContext);
+    return new CrudQueryBuilder(session, executionContext, batch);
   }
 
   /**
@@ -99,7 +106,7 @@ public class CrudQueryBuilder implements QueryBuilder, ConsistencyTunable<CrudQu
   public CrudQueryBuilder withExecutionProfile(String executionProfile) {
     ExecutionContext executionContext = new ExecutionContext(this.executionContext);
     executionContext.setExecutionProfileName(executionProfile);
-    return new CrudQueryBuilder(session, executionContext);
+    return new CrudQueryBuilder(session, executionContext, batch);
   }
 
   /**
@@ -111,7 +118,12 @@ public class CrudQueryBuilder implements QueryBuilder, ConsistencyTunable<CrudQu
    * @return persisted entity.
    */
   public <T> T create(final TableMetadata<T> table, final T entity) {
-    return new CreateEntityManager<T>(executionContext).withTableMetadata(table).withEntity(entity).save(session);
+    CreateEntityManager<T> createEntityManager = new CreateEntityManager<T>(executionContext).withTableMetadata(table).withEntity(entity);
+    if (batch != null) {
+      createEntityManager.addToBatch(batch);
+      return null;
+    }
+    return createEntityManager.save(session);
   }
 
   /**
@@ -126,8 +138,13 @@ public class CrudQueryBuilder implements QueryBuilder, ConsistencyTunable<CrudQu
    * @return persisted entity.
    */
   public <T> T create(final TableMetadata<T> table, final T entity, final boolean ifNotExists) {
-    return new CreateEntityManager<T>(executionContext).withTableMetadata(table).withEntity(entity).withIfNotExists(ifNotExists)
-                                       .save(session);
+    CreateEntityManager<T> createEntityManager = new CreateEntityManager<T>(executionContext).withTableMetadata(table)
+        .withEntity(entity).withIfNotExists(ifNotExists);
+    if  (batch != null) {
+      createEntityManager.addToBatch(batch);
+      return null;
+    }
+    return createEntityManager.save(session);
   }
 
   /**
@@ -140,8 +157,13 @@ public class CrudQueryBuilder implements QueryBuilder, ConsistencyTunable<CrudQu
    * @return persisted entity.
    */
   public <T> T create(final TableMetadata<T> table, final T entity, final int seconds) {
-    return new CreateEntityManager<T>(executionContext).withTableMetadata(table).withEntity(entity).withTtl(seconds)
-                                       .save(session);
+    CreateEntityManager<T> createEntityManager = new CreateEntityManager<T>(executionContext).withTableMetadata(table)
+        .withEntity(entity).withTtl(seconds);
+    if  (batch != null) {
+      createEntityManager.addToBatch(batch);
+      return null;
+    }
+    return createEntityManager.save(session);
   }
 
   /**
@@ -157,8 +179,13 @@ public class CrudQueryBuilder implements QueryBuilder, ConsistencyTunable<CrudQu
    * @return persisted entity.
    */
   public <T> T create(final TableMetadata<T> table, final T entity, final boolean ifNotExists, final int seconds) {
-    return new CreateEntityManager<T>(executionContext).withTableMetadata(table).withEntity(entity).withIfNotExists(ifNotExists).withTtl(seconds)
-                                       .save(session);
+    CreateEntityManager<T> createEntityManager = new CreateEntityManager<T>(executionContext).withTableMetadata(table)
+        .withEntity(entity).withIfNotExists(ifNotExists).withTtl(seconds);
+    if  (batch != null) {
+      createEntityManager.addToBatch(batch);
+      return null;
+    }
+    return createEntityManager.save(session);
   }
 
   /**
@@ -171,8 +198,13 @@ public class CrudQueryBuilder implements QueryBuilder, ConsistencyTunable<CrudQu
    * @return persisted entity.
    */
   public <T> T create(final TableMetadata<T> table, final T entity, final Instant timestamp) {
-    return new CreateEntityManager<T>(executionContext).withTableMetadata(table).withEntity(entity).withTimestamp(timestamp)
-                                       .save(session);
+    CreateEntityManager<T> createEntityManager = new CreateEntityManager<T>(executionContext).withTableMetadata(table)
+        .withEntity(entity).withTimestamp(timestamp);
+    if  (batch != null) {
+      createEntityManager.addToBatch(batch);
+      return null;
+    }
+    return createEntityManager.save(session);
   }
 
   /**
@@ -185,8 +217,13 @@ public class CrudQueryBuilder implements QueryBuilder, ConsistencyTunable<CrudQu
    * @return persisted entity.
    */
   public <T> T create(final TableMetadata<T> table, final T entity, final long timestamp) {
-    return new CreateEntityManager<T>(executionContext).withTableMetadata(table).withEntity(entity).withTimestamp(timestamp)
-                                       .save(session);
+    CreateEntityManager<T> createEntityManager = new CreateEntityManager<T>(executionContext).withTableMetadata(table)
+        .withEntity(entity).withTimestamp(timestamp);
+    if  (batch != null) {
+      createEntityManager.addToBatch(batch);
+      return null;
+    }
+    return createEntityManager.save(session);
   }
 
   /**
@@ -199,8 +236,12 @@ public class CrudQueryBuilder implements QueryBuilder, ConsistencyTunable<CrudQu
    * @return updated entity.
    */
   public <T> T update(final TableMetadata<T> table, final T entity) {
-    return new UpdateEntityManager<T>(executionContext).withTableMetadata(table).withEntity(entity)
-                                       .save(session);
+    UpdateEntityManager<T> updateEntityManager = new UpdateEntityManager<T>(executionContext).withTableMetadata(table).withEntity(entity);
+    if  (batch != null) {
+      updateEntityManager.addToBatch(batch);
+      return null;
+    }
+    return updateEntityManager.save(session);
   }
 
   /**
@@ -212,8 +253,12 @@ public class CrudQueryBuilder implements QueryBuilder, ConsistencyTunable<CrudQu
    * @return true if entity deleted.
    */
   public <T> boolean delete(final TableMetadata<T> table, final T entity) {
-    return new DeleteEntityManager<T>(executionContext).withTableMetadata(table).withEntity(entity)
-                                       .save(session);
+    DeleteEntityManager<T> deleteEntityManager = new DeleteEntityManager<T>(executionContext).withTableMetadata(table).withEntity(entity);
+    if  (batch != null) {
+      deleteEntityManager.addToBatch(batch);
+      return true;
+    }
+    return deleteEntityManager.save(session);
   }
 
   /**

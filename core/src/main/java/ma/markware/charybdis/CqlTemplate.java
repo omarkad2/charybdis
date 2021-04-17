@@ -22,7 +22,6 @@ package ma.markware.charybdis;
 import com.datastax.oss.driver.api.core.CqlSession;
 import ma.markware.charybdis.batch.Batch;
 import ma.markware.charybdis.batch.BatchQueryBuilder;
-import ma.markware.charybdis.crud.CrudQueryBatchBuilder;
 import ma.markware.charybdis.crud.CrudQueryBuilder;
 import ma.markware.charybdis.dsl.DslQueryBuilder;
 import ma.markware.charybdis.session.DefaultSessionFactory;
@@ -103,7 +102,7 @@ public class CqlTemplate {
    * @return Crud API
    */
   public CrudQueryBuilder crud() {
-    return new CrudQueryBuilder(sessionFactory.getSession());
+    return crud(defaultBatch);
   }
 
   /**
@@ -112,8 +111,8 @@ public class CqlTemplate {
    * @param batch enclosing batch query
    * @return Crud API
    */
-  public CrudQueryBatchBuilder crud(Batch batch) {
-    return new CrudQueryBatchBuilder(batch);
+  public CrudQueryBuilder crud(Batch batch) {
+    return new CrudQueryBuilder(sessionFactory.getSession(), batch);
   }
 
   /**
