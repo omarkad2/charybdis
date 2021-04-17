@@ -312,7 +312,7 @@ cqlTemplate.executeAsLoggedBatch(() -> {
   personService.persistPersonBySsn(person);
 });
 ```
-Both queries *Query1* and *Query2* will be executed as a single logged batch.
+Both queries *Query1* and *Query2* will be executed as a single logged batch query.
 
 ### Lightweight Transaction
 Charybdis also handles lightweight transactions in order to prevent race conditions in
