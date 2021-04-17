@@ -21,22 +21,20 @@ package ma.markware.charybdis.dsl.update;
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.cql.AsyncResultSet;
 import com.datastax.oss.driver.api.core.cql.ResultSet;
-import java.time.Instant;
-import java.util.concurrent.CompletableFuture;
 import ma.markware.charybdis.ExecutionContext;
+import ma.markware.charybdis.batch.Batch;
 import ma.markware.charybdis.model.assignment.AssignmentListValue;
 import ma.markware.charybdis.model.assignment.AssignmentMapValue;
 import ma.markware.charybdis.model.assignment.AssignmentSetValue;
 import ma.markware.charybdis.model.criteria.CriteriaExpression;
-import ma.markware.charybdis.model.field.metadata.ColumnMetadata;
-import ma.markware.charybdis.model.field.metadata.ListColumnMetadata;
-import ma.markware.charybdis.model.field.metadata.MapColumnMetadata;
-import ma.markware.charybdis.model.field.metadata.SetColumnMetadata;
-import ma.markware.charybdis.model.field.metadata.TableMetadata;
+import ma.markware.charybdis.model.field.metadata.*;
 import ma.markware.charybdis.model.field.nested.ListNestedField;
 import ma.markware.charybdis.model.field.nested.MapNestedField;
 import ma.markware.charybdis.model.field.nested.UdtNestedField;
 import ma.markware.charybdis.query.UpdateQuery;
+
+import java.time.Instant;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Update query builder.
@@ -50,10 +48,12 @@ public class DslUpdateImpl
     UpdateExtraIfExpression, UpdateFinalExpression {
 
   private final CqlSession session;
+  private final Batch batch;
 
-  public DslUpdateImpl(final CqlSession session, final ExecutionContext executionContext) {
+  public DslUpdateImpl(final CqlSession session, final ExecutionContext executionContext, Batch batch) {
     super(new UpdateQuery(executionContext));
     this.session = session;
+    this.batch = batch;
   }
 
   /**
@@ -196,6 +196,10 @@ public class DslUpdateImpl
    */
   @Override
   public boolean execute() {
+    if (batch != null) {
+      updateQuery.addToBatch(batch);
+      return true;
+    }
     ResultSet resultSet = updateQuery.execute(session);
     return resultSet != null && resultSet.wasApplied();
   }
@@ -205,6 +209,10 @@ public class DslUpdateImpl
    */
   @Override
   public CompletableFuture<Boolean> executeAsync() {
+    if (batch != null) {
+      updateQuery.addToBatch(batch);
+      return CompletableFuture.completedFuture(true);
+    }
     return updateQuery.executeAsync(session).thenApply(AsyncResultSet::wasApplied);
   }
 }

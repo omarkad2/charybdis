@@ -24,7 +24,6 @@ import ma.markware.charybdis.batch.Batch;
 import ma.markware.charybdis.batch.BatchQueryBuilder;
 import ma.markware.charybdis.crud.CrudQueryBatchBuilder;
 import ma.markware.charybdis.crud.CrudQueryBuilder;
-import ma.markware.charybdis.dsl.DslQueryBatchBuilder;
 import ma.markware.charybdis.dsl.DslQueryBuilder;
 import ma.markware.charybdis.session.DefaultSessionFactory;
 import ma.markware.charybdis.session.SessionFactory;
@@ -41,6 +40,7 @@ import ma.markware.charybdis.session.StandaloneSessionFactory;
 public class CqlTemplate {
 
   private final SessionFactory sessionFactory;
+  private Batch defaultBatch;
 
   /**
    * Initialize the data manager using a custom session factory.
@@ -84,7 +84,7 @@ public class CqlTemplate {
    * @return Dsl API
    */
   public DslQueryBuilder dsl() {
-    return new DslQueryBuilder(sessionFactory.getSession());
+    return dsl(defaultBatch);
   }
 
   /**
@@ -93,8 +93,8 @@ public class CqlTemplate {
    * @param batch enclosing batch query
    * @return Dsl API
    */
-  public DslQueryBatchBuilder dsl(Batch batch) {
-    return new DslQueryBatchBuilder(batch);
+  public DslQueryBuilder dsl(Batch batch) {
+    return new DslQueryBuilder(sessionFactory.getSession(), batch);
   }
 
   /**
@@ -121,5 +121,17 @@ public class CqlTemplate {
    */
   public BatchQueryBuilder batch() {
     return new BatchQueryBuilder(sessionFactory.getSession());
+  }
+
+  public void executeInBatch(BatchCallback batchCallback) {
+    this.defaultBatch = batch().logged();
+    batchCallback.execute();
+    this.defaultBatch = null;
+  }
+
+  @FunctionalInterface
+  public interface BatchCallback {
+
+    void execute();
   }
 }

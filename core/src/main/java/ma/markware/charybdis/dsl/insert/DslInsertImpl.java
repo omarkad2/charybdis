@@ -21,12 +21,14 @@ package ma.markware.charybdis.dsl.insert;
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.cql.AsyncResultSet;
 import com.datastax.oss.driver.api.core.cql.ResultSet;
-import java.time.Instant;
-import java.util.concurrent.CompletableFuture;
 import ma.markware.charybdis.ExecutionContext;
+import ma.markware.charybdis.batch.Batch;
 import ma.markware.charybdis.model.field.metadata.ColumnMetadata;
 import ma.markware.charybdis.model.field.metadata.TableMetadata;
 import ma.markware.charybdis.query.InsertQuery;
+
+import java.time.Instant;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Insert query builder.
@@ -39,10 +41,12 @@ public class DslInsertImpl
     InsertOnExistExpression, InsertTtlExpression, InsertTimestampExpression, InsertFinalExpression {
 
   private final CqlSession session;
+  private final Batch batch;
 
-  public DslInsertImpl(final CqlSession session, final ExecutionContext executionContext) {
+  public DslInsertImpl(final CqlSession session, final ExecutionContext executionContext, Batch batch) {
     super(new InsertQuery(executionContext));
     this.session = session;
+    this.batch = batch;
   }
 
   /**
@@ -121,6 +125,10 @@ public class DslInsertImpl
    */
   @Override
   public boolean execute() {
+    if (batch != null) {
+      insertQuery.addToBatch(batch);
+      return true;
+    }
     ResultSet resultSet = insertQuery.execute(session);
     return resultSet.wasApplied();
   }
@@ -130,6 +138,10 @@ public class DslInsertImpl
    */
   @Override
   public CompletableFuture<Boolean> executeAsync() {
+    if (batch != null) {
+      insertQuery.addToBatch(batch);
+      return CompletableFuture.completedFuture(true);
+    }
     return insertQuery.executeAsync(session).thenApply(AsyncResultSet::wasApplied);
   }
 }

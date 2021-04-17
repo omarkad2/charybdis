@@ -18,9 +18,6 @@
  */
 package ma.markware.charybdis.dsl.update;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.tuple;
-
 import com.datastax.oss.driver.api.core.CqlIdentifier;
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.internal.querybuilder.condition.DefaultCondition;
@@ -33,14 +30,6 @@ import com.datastax.oss.driver.internal.querybuilder.update.DefaultAssignment;
 import com.datastax.oss.driver.internal.querybuilder.update.PrependAssignment;
 import com.datastax.oss.driver.internal.querybuilder.update.RemoveAssignment;
 import com.google.common.collect.ImmutableMap;
-import java.time.Instant;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
 import ma.markware.charybdis.ExecutionContext;
 import ma.markware.charybdis.model.option.ConsistencyLevel;
 import ma.markware.charybdis.query.UpdateQuery;
@@ -54,6 +43,12 @@ import ma.markware.charybdis.test.metadata.TestExtraUdt_Udt;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 
+import java.time.Instant;
+import java.util.*;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
+
 class DslUpdateImplTest extends AbstractDslUpdateTest<DslUpdateImpl> {
 
   @Mock
@@ -61,7 +56,7 @@ class DslUpdateImplTest extends AbstractDslUpdateTest<DslUpdateImpl> {
 
   @Override
   DslUpdateImpl getInstance() {
-    return new DslUpdateImpl(session, new ExecutionContext());
+    return new DslUpdateImpl(session, new ExecutionContext(), null);
   }
 
   @Test
@@ -331,7 +326,7 @@ class DslUpdateImplTest extends AbstractDslUpdateTest<DslUpdateImpl> {
   @Test
   void update_should_set_fallback_consistency() {
     ExecutionContext executionContext = new ExecutionContext();
-    DslUpdateImpl dslUpdate = new DslUpdateImpl(session, executionContext);
+    DslUpdateImpl dslUpdate = new DslUpdateImpl(session, executionContext, null);
     dslUpdate.update(TestEntity_Table.test_entity);
     assertThat(executionContext.getDefaultConsistencyLevel()).isEqualTo(ConsistencyLevel.QUORUM);
   }

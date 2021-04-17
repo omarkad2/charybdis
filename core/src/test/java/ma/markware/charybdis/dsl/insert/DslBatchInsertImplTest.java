@@ -19,14 +19,8 @@
 
 package ma.markware.charybdis.dsl.insert;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import com.datastax.oss.driver.api.core.CqlSession;
+import ma.markware.charybdis.ExecutionContext;
 import ma.markware.charybdis.batch.Batch;
 import ma.markware.charybdis.query.InsertQuery;
 import ma.markware.charybdis.test.metadata.TestEntity_Table;
@@ -34,14 +28,25 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 
-class DslBatchInsertImplTest extends AbstractDslInsertTest<DslBatchInsertImpl> {
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+class DslBatchInsertImplTest extends AbstractDslInsertTest<DslInsertImpl> {
+
+  @Mock
+  private CqlSession session;
   @Mock
   private Batch batch;
 
   @Override
-  DslBatchInsertImpl getInstance() {
-    return new DslBatchInsertImpl(batch);
+  DslInsertImpl getInstance() {
+    return new DslInsertImpl(session, new ExecutionContext(), batch);
   }
 
   @Test

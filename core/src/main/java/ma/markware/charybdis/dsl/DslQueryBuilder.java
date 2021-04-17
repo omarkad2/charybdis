@@ -25,6 +25,7 @@ import ma.markware.charybdis.ConsistencyTunable;
 import ma.markware.charybdis.ExecutionContext;
 import ma.markware.charybdis.ExecutionProfileTunable;
 import ma.markware.charybdis.QueryBuilder;
+import ma.markware.charybdis.batch.Batch;
 import ma.markware.charybdis.dsl.delete.DeleteInitExpression;
 import ma.markware.charybdis.dsl.delete.DslDeleteImpl;
 import ma.markware.charybdis.dsl.insert.DslInsertImpl;
@@ -53,14 +54,20 @@ public class DslQueryBuilder implements QueryBuilder, ConsistencyTunable<DslQuer
 
   private final CqlSession session;
   private final ExecutionContext executionContext;
+  private Batch batch;
 
-  private DslQueryBuilder(CqlSession session, ExecutionContext executionContext) {
+  private DslQueryBuilder(CqlSession session, ExecutionContext executionContext, Batch batch) {
     this.session = session;
     this.executionContext = executionContext;
+    this.batch = batch;
   }
 
   public DslQueryBuilder(CqlSession session) {
-    this(session, new ExecutionContext());
+    this(session, new ExecutionContext(), null);
+  }
+
+  public DslQueryBuilder(CqlSession session, Batch batch) {
+    this(session, new ExecutionContext(), batch);
   }
 
   @VisibleForTesting
@@ -75,7 +82,7 @@ public class DslQueryBuilder implements QueryBuilder, ConsistencyTunable<DslQuer
   public DslQueryBuilder withExecutionProfile(DriverExecutionProfile executionProfile) {
     ExecutionContext executionContext = new ExecutionContext(this.executionContext);
     executionContext.setDriverExecutionProfile(executionProfile);
-    return new DslQueryBuilder(session, executionContext);
+    return new DslQueryBuilder(session, executionContext, batch);
   }
 
   /**
@@ -85,7 +92,7 @@ public class DslQueryBuilder implements QueryBuilder, ConsistencyTunable<DslQuer
   public DslQueryBuilder withExecutionProfile(String executionProfile) {
     ExecutionContext executionContext = new ExecutionContext(this.executionContext);
     executionContext.setExecutionProfileName(executionProfile);
-    return new DslQueryBuilder(session, executionContext);
+    return new DslQueryBuilder(session, executionContext, batch);
   }
 
   /**
@@ -95,7 +102,7 @@ public class DslQueryBuilder implements QueryBuilder, ConsistencyTunable<DslQuer
   public DslQueryBuilder withConsistency(ConsistencyLevel consistencyLevel) {
     ExecutionContext executionContext = new ExecutionContext(this.executionContext);
     executionContext.setConsistencyLevel(consistencyLevel);
-    return new DslQueryBuilder(session, executionContext);
+    return new DslQueryBuilder(session, executionContext, batch);
   }
 
   /**
@@ -105,7 +112,7 @@ public class DslQueryBuilder implements QueryBuilder, ConsistencyTunable<DslQuer
   public DslQueryBuilder withSerialConsistency(SerialConsistencyLevel serialConsistencyLevel) {
     ExecutionContext executionContext = new ExecutionContext(this.executionContext);
     executionContext.setSerialConsistencyLevel(serialConsistencyLevel);
-    return new DslQueryBuilder(session, executionContext);
+    return new DslQueryBuilder(session, executionContext, batch);
   }
 
   /**
@@ -152,7 +159,7 @@ public class DslQueryBuilder implements QueryBuilder, ConsistencyTunable<DslQuer
    * @param table table of select query.
    * @return initialized select expression.
    */
-  public SelectWhereExpression selectFrom(final ReadableTableMetadata table) {
+  public SelectWhereExpression selectFrom(final ReadableTableMetadata<?> table) {
     return new DslSelectImpl(session, executionContext).selectFrom(table);
   }
 
@@ -170,7 +177,7 @@ public class DslQueryBuilder implements QueryBuilder, ConsistencyTunable<DslQuer
    * @return initialized insert expression.
    */
   public InsertInitExpression insertInto(final TableMetadata table) {
-    return new DslInsertImpl(session, executionContext).insertInto(table);
+    return new DslInsertImpl(session, executionContext, batch).insertInto(table);
   }
 
   /**
@@ -187,7 +194,7 @@ public class DslQueryBuilder implements QueryBuilder, ConsistencyTunable<DslQuer
    * @return initialized insert expression.
    */
   public InsertInitWithColumnsExpression insertInto(TableMetadata table, ColumnMetadata... columns) {
-    return new DslInsertImpl(session, executionContext).insertInto(table, columns);
+    return new DslInsertImpl(session, executionContext, batch).insertInto(table, columns);
   }
 
   /**
@@ -205,7 +212,7 @@ public class DslQueryBuilder implements QueryBuilder, ConsistencyTunable<DslQuer
    * @return initialized update expression.
    */
   public UpdateInitExpression update(TableMetadata table) {
-    return new DslUpdateImpl(session, executionContext).update(table);
+    return new DslUpdateImpl(session, executionContext, batch).update(table);
   }
 
   /**
@@ -222,7 +229,7 @@ public class DslQueryBuilder implements QueryBuilder, ConsistencyTunable<DslQuer
    * @return initialized delete expression.
    */
   public DeleteInitExpression delete() {
-    return new DslDeleteImpl(session, executionContext).delete();
+    return new DslDeleteImpl(session, executionContext, batch).delete();
   }
 
   /**
@@ -238,6 +245,6 @@ public class DslQueryBuilder implements QueryBuilder, ConsistencyTunable<DslQuer
    * @return initialized delete expression.
    */
   public DeleteInitExpression delete(final DeletableField... fields) {
-    return new DslDeleteImpl(session, executionContext).delete(fields);
+    return new DslDeleteImpl(session, executionContext, batch).delete(fields);
   }
 }

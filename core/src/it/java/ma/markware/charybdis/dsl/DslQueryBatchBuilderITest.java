@@ -19,22 +19,9 @@
 
 package ma.markware.charybdis.dsl;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import ma.markware.charybdis.AbstractIntegrationITest;
 import ma.markware.charybdis.CqlTemplate;
 import ma.markware.charybdis.batch.Batch;
@@ -46,19 +33,20 @@ import ma.markware.charybdis.test.instances.TestEntity_INST1;
 import ma.markware.charybdis.test.instances.TestEntity_INST2;
 import ma.markware.charybdis.test.metadata.TestEntity_Table;
 import ma.markware.charybdis.test.metadata.TestExtraUdt_Udt;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
+
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @TestInstance(Lifecycle.PER_CLASS)
 class DslQueryBatchBuilderITest  extends AbstractIntegrationITest {
 
   private Batch batch;
-  private DslQueryBatchBuilder dslBatch;
+  private DslQueryBuilder dslBatch;
   private DslQueryBuilder dsl;
 
   @BeforeAll

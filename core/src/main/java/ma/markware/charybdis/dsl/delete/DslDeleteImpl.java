@@ -21,13 +21,15 @@ package ma.markware.charybdis.dsl.delete;
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.cql.AsyncResultSet;
 import com.datastax.oss.driver.api.core.cql.ResultSet;
-import java.time.Instant;
-import java.util.concurrent.CompletableFuture;
 import ma.markware.charybdis.ExecutionContext;
+import ma.markware.charybdis.batch.Batch;
 import ma.markware.charybdis.model.criteria.CriteriaExpression;
 import ma.markware.charybdis.model.field.DeletableField;
 import ma.markware.charybdis.model.field.metadata.TableMetadata;
 import ma.markware.charybdis.query.DeleteQuery;
+
+import java.time.Instant;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Delete query builder.
@@ -40,10 +42,12 @@ public class DslDeleteImpl
     DeleteFinalExpression {
 
   private final CqlSession session;
+  private final Batch batch;
 
-  public DslDeleteImpl(final CqlSession session, final ExecutionContext executionContext) {
+  public DslDeleteImpl(final CqlSession session, final ExecutionContext executionContext, Batch batch) {
     super(new DeleteQuery(executionContext));
     this.session = session;
+    this.batch = batch;
   }
 
   /**
@@ -129,6 +133,10 @@ public class DslDeleteImpl
    */
   @Override
   public boolean execute() {
+    if (batch != null) {
+      deleteQuery.addToBatch(batch);
+      return true;
+    }
     ResultSet resultSet = deleteQuery.execute(session);
     return resultSet != null && resultSet.wasApplied();
   }
@@ -138,6 +146,10 @@ public class DslDeleteImpl
    */
   @Override
   public CompletableFuture<Boolean> executeAsync() {
+    if (batch != null) {
+      deleteQuery.addToBatch(batch);
+      return CompletableFuture.completedFuture(true);
+    }
     return deleteQuery.executeAsync(session).thenApply(AsyncResultSet::wasApplied);
   }
 }
