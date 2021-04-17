@@ -20,8 +20,6 @@ package ma.markware.charybdis.crud;
 
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.cql.ResultSet;
-import java.util.Map;
-import java.util.Map.Entry;
 import ma.markware.charybdis.ExecutionContext;
 import ma.markware.charybdis.batch.Batch;
 import ma.markware.charybdis.model.criteria.CriteriaExpression;
@@ -30,6 +28,9 @@ import ma.markware.charybdis.model.field.metadata.TableMetadata;
 import ma.markware.charybdis.query.DeleteQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * Responsible of entity creation in DB <b>(Internal use only)</b>.
@@ -46,10 +47,6 @@ public class DeleteEntityManager<T> {
   private final DeleteQuery deleteQuery;
   private TableMetadata<T> tableMetadata;
   private T entity;
-
-  DeleteEntityManager() {
-    this.deleteQuery = new DeleteQuery();
-  }
 
   DeleteEntityManager(ExecutionContext executionContext) {
     this.deleteQuery = new DeleteQuery(executionContext);

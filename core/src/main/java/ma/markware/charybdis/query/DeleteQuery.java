@@ -23,18 +23,19 @@ import com.datastax.oss.driver.api.querybuilder.QueryBuilder;
 import com.datastax.oss.driver.api.querybuilder.delete.Delete;
 import com.datastax.oss.driver.api.querybuilder.delete.DeleteSelection;
 import com.datastax.oss.driver.api.querybuilder.select.Selector;
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Function;
-import java.util.stream.Stream;
-import javax.annotation.Nonnull;
 import ma.markware.charybdis.ExecutionContext;
 import ma.markware.charybdis.model.criteria.CriteriaExpression;
 import ma.markware.charybdis.model.field.DeletableField;
 import ma.markware.charybdis.model.field.metadata.TableMetadata;
 import ma.markware.charybdis.query.clause.ConditionClause;
 import ma.markware.charybdis.query.clause.WhereClause;
+
+import javax.annotation.Nonnull;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Stream;
 
 /**
  * Delete query.
@@ -52,10 +53,6 @@ public class DeleteQuery extends AbstractQuery {
 
   public DeleteQuery(@Nonnull ExecutionContext executionContext) {
     super(executionContext);
-  }
-
-  public DeleteQuery() {
-    super(new ExecutionContext());
   }
 
   public String getKeyspace() {

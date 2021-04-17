@@ -23,28 +23,25 @@ import com.datastax.oss.driver.api.querybuilder.QueryBuilder;
 import com.datastax.oss.driver.api.querybuilder.update.Update;
 import com.datastax.oss.driver.api.querybuilder.update.UpdateStart;
 import com.datastax.oss.driver.api.querybuilder.update.UpdateWithAssignments;
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Function;
-import java.util.stream.Stream;
-import javax.annotation.Nonnull;
 import ma.markware.charybdis.ExecutionContext;
 import ma.markware.charybdis.model.assignment.AssignmentListValue;
 import ma.markware.charybdis.model.assignment.AssignmentMapValue;
 import ma.markware.charybdis.model.assignment.AssignmentSetValue;
 import ma.markware.charybdis.model.criteria.CriteriaExpression;
-import ma.markware.charybdis.model.field.metadata.ColumnMetadata;
-import ma.markware.charybdis.model.field.metadata.ListColumnMetadata;
-import ma.markware.charybdis.model.field.metadata.MapColumnMetadata;
-import ma.markware.charybdis.model.field.metadata.SetColumnMetadata;
-import ma.markware.charybdis.model.field.metadata.TableMetadata;
+import ma.markware.charybdis.model.field.metadata.*;
 import ma.markware.charybdis.model.field.nested.ListNestedField;
 import ma.markware.charybdis.model.field.nested.MapNestedField;
 import ma.markware.charybdis.model.field.nested.UdtNestedField;
 import ma.markware.charybdis.query.clause.AssignmentClause;
 import ma.markware.charybdis.query.clause.ConditionClause;
 import ma.markware.charybdis.query.clause.WhereClause;
+
+import javax.annotation.Nonnull;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Stream;
 
 /**
  * Update query.
@@ -63,10 +60,6 @@ public class UpdateQuery extends AbstractQuery {
 
   public UpdateQuery(@Nonnull ExecutionContext executionContext) {
     super(executionContext);
-  }
-
-  public UpdateQuery() {
-    super(new ExecutionContext());
   }
 
   public String getKeyspace() {
