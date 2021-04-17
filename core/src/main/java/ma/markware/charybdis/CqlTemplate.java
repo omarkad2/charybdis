@@ -140,7 +140,7 @@ public class CqlTemplate {
    * @param action a set of write queries
    */
   public void executeAsUnloggedBatch(BatchContextCallback action) {
-    this.defaultBatch = batch().logged();
+    this.defaultBatch = batch().unlogged();
     action.execute();
     defaultBatch.execute();
     this.defaultBatch = null;
