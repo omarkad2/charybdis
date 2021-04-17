@@ -45,13 +45,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 @TestInstance(Lifecycle.PER_CLASS)
 class DslQueryBatchBuilderITest  extends AbstractIntegrationITest {
 
+  private CqlTemplate cqlTemplate;
   private Batch batch;
   private DslQueryBuilder dslBatch;
   private DslQueryBuilder dsl;
 
   @BeforeAll
   void setup(CqlSession session) {
-    CqlTemplate cqlTemplate = new CqlTemplate(session);
+    cqlTemplate = new CqlTemplate(session);
     batch = cqlTemplate.batch().logged();
     dslBatch = cqlTemplate.dsl(batch);
     dsl = cqlTemplate.dsl();
@@ -580,5 +581,26 @@ class DslQueryBatchBuilderITest  extends AbstractIntegrationITest {
       // Then
       assertThat(record.get(TestEntity_Table.flag)).isNull();
     }
+  }
+
+  @Test
+  void cqlTemplate_executeInBatch() {
+    // Given
+    cqlTemplate.executeInBatch(() -> {
+      dsl.insertInto(TestEntity_Table.test_entity, TestEntity_Table.id, TestEntity_Table.date, TestEntity_Table.udt, TestEntity_Table.list, TestEntity_Table.flag)
+          .values(TestEntity_INST1.id, TestEntity_INST1.date, TestEntity_INST1.udt1, TestEntity_INST1.list, false)
+          .execute();
+      dsl.insertInto(TestEntity_Table.test_entity, TestEntity_Table.id, TestEntity_Table.date, TestEntity_Table.udt, TestEntity_Table.list, TestEntity_Table.flag)
+          .values(TestEntity_INST2.id, TestEntity_INST2.date, TestEntity_INST2.udt, TestEntity_INST2.list, true)
+          .ifNotExists()
+          .execute();
+    });
+
+    // When
+    Collection<Record> records = dsl.selectFrom(TestEntity_Table.test_entity)
+        .fetch();
+
+    // Then
+    assertThat(records).hasSize(2);
   }
 }

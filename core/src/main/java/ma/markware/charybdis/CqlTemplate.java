@@ -125,6 +125,7 @@ public class CqlTemplate {
   public void executeInBatch(BatchCallback batchCallback) {
     this.defaultBatch = batch().logged();
     batchCallback.execute();
+    defaultBatch.execute();
     this.defaultBatch = null;
   }
 
