@@ -309,7 +309,7 @@ cqlTemplate.executeAsLoggedBatch(() -> {
              .values(1, "999-00-1111", "Franklin Roosevelt")
              .execute();
   // Query2: Persist person_by_ssn using a custom service (which in turn uses Charybdis's Crud or Dsl API)
-  eventLogService.createNewPersoneEventLog(person);
+  personService.persistPersonBySsn(person);
 });
 ```
 Both queries *Query1* and *Query2* will be executed as a single logged batch.
