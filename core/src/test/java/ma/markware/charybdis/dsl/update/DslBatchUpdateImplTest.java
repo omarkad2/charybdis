@@ -19,10 +19,8 @@
 
 package ma.markware.charybdis.dsl.update;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.tuple;
-
 import com.datastax.oss.driver.api.core.CqlIdentifier;
+import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.internal.querybuilder.condition.DefaultCondition;
 import com.datastax.oss.driver.internal.querybuilder.lhs.ColumnComponentLeftOperand;
 import com.datastax.oss.driver.internal.querybuilder.lhs.ColumnLeftOperand;
@@ -33,14 +31,7 @@ import com.datastax.oss.driver.internal.querybuilder.update.DefaultAssignment;
 import com.datastax.oss.driver.internal.querybuilder.update.PrependAssignment;
 import com.datastax.oss.driver.internal.querybuilder.update.RemoveAssignment;
 import com.google.common.collect.ImmutableMap;
-import java.time.Instant;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import ma.markware.charybdis.ExecutionContext;
 import ma.markware.charybdis.batch.Batch;
 import ma.markware.charybdis.query.UpdateQuery;
 import ma.markware.charybdis.query.clause.AssignmentClause;
@@ -53,14 +44,22 @@ import ma.markware.charybdis.test.metadata.TestExtraUdt_Udt;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 
-class DslBatchUpdateImplTest extends AbstractDslUpdateTest<DslBatchUpdateImpl> {
+import java.time.Instant;
+import java.util.*;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
+
+class DslBatchUpdateImplTest extends AbstractDslUpdateTest<DslUpdateImpl> {
+
+  @Mock
+  private CqlSession session;
   @Mock
   private Batch batch;
 
   @Override
-  DslBatchUpdateImpl getInstance() {
-    return new DslBatchUpdateImpl(batch);
+  DslUpdateImpl getInstance() {
+    return new DslUpdateImpl(session, new ExecutionContext(), batch);
   }
 
   @Test

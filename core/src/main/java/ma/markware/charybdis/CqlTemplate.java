@@ -22,9 +22,7 @@ package ma.markware.charybdis;
 import com.datastax.oss.driver.api.core.CqlSession;
 import ma.markware.charybdis.batch.Batch;
 import ma.markware.charybdis.batch.BatchQueryBuilder;
-import ma.markware.charybdis.crud.CrudQueryBatchBuilder;
 import ma.markware.charybdis.crud.CrudQueryBuilder;
-import ma.markware.charybdis.dsl.DslQueryBatchBuilder;
 import ma.markware.charybdis.dsl.DslQueryBuilder;
 import ma.markware.charybdis.session.DefaultSessionFactory;
 import ma.markware.charybdis.session.SessionFactory;
@@ -41,6 +39,7 @@ import ma.markware.charybdis.session.StandaloneSessionFactory;
 public class CqlTemplate {
 
   private final SessionFactory sessionFactory;
+  private Batch defaultBatch;
 
   /**
    * Initialize the data manager using a custom session factory.
@@ -84,7 +83,7 @@ public class CqlTemplate {
    * @return Dsl API
    */
   public DslQueryBuilder dsl() {
-    return new DslQueryBuilder(sessionFactory.getSession());
+    return dsl(defaultBatch);
   }
 
   /**
@@ -93,8 +92,8 @@ public class CqlTemplate {
    * @param batch enclosing batch query
    * @return Dsl API
    */
-  public DslQueryBatchBuilder dsl(Batch batch) {
-    return new DslQueryBatchBuilder(batch);
+  public DslQueryBuilder dsl(Batch batch) {
+    return new DslQueryBuilder(sessionFactory.getSession(), batch);
   }
 
   /**
@@ -103,7 +102,7 @@ public class CqlTemplate {
    * @return Crud API
    */
   public CrudQueryBuilder crud() {
-    return new CrudQueryBuilder(sessionFactory.getSession());
+    return crud(defaultBatch);
   }
 
   /**
@@ -112,8 +111,8 @@ public class CqlTemplate {
    * @param batch enclosing batch query
    * @return Crud API
    */
-  public CrudQueryBatchBuilder crud(Batch batch) {
-    return new CrudQueryBatchBuilder(batch);
+  public CrudQueryBuilder crud(Batch batch) {
+    return new CrudQueryBuilder(sessionFactory.getSession(), batch);
   }
 
   /**
@@ -121,5 +120,45 @@ public class CqlTemplate {
    */
   public BatchQueryBuilder batch() {
     return new BatchQueryBuilder(sessionFactory.getSession());
+  }
+
+  /**
+   * Execute all write queries that are present in {@link BatchContextCallback} as a unique logged batch query.
+   *
+   * @param action a set of write queries
+   */
+  public void executeAsLoggedBatch(BatchContextCallback action) {
+    this.defaultBatch = batch().logged();
+    action.execute();
+    defaultBatch.execute();
+    this.defaultBatch = null;
+  }
+
+  /**
+   * Execute all write queries that are present in {@link BatchContextCallback} as a unique unlogged batch query.
+   *
+   * @param action a set of write queries
+   */
+  public void executeAsUnloggedBatch(BatchContextCallback action) {
+    this.defaultBatch = batch().unlogged();
+    action.execute();
+    defaultBatch.execute();
+    this.defaultBatch = null;
+  }
+
+  /**
+   * Callback interface for code/queries to be executed as a batch.
+   * Used with {@link CqlTemplate}'s {@code executeAsUnloggedBatch} and {@code executeAsLoggedBatch} method,
+   * often as anonymous class within a method implementation.
+   */
+  @FunctionalInterface
+  public interface BatchContextCallback {
+
+    /**
+     * Gets called by {@link CqlTemplate#executeAsUnloggedBatch} and {@link CqlTemplate#executeAsLoggedBatch}
+     * within a batch query context.
+     * All write queries that are present in this context are be executed as an atomic batch query.
+     */
+    void execute();
   }
 }

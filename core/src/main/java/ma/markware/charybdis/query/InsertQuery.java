@@ -18,24 +18,25 @@
  */
 package ma.markware.charybdis.query;
 
-import static java.lang.String.format;
-
 import com.datastax.oss.driver.api.core.cql.SimpleStatement;
 import com.datastax.oss.driver.api.querybuilder.QueryBuilder;
 import com.datastax.oss.driver.api.querybuilder.insert.Insert;
 import com.datastax.oss.driver.api.querybuilder.insert.InsertInto;
 import com.datastax.oss.driver.api.querybuilder.insert.RegularInsert;
-import java.time.Instant;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-import javax.annotation.Nonnull;
 import ma.markware.charybdis.ExecutionContext;
 import ma.markware.charybdis.model.field.metadata.ColumnMetadata;
 import ma.markware.charybdis.model.field.metadata.TableMetadata;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
+
+import javax.annotation.Nonnull;
+import java.time.Instant;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+
+import static java.lang.String.format;
 
 /**
  * Insert query.
@@ -53,10 +54,6 @@ public class InsertQuery extends AbstractQuery {
 
   public InsertQuery(@Nonnull ExecutionContext executionContext) {
     super(executionContext);
-  }
-
-  public InsertQuery() {
-    super(new ExecutionContext());
   }
 
   public String getKeyspace() {

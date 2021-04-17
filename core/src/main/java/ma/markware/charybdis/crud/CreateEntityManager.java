@@ -20,13 +20,14 @@ package ma.markware.charybdis.crud;
 
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.cql.ResultSet;
-import java.time.Instant;
 import ma.markware.charybdis.ExecutionContext;
 import ma.markware.charybdis.batch.Batch;
 import ma.markware.charybdis.model.field.metadata.TableMetadata;
 import ma.markware.charybdis.query.InsertQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.time.Instant;
 
 /**
  * Responsible of entity creation in DB <b>(Internal use only)</b>.
@@ -43,10 +44,6 @@ class CreateEntityManager<T> {
   private final InsertQuery insertQuery;
   private TableMetadata<T> tableMetadata;
   private T entity;
-
-  CreateEntityManager() {
-    this.insertQuery = new InsertQuery();
-  }
 
   CreateEntityManager(ExecutionContext executionContext) {
     this.insertQuery = new InsertQuery(executionContext);

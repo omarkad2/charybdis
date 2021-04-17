@@ -19,20 +19,14 @@
 
 package ma.markware.charybdis.dsl.delete;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.tuple;
-
 import com.datastax.oss.driver.api.core.CqlIdentifier;
+import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.internal.querybuilder.condition.DefaultCondition;
 import com.datastax.oss.driver.internal.querybuilder.lhs.ColumnLeftOperand;
 import com.datastax.oss.driver.internal.querybuilder.relation.DefaultRelation;
 import com.datastax.oss.driver.internal.querybuilder.select.ColumnSelector;
 import com.google.common.collect.ImmutableMap;
-import java.time.Instant;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
+import ma.markware.charybdis.ExecutionContext;
 import ma.markware.charybdis.batch.Batch;
 import ma.markware.charybdis.query.DeleteQuery;
 import ma.markware.charybdis.query.clause.ConditionClause;
@@ -42,14 +36,25 @@ import ma.markware.charybdis.test.metadata.TestEntity_Table;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 
-class DslBatchDeleteImplTest extends AbstractDslDeleteTest<DslBatchDeleteImpl> {
+import java.time.Instant;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
+
+class DslBatchDeleteImplTest extends AbstractDslDeleteTest<DslDeleteImpl> {
+
+  @Mock
+  private CqlSession session;
   @Mock
   private Batch batch;
 
   @Override
-  DslBatchDeleteImpl getInstance() {
-    return new DslBatchDeleteImpl(batch);
+  DslDeleteImpl getInstance() {
+    return new DslDeleteImpl(session, new ExecutionContext(), batch);
   }
 
   @Test

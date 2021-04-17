@@ -19,9 +19,6 @@
 
 package ma.markware.charybdis.dsl.delete;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.tuple;
-
 import com.datastax.oss.driver.api.core.CqlIdentifier;
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.internal.querybuilder.condition.DefaultCondition;
@@ -29,11 +26,6 @@ import com.datastax.oss.driver.internal.querybuilder.lhs.ColumnLeftOperand;
 import com.datastax.oss.driver.internal.querybuilder.relation.DefaultRelation;
 import com.datastax.oss.driver.internal.querybuilder.select.ColumnSelector;
 import com.google.common.collect.ImmutableMap;
-import java.time.Instant;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
 import ma.markware.charybdis.ExecutionContext;
 import ma.markware.charybdis.model.option.ConsistencyLevel;
 import ma.markware.charybdis.query.DeleteQuery;
@@ -44,6 +36,15 @@ import ma.markware.charybdis.test.metadata.TestEntity_Table;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 
+import java.time.Instant;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
+
 class DslDeleteImplTest extends AbstractDslDeleteTest<DslDeleteImpl> {
 
   @Mock
@@ -51,7 +52,7 @@ class DslDeleteImplTest extends AbstractDslDeleteTest<DslDeleteImpl> {
 
   @Override
   DslDeleteImpl getInstance() {
-    return new DslDeleteImpl(session, new ExecutionContext());
+    return new DslDeleteImpl(session, new ExecutionContext(), null);
   }
 
   @Test
@@ -187,7 +188,7 @@ class DslDeleteImplTest extends AbstractDslDeleteTest<DslDeleteImpl> {
   @Test
   void delete_should_set_fallback_consistency() {
     ExecutionContext executionContext = new ExecutionContext();
-    DslDeleteImpl dslDeleteImpl = new DslDeleteImpl(session, executionContext);
+    DslDeleteImpl dslDeleteImpl = new DslDeleteImpl(session, executionContext, null);
     dslDeleteImpl.delete().from(TestEntity_Table.test_entity);
     assertThat(executionContext.getDefaultConsistencyLevel()).isEqualTo(ConsistencyLevel.QUORUM);
   }

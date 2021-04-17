@@ -38,7 +38,7 @@ public class BatchQueryBuilder implements QueryBuilder, ConsistencyTunable<Batch
 
   private final CqlSession session;
 
-  private ExecutionContext executionContext;
+  private final ExecutionContext executionContext;
 
   private BatchQueryBuilder(CqlSession session, ExecutionContext executionContext) {
     this.session = session;

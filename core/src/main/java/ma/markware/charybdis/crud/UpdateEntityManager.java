@@ -18,13 +18,8 @@
  */
 package ma.markware.charybdis.crud;
 
-import static java.lang.String.format;
-
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.cql.ResultSet;
-import java.time.Instant;
-import java.util.Map;
-import java.util.Map.Entry;
 import ma.markware.charybdis.ExecutionContext;
 import ma.markware.charybdis.batch.Batch;
 import ma.markware.charybdis.model.criteria.CriteriaExpression;
@@ -34,6 +29,12 @@ import ma.markware.charybdis.model.field.metadata.TableMetadata;
 import ma.markware.charybdis.query.UpdateQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.time.Instant;
+import java.util.Map;
+import java.util.Map.Entry;
+
+import static java.lang.String.format;
 
 /**
  * Responsible of entity update in DB <b>(Internal use only)</b>.
@@ -50,10 +51,6 @@ class UpdateEntityManager<T> {
   private final UpdateQuery updateQuery;
   private TableMetadata<T> tableMetadata;
   private T entity;
-
-  UpdateEntityManager() {
-    this.updateQuery = new UpdateQuery();
-  }
 
   UpdateEntityManager(ExecutionContext executionContext) {
     this.updateQuery = new UpdateQuery(executionContext);
