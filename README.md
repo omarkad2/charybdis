@@ -300,6 +300,19 @@ cqlTemplate.crud(batch).create(Person_Table.person, newPerson);
 // Execute batch query
 batch.execute();
 ```
+#### Programmatic Batch Management
+It is also possible to execute a bunch of write queries as a single batch with the following:
+```java
+cqlTemplate.executeAsLoggedBatch(() -> {
+  // Query1: Persist person entity using Dsl API
+  cqlTemplate.dsl().insertInto(Person_Table.person, Person_Table.id, Person_Table.ssn, Person_Table.name)
+             .values(1, "999-00-1111", "Franklin Roosevelt")
+             .execute();
+  // Query2: Persist person_by_ssn using a custom service (which in turn uses Charybdis's Crud or Dsl API)
+  eventLogService.createNewPersoneEventLog(person);
+});
+```
+Both queries *Query1* and *Query2* will be executed as a single logged batch.
 
 ### Lightweight Transaction
 Charybdis also handles lightweight transactions in order to prevent race conditions in

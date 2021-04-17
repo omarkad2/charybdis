@@ -122,16 +122,43 @@ public class CqlTemplate {
     return new BatchQueryBuilder(sessionFactory.getSession());
   }
 
-  public void executeInBatch(BatchCallback batchCallback) {
+  /**
+   * Execute all write queries that are present in {@link BatchContextCallback} as a unique logged batch query.
+   *
+   * @param action a set of write queries
+   */
+  public void executeAsLoggedBatch(BatchContextCallback action) {
     this.defaultBatch = batch().logged();
-    batchCallback.execute();
+    action.execute();
     defaultBatch.execute();
     this.defaultBatch = null;
   }
 
-  @FunctionalInterface
-  public interface BatchCallback {
+  /**
+   * Execute all write queries that are present in {@link BatchContextCallback} as a unique unlogged batch query.
+   *
+   * @param action a set of write queries
+   */
+  public void executeAsUnloggedBatch(BatchContextCallback action) {
+    this.defaultBatch = batch().logged();
+    action.execute();
+    defaultBatch.execute();
+    this.defaultBatch = null;
+  }
 
+  /**
+   * Callback interface for code/queries to be executed as a batch.
+   * Used with {@link CqlTemplate}'s {@code executeAsUnloggedBatch} and {@code executeAsLoggedBatch} method,
+   * often as anonymous class within a method implementation.
+   */
+  @FunctionalInterface
+  public interface BatchContextCallback {
+
+    /**
+     * Gets called by {@link CqlTemplate#executeAsUnloggedBatch} and {@link CqlTemplate#executeAsLoggedBatch}
+     * within a batch query context.
+     * All write queries that are present in this context are be executed as an atomic batch query.
+     */
     void execute();
   }
 }

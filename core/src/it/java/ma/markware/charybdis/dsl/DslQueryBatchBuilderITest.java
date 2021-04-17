@@ -584,9 +584,9 @@ class DslQueryBatchBuilderITest  extends AbstractIntegrationITest {
   }
 
   @Test
-  void cqlTemplate_executeInBatch() {
+  void cqlTemplate_executeAsLoggedBatch() {
     // Given
-    cqlTemplate.executeInBatch(() -> {
+    cqlTemplate.executeAsLoggedBatch(() -> {
       dsl.insertInto(TestEntity_Table.test_entity, TestEntity_Table.id, TestEntity_Table.date, TestEntity_Table.udt, TestEntity_Table.list, TestEntity_Table.flag)
           .values(TestEntity_INST1.id, TestEntity_INST1.date, TestEntity_INST1.udt1, TestEntity_INST1.list, false)
           .execute();
@@ -601,6 +601,40 @@ class DslQueryBatchBuilderITest  extends AbstractIntegrationITest {
         .fetch();
 
     // Then
-    assertThat(records).hasSize(2);
+    assertThat(records).hasSize(2).extracting(record -> record.get(TestEntity_Table.flag)).containsExactlyInAnyOrder(true, false);
+  }
+
+  @Test
+  void cqlTemplate_executeAsUnloggedBatch() {
+    // Given
+    cqlTemplate.executeAsUnloggedBatch(() -> {
+      dsl.insertInto(TestEntity_Table.test_entity, TestEntity_Table.id, TestEntity_Table.date, TestEntity_Table.udt, TestEntity_Table.list, TestEntity_Table.flag)
+          .values(TestEntity_INST1.id, TestEntity_INST1.date, TestEntity_INST1.udt1, TestEntity_INST1.list, false)
+          .executeAsync();
+      dsl.insertInto(TestEntity_Table.test_entity, TestEntity_Table.id, TestEntity_Table.date, TestEntity_Table.udt, TestEntity_Table.list, TestEntity_Table.flag)
+          .values(TestEntity_INST2.id, TestEntity_INST2.date, TestEntity_INST2.udt, TestEntity_INST2.list, true)
+          .ifNotExists()
+          .executeAsync();
+      dsl.update(TestEntity_Table.test_entity)
+          .set(TestEntity_Table.flag, false)
+          .where(TestEntity_Table.id.eq(TestEntity_INST2.id))
+          .and(TestEntity_Table.date.eq(TestEntity_INST2.date))
+          .and(TestEntity_Table.udt.eq(TestEntity_INST2.udt))
+          .and(TestEntity_Table.list.eq(TestEntity_INST2.list))
+          .executeAsync();
+      dsl.delete().from(TestEntity_Table.test_entity)
+          .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
+          .and(TestEntity_Table.date.eq(TestEntity_INST1.date))
+          .and(TestEntity_Table.udt.eq(TestEntity_INST1.udt1))
+          .and(TestEntity_Table.list.eq(TestEntity_INST1.list))
+          .executeAsync();
+    });
+
+    // When
+    Collection<Record> records = dsl.selectFrom(TestEntity_Table.test_entity)
+        .fetch();
+
+    // Then
+    assertThat(records).hasSize(1).extracting(record -> record.get(TestEntity_Table.flag)).containsExactlyInAnyOrder(false);
   }
 }
