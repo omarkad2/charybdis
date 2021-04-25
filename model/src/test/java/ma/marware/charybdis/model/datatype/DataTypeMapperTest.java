@@ -18,23 +18,25 @@
  */
 package ma.marware.charybdis.model.datatype;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-
 import com.datastax.oss.driver.api.core.type.DataType;
 import com.datastax.oss.driver.api.core.type.DataTypes;
-import java.math.BigDecimal;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.util.Date;
-import java.util.UUID;
-import java.util.stream.Stream;
 import ma.markware.charybdis.model.datatype.DataTypeMapper;
 import ma.markware.charybdis.model.exception.CharybdisUnknownTypeException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+
+import java.math.BigDecimal;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.util.Date;
+import java.util.UUID;
+import java.util.stream.Stream;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 class DataTypeMapperTest {
 
@@ -69,7 +71,8 @@ class DataTypeMapperTest {
         Arguments.of(Enum.class, DataTypes.TEXT),
         Arguments.of(Date.class, DataTypes.DATE),
         Arguments.of(Instant.class, DataTypes.TIMESTAMP),
-        Arguments.of(LocalDate.class, DataTypes.DATE)
+        Arguments.of(LocalDate.class, DataTypes.DATE),
+        Arguments.of(Duration.class, DataTypes.DURATION)
     );
   }
 

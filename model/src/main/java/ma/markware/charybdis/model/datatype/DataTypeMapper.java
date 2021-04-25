@@ -20,14 +20,16 @@ package ma.markware.charybdis.model.datatype;
 
 import com.datastax.oss.driver.api.core.type.DataType;
 import com.datastax.oss.driver.api.core.type.DataTypes;
+import ma.markware.charybdis.model.exception.CharybdisUnknownTypeException;
+
 import java.math.BigDecimal;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-import ma.markware.charybdis.model.exception.CharybdisUnknownTypeException;
 
 /**
  * Mapper to link java type to Cassandra's data types.
@@ -56,6 +58,7 @@ public class DataTypeMapper {
     dataTypeMap.put(Date.class, DataTypes.DATE);
     dataTypeMap.put(Instant.class, DataTypes.TIMESTAMP);
     dataTypeMap.put(LocalDate.class, DataTypes.DATE);
+    dataTypeMap.put(Duration.class, DataTypes.DURATION);
   }
 
   /**
