@@ -18,13 +18,11 @@
  */
 package ma.markware.charybdis.dsl.update;
 
+import ma.markware.charybdis.model.assignment.AssignmentCounterValue;
 import ma.markware.charybdis.model.assignment.AssignmentListValue;
 import ma.markware.charybdis.model.assignment.AssignmentMapValue;
 import ma.markware.charybdis.model.assignment.AssignmentSetValue;
-import ma.markware.charybdis.model.field.metadata.ColumnMetadata;
-import ma.markware.charybdis.model.field.metadata.ListColumnMetadata;
-import ma.markware.charybdis.model.field.metadata.MapColumnMetadata;
-import ma.markware.charybdis.model.field.metadata.SetColumnMetadata;
+import ma.markware.charybdis.model.field.metadata.*;
 import ma.markware.charybdis.model.field.nested.ListNestedField;
 import ma.markware.charybdis.model.field.nested.MapNestedField;
 import ma.markware.charybdis.model.field.nested.UdtNestedField;
@@ -102,4 +100,13 @@ public interface UpdateAssignmentExpression {
    * @return updated update DSL query expression.
    */
   <D, S> UpdateExtraAssignmentExpression set(UdtNestedField<D, S> field, D value);
+
+  /**
+   * Assign value to counter column in update DSL query.
+   *
+   * @param column assigned field.
+   * @param value assigned value.
+   * @return updated update DSL query expression.
+   */
+  UpdateExtraAssignmentExpression set(CounterColumnMetadata column, AssignmentCounterValue value);
 }

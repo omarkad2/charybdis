@@ -31,8 +31,12 @@ import javax.lang.model.util.Types;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static java.lang.String.format;
+import static ma.markware.charybdis.apt.utils.ExceptionMessagerWrapper.throwParsingException;
 
 /**
  * A specific Class parser.
@@ -82,23 +86,48 @@ public class TableParser extends AbstractEntityParser<TableMetaType> {
 
     tableMetaType.setColumns(columns);
 
-    List<ColumnFieldMetaType> partitionKeyColumns = columns.stream()
+    final List<ColumnFieldMetaType> partitionKeyColumns = columns.stream()
                                                .filter(ColumnFieldMetaType::isPartitionKey)
                                                .sorted(Comparator.comparingInt(ColumnFieldMetaType::getPartitionKeyIndex))
                                                .collect(Collectors.toList());
-    List<ColumnFieldMetaType> clusteringKeyColumns = columns.stream()
+    final List<ColumnFieldMetaType> clusteringKeyColumns = columns.stream()
                                                .filter(ColumnFieldMetaType::isClusteringKey)
                                                .sorted(Comparator.comparingInt(ColumnFieldMetaType::getClusteringKeyIndex))
                                                .collect(Collectors.toList());
+    final List<ColumnFieldMetaType> counterColumns = columns.stream()
+                                               .filter(ColumnFieldMetaType::isCounter)
+                                               .collect(Collectors.toList());
 
-    partitionKeyColumns = resolvePartitionKeyColumns(tableMetaType.getTableName(), partitionKeyColumns, clusteringKeyColumns);
+    checkCounterTableDefinition(tableName, columns, partitionKeyColumns, clusteringKeyColumns, counterColumns);
 
-    tableMetaType.setPartitionKeyColumns(partitionKeyColumns);
+    List<ColumnFieldMetaType> resolvedPartitionKeyColumns = resolvePartitionKeyColumns(tableMetaType.getTableName(), partitionKeyColumns, clusteringKeyColumns);
+
+    tableMetaType.setPartitionKeyColumns(resolvedPartitionKeyColumns);
     tableMetaType.setClusteringKeyColumns(clusteringKeyColumns);
+    tableMetaType.setCounterColumns(counterColumns);
 
     aptContext.addTableMetaTypeByClassName(annotatedClass.toString(), tableMetaType);
 
     return tableMetaType;
+  }
+
+  private void checkCounterTableDefinition(String tableName, List<ColumnFieldMetaType> columns, List<ColumnFieldMetaType> partitionKeyColumns, List<ColumnFieldMetaType> clusteringKeyColumns, List<ColumnFieldMetaType> counterColumns) {
+    if (!counterColumns.isEmpty()) {
+      // All other columns should be part of the PRIMARY KEY definition
+      Predicate<ColumnFieldMetaType> columnIsNotPartOfPrimaryKeyPredicate = column -> Stream.concat(partitionKeyColumns.stream(), clusteringKeyColumns.stream())
+          .noneMatch(primaryColumn -> primaryColumn.getSerializationName().equals(column.getSerializationName()));
+      Predicate<ColumnFieldMetaType> columnIsPartOfPrimaryKeyPredicate = column -> Stream.concat(partitionKeyColumns.stream(), clusteringKeyColumns.stream())
+          .anyMatch(primaryColumn -> primaryColumn.getSerializationName().equals(column.getSerializationName()));
+      Predicate<ColumnFieldMetaType> notCounterColumnFilter = column -> counterColumns.stream().noneMatch(counterColumn -> counterColumn.getSerializationName().equals(column.getSerializationName()));
+      if (columns.stream().filter(notCounterColumnFilter).anyMatch(columnIsNotPartOfPrimaryKeyPredicate)) {
+        throwParsingException(messager, format("In table '%s' all non-counter columns should be part of the PRIMARY KEY definition", tableName));
+      }
+
+      // Counter columns should not be part of the PRIMARY KEY definition
+      if (counterColumns.stream().anyMatch(columnIsPartOfPrimaryKeyPredicate)) {
+        throwParsingException(messager, format("In table '%s' counter columns should not be part of the PRIMARY KEY definition", tableName));
+      }
+    }
   }
 
   /**

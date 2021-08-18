@@ -18,28 +18,29 @@
  */
 package ma.markware.charybdis.model.assignment;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import com.datastax.oss.driver.api.core.cql.Row;
 import com.datastax.oss.driver.shaded.guava.common.collect.ImmutableMap;
-import java.util.Collections;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Stream;
 import ma.markware.charybdis.model.field.metadata.MapColumnMetadata;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+
+import java.util.Collections;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Stream;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class AssignmentMapValueTest {
 
   @ParameterizedTest
   @MethodSource("getAssignmentMapValueTestArguments")
   <D_KEY, D_VALUE, S_KEY, S_VALUE> void testAssignmentListValue(AssignmentMapValue<D_KEY, D_VALUE, S_KEY, S_VALUE> assignmentMapValue,
-      MapColumnMetadata<D_KEY, D_VALUE, S_KEY, S_VALUE> mapColumnMetadata, AssignmentOperation assignmentOperation,
+      MapColumnMetadata<D_KEY, D_VALUE, S_KEY, S_VALUE> mapColumnMetadata, AssignmentCollectionOperation assignmentCollectionOperation,
       Map<S_KEY, S_VALUE> appendValues, Set<S_VALUE> removeValues) {
     assertThat(assignmentMapValue.getMapColumn()).isEqualTo(mapColumnMetadata);
-    assertThat(assignmentMapValue.getOperation()).isEqualTo(assignmentOperation);
+    assertThat(assignmentMapValue.getOperation()).isEqualTo(assignmentCollectionOperation);
     assertThat(assignmentMapValue.getAppendSerializedValues()).isEqualTo(appendValues);
     assertThat(assignmentMapValue.getRemoveSerializedValues()).isEqualTo(removeValues);
   }
@@ -78,9 +79,9 @@ public class AssignmentMapValueTest {
     };
 
     return Stream.of(
-        Arguments.of(mapColumnMetadata.append(ImmutableMap.of(0, "value0", 1, "value1")), mapColumnMetadata, AssignmentOperation.APPEND,
+        Arguments.of(mapColumnMetadata.append(ImmutableMap.of(0, "value0", 1, "value1")), mapColumnMetadata, AssignmentCollectionOperation.APPEND,
                      ImmutableMap.of(0, "value0", 1, "value1"), null),
-        Arguments.of(mapColumnMetadata.remove(Collections.singleton(0)), mapColumnMetadata, AssignmentOperation.REMOVE, null, Collections.singleton(0))
+        Arguments.of(mapColumnMetadata.remove(Collections.singleton(0)), mapColumnMetadata, AssignmentCollectionOperation.REMOVE, null, Collections.singleton(0))
     );
   }
 }

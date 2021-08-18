@@ -91,7 +91,8 @@ class DdlScriptSerializerTest {
     udtMetaTypes = Arrays.asList(configuration.getUdtParser().parse(testUdtElement), configuration.getUdtParser().parse(testNestedUdtElement),
                                  configuration.getUdtParser().parse(testExtraUdtElement));
     tableMetaTypes = Arrays.asList(configuration.getTableParser().parse(elements.getTypeElement(TestEntity.class.getCanonicalName())),
-                                   configuration.getTableParser().parse(elements.getTypeElement(TestEntityByDate.class.getCanonicalName())));
+                                   configuration.getTableParser().parse(elements.getTypeElement(TestEntityByDate.class.getCanonicalName())),
+                                   configuration.getTableParser().parse(elements.getTypeElement(TestEntityCounter.class.getCanonicalName())));
 
     materializedViewMetaTypes = Collections.singletonList((configuration.getMaterializedViewParser())
         .parse(elements.getTypeElement(TestEntityByValue.class.getCanonicalName())));

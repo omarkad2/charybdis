@@ -151,8 +151,14 @@ public class DdlScriptSerializer {
                            .map(clusteringKey -> clusteringKey.getSerializationNameWithQuotes() + " " + clusteringKey.getClusteringOrder().name()).collect(Collectors.joining(","));
 
     statementBuilder.append("(");
-    statementBuilder.append(allColumns.stream().map(columnMetaType -> columnMetaType.getSerializationNameWithQuotes() + " " + fieldTypeToCql(columnMetaType.getFieldType()))
-                                      .collect(Collectors.joining(",")));
+    statementBuilder.append(allColumns.stream().map(columnMetaType -> {
+        if (columnMetaType.isCounter()) {
+          return columnMetaType.getSerializationNameWithQuotes() + " counter";
+        } else {
+          return columnMetaType.getSerializationNameWithQuotes() + " " + fieldTypeToCql(columnMetaType.getFieldType());
+        }
+      })
+      .collect(Collectors.joining(",")));
     statementBuilder.append(",").append("PRIMARY KEY");
     statementBuilder.append("(").append(primaryKeyPart).append(")");
     statementBuilder.append(")");

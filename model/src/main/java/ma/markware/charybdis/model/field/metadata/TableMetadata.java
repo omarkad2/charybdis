@@ -92,4 +92,9 @@ public interface TableMetadata<ENTITY> extends ReadableTableMetadata<ENTITY> {
    * @return serialized entity as a column-value map.
    */
   Map<String, Object> serialize(ENTITY entity);
+
+  /**
+   * @return is table a counter table (contains a counter column).
+   */
+  boolean isCounterTable();
 }

@@ -18,14 +18,15 @@
  */
 package ma.markware.charybdis.model.field.metadata;
 
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
+import ma.markware.charybdis.model.assignment.AssignmentCollectionOperation;
 import ma.markware.charybdis.model.assignment.AssignmentMapValue;
-import ma.markware.charybdis.model.assignment.AssignmentOperation;
 import ma.markware.charybdis.model.criteria.CriteriaExpression;
 import ma.markware.charybdis.model.criteria.CriteriaOperator;
 import ma.markware.charybdis.model.field.nested.MapNestedField;
+
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Column of type {@link Map} metadata.
@@ -74,13 +75,13 @@ public interface MapColumnMetadata<D_KEY, D_VALUE, S_KEY, S_VALUE> extends Colle
    * Append values to column.
    */
   default AssignmentMapValue<D_KEY, D_VALUE, S_KEY, S_VALUE> append(Map<D_KEY, D_VALUE> values) {
-    return new AssignmentMapValue<>(this, AssignmentOperation.APPEND, serialize(values));
+    return new AssignmentMapValue<>(this, AssignmentCollectionOperation.APPEND, serialize(values));
   }
 
   /**
    * Remove values from column.
    */
   default AssignmentMapValue<D_KEY, D_VALUE, S_KEY, S_VALUE> remove(Set<D_KEY> keys) {
-    return new AssignmentMapValue<>(this, AssignmentOperation.REMOVE, keys.stream().map(this::serializeKey).collect(Collectors.toSet()));
+    return new AssignmentMapValue<>(this, AssignmentCollectionOperation.REMOVE, keys.stream().map(this::serializeKey).collect(Collectors.toSet()));
   }
 }

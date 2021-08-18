@@ -24,6 +24,7 @@ import com.datastax.oss.driver.api.querybuilder.update.Update;
 import com.datastax.oss.driver.api.querybuilder.update.UpdateStart;
 import com.datastax.oss.driver.api.querybuilder.update.UpdateWithAssignments;
 import ma.markware.charybdis.ExecutionContext;
+import ma.markware.charybdis.model.assignment.AssignmentCounterValue;
 import ma.markware.charybdis.model.assignment.AssignmentListValue;
 import ma.markware.charybdis.model.assignment.AssignmentMapValue;
 import ma.markware.charybdis.model.assignment.AssignmentSetValue;
@@ -127,6 +128,11 @@ public class UpdateQuery extends AbstractQuery {
 
   public <D, S> void setAssignment(UdtNestedField<D, S> udtNestedField, D value) {
     assignmentClauses.add(AssignmentClause.from(udtNestedField, udtNestedField.serialize(value)));
+  }
+
+  public void setAssignment(CounterColumnMetadata counterColumnMetadata,
+                                                             AssignmentCounterValue counterValue) {
+    assignmentClauses.add(AssignmentClause.from(counterColumnMetadata, counterValue));
   }
 
   public void setWhere(CriteriaExpression criteriaExpression) {

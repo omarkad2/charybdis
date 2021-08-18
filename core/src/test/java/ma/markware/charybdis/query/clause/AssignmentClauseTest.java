@@ -18,22 +18,12 @@
  */
 package ma.markware.charybdis.query.clause;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-
 import com.datastax.oss.driver.api.core.cql.Row;
 import com.datastax.oss.driver.shaded.guava.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Stream;
 import ma.markware.charybdis.exception.CharybdisUnsupportedOperationException;
+import ma.markware.charybdis.model.assignment.AssignmentCollectionOperation;
 import ma.markware.charybdis.model.assignment.AssignmentMapValue;
-import ma.markware.charybdis.model.assignment.AssignmentOperation;
 import ma.markware.charybdis.model.field.metadata.ColumnMetadata;
 import ma.markware.charybdis.model.field.metadata.ListColumnMetadata;
 import ma.markware.charybdis.model.field.metadata.MapColumnMetadata;
@@ -43,6 +33,12 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+
+import java.util.*;
+import java.util.stream.Stream;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 class AssignmentClauseTest {
 
@@ -166,7 +162,7 @@ class AssignmentClauseTest {
   @Test
   void shouldThrowExceptionWhenUnsupportedOperation() {
     assertThatExceptionOfType(CharybdisUnsupportedOperationException.class)
-        .isThrownBy(() -> AssignmentClause.from(mapColumnMetadata, new AssignmentMapValue<>(mapColumnMetadata, AssignmentOperation.PREPEND, new HashMap<>())))
+        .isThrownBy(() -> AssignmentClause.from(mapColumnMetadata, new AssignmentMapValue<>(mapColumnMetadata, AssignmentCollectionOperation.PREPEND, new HashMap<>())))
         .withMessage("Operation 'PREPEND' is not supported in [ASSIGNMENT] clause for data type 'map'");
   }
 

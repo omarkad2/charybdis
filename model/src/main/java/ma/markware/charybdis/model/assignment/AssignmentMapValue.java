@@ -18,9 +18,10 @@
  */
 package ma.markware.charybdis.model.assignment;
 
+import ma.markware.charybdis.model.field.metadata.MapColumnMetadata;
+
 import java.util.Map;
 import java.util.Set;
-import ma.markware.charybdis.model.field.metadata.MapColumnMetadata;
 
 /**
  * Representation of an assignment on a map.
@@ -35,18 +36,18 @@ import ma.markware.charybdis.model.field.metadata.MapColumnMetadata;
 public class AssignmentMapValue<D_KEY, D_VALUE, S_KEY, S_VALUE> {
 
   private final MapColumnMetadata<D_KEY, D_VALUE, S_KEY, S_VALUE> mapColumn;
-  private AssignmentOperation operation;
+  private AssignmentCollectionOperation operation;
   private Map<S_KEY, S_VALUE> appendSerializedValues;
   private Set<S_KEY> removeSerializedValues;
 
-  public AssignmentMapValue(final MapColumnMetadata<D_KEY, D_VALUE, S_KEY, S_VALUE> mapColumn, final AssignmentOperation operation,
+  public AssignmentMapValue(final MapColumnMetadata<D_KEY, D_VALUE, S_KEY, S_VALUE> mapColumn, final AssignmentCollectionOperation operation,
       final Map<S_KEY, S_VALUE> appendSerializedValues) {
     this.mapColumn = mapColumn;
     this.operation = operation;
     this.appendSerializedValues = appendSerializedValues;
   }
 
-  public AssignmentMapValue(final MapColumnMetadata<D_KEY, D_VALUE, S_KEY, S_VALUE> mapColumn, final AssignmentOperation operation,
+  public AssignmentMapValue(final MapColumnMetadata<D_KEY, D_VALUE, S_KEY, S_VALUE> mapColumn, final AssignmentCollectionOperation operation,
       final Set<S_KEY> removeSerializedValues) {
     this.mapColumn = mapColumn;
     this.operation = operation;
@@ -57,7 +58,7 @@ public class AssignmentMapValue<D_KEY, D_VALUE, S_KEY, S_VALUE> {
     return mapColumn;
   }
 
-  public AssignmentOperation getOperation() {
+  public AssignmentCollectionOperation getOperation() {
     return operation;
   }
 
