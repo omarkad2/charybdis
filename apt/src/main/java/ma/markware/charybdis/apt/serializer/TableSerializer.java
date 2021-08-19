@@ -33,10 +33,7 @@ import javax.annotation.processing.Filer;
 import javax.annotation.processing.Messager;
 import javax.lang.model.element.Modifier;
 import java.time.Instant;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -87,6 +84,7 @@ public class TableSerializer implements EntitySerializer<TableMetaType>, Readabl
             buildGetDefaultReadConsistencyMethod(tableMetaType.getDefaultReadConsistency()),
             buildGetDefaultWriteConsistencyMethod(tableMetaType.getDefaultWriteConsistency()),
             buildGetDefaultSerialConsistencyMethod(tableMetaType.getDefaultSerialConsistency()),
+            buildIsCounterTableMethod(tableMetaType.getCounterColumns()),
             buildColumnsGetterMethod(SerializationConstants.GET_COLUMNS_METADATA_METHOD, tableMetaType.getColumns()),
             buildColumnsGetterMethod(SerializationConstants.GET_PARTITION_KEY_COLUMNS_METHOD, tableMetaType.getPartitionKeyColumns()),
             buildColumnsGetterMethod(SerializationConstants.GET_CLUSTERING_KEY_COLUMNS_METHOD, tableMetaType.getClusteringKeyColumns()),
@@ -103,6 +101,14 @@ public class TableSerializer implements EntitySerializer<TableMetaType>, Readabl
         .build();
 
     writeSerialization(packageName, className, tableMetadataSerialization, filer, messager);
+  }
+
+  private MethodSpec buildIsCounterTableMethod(List<ColumnFieldMetaType> counterColumns) {
+    return MethodSpec.methodBuilder(SerializationConstants.IS_COUNTER_TABLE_METHOD)
+        .addModifiers(Modifier.PUBLIC)
+        .returns(boolean.class)
+        .addStatement("return $L", !counterColumns.isEmpty())
+        .build();
   }
 
   private MethodSpec buildGetDefaultWriteConsistencyMethod(ConsistencyLevel defaultWriteConsistency) {

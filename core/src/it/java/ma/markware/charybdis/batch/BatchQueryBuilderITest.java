@@ -19,12 +19,7 @@
 
 package ma.markware.charybdis.batch;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import com.datastax.oss.driver.api.core.CqlSession;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.Arrays;
 import ma.markware.charybdis.AbstractIntegrationITest;
 import ma.markware.charybdis.CqlTemplate;
 import ma.markware.charybdis.dsl.DslQueryBuilder;
@@ -34,13 +29,14 @@ import ma.markware.charybdis.test.entities.TestEntityByDate;
 import ma.markware.charybdis.test.instances.TestEntity_INST1;
 import ma.markware.charybdis.test.metadata.TestEntityByDate_Table;
 import ma.markware.charybdis.test.metadata.TestEntity_Table;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
+
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @TestInstance(Lifecycle.PER_CLASS)
 class BatchQueryBuilderITest extends AbstractIntegrationITest {
@@ -109,7 +105,7 @@ class BatchQueryBuilderITest extends AbstractIntegrationITest {
       batchUnlogged.execute();
 
       // Then
-      asserThatBatchExecuted();
+      assertThatBatchExecuted();
     }
 
     @Test
@@ -125,7 +121,7 @@ class BatchQueryBuilderITest extends AbstractIntegrationITest {
       batchUnlogged.execute();
 
       // Then
-      asserThatBatchExecuted();
+      assertThatBatchExecuted();
     }
 
     @Test
@@ -149,7 +145,7 @@ class BatchQueryBuilderITest extends AbstractIntegrationITest {
       batchUnlogged.execute();
 
       // Then
-      asserThatBatchExecuted();
+      assertThatBatchExecuted();
     }
 
     @Test
@@ -166,40 +162,43 @@ class BatchQueryBuilderITest extends AbstractIntegrationITest {
       cqlTemplate.crud(batchUnlogged).create(TestEntity_Table.test_entity, entity2);
 
       // When
-      batchUnlogged.executeAsync().whenComplete((result, error) ->asserThatBatchExecuted());
+      batchUnlogged.executeAsync().whenComplete((result, error) -> assertThatBatchExecuted());
     }
 
-    private void asserThatBatchExecuted() {
-      Record record1 = dsl.selectFrom(TestEntity_Table.test_entity)
-                          .where(TestEntity_Table.id.eq(entity1.getId()))
-                          .and(TestEntity_Table.date.eq(entity1.getDate()))
-                          .fetchOne();
-      Record record2 = dsl.selectFrom(TestEntity_Table.test_entity)
-                          .where(TestEntity_Table.id.eq(entity2.getId()))
-                          .and(TestEntity_Table.date.eq(entity2.getDate()))
-                          .fetchOne();
+    private void assertThatBatchExecuted() {
+      dsl.selectFrom(TestEntity_Table.test_entity)
+          .where(TestEntity_Table.id.eq(entity1.getId()))
+          .and(TestEntity_Table.date.eq(entity1.getDate()))
+          .fetchOneAsync().thenAccept(record1 -> {
+            TestEntity actual1 = new TestEntity(record1.get(TestEntity_Table.id), record1.get(TestEntity_Table.date), record1.get(TestEntity_Table.udt),
+                record1.get(TestEntity_Table.list), record1.get(TestEntity_Table.se), record1.get(TestEntity_Table.map),
+                record1.get(TestEntity_Table.nestedList), record1.get(TestEntity_Table.nestedSet),
+                record1.get(TestEntity_Table.nestedMap), record1.get(TestEntity_Table.enumValue),
+                record1.get(TestEntity_Table.enumList), record1.get(TestEntity_Table.enumMap),
+                record1.get(TestEntity_Table.enumNestedList), record1.get(TestEntity_Table.extraUdt),
+                record1.get(TestEntity_Table.udtList), record1.get(TestEntity_Table.udtSet),
+                record1.get(TestEntity_Table.udtMap), record1.get(TestEntity_Table.udtNestedList),
+                record1.get(TestEntity_Table.flag));
 
-      TestEntity actual1 = new TestEntity(record1.get(TestEntity_Table.id), record1.get(TestEntity_Table.date), record1.get(TestEntity_Table.udt),
-                                          record1.get(TestEntity_Table.list), record1.get(TestEntity_Table.se), record1.get(TestEntity_Table.map),
-                                          record1.get(TestEntity_Table.nestedList), record1.get(TestEntity_Table.nestedSet),
-                                          record1.get(TestEntity_Table.nestedMap), record1.get(TestEntity_Table.enumValue),
-                                          record1.get(TestEntity_Table.enumList), record1.get(TestEntity_Table.enumMap),
-                                          record1.get(TestEntity_Table.enumNestedList), record1.get(TestEntity_Table.extraUdt),
-                                          record1.get(TestEntity_Table.udtList), record1.get(TestEntity_Table.udtSet),
-                                          record1.get(TestEntity_Table.udtMap), record1.get(TestEntity_Table.udtNestedList),
-                                          record1.get(TestEntity_Table.flag));
-      TestEntity actual2 = new TestEntity(record2.get(TestEntity_Table.id), record2.get(TestEntity_Table.date), record2.get(TestEntity_Table.udt),
-                                          record2.get(TestEntity_Table.list), record2.get(TestEntity_Table.se), record2.get(TestEntity_Table.map),
-                                          record2.get(TestEntity_Table.nestedList), record2.get(TestEntity_Table.nestedSet),
-                                          record2.get(TestEntity_Table.nestedMap), record2.get(TestEntity_Table.enumValue),
-                                          record2.get(TestEntity_Table.enumList), record2.get(TestEntity_Table.enumMap),
-                                          record2.get(TestEntity_Table.enumNestedList), record2.get(TestEntity_Table.extraUdt),
-                                          record2.get(TestEntity_Table.udtList), record2.get(TestEntity_Table.udtSet),
-                                          record2.get(TestEntity_Table.udtMap), record2.get(TestEntity_Table.udtNestedList),
-                                          record2.get(TestEntity_Table.flag));
+            assertThat(actual1).isEqualTo(entity1);
+          });
 
-      assertThat(actual1).isEqualTo(entity1);
-      assertThat(actual2).isEqualTo(entity2);
+      dsl.selectFrom(TestEntity_Table.test_entity)
+          .where(TestEntity_Table.id.eq(entity2.getId()))
+          .and(TestEntity_Table.date.eq(entity2.getDate()))
+          .fetchOneAsync().thenAccept(record2 -> {
+            TestEntity actual2 = new TestEntity(record2.get(TestEntity_Table.id), record2.get(TestEntity_Table.date), record2.get(TestEntity_Table.udt),
+                record2.get(TestEntity_Table.list), record2.get(TestEntity_Table.se), record2.get(TestEntity_Table.map),
+                record2.get(TestEntity_Table.nestedList), record2.get(TestEntity_Table.nestedSet),
+                record2.get(TestEntity_Table.nestedMap), record2.get(TestEntity_Table.enumValue),
+                record2.get(TestEntity_Table.enumList), record2.get(TestEntity_Table.enumMap),
+                record2.get(TestEntity_Table.enumNestedList), record2.get(TestEntity_Table.extraUdt),
+                record2.get(TestEntity_Table.udtList), record2.get(TestEntity_Table.udtSet),
+                record2.get(TestEntity_Table.udtMap), record2.get(TestEntity_Table.udtNestedList),
+                record2.get(TestEntity_Table.flag));
+
+            assertThat(actual2).isEqualTo(entity2);
+          });
     }
   }
 

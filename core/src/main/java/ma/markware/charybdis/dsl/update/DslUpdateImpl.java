@@ -23,6 +23,7 @@ import com.datastax.oss.driver.api.core.cql.AsyncResultSet;
 import com.datastax.oss.driver.api.core.cql.ResultSet;
 import ma.markware.charybdis.ExecutionContext;
 import ma.markware.charybdis.batch.Batch;
+import ma.markware.charybdis.model.assignment.AssignmentCounterValue;
 import ma.markware.charybdis.model.assignment.AssignmentListValue;
 import ma.markware.charybdis.model.assignment.AssignmentMapValue;
 import ma.markware.charybdis.model.assignment.AssignmentSetValue;
@@ -152,6 +153,12 @@ public class DslUpdateImpl
   @Override
   public <D, S> UpdateExtraAssignmentExpression set(final UdtNestedField<D, S> field, final D value) {
     updateQuery.setAssignment(field, value);
+    return this;
+  }
+
+  @Override
+  public UpdateExtraAssignmentExpression set(CounterColumnMetadata column, AssignmentCounterValue value) {
+    updateQuery.setAssignment(column, value);
     return this;
   }
 

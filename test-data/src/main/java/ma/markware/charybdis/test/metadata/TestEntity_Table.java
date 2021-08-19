@@ -3,22 +3,7 @@ package ma.markware.charybdis.test.metadata;
 import com.datastax.oss.driver.api.core.cql.Row;
 import com.datastax.oss.driver.api.core.data.UdtValue;
 import com.datastax.oss.driver.api.core.type.reflect.GenericType;
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-import ma.markware.charybdis.model.field.metadata.ClusteringKeyColumnMetadata;
-import ma.markware.charybdis.model.field.metadata.ColumnMetadata;
-import ma.markware.charybdis.model.field.metadata.ListColumnMetadata;
-import ma.markware.charybdis.model.field.metadata.MapColumnMetadata;
-import ma.markware.charybdis.model.field.metadata.PartitionKeyColumnMetadata;
-import ma.markware.charybdis.model.field.metadata.SetColumnMetadata;
-import ma.markware.charybdis.model.field.metadata.TableMetadata;
-import ma.markware.charybdis.model.field.metadata.UdtColumnMetadata;
+import ma.markware.charybdis.model.field.metadata.*;
 import ma.markware.charybdis.model.option.ClusteringOrder;
 import ma.markware.charybdis.model.option.ConsistencyLevel;
 import ma.markware.charybdis.model.option.SerialConsistencyLevel;
@@ -26,6 +11,9 @@ import ma.markware.charybdis.test.entities.TestEntity;
 import ma.markware.charybdis.test.entities.TestEnum;
 import ma.markware.charybdis.test.entities.TestExtraUdt;
 import ma.markware.charybdis.test.entities.TestUdt;
+
+import java.time.Instant;
+import java.util.*;
 
 public class TestEntity_Table implements TableMetadata<TestEntity> {
   public static final GenericType<List<List<Integer>>> nestedListGenericType = new GenericType<java.util.List<java.util.List<java.lang.Integer>>>(){};
@@ -845,6 +833,11 @@ public class TestEntity_Table implements TableMetadata<TestEntity> {
   @Override
   public SerialConsistencyLevel getDefaultSerialConsistency() {
     return SerialConsistencyLevel.LOCAL_SERIAL;
+  }
+
+  @Override
+  public boolean isCounterTable() {
+    return false;
   }
 
   @Override

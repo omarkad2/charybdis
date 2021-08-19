@@ -19,29 +19,10 @@
 package ma.markware.charybdis.apt.parser;
 
 
-import static java.util.Arrays.asList;
-import static ma.markware.charybdis.apt.parser.ParserTestHelper.buildFieldTypeMetaType;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static org.assertj.core.api.Assertions.tuple;
-import static org.mockito.Mockito.when;
-
 import com.datastax.oss.driver.api.core.data.UdtValue;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
-import java.time.Instant;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-import javax.annotation.processing.Filer;
-import javax.annotation.processing.Messager;
-import javax.annotation.processing.RoundEnvironment;
-import javax.lang.model.element.TypeElement;
-import javax.lang.model.util.Elements;
-import javax.lang.model.util.Types;
 import ma.markware.charybdis.apt.AptConfiguration;
 import ma.markware.charybdis.apt.AptContext;
 import ma.markware.charybdis.apt.AptDefaultConfiguration;
@@ -53,25 +34,27 @@ import ma.markware.charybdis.apt.metatype.FieldTypeMetaType.FieldTypeKind;
 import ma.markware.charybdis.apt.metatype.TableMetaType;
 import ma.markware.charybdis.model.annotation.Udt;
 import ma.markware.charybdis.model.option.ClusteringOrder;
-import ma.markware.charybdis.test.entities.TestEntity;
-import ma.markware.charybdis.test.entities.TestEntityWithNoPrimaryKey;
-import ma.markware.charybdis.test.entities.TestEnum;
-import ma.markware.charybdis.test.entities.TestExtraUdt;
-import ma.markware.charybdis.test.entities.TestKeyspaceDefinition;
-import ma.markware.charybdis.test.entities.TestNestedUdt;
-import ma.markware.charybdis.test.entities.TestUdt;
-import ma.markware.charybdis.test.entities.invalid.TestEntityWithNonFrozenNestedCollectionField;
-import ma.markware.charybdis.test.entities.invalid.TestEntityWithNonFrozenNestedUdtField;
-import ma.markware.charybdis.test.entities.invalid.TestEntityWithUnsupportedType;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
+import ma.markware.charybdis.test.entities.*;
+import ma.markware.charybdis.test.entities.invalid.*;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+
+import javax.annotation.processing.Filer;
+import javax.annotation.processing.Messager;
+import javax.annotation.processing.RoundEnvironment;
+import javax.lang.model.element.TypeElement;
+import javax.lang.model.util.Elements;
+import javax.lang.model.util.Types;
+import java.time.Instant;
+import java.util.*;
+
+import static java.util.Arrays.asList;
+import static ma.markware.charybdis.apt.parser.ParserTestHelper.buildFieldTypeMetaType;
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.Mockito.when;
 
 @TestInstance(Lifecycle.PER_CLASS)
 @ExtendWith({CompilationExtension.class})
@@ -265,5 +248,32 @@ class TableParserTest {
         .isThrownBy(() -> configuration.getTableParser()
                                        .parse(elements.getTypeElement(TestEntityWithUnsupportedType.class.getCanonicalName())))
         .withMessage("type 'ArrayList' is not supported. Parameter types are supported only on list, set and map");
+  }
+
+  @Test
+  @DisplayName("Compilation should fail if counter table has non-counter columns not present in PRIMARY KEY definition")
+  void should_throw_exception_when_non_counter_columns_missing_in_primary_key_definition(Elements elements) {
+    assertThatExceptionOfType(CharybdisParsingException.class)
+        .isThrownBy(() -> configuration.getTableParser()
+            .parse(elements.getTypeElement(TestEntityCounterWithMissingPrimaryKeys.class.getCanonicalName())))
+        .withMessage("In table 'test_entity_counter_with_missing_primary_keys' all non-counter columns should be part of the PRIMARY KEY definition");
+  }
+
+  @Test
+  @DisplayName("Compilation should fail if counter table has counter columns present in PRIMARY KEY definition")
+  void should_throw_exception_when_counter_column_present_in_primary_key_definition(Elements elements) {
+    assertThatExceptionOfType(CharybdisParsingException.class)
+        .isThrownBy(() -> configuration.getTableParser()
+            .parse(elements.getTypeElement(TestEntityCounterWithCounterAsPrimaryKey.class.getCanonicalName())))
+        .withMessage("In table 'test_entity_counter_with_counter_as_primary_key' counter columns should not be part of the PRIMARY KEY definition");
+  }
+
+  @Test
+  @DisplayName("Compilation should fail if counter table has invalid counter column type")
+  void should_throw_exception_when_counter_column_has_invalid_type(Elements elements) {
+    assertThatExceptionOfType(CharybdisParsingException.class)
+        .isThrownBy(() -> configuration.getTableParser()
+            .parse(elements.getTypeElement(TestEntityCounterWithInvalidCounterType.class.getCanonicalName())))
+        .withMessage("Type java.lang.String of counter column 'counter' is not supported, java.lang.Long should be used instead");
   }
 }

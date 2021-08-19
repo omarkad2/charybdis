@@ -19,29 +19,19 @@
 package ma.markware.charybdis.apt.serializer;
 
 import com.datastax.oss.driver.api.core.cql.Row;
-import com.squareup.javapoet.ClassName;
-import com.squareup.javapoet.FieldSpec;
-import com.squareup.javapoet.MethodSpec;
+import com.squareup.javapoet.*;
 import com.squareup.javapoet.MethodSpec.Builder;
-import com.squareup.javapoet.ParameterSpec;
-import com.squareup.javapoet.ParameterizedTypeName;
-import com.squareup.javapoet.TypeSpec;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import javax.annotation.processing.Messager;
-import javax.lang.model.element.Modifier;
 import ma.markware.charybdis.apt.AptContext;
 import ma.markware.charybdis.apt.metatype.ColumnFieldMetaType;
 import ma.markware.charybdis.apt.metatype.FieldTypeMetaType;
-import ma.markware.charybdis.model.field.metadata.ClusteringKeyColumnMetadata;
-import ma.markware.charybdis.model.field.metadata.ColumnMetadata;
-import ma.markware.charybdis.model.field.metadata.ListColumnMetadata;
-import ma.markware.charybdis.model.field.metadata.MapColumnMetadata;
-import ma.markware.charybdis.model.field.metadata.PartitionKeyColumnMetadata;
-import ma.markware.charybdis.model.field.metadata.SetColumnMetadata;
-import ma.markware.charybdis.model.field.metadata.UdtColumnMetadata;
+import ma.markware.charybdis.model.field.metadata.*;
 import ma.markware.charybdis.model.option.ClusteringOrder;
+
+import javax.annotation.processing.Messager;
+import javax.lang.model.element.Modifier;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * A generic Field serializer.
@@ -58,7 +48,7 @@ public class ColumnFieldSerializer extends AbstractFieldSerializer<ColumnFieldMe
   @Override
   public FieldSpec serializeField(final ColumnFieldMetaType columnFieldMetaType) {
     FieldTypeMetaType columnFieldTypeMetaType = columnFieldMetaType.getFieldType();
-    ParameterizedTypeName fieldType = ParameterizedTypeName.get(ClassName.get(ColumnMetadata.class), columnFieldTypeMetaType.getDeserializationTypeName(),
+    TypeName fieldType = ParameterizedTypeName.get(ClassName.get(ColumnMetadata.class), columnFieldTypeMetaType.getDeserializationTypeName(),
                                                                 columnFieldTypeMetaType.getSerializationTypeName());
     ParameterSpec rowParameter = ParameterSpec.builder(Row.class, "row").build();
 
@@ -103,11 +93,13 @@ public class ColumnFieldSerializer extends AbstractFieldSerializer<ColumnFieldMe
                                                 itemMetaType.getDeserializationTypeName(), itemMetaType.getSerializationTypeName());
           // Add list item serialization method
           methods.add(buildListItemMetadataSerializeMethod(itemMetaType));
-        }  else if (columnFieldMetaType.isSet()) {
+        } else if (columnFieldMetaType.isSet()) {
           List<FieldTypeMetaType> fieldSubTypes = columnFieldTypeMetaType.getSubTypes();
           FieldTypeMetaType itemMetaType = fieldSubTypes.get(0);
           fieldType = ParameterizedTypeName.get(ClassName.get(SetColumnMetadata.class), itemMetaType.getDeserializationTypeName(),
                                                 itemMetaType.getSerializationTypeName());
+        } else if (columnFieldMetaType.isCounter()) {
+          fieldType = ClassName.get(CounterColumnMetadata.class);
         }
       }
     }

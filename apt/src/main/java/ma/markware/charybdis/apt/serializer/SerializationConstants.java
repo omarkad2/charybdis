@@ -35,6 +35,7 @@ final class SerializationConstants {
   static final String GET_UDT_NAME_METHOD = "getUdtName";
   static final String GET_UDT_FIELD_DATA_TYPE_METHOD = "getDataType";
   static final String GET_TABLE_NAME_METHOD = "getTableName";
+  static final String IS_COUNTER_TABLE_METHOD = "isCounterTable";
   static final String GET_DEFAULT_WRITE_CONSISTENCY_METHOD = "getDefaultWriteConsistency";
   static final String GET_DEFAULT_READ_CONSISTENCY_METHOD = "getDefaultReadConsistency";
   static final String GET_DEFAULT_SERIAL_CONSISTENCY_METHOD = "getDefaultSerialConsistency";

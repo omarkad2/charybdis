@@ -18,22 +18,16 @@
  */
 package ma.markware.charybdis.query.clause;
 
-import static java.lang.String.format;
-
 import com.datastax.oss.driver.api.querybuilder.QueryBuilder;
 import com.datastax.oss.driver.api.querybuilder.update.Assignment;
 import ma.markware.charybdis.exception.CharybdisUnsupportedOperationException;
-import ma.markware.charybdis.model.assignment.AssignmentListValue;
-import ma.markware.charybdis.model.assignment.AssignmentMapValue;
-import ma.markware.charybdis.model.assignment.AssignmentOperation;
-import ma.markware.charybdis.model.assignment.AssignmentSetValue;
-import ma.markware.charybdis.model.field.metadata.ColumnMetadata;
-import ma.markware.charybdis.model.field.metadata.ListColumnMetadata;
-import ma.markware.charybdis.model.field.metadata.MapColumnMetadata;
-import ma.markware.charybdis.model.field.metadata.SetColumnMetadata;
+import ma.markware.charybdis.model.assignment.*;
+import ma.markware.charybdis.model.field.metadata.*;
 import ma.markware.charybdis.model.field.nested.ListNestedField;
 import ma.markware.charybdis.model.field.nested.MapNestedField;
 import ma.markware.charybdis.model.field.nested.UdtNestedField;
+
+import static java.lang.String.format;
 
 /**
  * Assignment clause modelization.
@@ -69,7 +63,7 @@ public class AssignmentClause {
    * Create an assignment clause from list column metadata and assignment value.
    */
   public static <D, S> AssignmentClause from(final ListColumnMetadata<D, S> listColumnMetadata, final AssignmentListValue<D, S> listValue) {
-    AssignmentOperation operation = listValue.getOperation();
+    AssignmentCollectionOperation operation = listValue.getOperation();
     Object value = listValue.getSerializedValue();
     switch(operation) {
       case APPEND:
@@ -87,7 +81,7 @@ public class AssignmentClause {
    * Create an assignment clause from set column metadata and assignment value.
    */
   public static <D, S> AssignmentClause from(final SetColumnMetadata<D, S> setColumnMetadata, final AssignmentSetValue<D, S> setValue) {
-    AssignmentOperation operation = setValue.getOperation();
+    AssignmentCollectionOperation operation = setValue.getOperation();
     Object value = setValue.getSerializedValue();
     switch(operation) {
       case APPEND:
@@ -106,7 +100,7 @@ public class AssignmentClause {
    */
   public static <D_KEY, D_VALUE, S_KEY, S_VALUE> AssignmentClause from(final MapColumnMetadata<D_KEY, D_VALUE, S_KEY, S_VALUE> mapColumnMetadata,
       final AssignmentMapValue<D_KEY, D_VALUE, S_KEY, S_VALUE> mapValue) {
-    AssignmentOperation operation = mapValue.getOperation();
+    AssignmentCollectionOperation operation = mapValue.getOperation();
     switch(operation) {
       case APPEND:
         return new AssignmentClause(Assignment.append(mapColumnMetadata.getName(), QueryBuilder.bindMarker()), new Object[]{ mapValue.getAppendSerializedValues() });
@@ -139,6 +133,22 @@ public class AssignmentClause {
   public static <D, S> AssignmentClause from(final UdtNestedField<D, S> udtNestedField, final S value) {
     return new AssignmentClause(Assignment.setField(udtNestedField.getSourceColumn().getName(), udtNestedField.getEntry().getName(),
                                                     QueryBuilder.bindMarker()), new Object[]{ value });
+  }
+
+  /**
+   * Create an assignment clause from map column metadata and assignment value.
+   */
+  public static AssignmentClause from(final CounterColumnMetadata counterColumnMetadata,
+                                      final AssignmentCounterValue counterValue) {
+    AssignmentCounterOperation operation = counterValue.getOperation();
+    switch(operation) {
+      case INCREMENT:
+        return new AssignmentClause(Assignment.increment(counterColumnMetadata.getName(), QueryBuilder.literal(counterValue.getAmount())), new Object[]{ });
+      case DECREMENT:
+        return new AssignmentClause(Assignment.decrement(counterColumnMetadata.getName(), QueryBuilder.literal(counterValue.getAmount())), new Object[]{ });
+      default:
+        throw new CharybdisUnsupportedOperationException(format("Operation '%s' is not supported in [ASSIGNMENT] clause for data type 'counter'", counterValue.getOperation()));
+    }
   }
 
   public Assignment getAssignment() {

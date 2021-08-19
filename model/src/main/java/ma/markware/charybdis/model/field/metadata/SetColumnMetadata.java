@@ -18,13 +18,14 @@
  */
 package ma.markware.charybdis.model.field.metadata;
 
-import java.util.Arrays;
-import java.util.Set;
-import java.util.stream.Collectors;
-import ma.markware.charybdis.model.assignment.AssignmentOperation;
+import ma.markware.charybdis.model.assignment.AssignmentCollectionOperation;
 import ma.markware.charybdis.model.assignment.AssignmentSetValue;
 import ma.markware.charybdis.model.criteria.CriteriaExpression;
 import ma.markware.charybdis.model.criteria.CriteriaOperator;
+
+import java.util.Arrays;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Column of type {@link Set} metadata.
@@ -55,7 +56,7 @@ public interface SetColumnMetadata<D, S> extends CollectionColumnMetadata<Set<D>
    * Append values to column.
    */
   default AssignmentSetValue<D, S> append(Set<D> values) {
-    return new AssignmentSetValue<>(this, AssignmentOperation.APPEND, serialize(values));
+    return new AssignmentSetValue<>(this, AssignmentCollectionOperation.APPEND, serialize(values));
   }
 
   /**
@@ -70,7 +71,7 @@ public interface SetColumnMetadata<D, S> extends CollectionColumnMetadata<Set<D>
    * Prepend values to column.
    */
   default AssignmentSetValue<D, S> prepend(Set<D> values) {
-    return new AssignmentSetValue<>(this, AssignmentOperation.PREPEND, serialize(values));
+    return new AssignmentSetValue<>(this, AssignmentCollectionOperation.PREPEND, serialize(values));
   }
 
   /**
@@ -85,6 +86,6 @@ public interface SetColumnMetadata<D, S> extends CollectionColumnMetadata<Set<D>
    * Remove values from column.
    */
   default AssignmentSetValue<D, S> remove(Set<D> values) {
-    return new AssignmentSetValue<>(this, AssignmentOperation.REMOVE, serialize(values));
+    return new AssignmentSetValue<>(this, AssignmentCollectionOperation.REMOVE, serialize(values));
   }
 }

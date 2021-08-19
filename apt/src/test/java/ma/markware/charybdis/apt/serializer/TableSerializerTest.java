@@ -32,6 +32,7 @@ import ma.markware.charybdis.test.entities.*;
 import ma.markware.charybdis.test.entities.invalid.TestEntityWithUnknownUdt;
 import ma.markware.charybdis.test.entities.invalid.TestUnknownUdt;
 import ma.markware.charybdis.test.metadata.TestEntityByDate_Table;
+import ma.markware.charybdis.test.metadata.TestEntityCounter_Table;
 import ma.markware.charybdis.test.metadata.TestEntity_Table;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -104,7 +105,6 @@ class TableSerializerTest {
     StringWriter generatedFileWriter = new StringWriter();
     when(filer.createSourceFile(any(), any())).thenReturn(SerializerTestHelper.createJavaFileObject(generatedFileWriter));
 
-
     // When
     configuration.getTableSerializer().serialize(tableMetaType);
 
@@ -132,7 +132,8 @@ class TableSerializerTest {
   private Stream<Arguments> getTableArguments() {
     return Stream.of(
         Arguments.of(configuration.getTableParser().parse(elements.getTypeElement(TestEntity.class.getCanonicalName())), TestEntity_Table.class),
-        Arguments.of(configuration.getTableParser().parse(elements.getTypeElement(TestEntityByDate.class.getCanonicalName())), TestEntityByDate_Table.class)
+        Arguments.of(configuration.getTableParser().parse(elements.getTypeElement(TestEntityByDate.class.getCanonicalName())), TestEntityByDate_Table.class),
+        Arguments.of(configuration.getTableParser().parse(elements.getTypeElement(TestEntityCounter.class.getCanonicalName())), TestEntityCounter_Table.class)
     );
   }
 }

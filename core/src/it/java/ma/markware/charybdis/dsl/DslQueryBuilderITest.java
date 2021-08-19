@@ -35,6 +35,7 @@ import ma.markware.charybdis.test.entities.TestUdt;
 import ma.markware.charybdis.test.instances.TestEntity_INST1;
 import ma.markware.charybdis.test.instances.TestEntity_INST2;
 import ma.markware.charybdis.test.metadata.TestEntityByValue_View;
+import ma.markware.charybdis.test.metadata.TestEntityCounter_Table;
 import ma.markware.charybdis.test.metadata.TestEntity_Table;
 import ma.markware.charybdis.test.metadata.TestExtraUdt_Udt;
 import org.junit.jupiter.api.*;
@@ -847,6 +848,42 @@ class DslQueryBuilderITest extends AbstractIntegrationITest {
          .thenAccept(applied -> {
            assertThat(applied).isTrue();
          });
+    }
+
+    @Test
+    void update_counter_table_increment() {
+      UUID randomUUID = UUID.randomUUID();
+      boolean applied = dsl.update(TestEntityCounter_Table.test_entity_counter)
+          .set(TestEntityCounter_Table.counter, TestEntityCounter_Table.counter.incr(1))
+          .where(TestEntityCounter_Table.id.eq(randomUUID))
+          .execute();
+
+      Record record = dsl.selectFrom(TestEntityCounter_Table.test_entity_counter)
+          .where(TestEntityCounter_Table.id.eq(randomUUID))
+          .fetchOne();
+
+      assertThat(applied).isTrue();
+      assertThat(record).isNotNull();
+      assertThat(record.get(TestEntityCounter_Table.id)).isEqualTo(randomUUID);
+      assertThat(record.get(TestEntityCounter_Table.counter)).isEqualTo(1);
+    }
+
+    @Test
+    void update_counter_table_decrement() {
+      UUID randomUUID = UUID.randomUUID();
+      boolean applied = dsl.update(TestEntityCounter_Table.test_entity_counter)
+          .set(TestEntityCounter_Table.counter, TestEntityCounter_Table.counter.decr(1))
+          .where(TestEntityCounter_Table.id.eq(randomUUID))
+          .execute();
+
+      Record record = dsl.selectFrom(TestEntityCounter_Table.test_entity_counter)
+          .where(TestEntityCounter_Table.id.eq(randomUUID))
+          .fetchOne();
+
+      assertThat(applied).isTrue();
+      assertThat(record).isNotNull();
+      assertThat(record.get(TestEntityCounter_Table.id)).isEqualTo(randomUUID);
+      assertThat(record.get(TestEntityCounter_Table.counter)).isEqualTo(-1);
     }
   }
 

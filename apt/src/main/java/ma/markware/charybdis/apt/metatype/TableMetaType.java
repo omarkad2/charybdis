@@ -18,9 +18,10 @@
  */
 package ma.markware.charybdis.apt.metatype;
 
-import java.util.List;
 import ma.markware.charybdis.model.option.ConsistencyLevel;
 import ma.markware.charybdis.model.option.SerialConsistencyLevel;
+
+import java.util.List;
 
 /**
  * A specific Class meta-type.
@@ -38,6 +39,7 @@ public class TableMetaType extends AbstractEntityMetaType {
   private List<ColumnFieldMetaType> columns;
   private List<ColumnFieldMetaType> partitionKeyColumns;
   private List<ColumnFieldMetaType> clusteringKeyColumns;
+  private List<ColumnFieldMetaType> counterColumns;
 
   public TableMetaType(final AbstractEntityMetaType abstractEntityMetaType) {
     super(abstractEntityMetaType);
@@ -97,5 +99,13 @@ public class TableMetaType extends AbstractEntityMetaType {
 
   public void setClusteringKeyColumns(final List<ColumnFieldMetaType> clusteringKeyColumns) {
     this.clusteringKeyColumns = clusteringKeyColumns;
+  }
+
+  public List<ColumnFieldMetaType> getCounterColumns() {
+    return counterColumns;
+  }
+
+  public void setCounterColumns(List<ColumnFieldMetaType> counterColumns) {
+    this.counterColumns = counterColumns;
   }
 }

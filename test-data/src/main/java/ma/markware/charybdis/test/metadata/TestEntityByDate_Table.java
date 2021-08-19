@@ -2,10 +2,6 @@ package ma.markware.charybdis.test.metadata;
 
 import com.datastax.oss.driver.api.core.cql.Row;
 import com.datastax.oss.driver.api.core.data.UdtValue;
-import java.time.Instant;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import ma.markware.charybdis.model.field.metadata.ClusteringKeyColumnMetadata;
 import ma.markware.charybdis.model.field.metadata.ColumnMetadata;
 import ma.markware.charybdis.model.field.metadata.PartitionKeyColumnMetadata;
@@ -15,6 +11,11 @@ import ma.markware.charybdis.model.option.ConsistencyLevel;
 import ma.markware.charybdis.model.option.SerialConsistencyLevel;
 import ma.markware.charybdis.test.entities.TestEntityByDate;
 import ma.markware.charybdis.test.entities.TestUdt;
+
+import java.time.Instant;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class TestEntityByDate_Table implements TableMetadata<TestEntityByDate> {
   public static final PartitionKeyColumnMetadata<Instant, Instant> date = new PartitionKeyColumnMetadata<Instant, Instant>() {
@@ -213,6 +214,11 @@ public class TestEntityByDate_Table implements TableMetadata<TestEntityByDate> {
   @Override
   public SerialConsistencyLevel getDefaultSerialConsistency() {
     return SerialConsistencyLevel.SERIAL;
+  }
+
+  @Override
+  public boolean isCounterTable() {
+    return false;
   }
 
   @Override

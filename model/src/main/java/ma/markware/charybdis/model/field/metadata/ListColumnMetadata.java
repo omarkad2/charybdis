@@ -18,13 +18,14 @@
  */
 package ma.markware.charybdis.model.field.metadata;
 
-import java.util.Arrays;
-import java.util.List;
+import ma.markware.charybdis.model.assignment.AssignmentCollectionOperation;
 import ma.markware.charybdis.model.assignment.AssignmentListValue;
-import ma.markware.charybdis.model.assignment.AssignmentOperation;
 import ma.markware.charybdis.model.criteria.CriteriaExpression;
 import ma.markware.charybdis.model.criteria.CriteriaOperator;
 import ma.markware.charybdis.model.field.nested.ListNestedField;
+
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Column of type {@link List} metadata.
@@ -67,7 +68,7 @@ public interface ListColumnMetadata<D, S> extends CollectionColumnMetadata<List<
    * Append values to column.
    */
   default AssignmentListValue<D, S> append(List<D> values) {
-    return new AssignmentListValue<>(this, AssignmentOperation.APPEND, serialize(values));
+    return new AssignmentListValue<>(this, AssignmentCollectionOperation.APPEND, serialize(values));
   }
 
   /**
@@ -82,7 +83,7 @@ public interface ListColumnMetadata<D, S> extends CollectionColumnMetadata<List<
    * Prepend values to column.
    */
   default AssignmentListValue<D, S> prepend(List<D> values) {
-    return new AssignmentListValue<>(this, AssignmentOperation.PREPEND, serialize(values));
+    return new AssignmentListValue<>(this, AssignmentCollectionOperation.PREPEND, serialize(values));
   }
 
   /**
@@ -97,6 +98,6 @@ public interface ListColumnMetadata<D, S> extends CollectionColumnMetadata<List<
    * Remove values from column.
    */
   default AssignmentListValue<D, S> remove(List<D> values) {
-    return new AssignmentListValue<>(this, AssignmentOperation.REMOVE, serialize(values));
+    return new AssignmentListValue<>(this, AssignmentCollectionOperation.REMOVE, serialize(values));
   }
 }

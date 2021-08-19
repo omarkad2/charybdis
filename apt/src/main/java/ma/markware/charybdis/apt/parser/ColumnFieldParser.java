@@ -18,27 +18,22 @@
  */
 package ma.markware.charybdis.apt.parser;
 
-import static java.lang.String.format;
-import static ma.markware.charybdis.apt.utils.ExceptionMessagerWrapper.throwParsingException;
-
-import java.util.EnumSet;
-import javax.annotation.processing.Messager;
-import javax.lang.model.element.Element;
-import javax.lang.model.util.Types;
 import ma.markware.charybdis.apt.metatype.AbstractFieldMetaType;
 import ma.markware.charybdis.apt.metatype.ColumnFieldMetaType;
 import ma.markware.charybdis.apt.metatype.FieldTypeMetaType;
 import ma.markware.charybdis.apt.metatype.FieldTypeMetaType.FieldTypeKind;
 import ma.markware.charybdis.apt.utils.FieldUtils;
-import ma.markware.charybdis.model.annotation.ClusteringKey;
-import ma.markware.charybdis.model.annotation.Column;
-import ma.markware.charybdis.model.annotation.CreationDate;
-import ma.markware.charybdis.model.annotation.GeneratedValue;
-import ma.markware.charybdis.model.annotation.Index;
-import ma.markware.charybdis.model.annotation.LastUpdatedDate;
-import ma.markware.charybdis.model.annotation.PartitionKey;
+import ma.markware.charybdis.model.annotation.*;
 import ma.markware.charybdis.model.option.SequenceModel;
 import org.apache.commons.lang3.StringUtils;
+
+import javax.annotation.processing.Messager;
+import javax.lang.model.element.Element;
+import javax.lang.model.util.Types;
+import java.util.EnumSet;
+
+import static java.lang.String.format;
+import static ma.markware.charybdis.apt.utils.ExceptionMessagerWrapper.throwParsingException;
 
 /**
  * A specific Field parser.
@@ -100,11 +95,11 @@ public class ColumnFieldParser extends AbstractFieldParser<ColumnFieldMetaType> 
         if (sequenceModel != null) {
           columnMetaType.setSequenceModel(sequenceModel);
         } else {
-          throwParsingException(messager, format("Type %s of column '%s' is not supported for automatic value generation", columnMetaType.getFieldType(),
+          throwParsingException(messager, format("Type %s of column '%s' is not supported for automatic value generation", columnMetaType.getFieldType().getDeserializationTypeCanonicalName(),
                                  columnMetaType.getSerializationName()));
         }
       } catch (final ClassNotFoundException e) {
-        throwParsingException(messager, format("Class not found %s values for column '%s' will not be automatically generated", columnMetaType.getFieldType(),
+        throwParsingException(messager, format("Class not found %s values for column '%s' will not be automatically generated", columnMetaType.getFieldType().getDeserializationTypeCanonicalName(),
                                columnMetaType.getSerializationName()), e);
       }
     }
@@ -116,6 +111,23 @@ public class ColumnFieldParser extends AbstractFieldParser<ColumnFieldMetaType> 
     // TODO: ...Check if date type supported
     columnMetaType.setCreationDate(FieldUtils.getAnnotation(classElement, fieldElement, CreationDate.class, types) != null);
     columnMetaType.setLastUpdatedDate(FieldUtils.getAnnotation(classElement, fieldElement, LastUpdatedDate.class, types) != null);
+
+    final Counter counter = FieldUtils.getAnnotation(classElement, fieldElement, Counter.class, types);
+    if (counter != null) {
+      try {
+        Class<?> counterClass = Class.forName(columnMetaType.getFieldType().getDeserializationTypeCanonicalName());
+        if (Long.class.equals(counterClass) || long.class.equals(counterClass)) {
+          columnMetaType.setCounter(true);
+        } else {
+          throwParsingException(messager, format("Type %s of counter column '%s' is not supported, %s should be used instead",
+              columnMetaType.getFieldType().getDeserializationTypeCanonicalName(), columnMetaType.getSerializationName(), Long.class.getCanonicalName()));
+        }
+      } catch (final ClassNotFoundException e) {
+        throwParsingException(messager, format("Class not found %s values for column '%s' will not be automatically generated", columnMetaType.getFieldType().getDeserializationTypeCanonicalName(),
+            columnMetaType.getSerializationName()), e);
+      }
+    }
+
     return columnMetaType;
   }
 

@@ -23,7 +23,7 @@ package ma.markware.charybdis.model.assignment;
  *
  * @author Oussama Markad
  */
-public enum AssignmentOperation {
+public enum AssignmentCollectionOperation {
 
   APPEND, PREPEND, REMOVE
 }

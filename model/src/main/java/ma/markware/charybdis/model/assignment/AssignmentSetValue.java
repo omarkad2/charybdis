@@ -18,8 +18,9 @@
  */
 package ma.markware.charybdis.model.assignment;
 
-import java.util.Set;
 import ma.markware.charybdis.model.field.metadata.SetColumnMetadata;
+
+import java.util.Set;
 
 /**
  * Representation of an assignment on a collection of type set.
@@ -32,10 +33,10 @@ import ma.markware.charybdis.model.field.metadata.SetColumnMetadata;
 public class AssignmentSetValue<D, S> {
 
   private final SetColumnMetadata<D, S> setColumn;
-  private AssignmentOperation operation;
+  private AssignmentCollectionOperation operation;
   private final Set<S> serializedValue;
 
-  public AssignmentSetValue(final SetColumnMetadata<D, S> setColumn, final AssignmentOperation operation, final Set<S> serializedValue) {
+  public AssignmentSetValue(final SetColumnMetadata<D, S> setColumn, final AssignmentCollectionOperation operation, final Set<S> serializedValue) {
     this.setColumn = setColumn;
     this.operation = operation;
     this.serializedValue = serializedValue;
@@ -45,7 +46,7 @@ public class AssignmentSetValue<D, S> {
     return setColumn;
   }
 
-  public AssignmentOperation getOperation() {
+  public AssignmentCollectionOperation getOperation() {
     return operation;
   }
 

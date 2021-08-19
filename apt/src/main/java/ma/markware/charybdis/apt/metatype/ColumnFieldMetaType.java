@@ -39,6 +39,7 @@ public class ColumnFieldMetaType extends AbstractFieldMetaType {
   private SequenceModel sequenceModel;
   private boolean isCreationDate;
   private boolean isLastUpdatedDate;
+  private boolean isCounter;
 
   public ColumnFieldMetaType(AbstractFieldMetaType abstractFieldMetaType) {
     super(abstractFieldMetaType);
@@ -122,5 +123,13 @@ public class ColumnFieldMetaType extends AbstractFieldMetaType {
 
   public void setLastUpdatedDate(final boolean lastUpdatedDate) {
     isLastUpdatedDate = lastUpdatedDate;
+  }
+
+  public boolean isCounter() {
+    return isCounter;
+  }
+
+  public void setCounter(boolean counter) {
+    isCounter = counter;
   }
 }

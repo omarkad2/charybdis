@@ -18,8 +18,9 @@
  */
 package ma.markware.charybdis.model.assignment;
 
-import java.util.List;
 import ma.markware.charybdis.model.field.metadata.ListColumnMetadata;
+
+import java.util.List;
 
 /**
  * Representation of an assignment on a collection of type list.
@@ -32,10 +33,10 @@ import ma.markware.charybdis.model.field.metadata.ListColumnMetadata;
 public class AssignmentListValue<D, S> {
 
   private final ListColumnMetadata<D, S> listColumn;
-  private AssignmentOperation operation;
+  private AssignmentCollectionOperation operation;
   private final List<S> serializedValue;
 
-  public AssignmentListValue(final ListColumnMetadata<D, S> listColumn, final AssignmentOperation operation, final List<S> serializedValue) {
+  public AssignmentListValue(final ListColumnMetadata<D, S> listColumn, final AssignmentCollectionOperation operation, final List<S> serializedValue) {
     this.listColumn = listColumn;
     this.operation = operation;
     this.serializedValue = serializedValue;
@@ -45,7 +46,7 @@ public class AssignmentListValue<D, S> {
     return listColumn;
   }
 
-  public AssignmentOperation getOperation() {
+  public AssignmentCollectionOperation getOperation() {
     return operation;
   }
 
