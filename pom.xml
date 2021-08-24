@@ -41,7 +41,7 @@
     <maven.compiler.source>${java.version}</maven.compiler.source>
     <slf4j.version>1.7.30</slf4j.version>
     <logback.version>1.2.3</logback.version>
-    <cassandra-driver.version>4.8.0</cassandra-driver.version>
+    <cassandra-driver.version>4.13.0</cassandra-driver.version>
     <snakeyaml.version>1.24</snakeyaml.version>
     <auto-service.version>1.0-rc6</auto-service.version>
     <javapoet.version>1.12.1</javapoet.version>
@@ -258,6 +258,18 @@
       <artifactId>commons-lang3</artifactId>
       <version>${apache-commons.lang3.version}</version>
     </dependency>
+
+    <dependency>
+      <groupId>org.xerial.snappy</groupId>
+      <artifactId>snappy-java</artifactId>
+      <version>${snappy-java.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.lz4</groupId>
+      <artifactId>lz4-java</artifactId>
+      <version>${lz4-java.version}</version>
+    </dependency>
+
   </dependencies>
 
   <build>
