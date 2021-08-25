@@ -18,10 +18,8 @@
  */
 package ma.markware.charybdis.query;
 
-import java.nio.ByteBuffer;
-
 import com.datastax.oss.driver.api.core.cql.PagingState;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * A pagination expression.

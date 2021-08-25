@@ -108,11 +108,13 @@
         <groupId>ma.markware.charybdis</groupId>
         <artifactId>charybdis-test-tools</artifactId>
         <version>${project.version}</version>
+        <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>ma.markware.charybdis</groupId>
         <artifactId>charybdis-test-data</artifactId>
         <version>${project.version}</version>
+        <scope>test</scope>
       </dependency>
 
       <!--Datastax Driver-->
