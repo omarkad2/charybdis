@@ -71,7 +71,7 @@ public class DslAggregations {
    * @param field min cql function argument.
    * @return field that retrieves min value.
    */
-  public static SelectableField min(SelectableField<?> field) {
+  public static <T> SelectableField<T> min(SelectableField<T> field) {
     return new MinAggregationField<>(field);
   }
 
@@ -81,7 +81,7 @@ public class DslAggregations {
    * @param field sum cql function argument.
    * @return field that retrieves sum value.
    */
-  public static SelectableField sum(SelectableField<?> field) {
+  public static <T> SelectableField<T> sum(SelectableField<T> field) {
     return new SumAggregationField<>(field);
   }
 
@@ -91,7 +91,7 @@ public class DslAggregations {
    * @param field average cql function argument.
    * @return field that retrieves average value.
    */
-  public static SelectableField avg(SelectableField<?> field) {
+  public static <T> SelectableField<T> avg(SelectableField<T> field) {
     return new AvgAggregationField<>(field);
   }
 }
