@@ -26,6 +26,8 @@ import ma.markware.charybdis.batch.Batch;
 import ma.markware.charybdis.model.field.metadata.ColumnMetadata;
 import ma.markware.charybdis.model.field.metadata.TableMetadata;
 import ma.markware.charybdis.query.InsertQuery;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.Instant;
 import java.util.concurrent.CompletableFuture;
@@ -39,6 +41,8 @@ public class DslInsertImpl
     extends AbstractDslInsert
     implements InsertInitExpression, InsertInitWithColumnsExpression, InsertValuesExpression, InsertSetExpression,
     InsertOnExistExpression, InsertTtlExpression, InsertTimestampExpression, InsertFinalExpression {
+
+  private static final Logger log = LoggerFactory.getLogger(DslInsertImpl.class);
 
   private final CqlSession session;
   private final Batch batch;
@@ -126,9 +130,11 @@ public class DslInsertImpl
   @Override
   public boolean execute() {
     if (batch != null) {
+      log.info("Add insert query to enclosing batch query");
       insertQuery.addToBatch(batch);
       return true;
     }
+    log.info("Executing standalone insert query");
     ResultSet resultSet = insertQuery.execute(session);
     return resultSet.wasApplied();
   }

@@ -75,17 +75,23 @@ public class BatchQuery {
 
   public void execute(final CqlSession session) {
     BatchStatement batchStatement = buildStatement();
-    executeBatchStatement(session, batchStatement);
+    if (batchStatement != null) {
+      executeBatchStatement(session, batchStatement);
+    }
   }
 
   public CompletableFuture<Void> executeAsync(final CqlSession session) {
     BatchStatement batchStatement = buildStatement();
-    return executeBatchStatementAsync(session, batchStatement);
+    if (batchStatement != null) {
+      return executeBatchStatementAsync(session, batchStatement);
+    }
+    return CompletableFuture.completedFuture(null);
   }
 
   private void executeBatchStatement(final CqlSession session, BatchStatement batchStatement) {
     try {
       batchStatement = resolveExecutionContext(batchStatement);
+      log.debug("Batch query: {}", batchStatement);
       ResultSet resultSet = session.execute(batchStatement);
       log.debug("Batch applied => {}", resultSet.wasApplied());
     } catch (final Exception e) {
@@ -127,6 +133,9 @@ public class BatchQuery {
   }
 
   private BatchStatement buildStatement() {
+    if (statements.isEmpty()) {
+      return null;
+    }
     BatchStatementBuilder builder;
     if (isLogged) {
       builder = BatchStatement.builder(BatchType.LOGGED);

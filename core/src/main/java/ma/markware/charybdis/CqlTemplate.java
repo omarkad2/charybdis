@@ -27,6 +27,10 @@ import ma.markware.charybdis.dsl.DslQueryBuilder;
 import ma.markware.charybdis.session.DefaultSessionFactory;
 import ma.markware.charybdis.session.SessionFactory;
 import ma.markware.charybdis.session.StandaloneSessionFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * Interface used to interact with Cql database. This API gives access to :
@@ -36,10 +40,13 @@ import ma.markware.charybdis.session.StandaloneSessionFactory;
  *   <li>Batch API{@link BatchQueryBuilder}</li>
  * </ul>
  */
+@ThreadSafe
 public class CqlTemplate {
 
+  private static final Logger log = LoggerFactory.getLogger(CqlTemplate.class);
+
   private final SessionFactory sessionFactory;
-  private Batch defaultBatch;
+  private ThreadLocal<Batch> threadLocal = new ThreadLocal<Batch>();
 
   /**
    * Initialize the data manager using a custom session factory.
@@ -83,7 +90,7 @@ public class CqlTemplate {
    * @return Dsl API
    */
   public DslQueryBuilder dsl() {
-    return dsl(defaultBatch);
+    return new DslQueryBuilder(sessionFactory.getSession(), threadLocal.get());
   }
 
   /**
@@ -93,7 +100,8 @@ public class CqlTemplate {
    * @return Dsl API
    */
   public DslQueryBuilder dsl(Batch batch) {
-    return new DslQueryBuilder(sessionFactory.getSession(), batch);
+    Batch enclosingBatch = threadLocal.get();
+    return new DslQueryBuilder(sessionFactory.getSession(), enclosingBatch != null ? enclosingBatch : batch);
   }
 
   /**
@@ -102,7 +110,7 @@ public class CqlTemplate {
    * @return Crud API
    */
   public CrudQueryBuilder crud() {
-    return crud(defaultBatch);
+    return new CrudQueryBuilder(sessionFactory.getSession(), threadLocal.get());
   }
 
   /**
@@ -112,7 +120,8 @@ public class CqlTemplate {
    * @return Crud API
    */
   public CrudQueryBuilder crud(Batch batch) {
-    return new CrudQueryBuilder(sessionFactory.getSession(), batch);
+    Batch enclosingBatch = threadLocal.get();
+    return new CrudQueryBuilder(sessionFactory.getSession(), enclosingBatch != null ? enclosingBatch : batch);
   }
 
   /**
@@ -128,10 +137,14 @@ public class CqlTemplate {
    * @param action a set of write queries
    */
   public void executeAsLoggedBatch(BatchContextCallback action) {
-    this.defaultBatch = batch().logged();
+    Batch batch = batch().logged();
+    threadLocal.set(batch);
+    log.info("Create thread local variable in thread: '{}'", Thread.currentThread().getName());
+    log.info("Execute callback");
     action.execute();
-    defaultBatch.execute();
-    this.defaultBatch = null;
+    log.info("Execute Batch");
+    batch.execute();
+    threadLocal.remove();
   }
 
   /**
@@ -140,10 +153,11 @@ public class CqlTemplate {
    * @param action a set of write queries
    */
   public void executeAsUnloggedBatch(BatchContextCallback action) {
-    this.defaultBatch = batch().unlogged();
+    Batch batch = batch().unlogged();
+    threadLocal.set(batch);
     action.execute();
-    defaultBatch.execute();
-    this.defaultBatch = null;
+    batch.execute();
+    threadLocal.remove();
   }
 
   /**
