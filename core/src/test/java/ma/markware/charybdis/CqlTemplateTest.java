@@ -46,16 +46,24 @@ public class CqlTemplateTest {
   @Test
   void concurrent_executions_should_not_share_batch_context() {
     // Given
-    BatchedQueryThread batchedQueryThread = new BatchedQueryThread();
-    NonBatchedQueryThread nonBatchedQueryThread = new NonBatchedQueryThread();
+    Thread batchedQueryThread = new Thread(new BatchedQueryThread(), "thread-batch");
+    Thread nonBatchedQueryThread = new Thread(new NonBatchedQueryThread(), "thread-non-batch");
 
     // When
-    batchedQueryThread.run();
-    nonBatchedQueryThread.run();
+    batchedQueryThread.start();
+    nonBatchedQueryThread.start();
 
-    // Then
-    verify(session, times(1)).execute(any(DefaultBatchStatement.class));
-    verify(session, times(2)).execute(nonBatchBoundStatement);
+    try {
+      // wait for threads to end
+      batchedQueryThread.join();
+      nonBatchedQueryThread.join();
+
+      // Then
+      verify(session, times(1)).execute(any(DefaultBatchStatement.class));
+      verify(session, times(2)).execute(nonBatchBoundStatement);
+    } catch (Exception e) {
+      System.out.println("Interrupted");
+    }
   }
 
   @Test

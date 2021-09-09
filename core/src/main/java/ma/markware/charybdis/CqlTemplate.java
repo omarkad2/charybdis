@@ -139,10 +139,8 @@ public class CqlTemplate {
   public void executeAsLoggedBatch(BatchContextCallback action) {
     Batch batch = batch().logged();
     threadLocal.set(batch);
-    log.info("Create thread local variable in thread: '{}'", Thread.currentThread().getName());
-    log.info("Execute callback");
+    log.debug("Create thread local variable in thread: '{}'", Thread.currentThread().getName());
     action.execute();
-    log.info("Execute Batch");
     batch.execute();
     threadLocal.remove();
   }
