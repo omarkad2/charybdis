@@ -42,7 +42,7 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-maven-
     - name: Build project
-      uses: mvn clean compile -U -DskipTests
+      run: mvn clean compile -U -DskipTests
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v1
