@@ -19,7 +19,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        language: [ 'java' ]
+        language: [ 'java', 'javascript' ]
         
     steps:
     - name: Checkout repository
@@ -37,12 +37,14 @@ jobs:
         distribution: 'adopt'
         java-version: '8'
     - uses: actions/cache@v1
+      if: matrix.language == 'java'
       with:
         path: ~/.m2/repository
         key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
         restore-keys: |
           ${{ runner.os }}-maven-
     - name: Build project
+      if: matrix.language == 'java'
       run: mvn clean compile -U -DskipTests
 
     - name: Perform CodeQL Analysis
