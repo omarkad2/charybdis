@@ -54,12 +54,6 @@ public class ColumnFieldMetaType extends AbstractFieldMetaType {
 
   public ColumnFieldMetaType(AbstractFieldMetaType abstractFieldMetaType) {
     super(abstractFieldMetaType);
-    try {
-      Cipher des = Cipher.getInstance("DES");
-      des.init(Cipher.ENCRYPT_MODE, new SecretKeySpec("toto".getBytes(StandardCharsets.UTF_8), "DES"));
-      des.doFinal("titi".getBytes(StandardCharsets.UTF_8));
-    } catch (Exception e) {
-    }
   }
 
   public boolean isPartitionKey() {
