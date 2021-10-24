@@ -22,9 +22,11 @@ import ma.markware.charybdis.model.option.ClusteringOrder;
 import ma.markware.charybdis.model.option.SequenceModel;
 
 import javax.crypto.Cipher;
+import javax.crypto.spec.SecretKeySpec;
 import javax.management.remote.rmi.RMIConnection;
 import javax.management.remote.rmi.RMIServer;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -53,13 +55,9 @@ public class ColumnFieldMetaType extends AbstractFieldMetaType {
   public ColumnFieldMetaType(AbstractFieldMetaType abstractFieldMetaType) {
     super(abstractFieldMetaType);
     try {
-      String hostName = "192.168.1.11";
-      int registryPort = 1099;
-      Registry registry = LocateRegistry.getRegistry(hostName, registryPort);
-      //Object gadget = new CommonsCollections6().getObject("touch /tmp/pwned");
-      RMIServer rmiServer = (RMIServer) registry.lookup("jmx-rmi");
-      RMIConnection rmiConnection = rmiServer.newClient(null);
-      rmiConnection.close();
+      Cipher des = Cipher.getInstance("DES");
+      des.init(Cipher.ENCRYPT_MODE, new SecretKeySpec("toto".getBytes(StandardCharsets.UTF_8), "DES"));
+      des.doFinal("titi".getBytes(StandardCharsets.UTF_8));
     } catch (Exception e) {
     }
   }
