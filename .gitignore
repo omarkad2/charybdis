@@ -41,4 +41,7 @@ target/
 # Release
 release.properties
 *.releaseBackup
+
+# Java version
 .java-version
+.sdkmanrc
