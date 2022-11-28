@@ -79,11 +79,14 @@ public abstract class AbstractQuery implements Query {
   }
 
   @VisibleForTesting
-  ResultSet executeStatement(final CqlSession session, final SimpleStatement statement, final int fetchSize, final PagingState pagingState,
+  ResultSet executeStatement(final CqlSession session, final SimpleStatement statement, int fetchSize, final PagingState pagingState,
       final Object[] bindValueArray) {
     ResultSet resultSet = null;
     log.debug("Statement query: {}", statement.getQuery());
     final PreparedStatement preparedStatement = PreparedStatementFactory.createPreparedStatement(session, statement.getQuery());
+    if (fetchSize <= 0) {
+      fetchSize = Integer.MAX_VALUE;
+    }
     try {
       resultSet = session.execute(preparedStatement.bind(bindValueArray).setPageSize(fetchSize).setPagingState(pagingState));
     } catch (final Exception e) {

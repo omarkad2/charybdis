@@ -169,6 +169,7 @@ public class SelectQuery extends AbstractQuery {
     }
 
     SimpleStatement simpleStatement = select.build();
+
     Object[] bindValues = QueryHelper.extractWhereBindValues(whereClauses).toArray();
     if (pageRequest != null) {
       return new StatementTuple(simpleStatement, pageRequest.getFetchSize(), pageRequest.getPagingState(), bindValues);

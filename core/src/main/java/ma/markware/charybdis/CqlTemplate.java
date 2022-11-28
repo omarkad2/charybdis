@@ -158,6 +158,10 @@ public class CqlTemplate {
     threadLocal.remove();
   }
 
+  public SessionFactory getSessionFactory() {
+    return sessionFactory;
+  }
+
   /**
    * Callback interface for code/queries to be executed as a batch.
    * Used with {@link CqlTemplate}'s {@code executeAsUnloggedBatch} and {@code executeAsLoggedBatch} method,

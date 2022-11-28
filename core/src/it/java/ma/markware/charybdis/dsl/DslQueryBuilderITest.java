@@ -46,6 +46,8 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -260,6 +262,25 @@ class DslQueryBuilderITest extends AbstractIntegrationITest {
                                          record.get(TestEntity_Table.udtMap), record.get(TestEntity_Table.udtNestedList),
                                          record.get(TestEntity_Table.flag));
       assertThat(actual).isEqualTo(TestEntity_INST2.entity2);
+    }
+
+    @Test
+    void selectFrom_should_return_all(CqlSession session) {
+
+      // Given
+      IntStream.range(0, 10_000).forEach(item -> insertRow(session, TestEntity_Table.KEYSPACE_NAME, TestEntity_Table.TABLE_NAME,
+          ImmutableMap.of(TestEntity_Table.id.getName(), QueryBuilder.literal(UUID.randomUUID()), TestEntity_Table.date.getName(),
+            QueryBuilder.literal(TestEntity_Table.date.serialize(TestEntity_INST1.date)),
+            TestEntity_Table.udt.getName(), QueryBuilder.literal(TestEntity_Table.udt.serialize(TestEntity_INST1.udt1)),
+            TestEntity_Table.list.getName(), QueryBuilder.literal(TestEntity_Table.list.serialize(TestEntity_INST1.list))))
+      );
+
+      // When
+      Collection<Record> records = dsl.selectFrom(TestEntity_Table.test_entity)
+        .fetch();
+
+      // Then
+      assertThat(records).hasSize(10_000);
     }
 
     @Test
