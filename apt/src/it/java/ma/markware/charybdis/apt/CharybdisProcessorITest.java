@@ -57,6 +57,19 @@ class CharybdisProcessorITest {
     final CompilationTask task = compiler.getTask(null, manager, diagnostics,
                                                   options, null, sources );
     task.setProcessors(Collections.singletonList(charybdisProcessor));
-    assertThat(task.call()).isTrue();
+
+
+    Throwable thrownException = null;
+    Boolean callResult = null;
+    try {
+      callResult = task.call();
+    } catch (Exception e) {
+      thrownException = e;
+    }
+
+    assertThat(thrownException)
+        .withFailMessage(String.format("Processor wasn't expected to throw exception %s", thrownException))
+        .isNull();
+    assertThat(callResult).isTrue();
   }
 }

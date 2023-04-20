@@ -22,19 +22,22 @@ import static java.lang.String.format;
 import static ma.markware.charybdis.apt.utils.ExceptionMessagerWrapper.getParsingException;
 import static ma.markware.charybdis.apt.utils.ExceptionMessagerWrapper.throwParsingException;
 
-import com.sun.tools.javac.code.Symbol;
-import com.sun.tools.javac.code.SymbolMetadata;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 import javax.annotation.processing.Messager;
+import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
-import javax.lang.model.type.TypeMirror;
+import javax.lang.model.element.TypeElement;
+import javax.lang.model.element.VariableElement;
+import javax.lang.model.type.*;
 import javax.lang.model.util.Types;
+
 import ma.markware.charybdis.apt.exception.CharybdisFieldTypeParsingException;
 import ma.markware.charybdis.apt.metatype.AbstractFieldMetaType;
 import ma.markware.charybdis.apt.metatype.FieldTypeMetaType;
 import ma.markware.charybdis.apt.utils.FieldUtils;
-import ma.markware.charybdis.apt.utils.TypeUtils;
 import ma.markware.charybdis.model.annotation.Frozen;
 
 /**
@@ -88,32 +91,114 @@ abstract class AbstractFieldParser<FIELD_META_TYPE extends AbstractFieldMetaType
 
     // Field must have a public getter
     FieldUtils.getGetterMethodFromField(annotatedField, types)
-              .orElseThrow(() -> getParsingException(messager, format(
-                  "A public getter [name: '%s', parameter type: <empty>, return type: '%s'] is mandatory for field '%s' in class '%s'",
-                  fieldMetaType.getGetterName(), fieldMetaType.getFieldType()
-                                                              .getDeserializationTypeCanonicalName(), fieldMetaType.getDeserializationName(),
-                  enclosingClass.getSimpleName())));
+        .orElseThrow(() -> getParsingException(messager, format(
+            "A public getter [name: '%s', parameter type: <empty>, return type: '%s'] is mandatory for field '%s' in class '%s'",
+            fieldMetaType.getGetterName(), fieldMetaType.getFieldType()
+                .getDeserializationTypeCanonicalName(), fieldMetaType.getDeserializationName(),
+            enclosingClass.getSimpleName())));
 
     // Field must have a public setter
     FieldUtils.getSetterMethodFromField(annotatedField, types)
-              .orElseThrow(() -> getParsingException(messager, format(
-                  "A public setter [name: '%s', parameter type: '%s', return type: void] is mandatory for field '%s' in class '%s'",
-                  fieldMetaType.getSetterName(), fieldMetaType.getFieldType()
-                                                              .getDeserializationTypeCanonicalName(), fieldMetaType.getDeserializationName(),
-                  enclosingClass.getSimpleName())));
+        .orElseThrow(() -> getParsingException(messager, format(
+            "A public setter [name: '%s', parameter type: '%s', return type: void] is mandatory for field '%s' in class '%s'",
+            fieldMetaType.getSetterName(), fieldMetaType.getFieldType()
+                .getDeserializationTypeCanonicalName(), fieldMetaType.getDeserializationName(),
+            enclosingClass.getSimpleName())));
   }
 
+//  private Set<TypePosition> getFrozenAnnotationPositions(Element el) {
+//    Set<TypePosition> typePositions = new HashSet<>();
+//    if (el instanceof Symbol) {
+//      SymbolMetadata meta = ((Symbol) el).getMetadata();
+//      if (meta != null) {
+//        meta.getTypeAttributes().stream()
+//            .filter(typeCompound -> TypeUtils.isTypeEquals(typeCompound.getAnnotationType(), Frozen.class))
+//            .map(typeCompound -> TypePosition.from(typeCompound.getPosition().location))
+//            .forEach(typePositions::add);
+//      }
+//    }
+//    return typePositions;
+//  }
+
   private Set<TypePosition> getFrozenAnnotationPositions(Element el) {
+    TypeMirror typeMirror = el.asType();
+    return getFrozenAnnotationPositions(typeMirror);
+  }
+
+  private Set<TypePosition> getFrozenAnnotationPositions(TypeMirror fieldType) {
     Set<TypePosition> typePositions = new HashSet<>();
-    if (el instanceof Symbol) {
-      SymbolMetadata meta = ((Symbol) el).getMetadata();
-      if (meta != null) {
-        meta.getTypeAttributes().stream()
-            .filter(typeCompound -> TypeUtils.isTypeEquals(typeCompound.getAnnotationType(), Frozen.class))
-            .map(typeCompound -> TypePosition.from(typeCompound.getPosition().location))
-            .forEach(typePositions::add);
-      }
+    switch (fieldType.getKind()) {
+      case DECLARED:
+        DeclaredType declaredType = (DeclaredType) fieldType;
+        List<? extends AnnotationMirror> annotations = declaredType.getAnnotationMirrors();
+        for (AnnotationMirror annotation : annotations) {
+          if (Frozen.class.getName().equals(annotation.getAnnotationType().toString())) {
+            typePositions.add(getFrozenAnnotationPositionFromDeclaredType(declaredType));
+          }
+        }
+        List<? extends TypeMirror> typeArguments = declaredType.getTypeArguments();
+        for (TypeMirror typeArgument : typeArguments) {
+          typePositions.addAll(getFrozenAnnotationPositions(typeArgument));
+        }
+        break;
+      case ARRAY:
+        ArrayType arrayType = (ArrayType) fieldType;
+        typePositions.addAll(getFrozenAnnotationPositions(arrayType.getComponentType()));
+        break;
+      case WILDCARD:
+        WildcardType wildcardType = (WildcardType) fieldType;
+        TypeMirror extendsBound = wildcardType.getExtendsBound();
+        if (extendsBound != null) {
+          typePositions.addAll(getFrozenAnnotationPositions(extendsBound));
+        }
+        TypeMirror superBound = wildcardType.getSuperBound();
+        if (superBound != null) {
+          typePositions.addAll(getFrozenAnnotationPositions(superBound));
+        }
+        break;
     }
     return typePositions;
+  }
+
+  private TypePosition getFrozenAnnotationPositionFromDeclaredType(DeclaredType declaredType) {
+    List<? extends TypeMirror> typeArguments = declaredType.getTypeArguments();
+    if (typeArguments.isEmpty()) {
+      return new TypePosition(0, 0);
+    }
+    int depth = 0;
+    for (TypeMirror typeArgument : typeArguments) {
+      if (typeArgument.getKind() == TypeKind.DECLARED) {
+        DeclaredType declaredTypeArgument = (DeclaredType) typeArgument;
+        if (declaredTypeArgument.asElement().getAnnotation(Frozen.class) != null) {
+          return new TypePosition(typeArguments.indexOf(typeArgument), depth);
+        }
+      }
+      depth++;
+    }
+    return new TypePosition(0, 0);
+  }
+
+  public String getTypeAttributes(VariableElement variableElement) {
+    TypeElement enclosingType = (TypeElement) variableElement.getEnclosingElement();
+    List<? extends VariableElement> fields = enclosingType.getEnclosedElements().stream()
+        .filter(element -> element.getKind().isField())
+        .map(element -> (VariableElement) element)
+        .collect(Collectors.toList());
+
+    String type = variableElement.asType().toString();
+    for (VariableElement field : fields) {
+      if (field.asType().toString().equals(type)) {
+        List<? extends AnnotationMirror> annotationMirrors = field.asType().getAnnotationMirrors();
+        if (!annotationMirrors.isEmpty()) {
+          type += " with annotations ";
+          for (AnnotationMirror annotationMirror : annotationMirrors) {
+            type += "@" + annotationMirror.getAnnotationType().toString() + " ";
+          }
+        }
+        break;
+      }
+    }
+
+    return type;
   }
 }
