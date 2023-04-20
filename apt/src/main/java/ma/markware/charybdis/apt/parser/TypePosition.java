@@ -18,13 +18,11 @@
  */
 package ma.markware.charybdis.apt.parser;
 
-import com.sun.tools.javac.code.TypeAnnotationPosition.TypePathEntry;
-import java.util.List;
 import java.util.Objects;
 
 /**
  * Holds position of a given field's type.
- *
+ * <p>
  * Given Field with type: {@code List<List<Map<Integer, Target>>>}
  * the position of type {@code Target} is [index: 2, depth: 1]
  *
@@ -38,16 +36,6 @@ public class TypePosition {
   public TypePosition(final int index, final int depth) {
     this.index = index;
     this.depth = depth;
-  }
-
-  /**
-   * Creates instance from a list of {@link TypePathEntry}.
-   */
-  public static TypePosition from(List<TypePathEntry> location) {
-    if (location.size() == 0) {
-      return new TypePosition(0, 0);
-    }
-    return new TypePosition(location.get(location.size() - 1).arg, location.size());
   }
 
   public int getIndex() {

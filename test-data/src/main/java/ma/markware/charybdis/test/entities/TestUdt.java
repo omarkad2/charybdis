@@ -36,7 +36,7 @@ public class TestUdt {
 
   public TestUdt(final int number, final String value, final List<@Frozen TestNestedUdt> udtNestedList,
       final Set<@Frozen List<TestNestedUdt>> udtNestedNestedSet, final Map<TestEnum, @Frozen List<TestNestedUdt>> udtNestedMap,
-      final TestNestedUdt udtNested) {
+      final @Frozen TestNestedUdt udtNested) {
     this.number = number;
     this.value = value;
     this.udtNestedList = udtNestedList;
