@@ -22,8 +22,11 @@ import static java.lang.String.format;
 import static ma.markware.charybdis.apt.utils.ExceptionMessagerWrapper.getParsingException;
 import static ma.markware.charybdis.apt.utils.ExceptionMessagerWrapper.throwParsingException;
 
+import com.sun.tools.javac.code.Attribute;
 import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.SymbolMetadata;
+
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 import javax.annotation.processing.Messager;
@@ -108,10 +111,11 @@ abstract class AbstractFieldParser<FIELD_META_TYPE extends AbstractFieldMetaType
     if (el instanceof Symbol) {
       SymbolMetadata meta = ((Symbol) el).getMetadata();
       if (meta != null) {
-        meta.getTypeAttributes().stream()
-            .filter(typeCompound -> TypeUtils.isTypeEquals(typeCompound.getAnnotationType(), Frozen.class))
-            .map(typeCompound -> TypePosition.from(typeCompound.getPosition().location))
-            .forEach(typePositions::add);
+        for (Attribute.TypeCompound typeAttribute : new ArrayList<>(meta.getTypeAttributes())) {
+          if (TypeUtils.isTypeEquals(typeAttribute.getAnnotationType(), Frozen.class)) {
+            typePositions.add(TypePosition.from(typeAttribute.getPosition().location));
+          }
+        }
       }
     }
     return typePositions;
