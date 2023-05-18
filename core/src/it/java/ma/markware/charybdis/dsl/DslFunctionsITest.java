@@ -29,6 +29,7 @@ import ma.markware.charybdis.CqlTemplate;
 import ma.markware.charybdis.model.field.SelectableField;
 import ma.markware.charybdis.test.instances.TestEntity_INST1;
 import ma.markware.charybdis.test.metadata.TestEntity_Table;
+import ma.markware.charybdis.test.utils.InstantUtils;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -55,7 +56,7 @@ class DslFunctionsITest extends AbstractIntegrationITest {
   @Test
   void writetime(CqlSession session) {
     // Given
-    Instant now = Instant.now();
+    Instant now = InstantUtils.now();
     insertRow(session, TestEntity_Table.KEYSPACE_NAME, TestEntity_Table.TABLE_NAME, ImmutableMap.of(
         TestEntity_Table.id.getName(), QueryBuilder.literal(TestEntity_Table.id.serialize(TestEntity_INST1.id)),
         TestEntity_Table.date.getName(), QueryBuilder.literal(TestEntity_Table.date.serialize(TestEntity_INST1.date)),

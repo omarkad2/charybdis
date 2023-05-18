@@ -22,11 +22,13 @@ import com.datastax.oss.driver.api.core.AllNodesFailedException;
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.command.CreateContainerResponse;
-import com.github.dockerjava.api.model.Container;
-import com.github.dockerjava.api.model.ExposedPort;
-import com.github.dockerjava.api.model.HostConfig;
-import com.github.dockerjava.api.model.Ports;
+import com.github.dockerjava.api.command.PullImageCmd;
+import com.github.dockerjava.api.command.PullImageResultCallback;
+import com.github.dockerjava.api.exception.DockerClientException;
+import com.github.dockerjava.api.exception.NotFoundException;
+import com.github.dockerjava.api.model.*;
 import com.github.dockerjava.core.DockerClientBuilder;
+import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,8 +36,8 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
-import java.util.List;
-import java.util.Objects;
+import java.time.Duration;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -48,7 +50,7 @@ public class DockerizedCassandra implements ExtensionContext.Store.CloseableReso
   private static final Logger logger = LoggerFactory.getLogger(DockerizedCassandra.class);
 
   // Docker image
-  private static final String DOCKER_IMAGE_NAME = "cassandra:3.11.11";
+  private static final String DOCKER_IMAGE_NAME = "cassandra:3.11";
 //  private static final String DOCKER_IMAGE_NAME = "scylladb/scylla";
 
   // Datastax properties
@@ -95,24 +97,25 @@ public class DockerizedCassandra implements ExtensionContext.Store.CloseableReso
     Ports portBindings = new Ports();
     portBindings.bind(tcp, Ports.Binding.bindPort(port));
 
+    checkAndPullImage(DOCKER_IMAGE_NAME);
     CreateContainerResponse containerResponse = dockerClient.createContainerCmd(DOCKER_IMAGE_NAME)
-                                                            .withExposedPorts(tcp)
-                                                            .withHostConfig(
-                                                                HostConfig.newHostConfig().withPortBindings(portBindings)
-                                                            )
-                                                            .exec();
+      .withExposedPorts(tcp)
+      .withHostConfig(
+        HostConfig.newHostConfig().withPortBindings(portBindings)
+      )
+      .exec();
     logger.info("Created container : {}", containerResponse);
 
     containerId = containerResponse.getId();
     dockerClient.startContainerCmd(containerId)
-                .exec();
+      .exec();
 
     while (backoffService.shouldRetry()) {
       try {
         session = CqlSession.builder()
-                            .addContactPoint(new InetSocketAddress(port))
-                            .withLocalDatacenter(DEFAULT_DATACENTER)
-                            .build();
+          .addContactPoint(new InetSocketAddress(port))
+          .withLocalDatacenter(DEFAULT_DATACENTER)
+          .build();
         backoffService.doNotRetry();
         isUp = true;
       } catch (AllNodesFailedException e) {
@@ -147,7 +150,7 @@ public class DockerizedCassandra implements ExtensionContext.Store.CloseableReso
 
   private boolean isContainerExists(DockerClient dockerClient, String containerId) {
     List<Container> containers = dockerClient.listContainersCmd()
-                                             .exec();
+      .exec();
     logger.info("Containers started : " + containers.stream().map(Container::toString).collect(Collectors.joining(", ")));
     return containers.stream().anyMatch(container -> Objects.equals(containerId, container.getId()));
   }
@@ -156,6 +159,27 @@ public class DockerizedCassandra implements ExtensionContext.Store.CloseableReso
     try (ServerSocket socket = new ServerSocket(0)) {
       socket.setReuseAddress(true);
       return socket.getLocalPort();
+    }
+  }
+
+  public void checkAndPullImage(String image) {
+    try {
+      try {
+        dockerClient.inspectImageCmd(image).exec();
+      } catch (NotFoundException notFoundException) {
+        PullImageCmd pullImageCmd = dockerClient.pullImageCmd(image);
+        try {
+          pullImageCmd.exec(new PullImageResultCallback()).awaitCompletion();
+        } catch (DockerClientException e) {
+          // Try to fallback to x86
+          pullImageCmd
+            .withPlatform("linux/amd64")
+            .exec(new PullImageResultCallback())
+            .awaitCompletion();
+        }
+      }
+    } catch (Exception e) {
+      throw new RuntimeException(e);
     }
   }
 }

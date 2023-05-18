@@ -74,27 +74,22 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.5.1</version>
         <configuration>
-          <source>${java.version}</source>
-          <target>${java.version}</target>
+<!--          <source>${maven.compiler.source}</source>-->
+<!--          <target>${maven.compiler.target}</target>-->
+<!--          <compilerArgument>&#45;&#45;add-exports=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED</compilerArgument>-->
         </configuration>
         <executions>
           <execution>
             <id>default-compile</id>
             <configuration>
-              <compilerArgument>-proc:none</compilerArgument>
+              <compilerArgs>
+                <arg>-proc:none</arg>
+              </compilerArgs>
               <includes>
                 <include>ma/markware/charybdis/apt/CharybdisProcessor.java</include>
               </includes>
             </configuration>
-          </execution>
-          <execution>
-            <id>compile-project</id>
-            <phase>compile</phase>
-            <goals>
-              <goal>compile</goal>
-            </goals>
           </execution>
         </executions>
       </plugin>

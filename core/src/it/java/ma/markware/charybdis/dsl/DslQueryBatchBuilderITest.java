@@ -33,6 +33,7 @@ import ma.markware.charybdis.test.instances.TestEntity_INST1;
 import ma.markware.charybdis.test.instances.TestEntity_INST2;
 import ma.markware.charybdis.test.metadata.TestEntity_Table;
 import ma.markware.charybdis.test.metadata.TestExtraUdt_Udt;
+import ma.markware.charybdis.test.utils.InstantUtils;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
 
@@ -331,7 +332,7 @@ class DslQueryBatchBuilderITest  extends AbstractIntegrationITest {
     void update_with_timestamp_in_micros() {
 
       // When
-      long micros = Instant.now().plus(1, ChronoUnit.DAYS).toEpochMilli() * 1000;
+      long micros = InstantUtils.now().plus(1, ChronoUnit.DAYS).toEpochMilli() * 1000;
       dslBatch.update(TestEntity_Table.test_entity)
               .usingTimestamp(micros)
               .set(TestEntity_Table.flag, true)
@@ -559,7 +560,7 @@ class DslQueryBatchBuilderITest  extends AbstractIntegrationITest {
     void delete_with_timestamp_should_delete_values_written_before_timestamp() {
 
       // When
-      long micros = Instant.now().plus(1, ChronoUnit.DAYS).toEpochMilli() * 1000;
+      long micros = InstantUtils.now().plus(1, ChronoUnit.DAYS).toEpochMilli() * 1000;
       dslBatch.delete(TestEntity_Table.flag)
               .from(TestEntity_Table.test_entity)
               .usingTimestamp(micros)

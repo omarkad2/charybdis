@@ -30,6 +30,7 @@ import ma.markware.charybdis.model.field.SelectableField;
 import ma.markware.charybdis.test.entities.TestEntity;
 import ma.markware.charybdis.test.instances.TestEntity_INST1;
 import ma.markware.charybdis.test.metadata.TestEntity_Table;
+import ma.markware.charybdis.test.utils.InstantUtils;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
 
@@ -159,7 +160,7 @@ class CrudQueryBatchBuilderITest extends AbstractIntegrationITest {
 
     @Test
     void create_with_timestamp() {
-      Instant now = Instant.now();
+      Instant now = InstantUtils.now();
       crudBatch.create(TestEntity_Table.test_entity, TestEntity_INST1.entity1, now);
 
       batch.execute();
@@ -175,7 +176,7 @@ class CrudQueryBatchBuilderITest extends AbstractIntegrationITest {
 
     @Test
     void create_with_timestamp_epoch_milli() {
-      Instant now = Instant.now();
+      Instant now = InstantUtils.now();
       crudBatch.create(TestEntity_Table.test_entity, TestEntity_INST1.entity1, now.toEpochMilli());
 
       batch.execute();

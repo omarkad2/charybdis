@@ -13,11 +13,12 @@ import ma.markware.charybdis.test.entities.TestEnum;
 import ma.markware.charybdis.test.entities.TestExtraUdt;
 import ma.markware.charybdis.test.entities.TestNestedUdt;
 import ma.markware.charybdis.test.entities.TestUdt;
+import ma.markware.charybdis.test.utils.InstantUtils;
 
 public class TestEntity_INST1 {
 
   public final static UUID id = UUID.randomUUID();
-  public final static Instant date = Instant.now();
+  public final static Instant date = InstantUtils.now();
   public final static List<String> list = Arrays.asList("elt1", "elt2");
   public final static Set<Integer> se = Collections.singleton(1);
   public final static Map<String, String> map = ImmutableMap.of("key1", "value1", "key2", "value2");
