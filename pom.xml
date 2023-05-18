@@ -36,10 +36,9 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <java.version>1.8</java.version>
-    <maven.compiler.target>${java.version}</maven.compiler.target>
+    <java.version>17</java.version>
     <maven.compiler.source>${java.version}</maven.compiler.source>
-    <maven-javadoc-plugin.additionalJOptions></maven-javadoc-plugin.additionalJOptions>
+    <maven.compiler.target>${java.version}</maven.compiler.target>
     <slf4j.version>1.7.30</slf4j.version>
     <logback.version>1.2.3</logback.version>
     <cassandra-driver.version>4.13.0</cassandra-driver.version>
@@ -594,7 +593,7 @@
             <version>3.8.1</version>
             <configuration>
               <compilerArgs combine.children="append">
-                <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED</arg>
+                <arg>--add-exports=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED</arg>
               </compilerArgs>
             </configuration>
           </plugin>
