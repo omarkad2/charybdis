@@ -36,7 +36,7 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <java.version>17</java.version>
+    <java.version>1.8</java.version>
     <maven.compiler.source>${java.version}</maven.compiler.source>
     <maven.compiler.target>${java.version}</maven.compiler.target>
     <slf4j.version>1.7.30</slf4j.version>
@@ -478,9 +478,6 @@
             <configuration>
               <doclint>none</doclint>
               <show>public</show>
-<!--              <additionalJOptions>-->
-<!--                <additionalJOption>&#45;&#45;add-exports=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED</additionalJOption>-->
-<!--              </additionalJOptions>-->
             </configuration>
           </execution>
         </executions>
