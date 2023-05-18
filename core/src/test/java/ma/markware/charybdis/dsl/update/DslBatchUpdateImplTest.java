@@ -41,6 +41,7 @@ import ma.markware.charybdis.test.entities.TestEnum;
 import ma.markware.charybdis.test.entities.TestExtraUdt;
 import ma.markware.charybdis.test.metadata.TestEntity_Table;
 import ma.markware.charybdis.test.metadata.TestExtraUdt_Udt;
+import ma.markware.charybdis.test.utils.InstantUtils;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 
@@ -73,7 +74,7 @@ class DslBatchUpdateImplTest extends AbstractDslUpdateTest<DslUpdateImpl> {
 
   @Test
   void usingTimestamp() {
-    Instant now = Instant.now();
+    Instant now = InstantUtils.now();
     instance.update(TestEntity_Table.test_entity)
             .usingTimestamp(now)
             .set(TestEntity_Table.flag, true);
@@ -84,7 +85,7 @@ class DslBatchUpdateImplTest extends AbstractDslUpdateTest<DslUpdateImpl> {
 
   @Test
   void usingTimestamp_epoch_milli() {
-    Instant now = Instant.now();
+    Instant now = InstantUtils.now();
     instance.update(TestEntity_Table.test_entity)
             .usingTimestamp(now.toEpochMilli())
             .set(TestEntity_Table.flag, true);
@@ -248,7 +249,7 @@ class DslBatchUpdateImplTest extends AbstractDslUpdateTest<DslUpdateImpl> {
   @Test
   void and() {
     UUID uuid = UUID.randomUUID();
-    Instant now = Instant.now();
+    Instant now = InstantUtils.now();
     String mapKey = "key0";
     List<Integer> nestedSetValue = Collections.singletonList(10);
     instance.update(TestEntity_Table.test_entity)
@@ -284,7 +285,7 @@ class DslBatchUpdateImplTest extends AbstractDslUpdateTest<DslUpdateImpl> {
   @Test
   void if_() {
     UUID uuid = UUID.randomUUID();
-    Instant now = Instant.now();
+    Instant now = InstantUtils.now();
     instance.update(TestEntity_Table.test_entity)
             .set(TestEntity_Table.flag, true)
             .where(TestEntity_Table.id.eq(uuid))
@@ -304,7 +305,7 @@ class DslBatchUpdateImplTest extends AbstractDslUpdateTest<DslUpdateImpl> {
   @Test
   void and_() {
     UUID uuid = UUID.randomUUID();
-    Instant now = Instant.now();
+    Instant now = InstantUtils.now();
     instance.update(TestEntity_Table.test_entity)
             .set(TestEntity_Table.flag, true)
             .where(TestEntity_Table.id.eq(uuid))
