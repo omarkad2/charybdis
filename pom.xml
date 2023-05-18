@@ -314,7 +314,6 @@
         <configuration>
           <argLine>
             @{surefireArgLine}
-            --add-exports jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED
           </argLine>
           <excludes>
             <exclude>**/*ITest.java</exclude>
@@ -348,7 +347,6 @@
         <configuration>
           <argLine>
             @{failsafeArgLine}
-            --add-exports jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED
           </argLine>
           <includes>
             <include>**/*ITest.java</include>
@@ -603,7 +601,6 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-javadoc-plugin</artifactId>
-            <version>${maven-javadoc-plugin.version}</version>
             <executions>
               <execution>
                 <id>attach-javadocs</id>
@@ -617,6 +614,39 @@
                 </configuration>
               </execution>
             </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration combine.self="override">
+              <argLine>
+                @{surefireArgLine}
+                --add-exports jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED
+              </argLine>
+              <excludes>
+                <exclude>**/*ITest.java</exclude>
+              </excludes>
+            </configuration>
+          </plugin>
+          <plugin>
+            <artifactId>maven-failsafe-plugin</artifactId>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>integration-test</goal>
+                  <goal>verify</goal>
+                </goals>
+              </execution>
+            </executions>
+            <configuration combine.self="override">
+              <argLine>
+                @{failsafeArgLine}
+                --add-exports jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED
+              </argLine>
+              <includes>
+                <include>**/*ITest.java</include>
+              </includes>
+            </configuration>
           </plugin>
         </plugins>
       </build>
