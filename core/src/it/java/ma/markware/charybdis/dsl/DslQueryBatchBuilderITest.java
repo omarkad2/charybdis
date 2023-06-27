@@ -42,6 +42,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 
 @TestInstance(Lifecycle.PER_CLASS)
 class DslQueryBatchBuilderITest  extends AbstractIntegrationITest {
@@ -605,28 +606,52 @@ class DslQueryBatchBuilderITest  extends AbstractIntegrationITest {
   }
 
   @Test
+  void cqlTemplate_executeAsLoggedBatchAsync() {
+    // Given
+    cqlTemplate.executeAsLoggedBatchAsync(() -> {
+      cqlTemplate.dsl().insertInto(TestEntity_Table.test_entity, TestEntity_Table.id, TestEntity_Table.date, TestEntity_Table.udt, TestEntity_Table.list, TestEntity_Table.flag)
+        .values(TestEntity_INST1.id, TestEntity_INST1.date, TestEntity_INST1.udt1, TestEntity_INST1.list, false)
+        .execute();
+      cqlTemplate.dsl().insertInto(TestEntity_Table.test_entity, TestEntity_Table.id, TestEntity_Table.date, TestEntity_Table.udt, TestEntity_Table.list, TestEntity_Table.flag)
+        .values(TestEntity_INST2.id, TestEntity_INST2.date, TestEntity_INST2.udt, TestEntity_INST2.list, true)
+        .execute();
+    }).whenComplete((__, error) -> {
+      if (error != null) {
+        fail("executeAsLoggedBatchAsync failed", error);
+        return;
+      }
+      // When
+      Collection<Record> records = dsl.selectFrom(TestEntity_Table.test_entity)
+        .fetch();
+
+      // Then
+      assertThat(records).hasSize(2).extracting(record -> record.get(TestEntity_Table.flag)).containsExactlyInAnyOrder(true, false);
+    });
+  }
+
+  @Test
   void cqlTemplate_executeAsUnloggedBatch() {
     // Given
     cqlTemplate.executeAsUnloggedBatch(() -> {
       cqlTemplate.dsl().insertInto(TestEntity_Table.test_entity, TestEntity_Table.id, TestEntity_Table.date, TestEntity_Table.udt, TestEntity_Table.list, TestEntity_Table.flag)
           .values(TestEntity_INST1.id, TestEntity_INST1.date, TestEntity_INST1.udt1, TestEntity_INST1.list, false)
-          .executeAsync();
+          .execute();
       cqlTemplate.dsl().insertInto(TestEntity_Table.test_entity, TestEntity_Table.id, TestEntity_Table.date, TestEntity_Table.udt, TestEntity_Table.list, TestEntity_Table.flag)
           .values(TestEntity_INST2.id, TestEntity_INST2.date, TestEntity_INST2.udt, TestEntity_INST2.list, true)
-          .executeAsync();
+          .execute();
       cqlTemplate.dsl().update(TestEntity_Table.test_entity)
           .set(TestEntity_Table.flag, false)
           .where(TestEntity_Table.id.eq(TestEntity_INST2.id))
           .and(TestEntity_Table.date.eq(TestEntity_INST2.date))
           .and(TestEntity_Table.udt.eq(TestEntity_INST2.udt))
           .and(TestEntity_Table.list.eq(TestEntity_INST2.list))
-          .executeAsync();
+          .execute();
       cqlTemplate.dsl().delete().from(TestEntity_Table.test_entity)
           .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
           .and(TestEntity_Table.date.eq(TestEntity_INST1.date))
           .and(TestEntity_Table.udt.eq(TestEntity_INST1.udt1))
           .and(TestEntity_Table.list.eq(TestEntity_INST1.list))
-          .executeAsync();
+          .execute();
     });
 
     // When
@@ -635,5 +660,42 @@ class DslQueryBatchBuilderITest  extends AbstractIntegrationITest {
 
     // Then
     assertThat(records).hasSize(1);
+  }
+
+  @Test
+  void cqlTemplate_executeAsUnloggedBatchAsync() {
+    // Given
+    cqlTemplate.executeAsUnloggedBatchAsync(() -> {
+      cqlTemplate.dsl().insertInto(TestEntity_Table.test_entity, TestEntity_Table.id, TestEntity_Table.date, TestEntity_Table.udt, TestEntity_Table.list, TestEntity_Table.flag)
+        .values(TestEntity_INST1.id, TestEntity_INST1.date, TestEntity_INST1.udt1, TestEntity_INST1.list, false)
+        .execute();
+      cqlTemplate.dsl().insertInto(TestEntity_Table.test_entity, TestEntity_Table.id, TestEntity_Table.date, TestEntity_Table.udt, TestEntity_Table.list, TestEntity_Table.flag)
+        .values(TestEntity_INST2.id, TestEntity_INST2.date, TestEntity_INST2.udt, TestEntity_INST2.list, true)
+        .execute();
+      cqlTemplate.dsl().update(TestEntity_Table.test_entity)
+        .set(TestEntity_Table.flag, false)
+        .where(TestEntity_Table.id.eq(TestEntity_INST2.id))
+        .and(TestEntity_Table.date.eq(TestEntity_INST2.date))
+        .and(TestEntity_Table.udt.eq(TestEntity_INST2.udt))
+        .and(TestEntity_Table.list.eq(TestEntity_INST2.list))
+        .execute();
+      cqlTemplate.dsl().delete().from(TestEntity_Table.test_entity)
+        .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
+        .and(TestEntity_Table.date.eq(TestEntity_INST1.date))
+        .and(TestEntity_Table.udt.eq(TestEntity_INST1.udt1))
+        .and(TestEntity_Table.list.eq(TestEntity_INST1.list))
+        .execute();
+    }).whenComplete((__, error) -> {
+      if (error != null) {
+        fail("executeAsUnloggedBatchAsync failed", error);
+        return;
+      }
+      // When
+      Collection<Record> records = dsl.selectFrom(TestEntity_Table.test_entity)
+        .fetch();
+
+      // Then
+      assertThat(records).hasSize(1);
+    });
   }
 }
