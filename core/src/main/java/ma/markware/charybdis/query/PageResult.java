@@ -21,6 +21,7 @@ package ma.markware.charybdis.query;
 import com.datastax.oss.driver.api.core.cql.PagingState;
 
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -33,10 +34,9 @@ import java.util.List;
  */
 public class PageResult<T> {
 
-  public static final PageResult EMPTY_PAGE = new PageResult<>(Collections.emptyList(), null);
-  private List<T> results;
+  private final List<T> results;
 
-  private PagingState pagingState;
+  private final PagingState pagingState;
 
   public PageResult(final List<T> results, final PagingState pagingState) {
     this.results = results;

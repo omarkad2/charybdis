@@ -40,12 +40,13 @@ import org.junit.jupiter.api.TestInstance.Lifecycle;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.concurrent.ExecutionException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 
 @TestInstance(Lifecycle.PER_CLASS)
-class DslQueryBatchBuilderITest  extends AbstractIntegrationITest {
+class DslQueryBatchBuilderITest extends AbstractIntegrationITest {
 
   private CqlTemplate cqlTemplate;
   private Batch batch;
@@ -74,31 +75,31 @@ class DslQueryBatchBuilderITest  extends AbstractIntegrationITest {
 
       // Given
       dslBatch.insertInto(TestEntity_Table.test_entity, TestEntity_Table.id, TestEntity_Table.date, TestEntity_Table.udt, TestEntity_Table.list, TestEntity_Table.se, TestEntity_Table.map,
-                     TestEntity_Table.nestedList, TestEntity_Table.nestedSet, TestEntity_Table.nestedMap, TestEntity_Table.enumValue, TestEntity_Table.enumList, TestEntity_Table.enumMap,
-                     TestEntity_Table.enumNestedList, TestEntity_Table.extraUdt, TestEntity_Table.udtList, TestEntity_Table.udtSet, TestEntity_Table.udtMap, TestEntity_Table.udtNestedList,
-                     TestEntity_Table.flag)
-         .values(TestEntity_INST1.id, TestEntity_INST1.date, TestEntity_INST1.udt1, TestEntity_INST1.list, TestEntity_INST1.se, TestEntity_INST1.map, TestEntity_INST1.nestedList,
-                 TestEntity_INST1.nestedSet, TestEntity_INST1.nestedMap, TestEntity_INST1.enumValue, TestEntity_INST1.enumList, TestEntity_INST1.enumMap, TestEntity_INST1.enumNestedList,
-                 TestEntity_INST1.extraUdt, TestEntity_INST1.udtList, TestEntity_INST1.udtSet, TestEntity_INST1.udtMap, TestEntity_INST1.udtNestedList, TestEntity_INST1.flag)
-         .execute();
+          TestEntity_Table.nestedList, TestEntity_Table.nestedSet, TestEntity_Table.nestedMap, TestEntity_Table.enumValue, TestEntity_Table.enumList, TestEntity_Table.enumMap,
+          TestEntity_Table.enumNestedList, TestEntity_Table.extraUdt, TestEntity_Table.udtList, TestEntity_Table.udtSet, TestEntity_Table.udtMap, TestEntity_Table.udtNestedList,
+          TestEntity_Table.flag)
+        .values(TestEntity_INST1.id, TestEntity_INST1.date, TestEntity_INST1.udt1, TestEntity_INST1.list, TestEntity_INST1.se, TestEntity_INST1.map, TestEntity_INST1.nestedList,
+          TestEntity_INST1.nestedSet, TestEntity_INST1.nestedMap, TestEntity_INST1.enumValue, TestEntity_INST1.enumList, TestEntity_INST1.enumMap, TestEntity_INST1.enumNestedList,
+          TestEntity_INST1.extraUdt, TestEntity_INST1.udtList, TestEntity_INST1.udtSet, TestEntity_INST1.udtMap, TestEntity_INST1.udtNestedList, TestEntity_INST1.flag)
+        .execute();
       batch.execute();
 
       // When
       Record record = dsl.selectFrom(TestEntity_Table.test_entity)
-                         .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
-                         .fetchOne();
+        .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
+        .fetchOne();
 
       // Then
       TestEntity actual = new TestEntity(record.get(TestEntity_Table.id),
-                                         record.get(TestEntity_Table.date), record.get(TestEntity_Table.udt),
-                                         record.get(TestEntity_Table.list), record.get(TestEntity_Table.se), record.get(TestEntity_Table.map),
-                                         record.get(TestEntity_Table.nestedList), record.get(TestEntity_Table.nestedSet),
-                                         record.get(TestEntity_Table.nestedMap), record.get(TestEntity_Table.enumValue),
-                                         record.get(TestEntity_Table.enumList), record.get(TestEntity_Table.enumMap),
-                                         record.get(TestEntity_Table.enumNestedList), record.get(TestEntity_Table.extraUdt),
-                                         record.get(TestEntity_Table.udtList), record.get(TestEntity_Table.udtSet),
-                                         record.get(TestEntity_Table.udtMap), record.get(TestEntity_Table.udtNestedList),
-                                         record.get(TestEntity_Table.flag));
+        record.get(TestEntity_Table.date), record.get(TestEntity_Table.udt),
+        record.get(TestEntity_Table.list), record.get(TestEntity_Table.se), record.get(TestEntity_Table.map),
+        record.get(TestEntity_Table.nestedList), record.get(TestEntity_Table.nestedSet),
+        record.get(TestEntity_Table.nestedMap), record.get(TestEntity_Table.enumValue),
+        record.get(TestEntity_Table.enumList), record.get(TestEntity_Table.enumMap),
+        record.get(TestEntity_Table.enumNestedList), record.get(TestEntity_Table.extraUdt),
+        record.get(TestEntity_Table.udtList), record.get(TestEntity_Table.udtSet),
+        record.get(TestEntity_Table.udtMap), record.get(TestEntity_Table.udtNestedList),
+        record.get(TestEntity_Table.flag));
       assertThat(actual).isEqualTo(TestEntity_INST1.entity1);
     }
 
@@ -107,21 +108,21 @@ class DslQueryBatchBuilderITest  extends AbstractIntegrationITest {
 
       // Given
       dslBatch.insertInto(TestEntity_Table.test_entity, TestEntity_Table.id, TestEntity_Table.date, TestEntity_Table.udt, TestEntity_Table.list, TestEntity_Table.flag)
-         .values(TestEntity_INST1.id, TestEntity_INST1.date, TestEntity_INST1.udt1, TestEntity_INST1.list, false)
-         .execute();
+        .values(TestEntity_INST1.id, TestEntity_INST1.date, TestEntity_INST1.udt1, TestEntity_INST1.list, false)
+        .execute();
       batch.execute();
 
       dslBatch.insertInto(TestEntity_Table.test_entity, TestEntity_Table.id, TestEntity_Table.date, TestEntity_Table.udt, TestEntity_Table.list, TestEntity_Table.flag)
-         .values(TestEntity_INST1.id, TestEntity_INST1.date, TestEntity_INST1.udt1, TestEntity_INST1.list, true)
-         .ifNotExists()
-         .execute();
+        .values(TestEntity_INST1.id, TestEntity_INST1.date, TestEntity_INST1.udt1, TestEntity_INST1.list, true)
+        .ifNotExists()
+        .execute();
 
       batch.execute();
 
       // When
       Collection<Record> records = dsl.selectFrom(TestEntity_Table.test_entity)
-                                      .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
-                                      .fetch();
+        .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
+        .fetch();
 
       // Then
       assertThat(records).hasSize(1);
@@ -137,23 +138,23 @@ class DslQueryBatchBuilderITest  extends AbstractIntegrationITest {
     void setup(CqlSession session) {
       // Insert TestEntity_INST1 to DB
       dsl.insertInto(TestEntity_Table.test_entity, TestEntity_Table.id, TestEntity_Table.date, TestEntity_Table.udt, TestEntity_Table.list, TestEntity_Table.se, TestEntity_Table.map,
-                     TestEntity_Table.nestedList, TestEntity_Table.nestedSet, TestEntity_Table.nestedMap, TestEntity_Table.enumValue, TestEntity_Table.enumList, TestEntity_Table.enumMap,
-                     TestEntity_Table.enumNestedList, TestEntity_Table.extraUdt, TestEntity_Table.udtList, TestEntity_Table.udtSet, TestEntity_Table.udtMap, TestEntity_Table.udtNestedList,
-                     TestEntity_Table.flag)
-         .values(TestEntity_INST1.id, TestEntity_INST1.date, TestEntity_INST1.udt1, TestEntity_INST1.list, TestEntity_INST1.se, TestEntity_INST1.map, TestEntity_INST1.nestedList,
-                 TestEntity_INST1.nestedSet, TestEntity_INST1.nestedMap, TestEntity_INST1.enumValue, TestEntity_INST1.enumList, TestEntity_INST1.enumMap, TestEntity_INST1.enumNestedList,
-                 TestEntity_INST1.extraUdt, TestEntity_INST1.udtList, TestEntity_INST1.udtSet, TestEntity_INST1.udtMap, null, TestEntity_INST1.flag)
-         .execute();
+          TestEntity_Table.nestedList, TestEntity_Table.nestedSet, TestEntity_Table.nestedMap, TestEntity_Table.enumValue, TestEntity_Table.enumList, TestEntity_Table.enumMap,
+          TestEntity_Table.enumNestedList, TestEntity_Table.extraUdt, TestEntity_Table.udtList, TestEntity_Table.udtSet, TestEntity_Table.udtMap, TestEntity_Table.udtNestedList,
+          TestEntity_Table.flag)
+        .values(TestEntity_INST1.id, TestEntity_INST1.date, TestEntity_INST1.udt1, TestEntity_INST1.list, TestEntity_INST1.se, TestEntity_INST1.map, TestEntity_INST1.nestedList,
+          TestEntity_INST1.nestedSet, TestEntity_INST1.nestedMap, TestEntity_INST1.enumValue, TestEntity_INST1.enumList, TestEntity_INST1.enumMap, TestEntity_INST1.enumNestedList,
+          TestEntity_INST1.extraUdt, TestEntity_INST1.udtList, TestEntity_INST1.udtSet, TestEntity_INST1.udtMap, null, TestEntity_INST1.flag)
+        .execute();
 
       // Insert TestEntity_INST2 to DB
       dsl.insertInto(TestEntity_Table.test_entity, TestEntity_Table.id, TestEntity_Table.date, TestEntity_Table.udt, TestEntity_Table.list, TestEntity_Table.se, TestEntity_Table.map,
-                     TestEntity_Table.nestedList, TestEntity_Table.nestedSet, TestEntity_Table.nestedMap, TestEntity_Table.enumValue, TestEntity_Table.enumList, TestEntity_Table.enumMap,
-                     TestEntity_Table.enumNestedList, TestEntity_Table.extraUdt, TestEntity_Table.udtList, TestEntity_Table.udtSet, TestEntity_Table.udtMap, TestEntity_Table.udtNestedList,
-                     TestEntity_Table.flag)
-         .values(TestEntity_INST2.id, TestEntity_INST2.date, TestEntity_INST2.udt, TestEntity_INST2.list, TestEntity_INST2.se, TestEntity_INST2.map, TestEntity_INST2.nestedList,
-                 TestEntity_INST2.nestedSet, TestEntity_INST2.nestedMap, TestEntity_INST2.enumValue, TestEntity_INST2.enumList, TestEntity_INST2.enumMap, TestEntity_INST2.enumNestedList,
-                 TestEntity_INST2.extraUdt, TestEntity_INST2.udtList, TestEntity_INST2.udtSet, TestEntity_INST2.udtMap, TestEntity_INST2.udtNestedList, TestEntity_INST2.flag)
-         .execute();
+          TestEntity_Table.nestedList, TestEntity_Table.nestedSet, TestEntity_Table.nestedMap, TestEntity_Table.enumValue, TestEntity_Table.enumList, TestEntity_Table.enumMap,
+          TestEntity_Table.enumNestedList, TestEntity_Table.extraUdt, TestEntity_Table.udtList, TestEntity_Table.udtSet, TestEntity_Table.udtMap, TestEntity_Table.udtNestedList,
+          TestEntity_Table.flag)
+        .values(TestEntity_INST2.id, TestEntity_INST2.date, TestEntity_INST2.udt, TestEntity_INST2.list, TestEntity_INST2.se, TestEntity_INST2.map, TestEntity_INST2.nestedList,
+          TestEntity_INST2.nestedSet, TestEntity_INST2.nestedMap, TestEntity_INST2.enumValue, TestEntity_INST2.enumList, TestEntity_INST2.enumMap, TestEntity_INST2.enumNestedList,
+          TestEntity_INST2.extraUdt, TestEntity_INST2.udtList, TestEntity_INST2.udtSet, TestEntity_INST2.udtMap, TestEntity_INST2.udtNestedList, TestEntity_INST2.flag)
+        .execute();
     }
 
     @SuppressWarnings("unchecked")
@@ -162,24 +163,24 @@ class DslQueryBatchBuilderITest  extends AbstractIntegrationITest {
 
       // When
       dslBatch.update(TestEntity_Table.test_entity)
-         .set(TestEntity_Table.se, TestEntity_Table.se.append(1000, 1100))
-         .set(TestEntity_Table.map, TestEntity_Table.map.append(ImmutableMap.of("appendKey", "appendValue")))
-         .set(TestEntity_Table.nestedList, null)
-         .set(TestEntity_Table.nestedSet, TestEntity_Table.nestedSet.remove(TestEntity_INST1.nestedSet))
-         .set(TestEntity_Table.nestedMap, TestEntity_Table.nestedMap.remove(Collections.singleton("key0")))
-         .set(TestEntity_Table.enumNestedList, TestEntity_Table.enumNestedList.prepend(ImmutableSet.of(TestEnum.TYPE_B)))
-         .set(TestEntity_Table.udtNestedList, TestEntity_Table.udtNestedList.prepend(
-             Collections.singletonList(Collections.singletonList(TestEntity_INST1.udt1))))
-         .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
-         .and(TestEntity_Table.date.eq(TestEntity_INST1.date))
-         .and(TestEntity_Table.udt.eq(TestEntity_INST1.udt1))
-         .and(TestEntity_Table.list.eq(TestEntity_INST1.list))
-         .execute();
+        .set(TestEntity_Table.se, TestEntity_Table.se.append(1000, 1100))
+        .set(TestEntity_Table.map, TestEntity_Table.map.append(ImmutableMap.of("appendKey", "appendValue")))
+        .set(TestEntity_Table.nestedList, null)
+        .set(TestEntity_Table.nestedSet, TestEntity_Table.nestedSet.remove(TestEntity_INST1.nestedSet))
+        .set(TestEntity_Table.nestedMap, TestEntity_Table.nestedMap.remove(Collections.singleton("key0")))
+        .set(TestEntity_Table.enumNestedList, TestEntity_Table.enumNestedList.prepend(ImmutableSet.of(TestEnum.TYPE_B)))
+        .set(TestEntity_Table.udtNestedList, TestEntity_Table.udtNestedList.prepend(
+          Collections.singletonList(Collections.singletonList(TestEntity_INST1.udt1))))
+        .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
+        .and(TestEntity_Table.date.eq(TestEntity_INST1.date))
+        .and(TestEntity_Table.udt.eq(TestEntity_INST1.udt1))
+        .and(TestEntity_Table.list.eq(TestEntity_INST1.list))
+        .execute();
       batch.execute();
 
       Record record = dsl.selectFrom(TestEntity_Table.test_entity)
-                         .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
-                         .fetchOne();
+        .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
+        .fetchOne();
 
       // Then
       assertThat(record).isNotNull();
@@ -218,18 +219,18 @@ class DslQueryBatchBuilderITest  extends AbstractIntegrationITest {
 
       // When
       dslBatch.update(TestEntity_Table.test_entity)
-              .set(TestEntity_Table.se, TestEntity_Table.se.append(1_000_000))
-              .where(TestEntity_Table.id.eq(TestEntity_INST2.id))
-              .and(TestEntity_Table.date.eq(TestEntity_INST2.date))
-              .and(TestEntity_Table.udt.eq(TestEntity_INST2.udt))
-              .and(TestEntity_Table.list.eq(TestEntity_INST2.list))
-              .if_(TestEntity_Table.flag.eq(TestEntity_INST2.flag))
-              .execute();
+        .set(TestEntity_Table.se, TestEntity_Table.se.append(1_000_000))
+        .where(TestEntity_Table.id.eq(TestEntity_INST2.id))
+        .and(TestEntity_Table.date.eq(TestEntity_INST2.date))
+        .and(TestEntity_Table.udt.eq(TestEntity_INST2.udt))
+        .and(TestEntity_Table.list.eq(TestEntity_INST2.list))
+        .if_(TestEntity_Table.flag.eq(TestEntity_INST2.flag))
+        .execute();
       batch.execute();
 
       Record record = dsl.selectFrom(TestEntity_Table.test_entity)
-                         .where(TestEntity_Table.id.eq(TestEntity_INST2.id))
-                         .fetchOne();
+        .where(TestEntity_Table.id.eq(TestEntity_INST2.id))
+        .fetchOne();
 
       // Then
       assertThat(record).isNotNull();
@@ -245,18 +246,18 @@ class DslQueryBatchBuilderITest  extends AbstractIntegrationITest {
 
       // When
       dslBatch.update(TestEntity_Table.test_entity)
-              .set(TestEntity_Table.se, TestEntity_Table.se.append(1_000_000))
-              .where(TestEntity_Table.id.eq(TestEntity_INST2.id))
-              .and(TestEntity_Table.date.eq(TestEntity_INST2.date))
-              .and(TestEntity_Table.udt.eq(TestEntity_INST2.udt))
-              .and(TestEntity_Table.list.eq(TestEntity_INST2.list))
-              .if_(TestEntity_Table.flag.eq(!TestEntity_INST2.flag))
-              .execute();
+        .set(TestEntity_Table.se, TestEntity_Table.se.append(1_000_000))
+        .where(TestEntity_Table.id.eq(TestEntity_INST2.id))
+        .and(TestEntity_Table.date.eq(TestEntity_INST2.date))
+        .and(TestEntity_Table.udt.eq(TestEntity_INST2.udt))
+        .and(TestEntity_Table.list.eq(TestEntity_INST2.list))
+        .if_(TestEntity_Table.flag.eq(!TestEntity_INST2.flag))
+        .execute();
       batch.execute();
 
       Record record = dsl.selectFrom(TestEntity_Table.test_entity)
-                         .where(TestEntity_Table.id.eq(TestEntity_INST2.id))
-                         .fetchOne();
+        .where(TestEntity_Table.id.eq(TestEntity_INST2.id))
+        .fetchOne();
 
       // Then
       assertThat(record).isNotNull();
@@ -272,24 +273,24 @@ class DslQueryBatchBuilderITest  extends AbstractIntegrationITest {
     void update_nested_field() {
 
       dslBatch.update(TestEntity_Table.test_entity)
-              .set(TestEntity_Table.map.entry("key1"), "newValue")
-              .set(TestEntity_Table.nestedMap.entry("key1"), ImmutableMap.of(10, "newValue"))
-              .set(TestEntity_Table.enumList.entry(0), TestEnum.TYPE_B)
-              .set(TestEntity_Table.enumMap.entry(1), TestEnum.TYPE_B)
-              .set(TestEntity_Table.enumNestedList.entry(0), new HashSet<>(Arrays.asList(TestEnum.TYPE_A, TestEnum.TYPE_B)))
-              .set(TestEntity_Table.extraUdt.entry(TestExtraUdt_Udt.intValue), 1_000_000)
-              .set(TestEntity_Table.udtList.entry(1), TestEntity_INST1.udt1)
-              .set(TestEntity_Table.udtMap.entry(1), TestEntity_INST1.udt2)
-              .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
-              .and(TestEntity_Table.date.eq(TestEntity_INST1.date))
-              .and(TestEntity_Table.udt.eq(TestEntity_INST1.udt1))
-              .and(TestEntity_Table.list.eq(TestEntity_INST1.list))
-              .execute();
+        .set(TestEntity_Table.map.entry("key1"), "newValue")
+        .set(TestEntity_Table.nestedMap.entry("key1"), ImmutableMap.of(10, "newValue"))
+        .set(TestEntity_Table.enumList.entry(0), TestEnum.TYPE_B)
+        .set(TestEntity_Table.enumMap.entry(1), TestEnum.TYPE_B)
+        .set(TestEntity_Table.enumNestedList.entry(0), new HashSet<>(Arrays.asList(TestEnum.TYPE_A, TestEnum.TYPE_B)))
+        .set(TestEntity_Table.extraUdt.entry(TestExtraUdt_Udt.intValue), 1_000_000)
+        .set(TestEntity_Table.udtList.entry(1), TestEntity_INST1.udt1)
+        .set(TestEntity_Table.udtMap.entry(1), TestEntity_INST1.udt2)
+        .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
+        .and(TestEntity_Table.date.eq(TestEntity_INST1.date))
+        .and(TestEntity_Table.udt.eq(TestEntity_INST1.udt1))
+        .and(TestEntity_Table.list.eq(TestEntity_INST1.list))
+        .execute();
       batch.execute();
 
       Record record = dsl.selectFrom(TestEntity_Table.test_entity)
-                         .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
-                         .fetchOne();
+        .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
+        .fetchOne();
 
       // Then
       assertThat(record).isNotNull();
@@ -335,20 +336,20 @@ class DslQueryBatchBuilderITest  extends AbstractIntegrationITest {
       // When
       long micros = InstantUtils.now().plus(1, ChronoUnit.DAYS).toEpochMilli() * 1000;
       dslBatch.update(TestEntity_Table.test_entity)
-              .usingTimestamp(micros)
-              .set(TestEntity_Table.flag, true)
-              .where(TestEntity_Table.id.eq(TestEntity_INST2.id))
-              .and(TestEntity_Table.date.eq(TestEntity_INST2.date))
-              .and(TestEntity_Table.udt.eq(TestEntity_INST2.udt))
-              .and(TestEntity_Table.list.eq(TestEntity_INST2.list))
-              .execute();
+        .usingTimestamp(micros)
+        .set(TestEntity_Table.flag, true)
+        .where(TestEntity_Table.id.eq(TestEntity_INST2.id))
+        .and(TestEntity_Table.date.eq(TestEntity_INST2.date))
+        .and(TestEntity_Table.udt.eq(TestEntity_INST2.udt))
+        .and(TestEntity_Table.list.eq(TestEntity_INST2.list))
+        .execute();
       batch.execute();
 
       SelectableField<Long> writetime = DslFunctions.writetime(TestEntity_Table.flag);
       Record record = dsl.select(writetime)
-                         .from(TestEntity_Table.test_entity)
-                         .where(TestEntity_Table.id.eq(TestEntity_INST2.id))
-                         .fetchOne();
+        .from(TestEntity_Table.test_entity)
+        .where(TestEntity_Table.id.eq(TestEntity_INST2.id))
+        .fetchOne();
 
       // Then
       assertThat(record).isNotNull();
@@ -361,20 +362,20 @@ class DslQueryBatchBuilderITest  extends AbstractIntegrationITest {
       // When
       int ttlInSeconds = 86400;
       dslBatch.update(TestEntity_Table.test_entity)
-              .usingTtl(ttlInSeconds)
-              .set(TestEntity_Table.flag, false)
-              .where(TestEntity_Table.id.eq(TestEntity_INST2.id))
-              .and(TestEntity_Table.date.eq(TestEntity_INST2.date))
-              .and(TestEntity_Table.udt.eq(TestEntity_INST2.udt))
-              .and(TestEntity_Table.list.eq(TestEntity_INST2.list))
-              .execute();
+        .usingTtl(ttlInSeconds)
+        .set(TestEntity_Table.flag, false)
+        .where(TestEntity_Table.id.eq(TestEntity_INST2.id))
+        .and(TestEntity_Table.date.eq(TestEntity_INST2.date))
+        .and(TestEntity_Table.udt.eq(TestEntity_INST2.udt))
+        .and(TestEntity_Table.list.eq(TestEntity_INST2.list))
+        .execute();
       batch.execute();
 
       SelectableField<Integer> ttl = DslFunctions.ttl(TestEntity_Table.flag);
       Record record = dsl.select(ttl)
-                         .from(TestEntity_Table.test_entity)
-                         .where(TestEntity_Table.id.eq(TestEntity_INST2.id))
-                         .fetchOne();
+        .from(TestEntity_Table.test_entity)
+        .where(TestEntity_Table.id.eq(TestEntity_INST2.id))
+        .fetchOne();
 
       // Then
       assertThat(record).isNotNull();
@@ -390,13 +391,13 @@ class DslQueryBatchBuilderITest  extends AbstractIntegrationITest {
     void setup(CqlSession session) {
       // Insert TestEntity_INST1 to DB
       dsl.insertInto(TestEntity_Table.test_entity, TestEntity_Table.id, TestEntity_Table.date, TestEntity_Table.udt, TestEntity_Table.list, TestEntity_Table.se, TestEntity_Table.map,
-                     TestEntity_Table.nestedList, TestEntity_Table.nestedSet, TestEntity_Table.nestedMap, TestEntity_Table.enumValue, TestEntity_Table.enumList, TestEntity_Table.enumMap,
-                     TestEntity_Table.enumNestedList, TestEntity_Table.extraUdt, TestEntity_Table.udtList, TestEntity_Table.udtSet, TestEntity_Table.udtMap, TestEntity_Table.udtNestedList,
-                     TestEntity_Table.flag)
-         .values(TestEntity_INST1.id, TestEntity_INST1.date, TestEntity_INST1.udt1, TestEntity_INST1.list, TestEntity_INST1.se, TestEntity_INST1.map, TestEntity_INST1.nestedList,
-                 TestEntity_INST1.nestedSet, TestEntity_INST1.nestedMap, TestEntity_INST1.enumValue, TestEntity_INST1.enumList, TestEntity_INST1.enumMap, TestEntity_INST1.enumNestedList,
-                 TestEntity_INST1.extraUdt, TestEntity_INST1.udtList, TestEntity_INST1.udtSet, TestEntity_INST1.udtMap, TestEntity_INST1.udtNestedList, TestEntity_INST1.flag)
-         .execute();
+          TestEntity_Table.nestedList, TestEntity_Table.nestedSet, TestEntity_Table.nestedMap, TestEntity_Table.enumValue, TestEntity_Table.enumList, TestEntity_Table.enumMap,
+          TestEntity_Table.enumNestedList, TestEntity_Table.extraUdt, TestEntity_Table.udtList, TestEntity_Table.udtSet, TestEntity_Table.udtMap, TestEntity_Table.udtNestedList,
+          TestEntity_Table.flag)
+        .values(TestEntity_INST1.id, TestEntity_INST1.date, TestEntity_INST1.udt1, TestEntity_INST1.list, TestEntity_INST1.se, TestEntity_INST1.map, TestEntity_INST1.nestedList,
+          TestEntity_INST1.nestedSet, TestEntity_INST1.nestedMap, TestEntity_INST1.enumValue, TestEntity_INST1.enumList, TestEntity_INST1.enumMap, TestEntity_INST1.enumNestedList,
+          TestEntity_INST1.extraUdt, TestEntity_INST1.udtList, TestEntity_INST1.udtSet, TestEntity_INST1.udtMap, TestEntity_INST1.udtNestedList, TestEntity_INST1.flag)
+        .execute();
     }
 
     @Test
@@ -404,17 +405,17 @@ class DslQueryBatchBuilderITest  extends AbstractIntegrationITest {
 
       // When
       dslBatch.delete()
-              .from(TestEntity_Table.test_entity)
-              .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
-              .and(TestEntity_Table.date.eq(TestEntity_INST1.date))
-              .and(TestEntity_Table.udt.eq(TestEntity_INST1.udt1))
-              .and(TestEntity_Table.list.eq(TestEntity_INST1.list))
-              .execute();
+        .from(TestEntity_Table.test_entity)
+        .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
+        .and(TestEntity_Table.date.eq(TestEntity_INST1.date))
+        .and(TestEntity_Table.udt.eq(TestEntity_INST1.udt1))
+        .and(TestEntity_Table.list.eq(TestEntity_INST1.list))
+        .execute();
       batch.execute();
 
       Record record = dsl.selectFrom(TestEntity_Table.test_entity)
-                         .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
-                         .fetchOne();
+        .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
+        .fetchOne();
 
       // Then
       assertThat(record).isNull();
@@ -425,18 +426,18 @@ class DslQueryBatchBuilderITest  extends AbstractIntegrationITest {
 
       // When
       dslBatch.delete()
-              .from(TestEntity_Table.test_entity)
-              .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
-              .and(TestEntity_Table.date.eq(TestEntity_INST1.date))
-              .and(TestEntity_Table.udt.eq(TestEntity_INST1.udt1))
-              .and(TestEntity_Table.list.eq(TestEntity_INST1.list))
-              .if_(TestEntity_Table.flag.eq(TestEntity_INST1.flag))
-              .execute();
+        .from(TestEntity_Table.test_entity)
+        .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
+        .and(TestEntity_Table.date.eq(TestEntity_INST1.date))
+        .and(TestEntity_Table.udt.eq(TestEntity_INST1.udt1))
+        .and(TestEntity_Table.list.eq(TestEntity_INST1.list))
+        .if_(TestEntity_Table.flag.eq(TestEntity_INST1.flag))
+        .execute();
       batch.execute();
 
       Record record = dsl.selectFrom(TestEntity_Table.test_entity)
-                         .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
-                         .fetchOne();
+        .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
+        .fetchOne();
 
       // Then
       assertThat(record).isNull();
@@ -447,18 +448,18 @@ class DslQueryBatchBuilderITest  extends AbstractIntegrationITest {
 
       // When
       dslBatch.delete()
-              .from(TestEntity_Table.test_entity)
-              .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
-              .and(TestEntity_Table.date.eq(TestEntity_INST1.date))
-              .and(TestEntity_Table.udt.eq(TestEntity_INST1.udt1))
-              .and(TestEntity_Table.list.eq(TestEntity_INST1.list))
-              .if_(TestEntity_Table.flag.eq(!TestEntity_INST1.flag))
-              .execute();
+        .from(TestEntity_Table.test_entity)
+        .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
+        .and(TestEntity_Table.date.eq(TestEntity_INST1.date))
+        .and(TestEntity_Table.udt.eq(TestEntity_INST1.udt1))
+        .and(TestEntity_Table.list.eq(TestEntity_INST1.list))
+        .if_(TestEntity_Table.flag.eq(!TestEntity_INST1.flag))
+        .execute();
       batch.execute();
 
       Record record = dsl.selectFrom(TestEntity_Table.test_entity)
-                         .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
-                         .fetchOne();
+        .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
+        .fetchOne();
 
       // Then
       assertThat(record).isNotNull();
@@ -469,20 +470,20 @@ class DslQueryBatchBuilderITest  extends AbstractIntegrationITest {
 
       // When
       dslBatch.delete(TestEntity_Table.se, TestEntity_Table.map, TestEntity_Table.nestedList, TestEntity_Table.nestedSet, TestEntity_Table.nestedMap,
-                     TestEntity_Table.enumValue, TestEntity_Table.enumList, TestEntity_Table.enumMap, TestEntity_Table.enumNestedList,
-                     TestEntity_Table.extraUdt, TestEntity_Table.udtList, TestEntity_Table.udtSet, TestEntity_Table.udtMap, TestEntity_Table.udtNestedList,
-                     TestEntity_Table.flag)
-              .from(TestEntity_Table.test_entity)
-              .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
-              .and(TestEntity_Table.date.eq(TestEntity_INST1.date))
-              .and(TestEntity_Table.udt.eq(TestEntity_INST1.udt1))
-              .and(TestEntity_Table.list.eq(TestEntity_INST1.list))
-              .execute();
+          TestEntity_Table.enumValue, TestEntity_Table.enumList, TestEntity_Table.enumMap, TestEntity_Table.enumNestedList,
+          TestEntity_Table.extraUdt, TestEntity_Table.udtList, TestEntity_Table.udtSet, TestEntity_Table.udtMap, TestEntity_Table.udtNestedList,
+          TestEntity_Table.flag)
+        .from(TestEntity_Table.test_entity)
+        .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
+        .and(TestEntity_Table.date.eq(TestEntity_INST1.date))
+        .and(TestEntity_Table.udt.eq(TestEntity_INST1.udt1))
+        .and(TestEntity_Table.list.eq(TestEntity_INST1.list))
+        .execute();
       batch.execute();
 
       Record record = dsl.selectFrom(TestEntity_Table.test_entity)
-                         .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
-                         .fetchOne();
+        .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
+        .fetchOne();
 
       // Then
       assertThat(record).isNotNull();
@@ -508,20 +509,20 @@ class DslQueryBatchBuilderITest  extends AbstractIntegrationITest {
 
       // When
       dslBatch.delete(TestEntity_Table.map.entry("key1"), TestEntity_Table.nestedMap.entry("key1"),
-                     TestEntity_Table.enumList.entry(0), TestEntity_Table.enumMap.entry(1),
-                     TestEntity_Table.enumNestedList.entry(0), TestEntity_Table.extraUdt.entry(TestExtraUdt_Udt.intValue),
-                     TestEntity_Table.udtList.entry(1), TestEntity_Table.udtMap.entry(1), TestEntity_Table.udtNestedList.entry(0))
-              .from(TestEntity_Table.test_entity)
-              .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
-              .and(TestEntity_Table.date.eq(TestEntity_INST1.date))
-              .and(TestEntity_Table.udt.eq(TestEntity_INST1.udt1))
-              .and(TestEntity_Table.list.eq(TestEntity_INST1.list))
-              .execute();
+          TestEntity_Table.enumList.entry(0), TestEntity_Table.enumMap.entry(1),
+          TestEntity_Table.enumNestedList.entry(0), TestEntity_Table.extraUdt.entry(TestExtraUdt_Udt.intValue),
+          TestEntity_Table.udtList.entry(1), TestEntity_Table.udtMap.entry(1), TestEntity_Table.udtNestedList.entry(0))
+        .from(TestEntity_Table.test_entity)
+        .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
+        .and(TestEntity_Table.date.eq(TestEntity_INST1.date))
+        .and(TestEntity_Table.udt.eq(TestEntity_INST1.udt1))
+        .and(TestEntity_Table.list.eq(TestEntity_INST1.list))
+        .execute();
       batch.execute();
 
       Record record = dsl.selectFrom(TestEntity_Table.test_entity)
-                         .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
-                         .fetchOne();
+        .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
+        .fetchOne();
 
       // Then
       assertThat(record).isNotNull();
@@ -563,22 +564,22 @@ class DslQueryBatchBuilderITest  extends AbstractIntegrationITest {
       // When
       long micros = InstantUtils.now().plus(1, ChronoUnit.DAYS).toEpochMilli() * 1000;
       dslBatch.delete(TestEntity_Table.flag)
-              .from(TestEntity_Table.test_entity)
-              .usingTimestamp(micros)
-              .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
-              .and(TestEntity_Table.date.eq(TestEntity_INST1.date))
-              .and(TestEntity_Table.udt.eq(TestEntity_INST1.udt1))
-              .and(TestEntity_Table.list.eq(TestEntity_INST1.list))
-              .execute();
+        .from(TestEntity_Table.test_entity)
+        .usingTimestamp(micros)
+        .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
+        .and(TestEntity_Table.date.eq(TestEntity_INST1.date))
+        .and(TestEntity_Table.udt.eq(TestEntity_INST1.udt1))
+        .and(TestEntity_Table.list.eq(TestEntity_INST1.list))
+        .execute();
       batch.execute();
 
       Record record = dsl.select(TestEntity_Table.flag)
-                         .from(TestEntity_Table.test_entity)
-                         .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
-                         .and(TestEntity_Table.date.eq(TestEntity_INST1.date))
-                         .and(TestEntity_Table.udt.eq(TestEntity_INST1.udt1))
-                         .and(TestEntity_Table.list.eq(TestEntity_INST1.list))
-                         .fetchOne();
+        .from(TestEntity_Table.test_entity)
+        .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
+        .and(TestEntity_Table.date.eq(TestEntity_INST1.date))
+        .and(TestEntity_Table.udt.eq(TestEntity_INST1.udt1))
+        .and(TestEntity_Table.list.eq(TestEntity_INST1.list))
+        .fetchOne();
 
       // Then
       assertThat(record.get(TestEntity_Table.flag)).isNull();
@@ -590,23 +591,23 @@ class DslQueryBatchBuilderITest  extends AbstractIntegrationITest {
     // Given
     cqlTemplate.executeAsLoggedBatch(() -> {
       cqlTemplate.dsl().insertInto(TestEntity_Table.test_entity, TestEntity_Table.id, TestEntity_Table.date, TestEntity_Table.udt, TestEntity_Table.list, TestEntity_Table.flag)
-          .values(TestEntity_INST1.id, TestEntity_INST1.date, TestEntity_INST1.udt1, TestEntity_INST1.list, false)
-          .execute();
+        .values(TestEntity_INST1.id, TestEntity_INST1.date, TestEntity_INST1.udt1, TestEntity_INST1.list, false)
+        .execute();
       cqlTemplate.dsl().insertInto(TestEntity_Table.test_entity, TestEntity_Table.id, TestEntity_Table.date, TestEntity_Table.udt, TestEntity_Table.list, TestEntity_Table.flag)
-          .values(TestEntity_INST2.id, TestEntity_INST2.date, TestEntity_INST2.udt, TestEntity_INST2.list, true)
-          .execute();
+        .values(TestEntity_INST2.id, TestEntity_INST2.date, TestEntity_INST2.udt, TestEntity_INST2.list, true)
+        .execute();
     });
 
     // When
     Collection<Record> records = dsl.selectFrom(TestEntity_Table.test_entity)
-        .fetch();
+      .fetch();
 
     // Then
     assertThat(records).hasSize(2).extracting(record -> record.get(TestEntity_Table.flag)).containsExactlyInAnyOrder(true, false);
   }
 
   @Test
-  void cqlTemplate_executeAsLoggedBatchAsync() {
+  void cqlTemplate_executeAsLoggedBatchAsync() throws ExecutionException, InterruptedException {
     // Given
     cqlTemplate.executeAsLoggedBatchAsync(() -> {
       cqlTemplate.dsl().insertInto(TestEntity_Table.test_entity, TestEntity_Table.id, TestEntity_Table.date, TestEntity_Table.udt, TestEntity_Table.list, TestEntity_Table.flag)
@@ -615,18 +616,14 @@ class DslQueryBatchBuilderITest  extends AbstractIntegrationITest {
       cqlTemplate.dsl().insertInto(TestEntity_Table.test_entity, TestEntity_Table.id, TestEntity_Table.date, TestEntity_Table.udt, TestEntity_Table.list, TestEntity_Table.flag)
         .values(TestEntity_INST2.id, TestEntity_INST2.date, TestEntity_INST2.udt, TestEntity_INST2.list, true)
         .execute();
-    }).whenComplete((__, error) -> {
-      if (error != null) {
-        fail("executeAsLoggedBatchAsync failed", error);
-        return;
-      }
-      // When
-      Collection<Record> records = dsl.selectFrom(TestEntity_Table.test_entity)
-        .fetch();
+    }).get();
 
-      // Then
-      assertThat(records).hasSize(2).extracting(record -> record.get(TestEntity_Table.flag)).containsExactlyInAnyOrder(true, false);
-    });
+    // When
+    Collection<Record> records = dsl.selectFrom(TestEntity_Table.test_entity)
+      .fetch();
+
+    // Then
+    assertThat(records).hasSize(2).extracting(record -> record.get(TestEntity_Table.flag)).containsExactlyInAnyOrder(true, false);
   }
 
   @Test
@@ -634,36 +631,36 @@ class DslQueryBatchBuilderITest  extends AbstractIntegrationITest {
     // Given
     cqlTemplate.executeAsUnloggedBatch(() -> {
       cqlTemplate.dsl().insertInto(TestEntity_Table.test_entity, TestEntity_Table.id, TestEntity_Table.date, TestEntity_Table.udt, TestEntity_Table.list, TestEntity_Table.flag)
-          .values(TestEntity_INST1.id, TestEntity_INST1.date, TestEntity_INST1.udt1, TestEntity_INST1.list, false)
-          .execute();
+        .values(TestEntity_INST1.id, TestEntity_INST1.date, TestEntity_INST1.udt1, TestEntity_INST1.list, false)
+        .execute();
       cqlTemplate.dsl().insertInto(TestEntity_Table.test_entity, TestEntity_Table.id, TestEntity_Table.date, TestEntity_Table.udt, TestEntity_Table.list, TestEntity_Table.flag)
-          .values(TestEntity_INST2.id, TestEntity_INST2.date, TestEntity_INST2.udt, TestEntity_INST2.list, true)
-          .execute();
+        .values(TestEntity_INST2.id, TestEntity_INST2.date, TestEntity_INST2.udt, TestEntity_INST2.list, true)
+        .execute();
       cqlTemplate.dsl().update(TestEntity_Table.test_entity)
-          .set(TestEntity_Table.flag, false)
-          .where(TestEntity_Table.id.eq(TestEntity_INST2.id))
-          .and(TestEntity_Table.date.eq(TestEntity_INST2.date))
-          .and(TestEntity_Table.udt.eq(TestEntity_INST2.udt))
-          .and(TestEntity_Table.list.eq(TestEntity_INST2.list))
-          .execute();
+        .set(TestEntity_Table.flag, false)
+        .where(TestEntity_Table.id.eq(TestEntity_INST2.id))
+        .and(TestEntity_Table.date.eq(TestEntity_INST2.date))
+        .and(TestEntity_Table.udt.eq(TestEntity_INST2.udt))
+        .and(TestEntity_Table.list.eq(TestEntity_INST2.list))
+        .execute();
       cqlTemplate.dsl().delete().from(TestEntity_Table.test_entity)
-          .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
-          .and(TestEntity_Table.date.eq(TestEntity_INST1.date))
-          .and(TestEntity_Table.udt.eq(TestEntity_INST1.udt1))
-          .and(TestEntity_Table.list.eq(TestEntity_INST1.list))
-          .execute();
+        .where(TestEntity_Table.id.eq(TestEntity_INST1.id))
+        .and(TestEntity_Table.date.eq(TestEntity_INST1.date))
+        .and(TestEntity_Table.udt.eq(TestEntity_INST1.udt1))
+        .and(TestEntity_Table.list.eq(TestEntity_INST1.list))
+        .execute();
     });
 
     // When
     Collection<Record> records = dsl.selectFrom(TestEntity_Table.test_entity)
-        .fetch();
+      .fetch();
 
     // Then
     assertThat(records).hasSize(1);
   }
 
   @Test
-  void cqlTemplate_executeAsUnloggedBatchAsync() {
+  void cqlTemplate_executeAsUnloggedBatchAsync() throws ExecutionException, InterruptedException {
     // Given
     cqlTemplate.executeAsUnloggedBatchAsync(() -> {
       cqlTemplate.dsl().insertInto(TestEntity_Table.test_entity, TestEntity_Table.id, TestEntity_Table.date, TestEntity_Table.udt, TestEntity_Table.list, TestEntity_Table.flag)
@@ -685,17 +682,13 @@ class DslQueryBatchBuilderITest  extends AbstractIntegrationITest {
         .and(TestEntity_Table.udt.eq(TestEntity_INST1.udt1))
         .and(TestEntity_Table.list.eq(TestEntity_INST1.list))
         .execute();
-    }).whenComplete((__, error) -> {
-      if (error != null) {
-        fail("executeAsUnloggedBatchAsync failed", error);
-        return;
-      }
-      // When
-      Collection<Record> records = dsl.selectFrom(TestEntity_Table.test_entity)
-        .fetch();
+    }).get();
 
-      // Then
-      assertThat(records).hasSize(1);
-    });
+    // When
+    Collection<Record> records = dsl.selectFrom(TestEntity_Table.test_entity)
+      .fetch();
+
+    // Then
+    assertThat(records).hasSize(1);
   }
 }
