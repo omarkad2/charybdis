@@ -19,6 +19,7 @@
 package ma.markware.charybdis.crud;
 
 import com.datastax.oss.driver.api.core.CqlSession;
+import com.datastax.oss.driver.api.core.cql.AsyncResultSet;
 import com.datastax.oss.driver.api.core.cql.ResultSet;
 import ma.markware.charybdis.ExecutionContext;
 import ma.markware.charybdis.batch.Batch;
@@ -31,6 +32,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Responsible of entity creation in DB <b>(Internal use only)</b>.
@@ -94,6 +96,16 @@ public class DeleteEntityManager<T> {
     prepareQuery();
     ResultSet resultSet = deleteQuery.execute(session);
     return resultSet.wasApplied();
+  }
+
+  /**
+   * Execute delete query.
+   *
+   * @return if delete was applied
+   */
+  CompletableFuture<Boolean> saveAsync(CqlSession session) {
+    prepareQuery();
+    return deleteQuery.executeAsync(session).thenApply(AsyncResultSet::wasApplied);
   }
 
   /**

@@ -31,6 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.concurrent.ThreadSafe;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Interface used to interact with Cql database. This API gives access to :
@@ -46,7 +47,7 @@ public class CqlTemplate {
   private static final Logger log = LoggerFactory.getLogger(CqlTemplate.class);
 
   private final SessionFactory sessionFactory;
-  private ThreadLocal<Batch> threadLocal = new ThreadLocal<Batch>();
+  private final ThreadLocal<Batch> threadLocal = new ThreadLocal<>();
 
   /**
    * Initialize the data manager using a custom session factory.
@@ -146,6 +147,21 @@ public class CqlTemplate {
   }
 
   /**
+   * Execute all write queries that are present in {@link BatchContextCallback} as a unique logged batch query asynchronously.
+   *
+   * @param action a set of write queries
+   * @return execution future
+   */
+  public CompletableFuture<Void> executeAsLoggedBatchAsync(BatchContextCallback action) {
+    Batch batch = batch().logged();
+    threadLocal.set(batch);
+    log.debug("Create thread local variable in thread: '{}'", Thread.currentThread().getName());
+    action.execute();
+    threadLocal.remove();
+    return batch.executeAsync();
+  }
+
+  /**
    * Execute all write queries that are present in {@link BatchContextCallback} as a unique unlogged batch query.
    *
    * @param action a set of write queries
@@ -156,6 +172,20 @@ public class CqlTemplate {
     action.execute();
     batch.execute();
     threadLocal.remove();
+  }
+
+  /**
+   * Execute all write queries that are present in {@link BatchContextCallback} as a unique unlogged batch query asynchronously.
+   *
+   * @param action a set of write queries
+   * @return execution future
+   */
+  public CompletableFuture<Void> executeAsUnloggedBatchAsync(BatchContextCallback action) {
+    Batch batch = batch().unlogged();
+    threadLocal.set(batch);
+    action.execute();
+    threadLocal.remove();
+    return batch.executeAsync();
   }
 
   public SessionFactory getSessionFactory() {
