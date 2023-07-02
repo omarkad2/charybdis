@@ -214,7 +214,7 @@ class ReadEntityManager<T> {
       return asyncResultSet.fetchNextPage()
         .thenCompose(nextResultSet -> readAllRows(nextResultSet, rows));
     } else {
-      return CompletableFuture.completedFuture(null);
+      return CompletableFuture.completedFuture(rows);
     }
   }
 }
