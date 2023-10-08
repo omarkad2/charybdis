@@ -33,6 +33,7 @@ import ma.markware.charybdis.query.clause.ConditionClause;
 import ma.markware.charybdis.query.clause.WhereClause;
 import ma.markware.charybdis.test.entities.TestEnum;
 import ma.markware.charybdis.test.metadata.TestEntity_Table;
+import ma.markware.charybdis.test.utils.InstantUtils;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 
@@ -79,7 +80,7 @@ class DslBatchDeleteImplTest extends AbstractDslDeleteTest<DslDeleteImpl> {
 
   @Test
   void usingTimestamp() {
-    Instant now = Instant.now();
+    Instant now = InstantUtils.now();
     instance.from(TestEntity_Table.test_entity)
             .usingTimestamp(now);
 
@@ -89,7 +90,7 @@ class DslBatchDeleteImplTest extends AbstractDslDeleteTest<DslDeleteImpl> {
 
   @Test
   void usingTimestamp_epoch_milli() {
-    Instant now = Instant.now();
+    Instant now = InstantUtils.now();
     instance.from(TestEntity_Table.test_entity)
             .usingTimestamp(now.toEpochMilli());
 
@@ -116,7 +117,7 @@ class DslBatchDeleteImplTest extends AbstractDslDeleteTest<DslDeleteImpl> {
   @Test
   void and() {
     UUID uuid = UUID.randomUUID();
-    Instant now = Instant.now();
+    Instant now = InstantUtils.now();
     String mapKey = "key0";
     List<Integer> nestedSetValue = Collections.singletonList(10);
     instance.from(TestEntity_Table.test_entity)
@@ -165,7 +166,7 @@ class DslBatchDeleteImplTest extends AbstractDslDeleteTest<DslDeleteImpl> {
   @Test
   void and_() {
     UUID uuid = UUID.randomUUID();
-    Instant now = Instant.now();
+    Instant now = InstantUtils.now();
     instance.from(TestEntity_Table.test_entity)
             .if_(TestEntity_Table.id.eq(uuid))
             .and_(TestEntity_Table.date.lt(now))

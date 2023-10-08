@@ -24,6 +24,7 @@ import ma.markware.charybdis.ExecutionContext;
 import ma.markware.charybdis.batch.Batch;
 import ma.markware.charybdis.query.InsertQuery;
 import ma.markware.charybdis.test.metadata.TestEntity_Table;
+import ma.markware.charybdis.test.utils.InstantUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -78,7 +79,7 @@ class DslBatchInsertImplTest extends AbstractDslInsertTest<DslInsertImpl> {
   @Test
   void values() {
     UUID uuid = UUID.randomUUID();
-    Instant now = Instant.now();
+    Instant now = InstantUtils.now();
     List<String> stringList = Arrays.asList("value1", "value2");
     instance.insertInto(TestEntity_Table.test_entity, TestEntity_Table.id, TestEntity_Table.date, TestEntity_Table.list, TestEntity_Table.udt)
             .values(uuid, now, stringList, udt1);
@@ -96,7 +97,7 @@ class DslBatchInsertImplTest extends AbstractDslInsertTest<DslInsertImpl> {
   @Test
   void set() {
     UUID uuid = UUID.randomUUID();
-    Instant now = Instant.now();
+    Instant now = InstantUtils.now();
     List<String> stringList = Arrays.asList("value1", "value2");
     instance.insertInto(TestEntity_Table.test_entity)
             .set(TestEntity_Table.id, uuid)
@@ -117,7 +118,7 @@ class DslBatchInsertImplTest extends AbstractDslInsertTest<DslInsertImpl> {
   @Test
   void usingTtl() {
     UUID uuid = UUID.randomUUID();
-    Instant now = Instant.now();
+    Instant now = InstantUtils.now();
     List<String> stringList = Arrays.asList("value1", "value2");
     instance.insertInto(TestEntity_Table.test_entity, TestEntity_Table.id, TestEntity_Table.date, TestEntity_Table.list, TestEntity_Table.udt)
             .values(uuid, now, stringList, udt1)
@@ -131,7 +132,7 @@ class DslBatchInsertImplTest extends AbstractDslInsertTest<DslInsertImpl> {
   @Test
   void usingTimestamp() {
     UUID uuid = UUID.randomUUID();
-    Instant now = Instant.now();
+    Instant now = InstantUtils.now();
     List<String> stringList = Arrays.asList("value1", "value2");
     instance.insertInto(TestEntity_Table.test_entity, TestEntity_Table.id, TestEntity_Table.date, TestEntity_Table.list, TestEntity_Table.udt)
             .values(uuid, now, stringList, udt1)
@@ -145,7 +146,7 @@ class DslBatchInsertImplTest extends AbstractDslInsertTest<DslInsertImpl> {
   @Test
   void usingTimestamp_epochMilli() {
     UUID uuid = UUID.randomUUID();
-    Instant now = Instant.now();
+    Instant now = InstantUtils.now();
     List<String> stringList = Arrays.asList("value1", "value2");
     instance.insertInto(TestEntity_Table.test_entity, TestEntity_Table.id, TestEntity_Table.date, TestEntity_Table.list, TestEntity_Table.udt)
             .values(uuid, now, stringList, udt1)
@@ -159,7 +160,7 @@ class DslBatchInsertImplTest extends AbstractDslInsertTest<DslInsertImpl> {
   @Test
   void ifNotExists() {
     UUID uuid = UUID.randomUUID();
-    Instant now = Instant.now();
+    Instant now = InstantUtils.now();
     List<String> stringList = Arrays.asList("value1", "value2");
     instance.insertInto(TestEntity_Table.test_entity, TestEntity_Table.id, TestEntity_Table.date, TestEntity_Table.list, TestEntity_Table.udt)
             .values(uuid, now, stringList, udt1)

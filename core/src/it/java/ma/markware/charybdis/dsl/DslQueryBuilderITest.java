@@ -38,6 +38,7 @@ import ma.markware.charybdis.test.metadata.TestEntityByValue_View;
 import ma.markware.charybdis.test.metadata.TestEntityCounter_Table;
 import ma.markware.charybdis.test.metadata.TestEntity_Table;
 import ma.markware.charybdis.test.metadata.TestExtraUdt_Udt;
+import ma.markware.charybdis.test.utils.InstantUtils;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
 
@@ -190,21 +191,21 @@ class DslQueryBuilderITest extends AbstractIntegrationITest {
       // Row2
       insertRow(session, TestEntity_Table.KEYSPACE_NAME, TestEntity_Table.TABLE_NAME,
                 ImmutableMap.of(TestEntity_Table.id.getName(), QueryBuilder.literal(TestEntity_Table.id.serialize(id1)), TestEntity_Table.date.getName(),
-                                QueryBuilder.literal(TestEntity_Table.date.serialize(Instant.now())),
+                                QueryBuilder.literal(TestEntity_Table.date.serialize(InstantUtils.now())),
                                 TestEntity_Table.udt.getName(), QueryBuilder.literal(TestEntity_Table.udt.serialize(TestEntity_INST1.udt1)),
                                 TestEntity_Table.list.getName(), QueryBuilder.literal(TestEntity_Table.list.serialize(TestEntity_INST1.list))));
 
       // Row3
       insertRow(session, TestEntity_Table.KEYSPACE_NAME, TestEntity_Table.TABLE_NAME,
                 ImmutableMap.of(TestEntity_Table.id.getName(), QueryBuilder.literal(TestEntity_Table.id.serialize(id2)), TestEntity_Table.date.getName(),
-                                QueryBuilder.literal(TestEntity_Table.date.serialize(Instant.now())),
+                                QueryBuilder.literal(TestEntity_Table.date.serialize(InstantUtils.now())),
                                 TestEntity_Table.udt.getName(), QueryBuilder.literal(TestEntity_Table.udt.serialize(TestEntity_INST1.udt1)),
                                 TestEntity_Table.list.getName(), QueryBuilder.literal(TestEntity_Table.list.serialize(TestEntity_INST1.list))));
 
       // Row4
       insertRow(session, TestEntity_Table.KEYSPACE_NAME, TestEntity_Table.TABLE_NAME,
                 ImmutableMap.of(TestEntity_Table.id.getName(), QueryBuilder.literal(TestEntity_Table.id.serialize(id3)), TestEntity_Table.date.getName(),
-                                QueryBuilder.literal(TestEntity_Table.date.serialize(Instant.now())),
+                                QueryBuilder.literal(TestEntity_Table.date.serialize(InstantUtils.now())),
                                 TestEntity_Table.udt.getName(), QueryBuilder.literal(TestEntity_Table.udt.serialize(TestEntity_INST1.udt1)),
                                 TestEntity_Table.list.getName(), QueryBuilder.literal(TestEntity_Table.list.serialize(TestEntity_INST1.list))));
 
@@ -799,7 +800,7 @@ class DslQueryBuilderITest extends AbstractIntegrationITest {
     void update_with_timestamp_in_micros() {
 
       // When
-      long micros = Instant.now().plus(1, ChronoUnit.DAYS).toEpochMilli() * 1000;
+      long micros = InstantUtils.now().plus(1, ChronoUnit.DAYS).toEpochMilli() * 1000;
       boolean applied = dsl.update(TestEntity_Table.test_entity)
                            .usingTimestamp(micros)
                            .set(TestEntity_Table.flag, true)
@@ -1087,7 +1088,7 @@ class DslQueryBuilderITest extends AbstractIntegrationITest {
     void delete_with_timestamp_should_delete_values_written_before_timestamp() {
 
       // When
-      long micros = Instant.now().plus(1, ChronoUnit.DAYS).toEpochMilli() * 1000;
+      long micros = InstantUtils.now().plus(1, ChronoUnit.DAYS).toEpochMilli() * 1000;
       boolean applied = dsl.delete(TestEntity_Table.flag)
                            .from(TestEntity_Table.test_entity)
                            .usingTimestamp(micros)

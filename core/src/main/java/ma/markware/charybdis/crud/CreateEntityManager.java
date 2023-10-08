@@ -28,6 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Instant;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Responsible of entity creation in DB <b>(Internal use only)</b>.
@@ -113,6 +114,22 @@ class CreateEntityManager<T> {
     }
     log.warn("Entity [{}] was not created. execution info: {}", entity, resultSet.getExecutionInfo());
     return null;
+  }
+
+  /**
+   * Execute insert query asynchronously.
+   *
+   * @return inserted entity.
+   */
+  CompletableFuture<T> saveAsync(CqlSession session) {
+    prepareQuery();
+    return insertQuery.executeAsync(session).thenApply(resultSet -> {
+      if (resultSet.wasApplied()) {
+        return entity;
+      }
+      log.warn("Entity [{}] was not created. execution info: {}", entity, resultSet.getExecutionInfo());
+      return null;
+    });
   }
 
   /**

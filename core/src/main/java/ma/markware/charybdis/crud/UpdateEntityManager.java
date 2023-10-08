@@ -33,6 +33,7 @@ import org.slf4j.LoggerFactory;
 import java.time.Instant;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.CompletableFuture;
 
 import static java.lang.String.format;
 
@@ -110,6 +111,22 @@ class UpdateEntityManager<T> {
     }
     log.warn(format("Entity [%s] was not updated", entity));
     return null;
+  }
+
+  /**
+   * Execute udpate query asynchronously.
+   *
+   * @return updated entity.
+   */
+  CompletableFuture<T> saveAsync(CqlSession session) {
+    prepareQuery();
+    return updateQuery.executeAsync(session).thenApply(resultSet -> {
+      if (resultSet.wasApplied()) {
+        return entity;
+      }
+      log.warn(format("Entity [%s] was not updated", entity));
+      return null;
+    });
   }
 
   /**

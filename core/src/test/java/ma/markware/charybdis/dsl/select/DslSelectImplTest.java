@@ -41,6 +41,7 @@ import ma.markware.charybdis.test.entities.TestEnum;
 import ma.markware.charybdis.test.entities.TestNestedUdt;
 import ma.markware.charybdis.test.entities.TestUdt;
 import ma.markware.charybdis.test.metadata.TestEntity_Table;
+import ma.markware.charybdis.test.utils.InstantUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -144,7 +145,7 @@ class DslSelectImplTest {
   @Test
   void and() {
     UUID uuid = UUID.randomUUID();
-    Instant now = Instant.now();
+    Instant now = InstantUtils.now();
     String mapKey = "key0";
     List<Integer> nestedSetValue = Collections.singletonList(10);
     dslSelectImpl.selectFrom(TestEntity_Table.test_entity)

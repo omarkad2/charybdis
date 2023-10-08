@@ -38,6 +38,7 @@ import ma.markware.charybdis.query.PageResult;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Implementation of {@link QueryBuilder}, handle cql entities using crud semantics.
@@ -127,6 +128,23 @@ public class CrudQueryBuilder implements QueryBuilder, ConsistencyTunable<CrudQu
   }
 
   /**
+   * Create entity in DB asynchronously.
+   *
+   * @param table  table in which we want to create the entity.
+   * @param entity entity to persist.
+   * @param <T>    type of entity.
+   * @return persisted entity.
+   */
+  public <T> CompletableFuture<T> createAsync(final TableMetadata<T> table, final T entity) {
+    CreateEntityManager<T> createEntityManager = new CreateEntityManager<T>(executionContext).withTableMetadata(table).withEntity(entity);
+    if (batch != null) {
+      createEntityManager.addToBatch(batch);
+      return new CompletableFuture<>();
+    }
+    return createEntityManager.saveAsync(session);
+  }
+
+  /**
    * Create entity in DB if it doesn't exist (no overwriting).
    * If another entity is already present in DB with a primary key PK, enabling 'ifNotExists'
    * will ensure that the creation of any entity with the same PK will be ignored.
@@ -148,6 +166,27 @@ public class CrudQueryBuilder implements QueryBuilder, ConsistencyTunable<CrudQu
   }
 
   /**
+   * Create entity in DB if it doesn't exist (no overwriting) asynchronously.
+   * If another entity is already present in DB with a primary key PK, enabling 'ifNotExists'
+   * will ensure that the creation of any entity with the same PK will be ignored.
+   *
+   * @param table       table in which we want to create the entity.
+   * @param entity      entity to persist.
+   * @param ifNotExists enable to avoid overwriting.
+   * @param <T>         type of entity.
+   * @return persisted entity.
+   */
+  public <T> CompletableFuture<T> createAsync(final TableMetadata<T> table, final T entity, final boolean ifNotExists) {
+    CreateEntityManager<T> createEntityManager = new CreateEntityManager<T>(executionContext).withTableMetadata(table)
+      .withEntity(entity).withIfNotExists(ifNotExists);
+    if  (batch != null) {
+      createEntityManager.addToBatch(batch);
+      return new CompletableFuture<>();
+    }
+    return createEntityManager.saveAsync(session);
+  }
+
+  /**
    * Create entity in DB with TTL in seconds.
    *
    * @param table table in which we want to create the entity.
@@ -164,6 +203,25 @@ public class CrudQueryBuilder implements QueryBuilder, ConsistencyTunable<CrudQu
       return null;
     }
     return createEntityManager.save(session);
+  }
+
+  /**
+   * Create entity in DB with TTL in seconds asynchronously.
+   *
+   * @param table   table in which we want to create the entity.
+   * @param entity  entity to persist.
+   * @param seconds ttl in seconds.
+   * @param <T>     type of entity.
+   * @return persisted entity.
+   */
+  public <T> CompletableFuture<T> createAsync(final TableMetadata<T> table, final T entity, final int seconds) {
+    CreateEntityManager<T> createEntityManager = new CreateEntityManager<T>(executionContext).withTableMetadata(table)
+      .withEntity(entity).withTtl(seconds);
+    if  (batch != null) {
+      createEntityManager.addToBatch(batch);
+      return new CompletableFuture<>();
+    }
+    return createEntityManager.saveAsync(session);
   }
 
   /**
@@ -189,6 +247,28 @@ public class CrudQueryBuilder implements QueryBuilder, ConsistencyTunable<CrudQu
   }
 
   /**
+   * Create entity in DB if it doesn't exist (no overwriting) with TTL in seconds asynchronously.
+   * If another entity is already present in DB with a primary key PK, enabling 'ifNotExists'
+   * will ensure that the creation of any entity with the same PK will be ignored.
+   *
+   * @param table       table in which we want to create the entity.
+   * @param entity      entity to persist.
+   * @param ifNotExists enable to avoid overwriting.
+   * @param seconds     ttl in seconds.
+   * @param <T>         type of entity.
+   * @return persisted entity.
+   */
+  public <T> CompletableFuture<T> createAsync(final TableMetadata<T> table, final T entity, final boolean ifNotExists, final int seconds) {
+    CreateEntityManager<T> createEntityManager = new CreateEntityManager<T>(executionContext).withTableMetadata(table)
+      .withEntity(entity).withIfNotExists(ifNotExists).withTtl(seconds);
+    if  (batch != null) {
+      createEntityManager.addToBatch(batch);
+      return new CompletableFuture<>();
+    }
+    return createEntityManager.saveAsync(session);
+  }
+
+  /**
    * Create entity in DB with custom write time.
    *
    * @param table table in which we want to create the entity.
@@ -205,6 +285,25 @@ public class CrudQueryBuilder implements QueryBuilder, ConsistencyTunable<CrudQu
       return null;
     }
     return createEntityManager.save(session);
+  }
+
+  /**
+   * Create entity in DB with custom write time asynchronously.
+   *
+   * @param table     table in which we want to create the entity.
+   * @param entity    entity to persist.
+   * @param timestamp custom write time.
+   * @param <T>       type of entity.
+   * @return persisted entity.
+   */
+  public <T> CompletableFuture<T> createAsync(final TableMetadata<T> table, final T entity, final Instant timestamp) {
+    CreateEntityManager<T> createEntityManager = new CreateEntityManager<T>(executionContext).withTableMetadata(table)
+      .withEntity(entity).withTimestamp(timestamp);
+    if  (batch != null) {
+      createEntityManager.addToBatch(batch);
+      return new CompletableFuture<>();
+    }
+    return createEntityManager.saveAsync(session);
   }
 
   /**
@@ -227,6 +326,25 @@ public class CrudQueryBuilder implements QueryBuilder, ConsistencyTunable<CrudQu
   }
 
   /**
+   * Create entity in DB with custom write time in millis asynchronously.
+   *
+   * @param table     table in which we want to create the entity.
+   * @param entity    entity to persist.
+   * @param timestamp custom write time in millis.
+   * @param <T>       type of entity.
+   * @return persisted entity.
+   */
+  public <T> CompletableFuture<T> createAsync(final TableMetadata<T> table, final T entity, final long timestamp) {
+    CreateEntityManager<T> createEntityManager = new CreateEntityManager<T>(executionContext).withTableMetadata(table)
+      .withEntity(entity).withTimestamp(timestamp);
+    if  (batch != null) {
+      createEntityManager.addToBatch(batch);
+      return new CompletableFuture<>();
+    }
+    return createEntityManager.saveAsync(session);
+  }
+
+  /**
    * Update entity in DB.
    * returns null if entity not found in DB.
    *
@@ -242,6 +360,24 @@ public class CrudQueryBuilder implements QueryBuilder, ConsistencyTunable<CrudQu
       return null;
     }
     return updateEntityManager.save(session);
+  }
+
+  /**
+   * Update entity in DB asynchronously.
+   * returns null if entity not found in DB.
+   *
+   * @param table  table in which we want to update the entity.
+   * @param entity entity to update.
+   * @param <T>    type of entity.
+   * @return updated entity.
+   */
+  public <T> CompletableFuture<T> updateAsync(final TableMetadata<T> table, final T entity) {
+    UpdateEntityManager<T> updateEntityManager = new UpdateEntityManager<T>(executionContext).withTableMetadata(table).withEntity(entity);
+    if  (batch != null) {
+      updateEntityManager.addToBatch(batch);
+      return new CompletableFuture<>();
+    }
+    return updateEntityManager.saveAsync(session);
   }
 
   /**
@@ -262,6 +398,23 @@ public class CrudQueryBuilder implements QueryBuilder, ConsistencyTunable<CrudQu
   }
 
   /**
+   * Delete entity in DB.
+   *
+   * @param table  table in which we want to delete the entity asynchronously.
+   * @param entity entity to delete.
+   * @param <T>    type of entity.
+   * @return true if entity deleted.
+   */
+  public <T> CompletableFuture<Boolean> deleteAsync(final TableMetadata<T> table, final T entity) {
+    DeleteEntityManager<T> deleteEntityManager = new DeleteEntityManager<T>(executionContext).withTableMetadata(table).withEntity(entity);
+    if  (batch != null) {
+      deleteEntityManager.addToBatch(batch);
+      return new CompletableFuture<>();
+    }
+    return deleteEntityManager.saveAsync(session);
+  }
+
+  /**
    * Fetch one entity from DB fulfilling given conditions.
    *
    * @param table table in which we want to fetch the entity.
@@ -272,6 +425,19 @@ public class CrudQueryBuilder implements QueryBuilder, ConsistencyTunable<CrudQu
   public <T> T findOne(final ReadableTableMetadata<T> table, final ExtendedCriteriaExpression conditions) {
     return new ReadEntityManager<T>(executionContext).withTableMetadata(table).withConditions(conditions)
                                      .fetchOne(session);
+  }
+
+  /**
+   * Fetch one entity from DB fulfilling given conditions asynchronously.
+   *
+   * @param table      table in which we want to fetch the entity.
+   * @param conditions conditions to be fulfilled by entity.
+   * @param <T>        type of entity.
+   * @return the entity if found otherwise {@code null}.
+   */
+  public <T> CompletableFuture<T> findOneAsync(final ReadableTableMetadata<T> table, final ExtendedCriteriaExpression conditions) {
+    return new ReadEntityManager<T>(executionContext).withTableMetadata(table).withConditions(conditions)
+      .fetchOneAsync(session);
   }
 
   /**
@@ -288,6 +454,19 @@ public class CrudQueryBuilder implements QueryBuilder, ConsistencyTunable<CrudQu
   }
 
   /**
+   * Fetch one entity from DB fulfilling a given condition asynchronously.
+   *
+   * @param table     table in which we want to fetch the entity.
+   * @param condition condition to be fulfilled by entity.
+   * @param <T>       type of entity.
+   * @return the entity if found otherwise {@code null}.
+   */
+  public <T> CompletableFuture<T> findOneAsync(final ReadableTableMetadata<T> table, final CriteriaExpression condition) {
+    return new ReadEntityManager<T>(executionContext).withTableMetadata(table).withCondition(condition)
+      .fetchOneAsync(session);
+  }
+
+  /**
    * Fetch one entity wrapped in {@code Optional} from DB fulfilling given conditions.
    *
    * @param table table in which we want to fetch the entity.
@@ -297,6 +476,18 @@ public class CrudQueryBuilder implements QueryBuilder, ConsistencyTunable<CrudQu
    */
   public <T> Optional<T> findOptional(final ReadableTableMetadata<T> table, final ExtendedCriteriaExpression conditions) {
     return Optional.ofNullable(findOne(table, conditions));
+  }
+
+  /**
+   * Fetch one entity wrapped in {@code Optional} from DB fulfilling given conditions asynchronously.
+   *
+   * @param table      table in which we want to fetch the entity.
+   * @param conditions conditions to be fulfilled by entity.
+   * @param <T>        type of entity.
+   * @return the entity wrapped in {@code Optional} if found otherwise {@code Optional.empty()}.
+   */
+  public <T> CompletableFuture<Optional<T>> findOptionalAsync(final ReadableTableMetadata<T> table, final ExtendedCriteriaExpression conditions) {
+    return findOneAsync(table, conditions).thenApply(Optional::ofNullable);
   }
 
   /**
@@ -312,6 +503,18 @@ public class CrudQueryBuilder implements QueryBuilder, ConsistencyTunable<CrudQu
   }
 
   /**
+   * Fetch one entity wrapped in {@code Optional} from DB fulfilling a given condition asynchronously.
+   *
+   * @param table     table in which we want to fetch the entity.
+   * @param condition condition to be fulfilled by entity.
+   * @param <T>       type of entity.
+   * @return the entity wrapped in {@code Optional} if found otherwise {@code Optional.empty()}.
+   */
+  public <T> CompletableFuture<Optional<T>> findOptionalAsync(final ReadableTableMetadata<T> table, final CriteriaExpression condition) {
+    return findOneAsync(table, condition).thenApply(Optional::ofNullable);
+  }
+
+  /**
    * Fetch entities from DB.
    *
    * @param table table in which we want to fetch the entities.
@@ -321,6 +524,18 @@ public class CrudQueryBuilder implements QueryBuilder, ConsistencyTunable<CrudQu
   public <T> List<T> find(final ReadableTableMetadata<T> table) {
     return new ReadEntityManager<T>(executionContext).withTableMetadata(table)
                                      .fetch(session);
+  }
+
+  /**
+   * Fetch entities from DB asynchronously.
+   *
+   * @param table table in which we want to fetch the entities.
+   * @param <T>   type of entities.
+   * @return entities from DB.
+   */
+  public <T> CompletableFuture<List<T>> findAsync(final ReadableTableMetadata<T> table) {
+    return new ReadEntityManager<T>(executionContext).withTableMetadata(table)
+      .fetchAsync(session);
   }
 
   /**
@@ -337,6 +552,19 @@ public class CrudQueryBuilder implements QueryBuilder, ConsistencyTunable<CrudQu
   }
 
   /**
+   * Fetch entities from DB fulfilling given conditions asynchronously.
+   *
+   * @param table      table in which we want to fetch the entities.
+   * @param conditions conditions to be fulfilled by entities.
+   * @param <T>        type of entities.
+   * @return entities from DB.
+   */
+  public <T> CompletableFuture<List<T>> findAsync(final ReadableTableMetadata<T> table, final ExtendedCriteriaExpression conditions) {
+    return new ReadEntityManager<T>(executionContext).withTableMetadata(table).withConditions(conditions)
+      .fetchAsync(session);
+  }
+
+  /**
    * Fetch entities from DB fulfilling given conditions while specifying if filtering is enabled or not.
    *
    * @param table table in which we want to fetch the entities.
@@ -347,6 +575,19 @@ public class CrudQueryBuilder implements QueryBuilder, ConsistencyTunable<CrudQu
   public <T> List<T> find(final ReadableTableMetadata<T> table, final ExtendedCriteriaExpression conditions, final boolean allowFiltering) {
     return new ReadEntityManager<T>(executionContext).withTableMetadata(table).withConditions(conditions).withFiltering(allowFiltering)
                                                      .fetch(session);
+  }
+
+  /**
+   * Fetch entities from DB fulfilling given conditions while specifying if filtering is enabled or not asynchronously.
+   *
+   * @param table      table in which we want to fetch the entities.
+   * @param conditions conditions to be fulfilled by entities.
+   * @param <T>        type of entities.
+   * @return entities from DB.
+   */
+  public <T> CompletableFuture<List<T>> findAsync(final ReadableTableMetadata<T> table, final ExtendedCriteriaExpression conditions, final boolean allowFiltering) {
+    return new ReadEntityManager<T>(executionContext).withTableMetadata(table).withConditions(conditions).withFiltering(allowFiltering)
+      .fetchAsync(session);
   }
 
   /**
@@ -363,6 +604,19 @@ public class CrudQueryBuilder implements QueryBuilder, ConsistencyTunable<CrudQu
   }
 
   /**
+   * Fetch entities from DB fulfilling a given condition asynchronously.
+   *
+   * @param table     table in which we want to fetch the entities.
+   * @param condition condition to be fulfilled by entities.
+   * @param <T>       type of entities.
+   * @return entities from DB.
+   */
+  public <T> CompletableFuture<List<T>> findAsync(final ReadableTableMetadata<T> table, final CriteriaExpression condition) {
+    return new ReadEntityManager<T>(executionContext).withTableMetadata(table).withCondition(condition)
+      .fetchAsync(session);
+  }
+
+  /**
    * Fetch entities from DB fulfilling a given condition while specifying if filtering is enabled or not.
    *
    * @param table table in which we want to fetch the entities.
@@ -373,6 +627,19 @@ public class CrudQueryBuilder implements QueryBuilder, ConsistencyTunable<CrudQu
   public <T> List<T> find(final ReadableTableMetadata<T> table, final CriteriaExpression condition, final boolean allowFiltering) {
     return new ReadEntityManager<T>(executionContext).withTableMetadata(table).withCondition(condition).withFiltering(allowFiltering)
                                                      .fetch(session);
+  }
+
+  /**
+   * Fetch entities from DB fulfilling a given condition while specifying if filtering is enabled or not asynchronously.
+   *
+   * @param table     table in which we want to fetch the entities.
+   * @param condition condition to be fulfilled by entities.
+   * @param <T>       type of entities.
+   * @return entities from DB.
+   */
+  public <T> CompletableFuture<List<T>> findAsync(final ReadableTableMetadata<T> table, final CriteriaExpression condition, final boolean allowFiltering) {
+    return new ReadEntityManager<T>(executionContext).withTableMetadata(table).withCondition(condition).withFiltering(allowFiltering)
+      .fetchAsync(session);
   }
 
   /**
@@ -388,6 +655,21 @@ public class CrudQueryBuilder implements QueryBuilder, ConsistencyTunable<CrudQu
     return new ReadEntityManager<T>(executionContext).withTableMetadata(table)
                                      .withPaging(pageRequest)
                                      .fetchPage(session);
+  }
+
+  /**
+   * Fetch a page of entities from DB asynchronously.
+   * When fetching the last page, {@link PageResult#getPagingState()} will be {@code null}.
+   *
+   * @param table       table in which we want to fetch the entities.
+   * @param pageRequest requested page see {@link PageRequest}.
+   * @param <T>         type of entities.
+   * @return page result of entities from DB and updated paging state {@link PageResult}.
+   */
+  public <T> CompletableFuture<PageResult<T>> findAsync(final ReadableTableMetadata<T> table, final PageRequest pageRequest) {
+    return new ReadEntityManager<T>(executionContext).withTableMetadata(table)
+      .withPaging(pageRequest)
+      .fetchPageAsync(session);
   }
 
   /**
@@ -407,6 +689,22 @@ public class CrudQueryBuilder implements QueryBuilder, ConsistencyTunable<CrudQu
   }
 
   /**
+   * Fetch a page of entities from DB fulfilling given conditions asynchronously.
+   * When fetching the last page, {@link PageResult#getPagingState()} will be {@code null}.
+   *
+   * @param table       table in which we want to fetch the entities.
+   * @param conditions  conditions to be fulfilled by entities.
+   * @param pageRequest requested page see {@link PageRequest}.
+   * @param <T>         type of entities.
+   * @return page result of entities from DB and updated paging state {@link PageResult}.
+   */
+  public <T> CompletableFuture<PageResult<T>> findAsync(final ReadableTableMetadata<T> table, final ExtendedCriteriaExpression conditions, final PageRequest pageRequest) {
+    return new ReadEntityManager<T>(executionContext).withTableMetadata(table).withConditions(conditions)
+      .withPaging(pageRequest)
+      .fetchPageAsync(session);
+  }
+
+  /**
    * Fetch a page of entities from DB fulfilling a given condition.
    * When fetching the last page, {@link PageResult#getPagingState()} will be {@code null}.
    *
@@ -420,5 +718,21 @@ public class CrudQueryBuilder implements QueryBuilder, ConsistencyTunable<CrudQu
     return new ReadEntityManager<T>(executionContext).withTableMetadata(table).withCondition(condition)
                                      .withPaging(pageRequest)
                                      .fetchPage(session);
+  }
+
+  /**
+   * Fetch a page of entities from DB fulfilling a given condition asynchronously.
+   * When fetching the last page, {@link PageResult#getPagingState()} will be {@code null}.
+   *
+   * @param table       table in which we want to fetch the entities.
+   * @param condition   condition to be fulfilled by entities.
+   * @param pageRequest requested page see {@link PageRequest}.
+   * @param <T>         type of entities.
+   * @return page result of entities from DB and updated paging state {@link PageResult}.
+   */
+  public <T> CompletableFuture<PageResult<T>> findAsync(final ReadableTableMetadata<T> table, final CriteriaExpression condition, final PageRequest pageRequest) {
+    return new ReadEntityManager<T>(executionContext).withTableMetadata(table).withCondition(condition)
+      .withPaging(pageRequest)
+      .fetchPageAsync(session);
   }
 }

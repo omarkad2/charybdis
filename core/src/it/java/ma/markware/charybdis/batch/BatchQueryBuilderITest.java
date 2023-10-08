@@ -29,6 +29,7 @@ import ma.markware.charybdis.test.entities.TestEntityByDate;
 import ma.markware.charybdis.test.instances.TestEntity_INST1;
 import ma.markware.charybdis.test.metadata.TestEntityByDate_Table;
 import ma.markware.charybdis.test.metadata.TestEntity_Table;
+import ma.markware.charybdis.test.utils.InstantUtils;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
 
@@ -71,7 +72,7 @@ class BatchQueryBuilderITest extends AbstractIntegrationITest {
       entity1 = new TestEntity(TestEntity_INST1.entity1);
       // Create instance with same partition key & different clustering key
       entity2 = new TestEntity(TestEntity_INST1.entity1);
-      entity2.setDate(Instant.now().plus(10, ChronoUnit.DAYS));
+      entity2.setDate(InstantUtils.now().plus(10, ChronoUnit.DAYS));
     }
 
     @Test
@@ -212,7 +213,7 @@ class BatchQueryBuilderITest extends AbstractIntegrationITest {
     @BeforeEach
     void setup() {
       entity = new TestEntity(TestEntity_INST1.entity1);
-      entityByDate = new TestEntityByDate(Instant.now(), TestEntity_INST1.udt1, Arrays.asList("test1", "test2"), true);
+      entityByDate = new TestEntityByDate(InstantUtils.now(), TestEntity_INST1.udt1, Arrays.asList("test1", "test2"), true);
 
       dsl.insertInto(TestEntity_Table.test_entity, TestEntity_Table.id, TestEntity_Table.date, TestEntity_Table.udt, TestEntity_Table.list,
                      TestEntity_Table.se, TestEntity_Table.map, TestEntity_Table.nestedList, TestEntity_Table.nestedSet, TestEntity_Table.nestedMap,
@@ -324,7 +325,7 @@ class BatchQueryBuilderITest extends AbstractIntegrationITest {
     @BeforeEach
     void setup() {
       entity = new TestEntity(TestEntity_INST1.entity1);
-      entityByDate = new TestEntityByDate(Instant.now(), TestEntity_INST1.udt1, Arrays.asList("test1", "test2"), true);
+      entityByDate = new TestEntityByDate(InstantUtils.now(), TestEntity_INST1.udt1, Arrays.asList("test1", "test2"), true);
 
       dsl.insertInto(TestEntity_Table.test_entity, TestEntity_Table.id, TestEntity_Table.date, TestEntity_Table.udt, TestEntity_Table.list,
                      TestEntity_Table.se, TestEntity_Table.map, TestEntity_Table.nestedList, TestEntity_Table.nestedSet, TestEntity_Table.nestedMap,
